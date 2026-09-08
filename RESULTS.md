@@ -205,7 +205,9 @@ missed detections.
 ## 10. Coordinate-only baseline - DENTEX replication + stratified analysis
 
 **Scripts:** `cpu_repro/coord_baseline/dentex/build_coord_baseline_dentex.py`,
-`controls/run_controls_dentex.py`, `stratified_analysis.py` · **Split:**
+`controls/run_controls_dentex.py`, `stratified_analysis.py`,
+`composition_check.py`, `dissociation_mixed_effects.py`,
+`dissociation_loio.py` · **Split:**
 own image-level grouped 80/20 split over DENTEX's 1358 FDI-coded images
 (seed 0: 1087 train / 271 test images), same method/functions as Section 2
 but a separate split object (DENTEX has no augmentation-crop duplication,
@@ -246,10 +248,11 @@ with the composition fact that determines how to read it. Corrected below;
 see `cpu_repro/coord_baseline/dentex/composition_check.py` and the
 "Composition check" section of `cpu_repro/coord_baseline/dentex/README.md`
 for the full analysis. The dissociation row above is addressed separately:
-composition does not explain its drop away, but the drop itself is
-directionally consistent, not statistically significant at conventional
-thresholds given only 5 independent seed splits - see the paired-seed
-statistics in "Corrected reading" below.
+composition does not explain its drop away, but the size of the effect is
+sensitive to estimation method and the raw **-6.3 points** figure in the
+row above overstates it - see the full sensitivity analysis in "Corrected
+reading" below. The best-supported estimate is roughly **-3.6 to -3.9
+points**, not significant at conventional thresholds.
 
 **Composition fact, stated first because it determines how every
 impacted-stratum number should be read:** DENTEX's "Impacted" diagnosis
@@ -277,26 +280,63 @@ mix - the part of the gap tooth-type mix does not explain.)
 
 **Corrected reading:**
 
-- **Dissociation drop is not a composition artifact, but it is not
-  established as significant either.** Controlling for tooth-type mix does
-  not shrink it (-6.1pp raw vs. -6.4pp controlled); excluding third molars
-  entirely widens it further to -8.5pp - composition is not the
-  explanation. But those composition-controlled numbers are pooled point
-  estimates, not a per-seed significance test. Computed directly as a
-  paired comparison across the same 5 seeds (dissociation vs. canonical,
-  GBT): mean paired diff **-6.32pp**, 95% CI **[-12.67pp, +0.03pp]**,
-  paired t(4) = -2.76, **p = 0.0506**, direction consistent in all 5/5
-  seeds. That is **directionally consistent but not significant at
-  conventional thresholds given n=5 independent splits** - do not describe
-  this as "surviving" or "holding up"; it is an unresolved, marginal
-  result, not an established finding.
-  **Untested hypothesis, not a fact:** the true per-tooth effect on
-  genuinely anomalous instances is likely larger than -6.3pp, because the
-  dissociation flag is image-level, not tooth-level - a flagged image
-  still contains mostly well-behaved teeth, which dilutes the
-  stratum-average estimate toward zero. This dilution has not been
-  quantified and is not evidence the effect is actually stronger; it is a
-  caveat about interpretation, not a result.
+- **Dissociation drop is not a composition artifact, but its size is
+  estimation-method-sensitive, and the more careful estimate is well under
+  half of what was first reported.** Composition does not explain it away
+  (composition-controlled table above), but that comparison, the naive
+  instance-pooled comparison, and the 5-seed paired mean are all simpler
+  estimators that do not account for image-level clustering - and
+  accounting for it changes the number substantially.
+
+  **Primary estimate (image + seed crossed random-effects model, full
+  1,291 dissociation + 20,229 canonical instances, GBT, `correct ~
+  is_dissociation + (1 | image_id) + (1 | seed)`):** stratum coefficient
+  **-3.58pp**, 95% CI **[-7.87pp, +0.71pp]**, p = 0.102. Adding
+  log(teeth-in-image) as a covariate barely moves this - **-3.91pp**, 95%
+  CI [-8.22pp, +0.40pp], p = 0.076 - and teeth-count itself is not a
+  significant predictor (coefficient -0.96pp per unit log-teeth, p =
+  0.164, wrong direction to explain the gap, closes only ~12% of it), so
+  teeth-count/crowding is ruled out as the explanation. **Neither version
+  reaches significance at conventional thresholds.**
+
+  **Why this differs from the previously reported -6.32pp:** that number
+  came from the paired 5-seed mean (mean diff -6.32pp, 95% CI [-12.67pp,
+  +0.03pp], p = 0.0506) and closely matches the naive instance-pooled
+  comparison (-6.07pp) - neither accounts for image-level clustering. A
+  leave-one-image-out check across all 70 dissociation images shows the
+  naive estimate is **not driven by any single image** (excluding any one
+  image individually shifts it by at most 1.2pp; 0/70 images shift it by
+  more than 2pp). But it **is concentrated in a small cluster of large,
+  low-accuracy images**: the 5 lowest-per-image-accuracy dissociation
+  images - `validation_triple_36` (2 instances, 0% acc, 2 teeth in the
+  whole image), `train_quadrant_enumeration_disease_512` (2 instances, 0%
+  acc, only **1** tooth in the whole image), `train_quadrant_enumeration_
+  disease_182` (8 instances, 12.5% acc), `train_quadrant_enumeration_
+  disease_63` (12 instances, 25% acc), `train_quadrant_enumeration_279`
+  (31 instances, 25.8% acc) - just 7% of the 70 images (4.3% of
+  instances) - account for about **78% of the gap** between the naive
+  pooled estimate and the crossed-model estimate: removing just those 5
+  moves the naive number from -6.07pp to -4.27pp. Removing the worst 10
+  images (14% of images, 22% of instances, since several are large crops)
+  overshoots past zero to +1.39pp. **This is the identified mechanism**:
+  instance-pooling implicitly gives images with more annotated teeth
+  proportionally more influence than image-level weighting does, and a
+  handful of large dissociation images happen to be both low-accuracy and
+  instance-heavy; two of the five worst images have only 1-2 teeth in the
+  entire image, too little to trust as an individual accuracy point at
+  all.
+
+  **Treat the crossed-model estimate (roughly -3.6pp to -3.9pp, not
+  significant) as the number to cite, not -6.32pp/-6.07pp.** If this
+  result is referenced anywhere, report it with this full chain - a
+  single point estimate without this context is not an accurate summary
+  of what was measured.
+  **Still-untested hypothesis, not a fact:** the dissociation flag is
+  image-level, not tooth-level, so even a well-estimated stratum-average
+  understates the effect on the specific anomalous teeth within a flagged
+  image, diluted by the mostly well-behaved teeth in the same image. This
+  dilution direction is plausible but unquantified and does not offset the
+  estimation-sensitivity finding above.
 - **Impacted "23pp easier" claim is corrected.** Restricting to a matched
   third-molars-only subset (the cleanest apples-to-apples control):
   impacted third molars score 0.9121 vs. canonical third molars at 0.7354
@@ -399,11 +439,48 @@ hold, and should vanish where either breaks -
    rotation/zoom variation).
 
 **Tested so far: FDI numbering, panoramic radiographs only** (UFBA-425,
-DENTEX). No claim is made here about Universal or Palmer numbering, about
-non-panoramic imaging (bitewing, periapical, CBCT), or about landmark
-detection tasks outside dentistry - those are the natural next tests of
-the hypothesis (see Section 11.5, item 2, for the cheapest of these), not
-yet-covered special cases of an established general result.
+DENTEX). No claim is made here about non-panoramic imaging (bitewing,
+periapical, CBCT), or about landmark detection tasks outside dentistry -
+those remain untested next steps for the hypothesis, not yet-covered
+special cases of an established general result.
+
+**Universal/Palmer relabeling check (2026-09-08):** run and resolved - see
+below. It does **not** test either precondition above, and should not be
+read as generalization evidence; it confirms an expected invariance, not a
+new data point on the hypothesis.
+
+FDI, Universal, and Palmer numbering are three notations for the
+**identical** 32-way partition of physical tooth positions - not three
+different label spaces. Universal and Palmer were built as relabelings of
+`FDI_CODES` and verified as clean bijections before use (32 unique targets
+each, no merged or split classes; e.g. FDI 11 -> Universal 8 -> Palmer
+UR1, FDI 48 -> Universal 32 -> Palmer LR8). Because the relabeling changes
+neither the acquisition protocol (precondition 2) nor which physical
+positions get grouped into which class (precondition 1 is about the label
+space's structure, unchanged by renaming it), this check could only ever
+demonstrate label-invariance, not test the hypothesis's boundary.
+
+5-seed mean +/- 95% CI, same splits/seeds as the existing FDI results:
+
+| dataset | convention | GBT top-1 | LogReg top-1 |
+|---|---|---|---|
+| UFBA-425 | FDI (existing, Section 2) | 0.6949 +/- 0.0077 | 0.6706 +/- 0.0095 |
+| UFBA-425 | Universal | 0.6954 +/- 0.0139 | 0.6707 +/- 0.0097 |
+| UFBA-425 | Palmer | 0.6954 +/- 0.0140 | 0.6707 +/- 0.0097 |
+| DENTEX | FDI (existing, Section 10) | 0.6847 +/- 0.0124 | 0.6129 +/- 0.0180 |
+| DENTEX | Universal | 0.6818 +/- 0.0131 | 0.6130 +/- 0.0180 |
+| DENTEX | Palmer | 0.6811 +/- 0.0123 | 0.6130 +/- 0.0180 |
+
+**LogReg is exactly label-invariant** (as expected for a linear
+multinomial classifier that treats class labels as nominal): means agree
+to within 0.01pp across all three conventions on both datasets. **GBT
+shows small differences (0.05-0.36pp)** that are not exactly invariant -
+traced to `HistGradientBoostingClassifier`'s internal implementation
+(per-class boosting order, early-stopping validation split) being
+sensitive to label identity, not to the tooth-numbering problem itself -
+but these differences are 3-20x smaller than the seed-to-seed noise (CI
+half-widths of 0.77-1.8pp) and are not distinguishable from it.
+Verification script: `cpu_repro/coord_baseline/numbering_convention_check.py`.
 
 ### 11.5 Open items
 
@@ -415,22 +492,16 @@ yet-covered special cases of an established general result.
   needed - run existing trained-detector predictions through the existing
   error-taxonomy code. This is the cheapest available step toward
   evidence on claim B (Section 11.2).
-- **Universal/Palmer relabeling check.** Remap the existing FDI labels
-  (UFBA-425 and/or DENTEX) to Universal and Palmer numbering conventions,
-  and rerun the identical coordinate-only classifier on the same box
-  coordinates. A free additional data point on the generalization boundary
-  (Section 11.4) - no new data collection needed, only a relabeling of
-  data already on disk.
-- **Dissociation-stratum precision.** Per the go/no-go-style decision in
-  Section 10's paired-seed statistics (mean -6.32pp, 95% CI
-  [-12.67pp, +0.03pp], p = 0.0506): run a **mixed-effects model** treating
-  image as a random effect over the full 1,291 dissociation-stratum
-  instances, rather than collecting more seeds. Chosen over more seeds
-  because the dissociation number is now **illustrative** - supporting the
-  diagnostic-tool framing in Section 11.1 - rather than **load-bearing**
-  for a specific point estimate; a model that uses the full instance-level
-  data (not a 5-point seed mean) is the more informative use of further
-  effort than shrinking the same 5-seed CI with additional seeds.
+- ~~**Universal/Palmer relabeling check.**~~ **Resolved 2026-09-08** - see
+  Section 11.4. Confirmed label-invariant (not a generalization data
+  point; see that section for why).
+- ~~**Dissociation-stratum precision.**~~ **Resolved 2026-09-08** - see
+  Section 10's "Corrected reading." Image + seed crossed random-effects
+  model is now the reported estimate (-3.6pp to -3.9pp, not significant),
+  replacing the paired-seed -6.32pp figure. A follow-on leave-one-image-out
+  check explained why the simpler estimators overstated the effect (a
+  small cluster of large, low-accuracy images, not a single outlier and
+  not teeth-count/crowding).
 
 ## Adding a new entry
 
