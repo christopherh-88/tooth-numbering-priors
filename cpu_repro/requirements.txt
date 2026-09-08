@@ -1,0 +1,28 @@
+# Pinned, CPU-only, verified working set for macOS arm64 + Python 3.12
+# (also expected to work on Linux x86_64 CPU-only; not tested there).
+#
+# Install order matters a little because of a 3-way numpy pin conflict
+# between tensorflow / scipy / ultralytics on Darwin (see README.md).
+# Installing this file top-to-bottom in one `pip install -r` call resolves
+# fine because pip processes constraints together, but if you ever hit
+# dependency-resolver errors, install numpy first, then tensorflow, then
+# the rest.
+
+numpy==1.26.4
+scipy==1.13.1
+tensorflow==2.16.2          # last TF release that cleanly wants numpy<2.0
+torch==2.14.0                # CPU wheel: pip install --index-url https://download.pytorch.org/whl/cpu torch
+torchvision==0.29.0
+ultralytics==8.4.143          # repo was pinned to 8.0.28 (2024) - see README for API drift notes
+opencv-python-headless==4.10.0.84   # ultralytics' pip metadata asks for "opencv-python"; the headless
+                                     # build provides the same cv2 module and avoids a Qt/GUI dependency
+                                     # that isn't needed here. `pip check` will warn about this; harmless.
+scikit-image==0.26.0
+tifffile==2024.2.12
+imagecodecs==2024.6.1        # tifffile needs this to decode the dataset's LZW-compressed .ome.tiff labels
+pillow==12.3.0
+matplotlib==3.11.1
+psutil==7.2.2
+scikit-learn==1.9.0
+imageio==2.37.4
+pandas==3.0.5                # used by cpu_repro/coord_baseline/ only

@@ -1,0 +1,3 @@
+classifier,pearson_r_teeth_count_vs_correct
+logistic_regression,0.12545102645356115
+gradient_boosted_tree,0.12113448527811106

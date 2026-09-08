@@ -122,11 +122,22 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv*/
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# CPU repro outputs (model checkpoints, generated locally)
+cpu_repro/outputs/
+
+# YOLO training prep/run artifacts (regenerated each run; absolute paths
+# inside are machine-specific, e.g. different on Kaggle vs local)
+cpu_repro/yolo_training/prepared/
+cpu_repro/yolo_training/runs/
+cpu_repro/yolo_training/eval_results/
+*.pt
 
 # Spyder project settings
 .spyderproject

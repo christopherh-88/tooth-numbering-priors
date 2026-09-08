@@ -1,0 +1,1022 @@
+rank,label_file,image_id,total_tooth_count,n_duplicate_codes,duplicate_codes,n_missing_codes,missing_codes,n_position_violations,n_wrong_quadrant_both_axes,likely_global_framing,position_violation_detail,anomaly_score,primary_reason,reason_breakdown
+1,cate6-00093_jpg.rf.68d52c5cd54709b32b5ab687a1cca161.txt,cate6-00093,29,1,23x2,4,"33, 34, 43, 44",5,0,True,"21: expected image-upper (y<=0.55), got y=0.558; 22: expected image-upper (y<=0.55), got y=0.565; 23: expected image-upper (y<=0.55), got y=0.582; 16: expected image-upper (y<=0.55), got y=0.569; 26: expected image-upper (y<=0.55), got y=0.566",13.2,single_axis_position,"duplicate_codes(+3.0), single_axis_position(+10.0), missing_codes(+0.20)"
+2,cate2-00109_jpg.rf.3cc8a4bba16578df3bd2ae4ef124414a.txt,cate2-00109,34,1,32x3,0,-,1,0,False,"32: expected image-lower (y>=0.45), got y=0.388",12.0,duplicate_codes,"duplicate_codes(+6.0), single_axis_position(+2.0), overcount(+4.0)"
+3,cate2-00109_jpg.rf.4f7ba9a179030058bf19f2f8cb3958b1.txt,cate2-00109,34,1,32x3,0,-,1,0,False,"32: expected image-lower (y>=0.45), got y=0.387",12.0,duplicate_codes,"duplicate_codes(+6.0), single_axis_position(+2.0), overcount(+4.0)"
+4,cate2-00109_jpg.rf.988fa1e71c8624e141f4633c1fc7dacd.txt,cate2-00109,34,1,32x3,0,-,1,0,False,"32: expected image-lower (y>=0.45), got y=0.428",12.0,duplicate_codes,"duplicate_codes(+6.0), single_axis_position(+2.0), overcount(+4.0)"
+5,cate6-00087_jpg.rf.0b8f6ac1157c7f4a78fe351de087c3a1.txt,cate6-00087,32,0,-,0,-,6,0,True,"17: expected image-upper (y<=0.55), got y=0.566; 16: expected image-upper (y<=0.55), got y=0.592; 11: expected image-upper (y<=0.55), got y=0.577; 21: expected image-upper (y<=0.55), got y=0.569; 26: expected image-upper (y<=0.55), got y=0.617; 27: expected image-upper (y<=0.55), got y=0.553",12.0,single_axis_position,single_axis_position(+12.0)
+6,cate2-00035_jpg.rf.05a008269ed935a5c2d110783387856a.txt,cate2-00035,32,0,-,0,-,5,0,True,"12: expected image-upper (y<=0.55), got y=0.555; 11: expected image-upper (y<=0.55), got y=0.558; 21: expected image-upper (y<=0.55), got y=0.552; 22: expected image-upper (y<=0.55), got y=0.555; 23: expected image-upper (y<=0.55), got y=0.552",10.0,single_axis_position,single_axis_position(+10.0)
+7,cate2-00107_jpg.rf.38bbe97f6ee9a126926b3e50cfeff7f7.txt,cate2-00107,33,1,23x2,0,-,1,1,False,"23: WRONG QUADRANT (both axes) - expected image-right (x>=0.45), got x=0.127; expected image-upper (y<=0.55), got y=0.776",10.0,wrong_quadrant,"duplicate_codes(+3.0), wrong_quadrant(+5.0), overcount(+2.0)"
+8,cate8-00263_jpg.rf.5c4cd36de33dadb5bf7810f3e055cd93.txt,cate8-00263,17,0,-,15,"11, 12, 13, 14, 16, 18, 21, 22, 25, 26, 28, 36, 38, 47, 48",4,0,True,"15: expected image-upper (y<=0.55), got y=0.557; 27: expected image-upper (y<=0.55), got y=0.562; 24: expected image-upper (y<=0.55), got y=0.570; 23: expected image-upper (y<=0.55), got y=0.566",8.75,single_axis_position,"single_axis_position(+8.0), missing_codes(+0.75)"
+9,cate7-00002_jpg.rf.eaf80e16fb8ac22309f8365ee3511943.txt,cate7-00002,29,0,-,3,"36, 41, 46",4,0,True,"48: expected image-lower (y>=0.45), got y=0.361; 47: expected image-lower (y>=0.45), got y=0.431; 37: expected image-lower (y>=0.45), got y=0.436; 38: expected image-lower (y>=0.45), got y=0.376",8.15,single_axis_position,"single_axis_position(+8.0), missing_codes(+0.15)"
+10,cate6-00014_jpg.rf.222afb19caba6f009cd95961a7388096.txt,cate6-00014,30,1,36x2,3,"14, 35, 45",1,1,False,"36: WRONG QUADRANT (both axes) - expected image-right (x>=0.45), got x=0.384; expected image-lower (y>=0.45), got y=0.393",8.15,wrong_quadrant,"duplicate_codes(+3.0), wrong_quadrant(+5.0), missing_codes(+0.15)"
+11,cate7-00002_jpg.rf.f08b4f058e2184b7ecb9b193c5634d7b.txt,cate7-00002,29,0,-,3,"36, 41, 46",4,0,True,"48: expected image-lower (y>=0.45), got y=0.349; 47: expected image-lower (y>=0.45), got y=0.422; 37: expected image-lower (y>=0.45), got y=0.426; 38: expected image-lower (y>=0.45), got y=0.365",8.15,single_axis_position,"single_axis_position(+8.0), missing_codes(+0.15)"
+12,cate7-00002_jpg.rf.261b61cdff53632dae102509f163d684.txt,cate7-00002,29,0,-,3,"36, 41, 46",4,0,True,"48: expected image-lower (y>=0.45), got y=0.369; 47: expected image-lower (y>=0.45), got y=0.443; 37: expected image-lower (y>=0.45), got y=0.447; 38: expected image-lower (y>=0.45), got y=0.384",8.15,single_axis_position,"single_axis_position(+8.0), missing_codes(+0.15)"
+13,cate6-00065_jpg.rf.d1e79ad9990982e950ae2c9885d88088.txt,cate6-00065,30,1,36x2,3,"17, 35, 45",1,1,False,"36: WRONG QUADRANT (both axes) - expected image-right (x>=0.45), got x=0.303; expected image-lower (y>=0.45), got y=0.402",8.15,wrong_quadrant,"duplicate_codes(+3.0), wrong_quadrant(+5.0), missing_codes(+0.15)"
+14,cate6-00065_jpg.rf.098061df411a43ab45e50349d23fc1aa.txt,cate6-00065,30,1,36x2,3,"17, 35, 45",1,1,False,"36: WRONG QUADRANT (both axes) - expected image-right (x>=0.45), got x=0.296; expected image-lower (y>=0.45), got y=0.385",8.15,wrong_quadrant,"duplicate_codes(+3.0), wrong_quadrant(+5.0), missing_codes(+0.15)"
+15,cate6-00014_jpg.rf.f5f234a504b228381e83f552218fb23d.txt,cate6-00014,30,1,36x2,3,"14, 35, 45",1,1,False,"36: WRONG QUADRANT (both axes) - expected image-right (x>=0.45), got x=0.432; expected image-lower (y>=0.45), got y=0.396",8.15,wrong_quadrant,"duplicate_codes(+3.0), wrong_quadrant(+5.0), missing_codes(+0.15)"
+16,cate6-00014_jpg.rf.7f16a15b6dfcdc9c6faaaba7a56a8f13.txt,cate6-00014,30,1,36x2,3,"14, 35, 45",1,1,False,"36: WRONG QUADRANT (both axes) - expected image-right (x>=0.45), got x=0.428; expected image-lower (y>=0.45), got y=0.405",8.15,wrong_quadrant,"duplicate_codes(+3.0), wrong_quadrant(+5.0), missing_codes(+0.15)"
+17,cate6-00065_jpg.rf.2c543260f3d2116dc86c6bac2da6b296.txt,cate6-00065,30,1,36x2,3,"17, 35, 45",1,1,False,"36: WRONG QUADRANT (both axes) - expected image-right (x>=0.45), got x=0.293; expected image-lower (y>=0.45), got y=0.386",8.15,wrong_quadrant,"duplicate_codes(+3.0), wrong_quadrant(+5.0), missing_codes(+0.15)"
+18,cate6-00153_jpg.rf.f94a715c895a7cf7a599fd2e89debf93.txt,cate6-00153,32,2,"28x2, 36x2",2,"13, 38",1,0,False,"28: expected image-right (x>=0.45), got x=0.387",8.1,duplicate_codes,"duplicate_codes(+6.0), single_axis_position(+2.0), missing_codes(+0.10)"
+19,cate6-00075_jpg.rf.ca4afe79ad1594b3fb8c3c41a72cfb10.txt,cate6-00075,32,1,36x2,1,13,1,1,False,"36: WRONG QUADRANT (both axes) - expected image-right (x>=0.45), got x=0.417; expected image-lower (y>=0.45), got y=0.312",8.05,wrong_quadrant,"duplicate_codes(+3.0), wrong_quadrant(+5.0), missing_codes(+0.05)"
+20,cate6-00075_jpg.rf.39824d1ea3d6b29da81b5277f0c911a7.txt,cate6-00075,32,1,36x2,1,13,1,1,False,"36: WRONG QUADRANT (both axes) - expected image-right (x>=0.45), got x=0.445; expected image-lower (y>=0.45), got y=0.341",8.05,wrong_quadrant,"duplicate_codes(+3.0), wrong_quadrant(+5.0), missing_codes(+0.05)"
+21,cate6-00075_jpg.rf.04c5dcc3e38725ebba32acd18aa69be8.txt,cate6-00075,32,1,36x2,1,13,1,1,False,"36: WRONG QUADRANT (both axes) - expected image-right (x>=0.45), got x=0.444; expected image-lower (y>=0.45), got y=0.341",8.05,wrong_quadrant,"duplicate_codes(+3.0), wrong_quadrant(+5.0), missing_codes(+0.05)"
+22,cate5-00055_jpg.rf.f5ab103c5396aeb1587b0fd641ffb289.txt,cate5-00055,1,0,-,31,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.55,sparse_annotation,"missing_codes(+1.55), sparse_annotation(+5.0)"
+23,cate5-00019_jpg.rf.bcdce9a4ab87397f4e1ede7d00f15ec6.txt,cate5-00019,1,0,-,31,"11, 12, 13, 14, 15, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.55,sparse_annotation,"missing_codes(+1.55), sparse_annotation(+5.0)"
+24,cate5-00019_jpg.rf.fa71179da0124d7c00ded63f57c87304.txt,cate5-00019,1,0,-,31,"11, 12, 13, 14, 15, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.55,sparse_annotation,"missing_codes(+1.55), sparse_annotation(+5.0)"
+25,cate5-00019_jpg.rf.0bdea403aa040379bfc678546ea3137e.txt,cate5-00019,1,0,-,31,"11, 12, 13, 14, 15, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.55,sparse_annotation,"missing_codes(+1.55), sparse_annotation(+5.0)"
+26,cate5-00055_jpg.rf.dfb8e53a29ac753bfafd430a73efbf33.txt,cate5-00055,1,0,-,31,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.55,sparse_annotation,"missing_codes(+1.55), sparse_annotation(+5.0)"
+27,cate5-00091_jpg.rf.65104d1b7286594e8e4a5d70e9550a09.txt,cate5-00091,1,0,-,31,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.55,sparse_annotation,"missing_codes(+1.55), sparse_annotation(+5.0)"
+28,cate5-00091_jpg.rf.dc0758bbcdd56f20746a77e7c8a75da1.txt,cate5-00091,1,0,-,31,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.55,sparse_annotation,"missing_codes(+1.55), sparse_annotation(+5.0)"
+29,cate5-00091_jpg.rf.e7083649281ecdc5d8d8c8f7857ef625.txt,cate5-00091,1,0,-,31,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.55,sparse_annotation,"missing_codes(+1.55), sparse_annotation(+5.0)"
+30,cate5-00055_jpg.rf.5182bc213333ceae7598c178b0cc42ff.txt,cate5-00055,1,0,-,31,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.55,sparse_annotation,"missing_codes(+1.55), sparse_annotation(+5.0)"
+31,cate10-00078_jpg.rf.41e9196b8b1d01a990eaf842bb5c273e.txt,cate10-00078,2,0,-,30,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 34, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.5,sparse_annotation,"missing_codes(+1.50), sparse_annotation(+5.0)"
+32,cate5-00007_jpg.rf.875910a4429adb2f8a817ac772717e58.txt,cate5-00007,2,0,-,30,"11, 12, 13, 14, 15, 16, 18, 21, 22, 23, 24, 25, 26, 28, 31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.5,sparse_annotation,"missing_codes(+1.50), sparse_annotation(+5.0)"
+33,cate10-00078_jpg.rf.cad2e108428fef369c64e5f495ac4861.txt,cate10-00078,2,0,-,30,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 34, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.5,sparse_annotation,"missing_codes(+1.50), sparse_annotation(+5.0)"
+34,cate10-00078_jpg.rf.c5d9cf951424801e5c5140d6550548d6.txt,cate10-00078,2,0,-,30,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 34, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.5,sparse_annotation,"missing_codes(+1.50), sparse_annotation(+5.0)"
+35,cate10-00099_jpg.rf.bd736ca3902c9f7e8415b4d73dab2198.txt,cate10-00099,3,0,-,29,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.45,sparse_annotation,"missing_codes(+1.45), sparse_annotation(+5.0)"
+36,cate10-00099_jpg.rf.9aed28ed71f4e0bfe8cc0216eecd074c.txt,cate10-00099,3,0,-,29,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.45,sparse_annotation,"missing_codes(+1.45), sparse_annotation(+5.0)"
+37,cate5-00001_jpg.rf.e4bb66bbdf06cd9feaeb0bb0f3cdd9f9.txt,cate5-00001,3,0,-,29,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.45,sparse_annotation,"missing_codes(+1.45), sparse_annotation(+5.0)"
+38,cate10-00099_jpg.rf.930b392526a8d7c5bd58de4ef8d8913b.txt,cate10-00099,3,0,-,29,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.45,sparse_annotation,"missing_codes(+1.45), sparse_annotation(+5.0)"
+39,cate8-00195_jpg.rf.06d0da0a3942e133215498a9ebe26eea.txt,cate8-00195,4,0,-,28,"11, 12, 13, 17, 18, 21, 22, 23, 24, 25, 26, 28, 31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.4,sparse_annotation,"missing_codes(+1.40), sparse_annotation(+5.0)"
+40,cate8-00195_jpg.rf.b9d9ba94cf730ce7d645e68fef964f03.txt,cate8-00195,4,0,-,28,"11, 12, 13, 17, 18, 21, 22, 23, 24, 25, 26, 28, 31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.4,sparse_annotation,"missing_codes(+1.40), sparse_annotation(+5.0)"
+41,cate8-00195_jpg.rf.855360f5c5540ea834197d3ce32887b2.txt,cate8-00195,4,0,-,28,"11, 12, 13, 17, 18, 21, 22, 23, 24, 25, 26, 28, 31, 32, 33, 34, 35, 36, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48",0,0,False,-,6.4,sparse_annotation,"missing_codes(+1.40), sparse_annotation(+5.0)"
+42,cate10-00113_jpg.rf.88e25cd5a826e102fec8f956ebc56c4e.txt,cate10-00113,5,0,-,27,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 31, 32, 34, 35, 36, 37, 38, 41, 42, 43, 44, 46, 48",0,0,False,-,6.35,sparse_annotation,"missing_codes(+1.35), sparse_annotation(+5.0)"
+43,cate10-00113_jpg.rf.b131d93c8af80e729c75c2a4a0d403b0.txt,cate10-00113,5,0,-,27,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 31, 32, 34, 35, 36, 37, 38, 41, 42, 43, 44, 46, 48",0,0,False,-,6.35,sparse_annotation,"missing_codes(+1.35), sparse_annotation(+5.0)"
+44,cate10-00113_jpg.rf.b8bd7fe7443cc844b2fcb3b38bea5256.txt,cate10-00113,5,0,-,27,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 31, 32, 34, 35, 36, 37, 38, 41, 42, 43, 44, 46, 48",0,0,False,-,6.35,sparse_annotation,"missing_codes(+1.35), sparse_annotation(+5.0)"
+45,cate10-00056_jpg.rf.82b29d473ff0c5e901be3d2da752d1aa.txt,cate10-00056,6,0,-,26,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.3,sparse_annotation,"missing_codes(+1.30), sparse_annotation(+5.0)"
+46,cate10-00056_jpg.rf.8122111fefd7c62440c200a8d0d004c2.txt,cate10-00056,6,0,-,26,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.3,sparse_annotation,"missing_codes(+1.30), sparse_annotation(+5.0)"
+47,cate10-00048_jpg.rf.92983f684f1fd2a43753baeca42efb6d.txt,cate10-00048,6,0,-,26,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.3,sparse_annotation,"missing_codes(+1.30), sparse_annotation(+5.0)"
+48,cate10-00056_jpg.rf.e283da4454bc0607fd574ffbdbb20db6.txt,cate10-00056,6,0,-,26,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.3,sparse_annotation,"missing_codes(+1.30), sparse_annotation(+5.0)"
+49,cate10-00048_jpg.rf.63025d49d07345a479c96282bd6e590d.txt,cate10-00048,6,0,-,26,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.3,sparse_annotation,"missing_codes(+1.30), sparse_annotation(+5.0)"
+50,cate5-00025_jpg.rf.bfed93c6718d8e4fa12fdf802d73928d.txt,cate5-00025,6,0,-,26,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.3,sparse_annotation,"missing_codes(+1.30), sparse_annotation(+5.0)"
+51,cate5-00025_jpg.rf.187fe183453918816a59135b523c95ef.txt,cate5-00025,6,0,-,26,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.3,sparse_annotation,"missing_codes(+1.30), sparse_annotation(+5.0)"
+52,cate5-00025_jpg.rf.0e752b93c0c1391f4673d67543e73856.txt,cate5-00025,6,0,-,26,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.3,sparse_annotation,"missing_codes(+1.30), sparse_annotation(+5.0)"
+53,cate10-00048_jpg.rf.0c9e999cd4d1cb1347288a687b997f23.txt,cate10-00048,6,0,-,26,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.3,sparse_annotation,"missing_codes(+1.30), sparse_annotation(+5.0)"
+54,cate8-00191_jpg.rf.af4a0d06688f24f3fdf2304c4e23607e.txt,cate8-00191,7,0,-,25,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 38, 41, 44, 45, 46, 47, 48",0,0,False,-,6.25,sparse_annotation,"missing_codes(+1.25), sparse_annotation(+5.0)"
+55,cate5-00109_jpg.rf.b228b13645b1197647b308d0c2250412.txt,cate5-00109,7,0,-,25,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.25,sparse_annotation,"missing_codes(+1.25), sparse_annotation(+5.0)"
+56,cate10-00066_jpg.rf.258590bede3b77924430f33914476a9a.txt,cate10-00066,7,0,-,25,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 41, 42, 43, 44, 45, 46, 47",0,0,False,-,6.25,sparse_annotation,"missing_codes(+1.25), sparse_annotation(+5.0)"
+57,cate10-00066_jpg.rf.8355b9cd10e8f695c8c144f96f578c72.txt,cate10-00066,7,0,-,25,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 41, 42, 43, 44, 45, 46, 47",0,0,False,-,6.25,sparse_annotation,"missing_codes(+1.25), sparse_annotation(+5.0)"
+58,cate10-00066_jpg.rf.c1d56f5d8a5857b0c54d55c5760fec64.txt,cate10-00066,7,0,-,25,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 41, 42, 43, 44, 45, 46, 47",0,0,False,-,6.25,sparse_annotation,"missing_codes(+1.25), sparse_annotation(+5.0)"
+59,cate8-00191_jpg.rf.856a6afd259fc24434201fdf1c9b37a0.txt,cate8-00191,7,0,-,25,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 38, 41, 44, 45, 46, 47, 48",0,0,False,-,6.25,sparse_annotation,"missing_codes(+1.25), sparse_annotation(+5.0)"
+60,cate5-00109_jpg.rf.427468e498777c6dbb3fc098cf5ec11e.txt,cate5-00109,7,0,-,25,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.25,sparse_annotation,"missing_codes(+1.25), sparse_annotation(+5.0)"
+61,cate8-00191_jpg.rf.6a5a2a0a3cc8b967672423b048cfaabf.txt,cate8-00191,7,0,-,25,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 38, 41, 44, 45, 46, 47, 48",0,0,False,-,6.25,sparse_annotation,"missing_codes(+1.25), sparse_annotation(+5.0)"
+62,cate5-00109_jpg.rf.efd2e021595b4237e2d25c0b186cf96b.txt,cate5-00109,7,0,-,25,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,6.25,sparse_annotation,"missing_codes(+1.25), sparse_annotation(+5.0)"
+63,cate7-00112_jpg.rf.e3a3f0e8c30d32171c474fc4b65abb24.txt,cate7-00112,29,0,-,3,"15, 36, 44",3,0,True,"26: expected image-upper (y<=0.55), got y=0.552; 24: expected image-upper (y<=0.55), got y=0.551; 23: expected image-upper (y<=0.55), got y=0.555",6.15,single_axis_position,"single_axis_position(+6.0), missing_codes(+0.15)"
+64,cate4-00082_jpg.rf.0d143bf04358ac1bc4a8fd08dc77c4a7.txt,cate4-00082,32,0,-,0,-,3,0,True,"14: expected image-upper (y<=0.55), got y=0.552; 13: expected image-upper (y<=0.55), got y=0.570; 23: expected image-upper (y<=0.55), got y=0.578",6.0,single_axis_position,single_axis_position(+6.0)
+65,cate4-00082_jpg.rf.12e20d9ca0d91e1bb95ca9b725394abc.txt,cate4-00082,32,0,-,0,-,3,0,True,"14: expected image-upper (y<=0.55), got y=0.551; 13: expected image-upper (y<=0.55), got y=0.569; 23: expected image-upper (y<=0.55), got y=0.576",6.0,single_axis_position,single_axis_position(+6.0)
+66,cate8-00293_jpg.rf.2ffa30334a6f21e3b8b37f949b769f7c.txt,cate8-00293,31,1,26x2,2,"36, 46",1,0,False,"26: expected image-upper (y<=0.55), got y=0.554",5.1,duplicate_codes,"duplicate_codes(+3.0), single_axis_position(+2.0), missing_codes(+0.10)"
+67,cate6-00123_jpg.rf.4908a9aab82c38f83005ec64c6071d98.txt,cate6-00123,32,1,26x2,1,27,1,0,False,"26: expected image-upper (y<=0.55), got y=0.556",5.05,duplicate_codes,"duplicate_codes(+3.0), single_axis_position(+2.0), missing_codes(+0.05)"
+68,cate6-00123_jpg.rf.932167347b283ea6c32564cbab145398.txt,cate6-00123,32,1,26x2,1,27,1,0,False,"26: expected image-upper (y<=0.55), got y=0.557",5.05,duplicate_codes,"duplicate_codes(+3.0), single_axis_position(+2.0), missing_codes(+0.05)"
+69,cate6-00123_jpg.rf.c8e735c051fed483e84298a9cb8f17b3.txt,cate6-00123,32,1,26x2,1,27,1,0,False,"26: expected image-upper (y<=0.55), got y=0.554",5.05,duplicate_codes,"duplicate_codes(+3.0), single_axis_position(+2.0), missing_codes(+0.05)"
+70,cate4-00111_jpg.rf.1d271e4bcca3671a387db2ec5f0d4341.txt,cate4-00111,33,1,12x2,0,-,0,0,False,-,5.0,duplicate_codes,"duplicate_codes(+3.0), overcount(+2.0)"
+71,cate2-00029_jpg.rf.3b2920f66e2a769e3a3f6e4535ba5549.txt,cate2-00029,33,1,41x2,0,-,0,0,False,-,5.0,duplicate_codes,"duplicate_codes(+3.0), overcount(+2.0)"
+72,cate2-00029_jpg.rf.12ba5d7beb113dd5e23698ef2c98dff5.txt,cate2-00029,33,1,41x2,0,-,0,0,False,-,5.0,duplicate_codes,"duplicate_codes(+3.0), overcount(+2.0)"
+73,cate2-00029_jpg.rf.18be40d73e21136c043b185eece71e07.txt,cate2-00029,33,1,41x2,0,-,0,0,False,-,5.0,duplicate_codes,"duplicate_codes(+3.0), overcount(+2.0)"
+74,cate1-00047_jpg.rf.bcf913fc3b431f25462c25c32c8435d7.txt,cate1-00047,33,1,23x2,0,-,0,0,False,-,5.0,duplicate_codes,"duplicate_codes(+3.0), overcount(+2.0)"
+75,cate8-00263_jpg.rf.47776feb05a736b62558cca5fb2c532d.txt,cate8-00263,17,0,-,15,"11, 12, 13, 14, 16, 18, 21, 22, 25, 26, 28, 36, 38, 47, 48",2,0,False,"24: expected image-upper (y<=0.55), got y=0.556; 23: expected image-upper (y<=0.55), got y=0.552",4.75,single_axis_position,"single_axis_position(+4.0), missing_codes(+0.75)"
+76,cate8-00089_jpg.rf.5851642e5be77ef0f87b5df7a27a6e75.txt,cate8-00089,25,0,-,7,"16, 18, 26, 28, 38, 46, 48",2,0,False,"11: expected image-upper (y<=0.55), got y=0.554; 21: expected image-upper (y<=0.55), got y=0.553",4.35,single_axis_position,"single_axis_position(+4.0), missing_codes(+0.35)"
+77,cate8-00267_jpg.rf.82d6cf3a584b087ccf57a350888c18d2.txt,cate8-00267,29,0,-,3,"18, 36, 46",2,0,False,"48: expected image-lower (y>=0.45), got y=0.448; 38: expected image-lower (y>=0.45), got y=0.441",4.15,single_axis_position,"single_axis_position(+4.0), missing_codes(+0.15)"
+78,cate10-00005_jpg.rf.df645c31544aeaa5ad78449bd32704f4.txt,cate10-00005,31,0,-,1,26,2,0,False,"41: expected image-left (x<=0.55), got x=0.556; 11: expected image-left (x<=0.55), got x=0.553",4.05,single_axis_position,"single_axis_position(+4.0), missing_codes(+0.05)"
+79,cate2-00128_jpg.rf.8e8a009cf46ff4b255917c578fa580c1.txt,cate2-00128,32,0,-,0,-,2,0,False,"48: expected image-lower (y>=0.45), got y=0.441; 38: expected image-lower (y>=0.45), got y=0.416",4.0,single_axis_position,single_axis_position(+4.0)
+80,cate4-00069_jpg.rf.9a68aa63aaa70d4ff10ea98c8912b381.txt,cate4-00069,32,0,-,0,-,2,0,False,"11: expected image-left (x<=0.55), got x=0.554; 41: expected image-left (x<=0.55), got x=0.554",4.0,single_axis_position,single_axis_position(+4.0)
+81,cate4-00079_jpg.rf.0ff0ad044792e5955a6152a63eee69da.txt,cate4-00079,32,0,-,0,-,2,0,False,"38: expected image-lower (y>=0.45), got y=0.418; 48: expected image-lower (y>=0.45), got y=0.421",4.0,single_axis_position,single_axis_position(+4.0)
+82,cate1-00017_jpg.rf.3dd93f8441ac070e8ba7f26ffeae1c7a.txt,cate1-00017,32,0,-,0,-,2,0,False,"11: expected image-left (x<=0.55), got x=0.559; 41: expected image-left (x<=0.55), got x=0.575",4.0,single_axis_position,single_axis_position(+4.0)
+83,cate10-00085_jpg.rf.50e35c3788c415e0216fc9c2dcafe6e9.txt,cate10-00085,8,0,-,24,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 45, 46, 47, 48",1,0,False,"41: expected image-left (x<=0.55), got x=0.554",3.2,single_axis_position,"single_axis_position(+2.0), missing_codes(+1.20)"
+84,cate6-00093_jpg.rf.e5dbf92d7544f732b39244cbe31dbd5c.txt,cate6-00093,29,1,23x2,4,"33, 34, 43, 44",0,0,False,-,3.2,duplicate_codes,"duplicate_codes(+3.0), missing_codes(+0.20)"
+85,cate6-00093_jpg.rf.7ee6d6ffc4ba11e6e96146f65800cb82.txt,cate6-00093,29,1,23x2,4,"33, 34, 43, 44",0,0,False,-,3.2,duplicate_codes,"duplicate_codes(+3.0), missing_codes(+0.20)"
+86,cate8-00293_jpg.rf.c80037e6c49b66b68dbe56767f4efe55.txt,cate8-00293,31,1,26x2,2,"36, 46",0,0,False,-,3.1,duplicate_codes,"duplicate_codes(+3.0), missing_codes(+0.10)"
+87,cate8-00293_jpg.rf.45f247a184489270e6b48128a12ed13a.txt,cate8-00293,31,1,26x2,2,"36, 46",0,0,False,-,3.1,duplicate_codes,"duplicate_codes(+3.0), missing_codes(+0.10)"
+88,cate2-00130_jpg.rf.0ee146b78094364024e8a9f6e89577e7.txt,cate2-00130,32,1,33x2,1,35,0,0,False,-,3.05,duplicate_codes,"duplicate_codes(+3.0), missing_codes(+0.05)"
+89,cate2-00130_jpg.rf.a04c1ae2b52610b1a24547b3c5224f99.txt,cate2-00130,32,1,33x2,1,35,0,0,False,-,3.05,duplicate_codes,"duplicate_codes(+3.0), missing_codes(+0.05)"
+90,cate2-00130_jpg.rf.d27b6ece88b1f715deb20945dba90d47.txt,cate2-00130,32,1,33x2,1,35,0,0,False,-,3.05,duplicate_codes,"duplicate_codes(+3.0), missing_codes(+0.05)"
+91,cate10-00054_jpg.rf.d6529a7b6d6e05022a388ac1733026ab.txt,cate10-00054,16,0,-,16,"11, 12, 13, 14, 16, 21, 22, 23, 24, 25, 26, 37, 38, 46, 47, 48",1,0,False,"18: expected image-upper (y<=0.55), got y=0.557",2.8,single_axis_position,"single_axis_position(+2.0), missing_codes(+0.80)"
+92,cate8-00263_jpg.rf.e2948b82ed7a240f4b20fbfe79864440.txt,cate8-00263,17,0,-,15,"11, 12, 13, 14, 16, 18, 21, 22, 25, 26, 28, 36, 38, 47, 48",1,0,False,"24: expected image-upper (y<=0.55), got y=0.552",2.75,single_axis_position,"single_axis_position(+2.0), missing_codes(+0.75)"
+93,cate5-00103_jpg.rf.f8f4b0b4f50f530621b5495ba388ec47.txt,cate5-00103,23,0,-,9,"14, 15, 16, 34, 36, 37, 46, 47, 48",1,0,False,"38: expected image-lower (y>=0.45), got y=0.436",2.45,single_axis_position,"single_axis_position(+2.0), missing_codes(+0.45)"
+94,cate8-00131_jpg.rf.968b09ba8627582babdd1598a72f32dc.txt,cate8-00131,24,0,-,8,"14, 15, 18, 24, 35, 36, 38, 48",1,0,False,"41: expected image-left (x<=0.55), got x=0.566",2.4,single_axis_position,"single_axis_position(+2.0), missing_codes(+0.40)"
+95,cate8-00051_jpg.rf.dc01f9a2d611518110f41bf9f67a7ea9.txt,cate8-00051,28,0,-,4,"16, 26, 45, 46",1,0,False,"48: expected image-lower (y>=0.45), got y=0.439",2.2,single_axis_position,"single_axis_position(+2.0), missing_codes(+0.20)"
+96,cate10-00077_jpg.rf.6c2522e9df2ab929e83020a8367dae5f.txt,cate10-00077,28,0,-,4,"16, 26, 38, 48",1,0,False,"17: expected image-upper (y<=0.55), got y=0.559",2.2,single_axis_position,"single_axis_position(+2.0), missing_codes(+0.20)"
+97,cate7-00008_jpg.rf.88d4e3a33313179d1c3be4014aa9c678.txt,cate7-00008,28,0,-,4,"14, 18, 24, 28",1,0,False,"11: expected image-left (x<=0.55), got x=0.555",2.2,single_axis_position,"single_axis_position(+2.0), missing_codes(+0.20)"
+98,cate8-00051_jpg.rf.7fdaa8b122b04dd8bc3fec51b2434902.txt,cate8-00051,28,0,-,4,"16, 26, 45, 46",1,0,False,"48: expected image-lower (y>=0.45), got y=0.448",2.2,single_axis_position,"single_axis_position(+2.0), missing_codes(+0.20)"
+99,cate6-00087_jpg.rf.e235d20610b41e54729c8535ce4fab72.txt,cate6-00087,32,0,-,0,-,1,0,False,"26: expected image-upper (y<=0.55), got y=0.554",2.0,single_axis_position,single_axis_position(+2.0)
+100,cate2-00126_jpg.rf.ce79bbef8c026e2d73fcc5d177e34588.txt,cate2-00126,32,0,-,0,-,1,0,False,"22: expected image-upper (y<=0.55), got y=0.575",2.0,single_axis_position,single_axis_position(+2.0)
+101,cate6-00087_jpg.rf.6d21f076c8e7b224599794268da2a287.txt,cate6-00087,32,0,-,0,-,1,0,False,"26: expected image-upper (y<=0.55), got y=0.553",2.0,single_axis_position,single_axis_position(+2.0)
+102,cate4-00082_jpg.rf.66780bdeb0ae89e078539db7e3e73524.txt,cate4-00082,32,0,-,0,-,1,0,False,"23: expected image-upper (y<=0.55), got y=0.557",2.0,single_axis_position,single_axis_position(+2.0)
+103,cate2-00126_jpg.rf.1eb0b757ac52e5c637422ab727326ae5.txt,cate2-00126,32,0,-,0,-,1,0,False,"22: expected image-upper (y<=0.55), got y=0.573",2.0,single_axis_position,single_axis_position(+2.0)
+104,cate2-00126_jpg.rf.e1403da81d7a2219455e7b0687edcbcc.txt,cate2-00126,32,0,-,0,-,1,0,False,"22: expected image-upper (y<=0.55), got y=0.562",2.0,single_axis_position,single_axis_position(+2.0)
+105,cate6-00144_jpg.rf.4ee6cf9847d3e2d6466425ba9dc9b860.txt,cate6-00144,32,0,-,0,-,1,0,False,"26: expected image-upper (y<=0.55), got y=0.552",2.0,single_axis_position,single_axis_position(+2.0)
+106,cate6-00003_jpg.rf.d9bcf04920411a763793588c4af9d086.txt,cate6-00003,32,0,-,0,-,1,0,False,"26: expected image-upper (y<=0.55), got y=0.556",2.0,single_axis_position,single_axis_position(+2.0)
+107,cate10-00085_jpg.rf.109e6668ebf8011512eff39c1e5a775a.txt,cate10-00085,8,0,-,24,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,1.2,missing_codes,missing_codes(+1.20)
+108,cate10-00085_jpg.rf.d380bddae953a599b80ec0aaf44bb107.txt,cate10-00085,8,0,-,24,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,1.2,missing_codes,missing_codes(+1.20)
+109,cate5-00006_jpg.rf.890bb4918809e942965bffc4454895af.txt,cate5-00006,8,0,-,24,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,1.2,missing_codes,missing_codes(+1.20)
+110,cate8-00116_jpg.rf.80c642117e3fa25349af9b929da9095a.txt,cate8-00116,10,0,-,22,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 36, 37, 46, 48",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+111,cate5-00054_jpg.rf.692f15bedf68f11f233c7063a16b7f01.txt,cate5-00054,10,0,-,22,"11, 12, 13, 14, 16, 17, 18, 21, 22, 23, 24, 25, 26, 28, 31, 32, 36, 37, 41, 42, 46, 48",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+112,cate8-00116_jpg.rf.bf411dc049e576ba87940b24db02fe3e.txt,cate8-00116,10,0,-,22,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 36, 37, 46, 48",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+113,cate5-00054_jpg.rf.e019e4777bd2fa0b1dafca12c3895abc.txt,cate5-00054,10,0,-,22,"11, 12, 13, 14, 16, 17, 18, 21, 22, 23, 24, 25, 26, 28, 31, 32, 36, 37, 41, 42, 46, 48",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+114,cate8-00116_jpg.rf.8b5652f7babcf3d99f5b2f52785d963b.txt,cate8-00116,10,0,-,22,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 36, 37, 46, 48",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+115,cate8-00449_jpg.rf.6e7d8032fbbb2145df925c2b0a4251c3.txt,cate8-00449,10,0,-,22,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 38, 44, 45, 46, 47",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+116,cate8-00449_jpg.rf.e3d7c655fd2a01ec12b788edb9fd079f.txt,cate8-00449,10,0,-,22,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 38, 44, 45, 46, 47",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+117,cate8-00449_jpg.rf.72feb8270b91216f84095920bc81854a.txt,cate8-00449,10,0,-,22,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 38, 44, 45, 46, 47",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+118,cate10-00030_jpg.rf.d3e923451688ebd1865ebd7575569547.txt,cate10-00030,10,0,-,22,"14, 15, 16, 17, 18, 22, 23, 24, 25, 26, 27, 28, 34, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+119,cate5-00108_jpg.rf.5d48d84370470b3448081e1a2f47adbd.txt,cate5-00108,10,0,-,22,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 38, 45, 46, 48",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+120,cate5-00108_jpg.rf.996d16807e3c8734f22dd2e43b6ac2d9.txt,cate5-00108,10,0,-,22,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 38, 45, 46, 48",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+121,cate5-00108_jpg.rf.c225547cfa6751eaa2040eebd50c4295.txt,cate5-00108,10,0,-,22,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 35, 36, 38, 45, 46, 48",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+122,cate5-00054_jpg.rf.fb644e04630366b966998bf6cd7560e3.txt,cate5-00054,10,0,-,22,"11, 12, 13, 14, 16, 17, 18, 21, 22, 23, 24, 25, 26, 28, 31, 32, 36, 37, 41, 42, 46, 48",0,0,False,-,1.1,missing_codes,missing_codes(+1.10)
+123,cate8-00035_jpg.rf.6956ac22b73c99fc53e7b8006e69e2a2.txt,cate8-00035,11,0,-,21,"11, 12, 13, 14, 16, 18, 21, 22, 24, 25, 26, 28, 34, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,1.05,missing_codes,missing_codes(+1.05)
+124,cate8-00035_jpg.rf.643192f8435dce2c178b4fd15071fd49.txt,cate8-00035,11,0,-,21,"11, 12, 13, 14, 16, 18, 21, 22, 24, 25, 26, 28, 34, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,1.05,missing_codes,missing_codes(+1.05)
+125,cate8-00246_jpg.rf.3ba0348b191ccb1630f36e2c9282a360.txt,cate8-00246,11,0,-,21,"12, 13, 14, 15, 18, 22, 23, 24, 28, 31, 32, 35, 36, 37, 38, 41, 42, 45, 46, 47, 48",0,0,False,-,1.05,missing_codes,missing_codes(+1.05)
+126,cate8-00246_jpg.rf.3f760793c0d1f1bcdab881a848081dc5.txt,cate8-00246,11,0,-,21,"12, 13, 14, 15, 18, 22, 23, 24, 28, 31, 32, 35, 36, 37, 38, 41, 42, 45, 46, 47, 48",0,0,False,-,1.05,missing_codes,missing_codes(+1.05)
+127,cate8-00246_jpg.rf.435262d802cfd76c1260aafa151feed9.txt,cate8-00246,11,0,-,21,"12, 13, 14, 15, 18, 22, 23, 24, 28, 31, 32, 35, 36, 37, 38, 41, 42, 45, 46, 47, 48",0,0,False,-,1.05,missing_codes,missing_codes(+1.05)
+128,cate8-00035_jpg.rf.f27d79e4dbe4679b9551d4c53d286221.txt,cate8-00035,11,0,-,21,"11, 12, 13, 14, 16, 18, 21, 22, 24, 25, 26, 28, 34, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,1.05,missing_codes,missing_codes(+1.05)
+129,cate5-00102_jpg.rf.b2f532405a2c505d380d52c4b8809876.txt,cate5-00102,12,0,-,20,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 38, 46, 48",0,0,False,-,1.0,missing_codes,missing_codes(+1.00)
+130,cate5-00078_jpg.rf.1782318284b60f49c02ed07f453566bd.txt,cate5-00078,12,0,-,20,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 46, 48",0,0,False,-,1.0,missing_codes,missing_codes(+1.00)
+131,cate5-00078_jpg.rf.50b897f0b510710a35cce5750bb37da1.txt,cate5-00078,12,0,-,20,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 46, 48",0,0,False,-,1.0,missing_codes,missing_codes(+1.00)
+132,cate5-00097_jpg.rf.169a6ff9518c61a22ac39bb7e9373199.txt,cate5-00097,12,0,-,20,"11, 12, 14, 15, 16, 17, 18, 21, 22, 24, 25, 27, 28, 34, 35, 36, 37, 45, 46, 47",0,0,False,-,1.0,missing_codes,missing_codes(+1.00)
+133,cate5-00102_jpg.rf.bacc49b0f354808df1e427b4e692ad88.txt,cate5-00102,12,0,-,20,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 38, 46, 48",0,0,False,-,1.0,missing_codes,missing_codes(+1.00)
+134,cate5-00097_jpg.rf.a6d8f63884772b8fdb1668fdc3bdbcab.txt,cate5-00097,12,0,-,20,"11, 12, 14, 15, 16, 17, 18, 21, 22, 24, 25, 27, 28, 34, 35, 36, 37, 45, 46, 47",0,0,False,-,1.0,missing_codes,missing_codes(+1.00)
+135,cate8-00431_jpg.rf.e9a753767ad65be54775db7af883152b.txt,cate8-00431,12,0,-,20,"11, 12, 13, 15, 17, 18, 21, 22, 24, 26, 27, 28, 34, 35, 38, 41, 45, 46, 47, 48",0,0,False,-,1.0,missing_codes,missing_codes(+1.00)
+136,cate8-00431_jpg.rf.909d1a657ff5b00b0c612a014063f98b.txt,cate8-00431,12,0,-,20,"11, 12, 13, 15, 17, 18, 21, 22, 24, 26, 27, 28, 34, 35, 38, 41, 45, 46, 47, 48",0,0,False,-,1.0,missing_codes,missing_codes(+1.00)
+137,cate8-00431_jpg.rf.3b1f9b8c09a1e2f7477e9cd6d77cfc4c.txt,cate8-00431,12,0,-,20,"11, 12, 13, 15, 17, 18, 21, 22, 24, 26, 27, 28, 34, 35, 38, 41, 45, 46, 47, 48",0,0,False,-,1.0,missing_codes,missing_codes(+1.00)
+138,cate5-00102_jpg.rf.15cb7df7d69077ea36d7cbbacdfb2bc8.txt,cate5-00102,12,0,-,20,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 38, 46, 48",0,0,False,-,1.0,missing_codes,missing_codes(+1.00)
+139,cate5-00097_jpg.rf.eded789e83154c7bdc95827eccb9a24d.txt,cate5-00097,12,0,-,20,"11, 12, 14, 15, 16, 17, 18, 21, 22, 24, 25, 27, 28, 34, 35, 36, 37, 45, 46, 47",0,0,False,-,1.0,missing_codes,missing_codes(+1.00)
+140,cate5-00078_jpg.rf.00ab602ee40aaa203757588ec19bd491.txt,cate5-00078,12,0,-,20,"11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 46, 48",0,0,False,-,1.0,missing_codes,missing_codes(+1.00)
+141,cate5-00060_jpg.rf.aa377e2b8cdd8e7b62b2b2ca9b9b4085.txt,cate5-00060,13,0,-,19,"11, 12, 13, 14, 15, 16, 18, 21, 22, 23, 24, 25, 26, 28, 36, 38, 44, 46, 48",0,0,False,-,0.95,missing_codes,missing_codes(+0.95)
+142,cate5-00060_jpg.rf.41c25d1b8282c5f895ee20360cc44b37.txt,cate5-00060,13,0,-,19,"11, 12, 13, 14, 15, 16, 18, 21, 22, 23, 24, 25, 26, 28, 36, 38, 44, 46, 48",0,0,False,-,0.95,missing_codes,missing_codes(+0.95)
+143,cate5-00060_jpg.rf.1dc2141d74141ad2bd090b00e59c88f2.txt,cate5-00060,13,0,-,19,"11, 12, 13, 14, 15, 16, 18, 21, 22, 23, 24, 25, 26, 28, 36, 38, 44, 46, 48",0,0,False,-,0.95,missing_codes,missing_codes(+0.95)
+144,cate8-00339_jpg.rf.f5637961bbd3f5c59bb812e6365e1264.txt,cate8-00339,13,0,-,19,"11, 12, 15, 18, 21, 22, 23, 24, 25, 26, 28, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,0.95,missing_codes,missing_codes(+0.95)
+145,cate8-00339_jpg.rf.cdd40919ea154a3e261bacfeeeb6359c.txt,cate8-00339,13,0,-,19,"11, 12, 15, 18, 21, 22, 23, 24, 25, 26, 28, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,0.95,missing_codes,missing_codes(+0.95)
+146,cate8-00339_jpg.rf.488d6190a2e29e6b42460853a638983c.txt,cate8-00339,13,0,-,19,"11, 12, 15, 18, 21, 22, 23, 24, 25, 26, 28, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,0.95,missing_codes,missing_codes(+0.95)
+147,cate5-00115_jpg.rf.481409bf4dfed95590e0ec97ff2f0dd6.txt,cate5-00115,14,0,-,18,"11, 12, 13, 14, 15, 21, 22, 23, 24, 25, 28, 35, 36, 37, 38, 46, 47, 48",0,0,False,-,0.9,missing_codes,missing_codes(+0.90)
+148,cate5-00031_jpg.rf.2662826dc3eb6fc4ee8f1ccf4cfbd1c7.txt,cate5-00031,15,0,-,17,"17, 18, 21, 22, 23, 24, 25, 27, 28, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,0.85,missing_codes,missing_codes(+0.85)
+149,cate5-00043_jpg.rf.ee042e0b1d6a8b3b369c9eb86b3889d9.txt,cate5-00043,15,0,-,17,"13, 14, 18, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,0.85,missing_codes,missing_codes(+0.85)
+150,cate5-00031_jpg.rf.3e8b1c292e91d1bdf6752cb2ae16cf2d.txt,cate5-00031,15,0,-,17,"17, 18, 21, 22, 23, 24, 25, 27, 28, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,0.85,missing_codes,missing_codes(+0.85)
+151,cate5-00043_jpg.rf.4efd4c9f6d65fb93533a59614242c6f1.txt,cate5-00043,15,0,-,17,"13, 14, 18, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,0.85,missing_codes,missing_codes(+0.85)
+152,cate5-00043_jpg.rf.2b0b02e314cc99a2ecf0eb97dfed461e.txt,cate5-00043,15,0,-,17,"13, 14, 18, 23, 24, 25, 26, 27, 28, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,0.85,missing_codes,missing_codes(+0.85)
+153,cate5-00031_jpg.rf.dd8beb9296f21a8ea19c5492cebacf60.txt,cate5-00031,15,0,-,17,"17, 18, 21, 22, 23, 24, 25, 27, 28, 35, 36, 37, 38, 45, 46, 47, 48",0,0,False,-,0.85,missing_codes,missing_codes(+0.85)
+154,cate8-00332_jpg.rf.444c933ee740ff7aaade188af012c63d.txt,cate8-00332,16,0,-,16,"13, 14, 15, 16, 22, 24, 25, 26, 27, 28, 35, 36, 37, 46, 47, 48",0,0,False,-,0.8,missing_codes,missing_codes(+0.80)
+155,cate8-00161_jpg.rf.518b888d0c5c33ae085dc93d711bf435.txt,cate8-00161,16,0,-,16,"11, 12, 14, 15, 18, 21, 22, 25, 28, 35, 36, 38, 44, 45, 46, 48",0,0,False,-,0.8,missing_codes,missing_codes(+0.80)
+156,cate8-00077_jpg.rf.61b2c3b135dcdc56d184a1dac5d2f977.txt,cate8-00077,16,0,-,16,"11, 12, 14, 17, 21, 22, 24, 26, 27, 28, 34, 36, 38, 45, 46, 48",0,0,False,-,0.8,missing_codes,missing_codes(+0.80)
+157,cate10-00054_jpg.rf.92141099ff84c0b255061474366c6e45.txt,cate10-00054,16,0,-,16,"11, 12, 13, 14, 16, 21, 22, 23, 24, 25, 26, 37, 38, 46, 47, 48",0,0,False,-,0.8,missing_codes,missing_codes(+0.80)
+158,cate8-00332_jpg.rf.ce4faa3ef256373cd75ee41496985482.txt,cate8-00332,16,0,-,16,"13, 14, 15, 16, 22, 24, 25, 26, 27, 28, 35, 36, 37, 46, 47, 48",0,0,False,-,0.8,missing_codes,missing_codes(+0.80)
+159,cate8-00174_jpg.rf.08ecaca067424326827c55f7e4465e02.txt,cate8-00174,16,0,-,16,"11, 13, 15, 16, 18, 24, 25, 26, 28, 35, 37, 38, 43, 45, 46, 48",0,0,False,-,0.8,missing_codes,missing_codes(+0.80)
+160,cate8-00332_jpg.rf.7287c0bf54df93c2458263fe8b902a29.txt,cate8-00332,16,0,-,16,"13, 14, 15, 16, 22, 24, 25, 26, 27, 28, 35, 36, 37, 46, 47, 48",0,0,False,-,0.8,missing_codes,missing_codes(+0.80)
+161,cate10-00054_jpg.rf.539928d0af38aeef8526d002f545d108.txt,cate10-00054,16,0,-,16,"11, 12, 13, 14, 16, 21, 22, 23, 24, 25, 26, 37, 38, 46, 47, 48",0,0,False,-,0.8,missing_codes,missing_codes(+0.80)
+162,cate5-00066_jpg.rf.11b8f8d4dfb97d72c30aa579872f4bd2.txt,cate5-00066,17,0,-,15,"12, 14, 15, 18, 25, 26, 28, 34, 35, 36, 37, 45, 46, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+163,cate5-00084_jpg.rf.1a3af3da694fc289e91893aca7c93721.txt,cate5-00084,17,0,-,15,"11, 12, 13, 14, 18, 21, 22, 23, 24, 28, 36, 37, 46, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+164,cate5-00085_jpg.rf.ae53af885087d3e0b424f12c4f2c1357.txt,cate5-00085,17,0,-,15,"11, 12, 18, 21, 22, 23, 24, 26, 28, 31, 32, 35, 38, 45, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+165,cate5-00085_jpg.rf.d333a9cd224074570d00b16fd5e1ed47.txt,cate5-00085,17,0,-,15,"11, 12, 18, 21, 22, 23, 24, 26, 28, 31, 32, 35, 38, 45, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+166,cate5-00066_jpg.rf.60d5d3d758566c57ac5ae31998b927ce.txt,cate5-00066,17,0,-,15,"12, 14, 15, 18, 25, 26, 28, 34, 35, 36, 37, 45, 46, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+167,cate5-00085_jpg.rf.eb3dc165a1831456e0f369439e6cbdd4.txt,cate5-00085,17,0,-,15,"11, 12, 18, 21, 22, 23, 24, 26, 28, 31, 32, 35, 38, 45, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+168,cate5-00084_jpg.rf.424c568b56e6e402857ddca0113ee390.txt,cate5-00084,17,0,-,15,"11, 12, 13, 14, 18, 21, 22, 23, 24, 28, 36, 37, 46, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+169,cate5-00090_jpg.rf.98954c2a3b800e26af435cbe34114fa8.txt,cate5-00090,17,0,-,15,"12, 15, 16, 17, 18, 26, 27, 28, 35, 36, 37, 38, 45, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+170,cate5-00066_jpg.rf.5d26331c0b7cadb2d96e382b7e7332e9.txt,cate5-00066,17,0,-,15,"12, 14, 15, 18, 25, 26, 28, 34, 35, 36, 37, 45, 46, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+171,cate5-00090_jpg.rf.a651e75db549355505ac77c5a2eb92e9.txt,cate5-00090,17,0,-,15,"12, 15, 16, 17, 18, 26, 27, 28, 35, 36, 37, 38, 45, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+172,cate10-00024_jpg.rf.e7c951f564a56d45f88c13401e4ccfdb.txt,cate10-00024,17,0,-,15,"13, 15, 16, 25, 26, 27, 35, 36, 37, 38, 44, 45, 46, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+173,cate5-00090_jpg.rf.b060a6e27e818c3872900b86196997b2.txt,cate5-00090,17,0,-,15,"12, 15, 16, 17, 18, 26, 27, 28, 35, 36, 37, 38, 45, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+174,cate8-00143_jpg.rf.e68261a740f1013f5fa143688f513f13.txt,cate8-00143,17,0,-,15,"11, 12, 18, 21, 22, 28, 31, 32, 36, 37, 41, 42, 46, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+175,cate8-00143_jpg.rf.29f91a73afb246bb698a70585b505c2f.txt,cate8-00143,17,0,-,15,"11, 12, 18, 21, 22, 28, 31, 32, 36, 37, 41, 42, 46, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+176,cate8-00143_jpg.rf.11ab6d3a04e85800ba96ce5620962b60.txt,cate8-00143,17,0,-,15,"11, 12, 18, 21, 22, 28, 31, 32, 36, 37, 41, 42, 46, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+177,cate5-00084_jpg.rf.bf231961b5cf86ba29e10c1a195514b6.txt,cate5-00084,17,0,-,15,"11, 12, 13, 14, 18, 21, 22, 23, 24, 28, 36, 37, 46, 47, 48",0,0,False,-,0.75,missing_codes,missing_codes(+0.75)
+178,cate10-00102_jpg.rf.a98a4905e57ad9fb9c772f66f74e8871.txt,cate10-00102,18,0,-,14,"16, 17, 18, 21, 25, 26, 27, 32, 34, 36, 37, 42, 46, 47",0,0,False,-,0.7,missing_codes,missing_codes(+0.70)
+179,cate10-00102_jpg.rf.a13b825b4c6206c659c41586a243895d.txt,cate10-00102,18,0,-,14,"16, 17, 18, 21, 25, 26, 27, 32, 34, 36, 37, 42, 46, 47",0,0,False,-,0.7,missing_codes,missing_codes(+0.70)
+180,cate10-00102_jpg.rf.6b830e6892bd86f1df42b2289a80275f.txt,cate10-00102,18,0,-,14,"16, 17, 18, 21, 25, 26, 27, 32, 34, 36, 37, 42, 46, 47",0,0,False,-,0.7,missing_codes,missing_codes(+0.70)
+181,cate5-00061_jpg.rf.06b2bd4f9d9083fbab3b38698c67dba4.txt,cate5-00061,18,0,-,14,"11, 12, 13, 14, 16, 18, 25, 28, 35, 36, 37, 38, 46, 48",0,0,False,-,0.7,missing_codes,missing_codes(+0.70)
+182,cate5-00073_jpg.rf.90c8da96d866f96751d8c4eeba41072a.txt,cate5-00073,19,0,-,13,"14, 18, 24, 25, 26, 27, 28, 31, 32, 38, 45, 47, 48",0,0,False,-,0.65,missing_codes,missing_codes(+0.65)
+183,cate8-00188_jpg.rf.3d20e8e90fa37e6d2761841f47fa16b2.txt,cate8-00188,19,0,-,13,"11, 13, 14, 15, 18, 24, 25, 28, 36, 37, 46, 47, 48",0,0,False,-,0.65,missing_codes,missing_codes(+0.65)
+184,cate5-00073_jpg.rf.35ef24b02f2a62a2073e949f9ddf047f.txt,cate5-00073,19,0,-,13,"14, 18, 24, 25, 26, 27, 28, 31, 32, 38, 45, 47, 48",0,0,False,-,0.65,missing_codes,missing_codes(+0.65)
+185,cate5-00072_jpg.rf.996c9778b896fca87744c306db590877.txt,cate5-00072,19,0,-,13,"15, 16, 17, 18, 27, 28, 35, 36, 37, 38, 45, 46, 48",0,0,False,-,0.65,missing_codes,missing_codes(+0.65)
+186,cate5-00073_jpg.rf.9ff9e25a7dab60072f0a5218ea4d3866.txt,cate5-00073,19,0,-,13,"14, 18, 24, 25, 26, 27, 28, 31, 32, 38, 45, 47, 48",0,0,False,-,0.65,missing_codes,missing_codes(+0.65)
+187,cate5-00072_jpg.rf.c231300ac6c61afdb3b2bbb82736baa3.txt,cate5-00072,19,0,-,13,"15, 16, 17, 18, 27, 28, 35, 36, 37, 38, 45, 46, 48",0,0,False,-,0.65,missing_codes,missing_codes(+0.65)
+188,cate8-00224_jpg.rf.51c1bcfede524df339233c145001ceb9.txt,cate8-00224,19,0,-,13,"11, 12, 13, 18, 21, 22, 23, 28, 34, 35, 38, 46, 48",0,0,False,-,0.65,missing_codes,missing_codes(+0.65)
+189,cate8-00224_jpg.rf.c66baa562491788cda355d52fd6058c8.txt,cate8-00224,19,0,-,13,"11, 12, 13, 18, 21, 22, 23, 28, 34, 35, 38, 46, 48",0,0,False,-,0.65,missing_codes,missing_codes(+0.65)
+190,cate8-00224_jpg.rf.d3cef99c2cb73b3df9847a3ea2363d1f.txt,cate8-00224,19,0,-,13,"11, 12, 13, 18, 21, 22, 23, 28, 34, 35, 38, 46, 48",0,0,False,-,0.65,missing_codes,missing_codes(+0.65)
+191,cate5-00072_jpg.rf.3e06e359f6ea587c350fe3312cc51102.txt,cate5-00072,19,0,-,13,"15, 16, 17, 18, 27, 28, 35, 36, 37, 38, 45, 46, 48",0,0,False,-,0.65,missing_codes,missing_codes(+0.65)
+192,cate8-00299_jpg.rf.2b96936dd7f35244e444d6c857954ca1.txt,cate8-00299,20,0,-,12,"12, 15, 16, 18, 25, 26, 27, 28, 36, 38, 46, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+193,cate8-00287_jpg.rf.270ccd47d3cfdd1666ab2439704f0261.txt,cate8-00287,20,0,-,12,"14, 15, 18, 24, 28, 35, 36, 37, 38, 46, 47, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+194,cate10-00034_jpg.rf.8d39c2630e2949a8c1e1e2d78a8101a7.txt,cate10-00034,20,0,-,12,"11, 14, 15, 16, 25, 27, 28, 37, 38, 46, 47, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+195,cate8-00155_jpg.rf.3955b1b86f8fff729ed679f012c3267a.txt,cate8-00155,20,0,-,12,"14, 15, 16, 24, 26, 27, 28, 36, 37, 38, 47, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+196,cate8-00155_jpg.rf.80704589c482933880d38a7aa054216f.txt,cate8-00155,20,0,-,12,"14, 15, 16, 24, 26, 27, 28, 36, 37, 38, 47, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+197,cate8-00155_jpg.rf.e12bc1f48bd4fcc543b5f9c0124698ab.txt,cate8-00155,20,0,-,12,"14, 15, 16, 24, 26, 27, 28, 36, 37, 38, 47, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+198,cate8-00287_jpg.rf.82bc2f66f2d551ba2be0ffaf1d03a743.txt,cate8-00287,20,0,-,12,"14, 15, 18, 24, 28, 35, 36, 37, 38, 46, 47, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+199,cate8-00287_jpg.rf.d3c67f5ba97dc9f85f69c6f6f9c5a8c7.txt,cate8-00287,20,0,-,12,"14, 15, 18, 24, 28, 35, 36, 37, 38, 46, 47, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+200,cate5-00036_jpg.rf.82e3f8b793db47268e77a979c1252fa6.txt,cate5-00036,20,0,-,12,"17, 18, 27, 28, 31, 32, 38, 41, 42, 43, 44, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+201,cate8-00299_jpg.rf.e73b00f1b1b17fffbe47cfc7181a57c8.txt,cate8-00299,20,0,-,12,"12, 15, 16, 18, 25, 26, 27, 28, 36, 38, 46, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+202,cate8-00299_jpg.rf.039ed8c0fd89fa56ee421de35d30bd14.txt,cate8-00299,20,0,-,12,"12, 15, 16, 18, 25, 26, 27, 28, 36, 38, 46, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+203,cate5-00036_jpg.rf.560839067a44932020f5a0d9134a9091.txt,cate5-00036,20,0,-,12,"17, 18, 27, 28, 31, 32, 38, 41, 42, 43, 44, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+204,cate8-00221_jpg.rf.b9f7d9cec2e1ffa940b7cc5416786f96.txt,cate8-00221,20,0,-,12,"13, 14, 18, 25, 28, 35, 36, 37, 38, 46, 47, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+205,cate8-00221_jpg.rf.9e31964ab6b159357e5e6c047dd4a38d.txt,cate8-00221,20,0,-,12,"13, 14, 18, 25, 28, 35, 36, 37, 38, 46, 47, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+206,cate8-00221_jpg.rf.3fdb9cff3e6302c3e6e747d394c1c2ea.txt,cate8-00221,20,0,-,12,"13, 14, 18, 25, 28, 35, 36, 37, 38, 46, 47, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+207,cate7-00050_jpg.rf.d4270cdb911fe6fa3ede8caef193e6b1.txt,cate7-00050,20,0,-,12,"14, 15, 27, 28, 35, 36, 37, 38, 43, 46, 47, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+208,cate5-00036_jpg.rf.6e549b27b4d51ce064e2228a39e76261.txt,cate5-00036,20,0,-,12,"17, 18, 27, 28, 31, 32, 38, 41, 42, 43, 44, 48",0,0,False,-,0.6,missing_codes,missing_codes(+0.60)
+209,cate8-00095_jpg.rf.a2ef696b9a710dfc8e1ddadc6e124347.txt,cate8-00095,21,0,-,11,"14, 15, 16, 18, 24, 25, 26, 27, 28, 36, 46",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+210,cate8-00095_jpg.rf.3477b1fbdf69fa5d07ca7d5f1431679c.txt,cate8-00095,21,0,-,11,"14, 15, 16, 18, 24, 25, 26, 27, 28, 36, 46",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+211,cate8-00389_jpg.rf.fca91494857d0715664a085b74607ad1.txt,cate8-00389,21,0,-,11,"13, 14, 16, 26, 27, 28, 36, 37, 46, 47, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+212,cate8-00130_jpg.rf.7381cc7fd0d091f729461a3e6cdf2997.txt,cate8-00130,21,0,-,11,"11, 12, 14, 16, 21, 22, 28, 35, 38, 44, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+213,cate8-00130_jpg.rf.08de20bd9a3f0b2e84f555f587a21cae.txt,cate8-00130,21,0,-,11,"11, 12, 14, 16, 21, 22, 28, 35, 38, 44, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+214,cate8-00130_jpg.rf.9078c91ea833c034264c01bc600f65c2.txt,cate8-00130,21,0,-,11,"11, 12, 14, 16, 21, 22, 28, 35, 38, 44, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+215,cate5-00049_jpg.rf.3232e4d77617f18087674db664c86245.txt,cate5-00049,21,0,-,11,"14, 15, 16, 17, 24, 25, 26, 36, 45, 46, 47",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+216,cate8-00095_jpg.rf.71e5ed8116a8a6d31accea6d596a1d8a.txt,cate8-00095,21,0,-,11,"14, 15, 16, 18, 24, 25, 26, 27, 28, 36, 46",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+217,cate8-00426_jpg.rf.6a38a6a58c72d304c3c3954fb6caa9f3.txt,cate8-00426,21,0,-,11,"13, 18, 24, 28, 31, 35, 38, 41, 45, 46, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+218,cate5-00049_jpg.rf.423e42bec9a39f5ce2ab5a3da4cbf2fb.txt,cate5-00049,21,0,-,11,"14, 15, 16, 17, 24, 25, 26, 36, 45, 46, 47",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+219,cate8-00426_jpg.rf.2e1c303bd8ce9272d8d0493ec35033c3.txt,cate8-00426,21,0,-,11,"13, 18, 24, 28, 31, 35, 38, 41, 45, 46, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+220,cate5-00049_jpg.rf.f7127b9dd1ceafba3de09469220011f9.txt,cate5-00049,21,0,-,11,"14, 15, 16, 17, 24, 25, 26, 36, 45, 46, 47",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+221,cate8-00418_jpg.rf.31b465b7d5faf7a06da5b2e1e54293d6.txt,cate8-00418,21,0,-,11,"11, 18, 26, 27, 28, 36, 37, 38, 46, 47, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+222,cate8-00418_jpg.rf.3c8ae33b104c9cf3a98c0340629b248d.txt,cate8-00418,21,0,-,11,"11, 18, 26, 27, 28, 36, 37, 38, 46, 47, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+223,cate5-00079_jpg.rf.3c96c78f5e64bf2c3a6b10559ad6dd21.txt,cate5-00079,21,0,-,11,"18, 24, 25, 27, 28, 36, 37, 38, 46, 47, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+224,cate5-00079_jpg.rf.eeb07010eb5e2c5dd34fb10df79959b6.txt,cate5-00079,21,0,-,11,"18, 24, 25, 27, 28, 36, 37, 38, 46, 47, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+225,cate5-00079_jpg.rf.fd794c1ff311638c1bf9d35661acd1d2.txt,cate5-00079,21,0,-,11,"18, 24, 25, 27, 28, 36, 37, 38, 46, 47, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+226,cate8-00418_jpg.rf.c31fe6a7791e81128958ffbbc5b0f9cd.txt,cate8-00418,21,0,-,11,"11, 18, 26, 27, 28, 36, 37, 38, 46, 47, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+227,cate5-00012_jpg.rf.fdbde98053c3d34af3ef17790786ff3b.txt,cate5-00012,21,0,-,11,"14, 16, 22, 23, 24, 26, 36, 37, 38, 46, 47",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+228,cate8-00359_jpg.rf.9dbe2c04d7e56a9ead4e28c58268c748.txt,cate8-00359,21,0,-,11,"14, 15, 17, 18, 24, 25, 28, 36, 37, 38, 47",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+229,cate8-00275_jpg.rf.460ddccaddfb64b4b229e2cbc45b8d92.txt,cate8-00275,21,0,-,11,"11, 12, 18, 21, 22, 27, 28, 36, 38, 46, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+230,cate8-00426_jpg.rf.b13363f143ff6c95d347e0e214a04c53.txt,cate8-00426,21,0,-,11,"13, 18, 24, 28, 31, 35, 38, 41, 45, 46, 48",0,0,False,-,0.55,missing_codes,missing_codes(+0.55)
+231,cate5-00067_jpg.rf.9ec0145fac8afdffd2e7ac2a93ce27e8.txt,cate5-00067,22,0,-,10,"14, 16, 17, 25, 26, 27, 36, 38, 46, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+232,cate8-00282_jpg.rf.ee58d1f49ccef2feb9000b30eff7ed75.txt,cate8-00282,22,0,-,10,"17, 18, 27, 28, 35, 36, 38, 44, 45, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+233,cate8-00257_jpg.rf.a338f126164098cc47f0480280f95dd2.txt,cate8-00257,22,0,-,10,"11, 12, 16, 21, 22, 26, 31, 36, 41, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+234,cate8-00282_jpg.rf.7801c18bbf941e432fcfd425f9006928.txt,cate8-00282,22,0,-,10,"17, 18, 27, 28, 35, 36, 38, 44, 45, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+235,cate8-00282_jpg.rf.696adf682e8a0e1dc89fdc079608b782.txt,cate8-00282,22,0,-,10,"17, 18, 27, 28, 35, 36, 38, 44, 45, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+236,cate5-00067_jpg.rf.eb8ae2c0628eb1a3e6592c2b9b034fd8.txt,cate5-00067,22,0,-,10,"14, 16, 17, 25, 26, 27, 36, 38, 46, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+237,cate10-00049_jpg.rf.02a4a9b40991e03eabf75f332790cf6e.txt,cate10-00049,22,0,-,10,"14, 16, 17, 24, 26, 36, 37, 38, 47, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+238,cate10-00049_jpg.rf.19ce72ce93d19194b5979f4f55d9a916.txt,cate10-00049,22,0,-,10,"14, 16, 17, 24, 26, 36, 37, 38, 47, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+239,cate10-00049_jpg.rf.96f884881387c4fd44169ee6e7aea4a0.txt,cate10-00049,22,0,-,10,"14, 16, 17, 24, 26, 36, 37, 38, 47, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+240,cate5-00067_jpg.rf.79e3df1781de91f84157d5aa664c0431.txt,cate5-00067,22,0,-,10,"14, 16, 17, 25, 26, 27, 36, 38, 46, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+241,cate8-00257_jpg.rf.44d847e1328016c004f71f3bed48e1f3.txt,cate8-00257,22,0,-,10,"11, 12, 16, 21, 22, 26, 31, 36, 41, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+242,cate8-00257_jpg.rf.2f8f9d5cbd873f542d90bcc57bceae33.txt,cate8-00257,22,0,-,10,"11, 12, 16, 21, 22, 26, 31, 36, 41, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+243,cate8-00245_jpg.rf.e2d65ea1d120b707045af0c309ecf021.txt,cate8-00245,22,0,-,10,"15, 17, 18, 25, 26, 28, 38, 46, 47, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+244,cate8-00245_jpg.rf.9ac244e171656fdc1ce9ed529eff3e62.txt,cate8-00245,22,0,-,10,"15, 17, 18, 25, 26, 28, 38, 46, 47, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+245,cate8-00245_jpg.rf.76f421a63f6460f1bb871ac82843e64a.txt,cate8-00245,22,0,-,10,"15, 17, 18, 25, 26, 28, 38, 46, 47, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+246,cate7-00047_jpg.rf.5dcdd3a5b534dcd46e9b82dbc98c1d47.txt,cate7-00047,22,0,-,10,"17, 18, 28, 35, 36, 37, 38, 46, 47, 48",0,0,False,-,0.5,missing_codes,missing_codes(+0.50)
+247,cate5-00103_jpg.rf.bd1da1ffacb4fb36a3f4e644ab117b11.txt,cate5-00103,23,0,-,9,"14, 15, 16, 34, 36, 37, 46, 47, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+248,cate5-00103_jpg.rf.57ca8936ccdd6e4489e1c9eaf8abe53a.txt,cate5-00103,23,0,-,9,"14, 15, 16, 34, 36, 37, 46, 47, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+249,cate7-00011_jpg.rf.df4d17c3288b1b2a3df02edb4289470f.txt,cate7-00011,23,0,-,9,"14, 18, 24, 27, 36, 37, 46, 47, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+250,cate7-00011_jpg.rf.c69e41a99068ff6c739d526685d3c151.txt,cate7-00011,23,0,-,9,"14, 18, 24, 27, 36, 37, 46, 47, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+251,cate5-00018_jpg.rf.1c3763cff82bfae8969deec93de329d8.txt,cate5-00018,23,0,-,9,"15, 16, 18, 27, 34, 35, 36, 37, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+252,cate7-00011_jpg.rf.b27feda0559fc29259f89580405c90ee.txt,cate7-00011,23,0,-,9,"14, 18, 24, 27, 36, 37, 46, 47, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+253,cate8-00454_jpg.rf.43cddf927a1bcfba9d8e7d9bde5e409a.txt,cate8-00454,23,0,-,9,"15, 16, 18, 24, 26, 28, 38, 46, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+254,cate8-00303_jpg.rf.6a5a5a39322d3e9386c745b1ba9bc540.txt,cate8-00303,23,0,-,9,"16, 18, 25, 28, 36, 37, 38, 47, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+255,cate8-00454_jpg.rf.3ed845321a10b4ad6cb99de50057db72.txt,cate8-00454,23,0,-,9,"15, 16, 18, 24, 26, 28, 38, 46, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+256,cate8-00454_jpg.rf.12dc67e8e745ef1184b3738d438a3c8a.txt,cate8-00454,23,0,-,9,"15, 16, 18, 24, 26, 28, 38, 46, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+257,cate5-00018_jpg.rf.c1be210fbd78cfab825faf0c792ce7ac.txt,cate5-00018,23,0,-,9,"15, 16, 18, 27, 34, 35, 36, 37, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+258,cate8-00083_jpg.rf.0ca9557ef935b20d9cb8d817ee00a6fb.txt,cate8-00083,23,0,-,9,"14, 18, 24, 25, 28, 37, 38, 46, 47",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+259,cate8-00083_jpg.rf.442b5fcf594d078a0ce73490bc224798.txt,cate8-00083,23,0,-,9,"14, 18, 24, 25, 28, 37, 38, 46, 47",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+260,cate8-00083_jpg.rf.6642af4703b90edb3a7fdc4428fdfa85.txt,cate8-00083,23,0,-,9,"14, 18, 24, 25, 28, 37, 38, 46, 47",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+261,cate8-00159_jpg.rf.3d075740d264d12a6f4d0e3f8cf29445.txt,cate8-00159,23,0,-,9,"11, 12, 17, 21, 22, 28, 36, 46, 47",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+262,cate8-00303_jpg.rf.a3e701bff3c669333acfc92852546815.txt,cate8-00303,23,0,-,9,"16, 18, 25, 28, 36, 37, 38, 47, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+263,cate8-00303_jpg.rf.66d0e6b424e432f3845f85d7981d51af.txt,cate8-00303,23,0,-,9,"16, 18, 25, 28, 36, 37, 38, 47, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+264,cate5-00018_jpg.rf.2df8e1e8e2d18d481102fe3db411dcaa.txt,cate5-00018,23,0,-,9,"15, 16, 18, 27, 34, 35, 36, 37, 48",0,0,False,-,0.45,missing_codes,missing_codes(+0.45)
+265,cate8-00053_jpg.rf.b93f4ba3883212a3705056005f6b2005.txt,cate8-00053,24,0,-,8,"15, 18, 23, 26, 28, 37, 38, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+266,cate7-00026_jpg.rf.6bb14c357a56aae1898617ff4d88e00e.txt,cate7-00026,24,0,-,8,"16, 25, 26, 28, 36, 37, 38, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+267,cate7-00054_jpg.rf.bac31e472d7ed20b569607f8e06ca7c8.txt,cate7-00054,24,0,-,8,"15, 18, 25, 26, 38, 46, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+268,cate8-00197_jpg.rf.5479aff11eb3affe94ad581b3b9a6515.txt,cate8-00197,24,0,-,8,"15, 18, 25, 28, 35, 38, 45, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+269,cate8-00197_jpg.rf.b820783e83dfa08becb08cd77bbc1724.txt,cate8-00197,24,0,-,8,"15, 18, 25, 28, 35, 38, 45, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+270,cate8-00425_jpg.rf.beb6741e067335f6fe75bdacb0d6ef8a.txt,cate8-00425,24,0,-,8,"15, 18, 21, 22, 36, 38, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+271,cate8-00425_jpg.rf.3695198beb84cc8e0ce775c37eebf625.txt,cate8-00425,24,0,-,8,"15, 18, 21, 22, 36, 38, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+272,cate7-00026_jpg.rf.1ffefde9afffad4adfac1a46c1f23874.txt,cate7-00026,24,0,-,8,"16, 25, 26, 28, 36, 37, 38, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+273,cate7-00026_jpg.rf.5a8fa30d66095452b5807d78d59e9a0d.txt,cate7-00026,24,0,-,8,"16, 25, 26, 28, 36, 37, 38, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+274,cate8-00053_jpg.rf.c59157b3aad8afbcb5b589f7094cabdc.txt,cate8-00053,24,0,-,8,"15, 18, 23, 26, 28, 37, 38, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+275,cate8-00425_jpg.rf.23bcf560118705861b96153f6be57f6d.txt,cate8-00425,24,0,-,8,"15, 18, 21, 22, 36, 38, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+276,cate8-00239_jpg.rf.3640ab2eb42bcf1f2960990159b79eaf.txt,cate8-00239,24,0,-,8,"17, 24, 25, 27, 36, 37, 46, 47",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+277,cate7-00004_jpg.rf.32a235431c2e4f60db7fd50c8809e23d.txt,cate7-00004,24,0,-,8,"16, 23, 28, 34, 36, 37, 46, 47",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+278,cate7-00004_jpg.rf.777959ae5f8a40fd8515f7754f975f4e.txt,cate7-00004,24,0,-,8,"16, 23, 28, 34, 36, 37, 46, 47",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+279,cate7-00004_jpg.rf.ca37998477725a8349b56db33dffa06e.txt,cate7-00004,24,0,-,8,"16, 23, 28, 34, 36, 37, 46, 47",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+280,cate8-00353_jpg.rf.f960c7b3547e41bef3a2b908eadeb95a.txt,cate8-00353,24,0,-,8,"14, 17, 24, 28, 35, 36, 45, 46",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+281,cate8-00353_jpg.rf.97c9376cc036a3b7a291028278e4d9ea.txt,cate8-00353,24,0,-,8,"14, 17, 24, 28, 35, 36, 45, 46",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+282,cate8-00353_jpg.rf.5ddc91c4b0ba05042c4a423556c633a4.txt,cate8-00353,24,0,-,8,"14, 17, 24, 28, 35, 36, 45, 46",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+283,cate8-00197_jpg.rf.0b162fc7cdfe542463d39d52b7c82202.txt,cate8-00197,24,0,-,8,"15, 18, 25, 28, 35, 38, 45, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+284,cate5-00048_jpg.rf.713045de3a42978a2ba4ece39654917e.txt,cate5-00048,24,0,-,8,"15, 24, 25, 36, 38, 46, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+285,cate5-00048_jpg.rf.063436ca4e2f205b33073ab65125556b.txt,cate5-00048,24,0,-,8,"15, 24, 25, 36, 38, 46, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+286,cate5-00042_jpg.rf.186d28f60fa957912fab787b0974cf5b.txt,cate5-00042,24,0,-,8,"11, 15, 18, 21, 24, 25, 38, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+287,cate8-00053_jpg.rf.e3f5dcbd97cdc584dc8cb7fa89e54f24.txt,cate8-00053,24,0,-,8,"15, 18, 23, 26, 28, 37, 38, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+288,cate8-00094_jpg.rf.00c05b98f2f4e72f1279f6f5fa4ce661.txt,cate8-00094,24,0,-,8,"18, 28, 35, 36, 38, 46, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+289,cate8-00094_jpg.rf.c7c830a886d59fb196ffed83200754d7.txt,cate8-00094,24,0,-,8,"18, 28, 35, 36, 38, 46, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+290,cate7-00090_jpg.rf.1e48f03d7c464420be5c7af5e78381da.txt,cate7-00090,24,0,-,8,"13, 14, 16, 26, 38, 46, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+291,cate8-00094_jpg.rf.d31695c582319ad9e21be26d1ddc17b4.txt,cate8-00094,24,0,-,8,"18, 28, 35, 36, 38, 46, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+292,cate5-00042_jpg.rf.69bf9f1103d0275875ac74d175e996a1.txt,cate5-00042,24,0,-,8,"11, 15, 18, 21, 24, 25, 38, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+293,cate5-00048_jpg.rf.88695a50494c1c1ade17c270fa988532.txt,cate5-00048,24,0,-,8,"15, 24, 25, 36, 38, 46, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+294,cate7-00090_jpg.rf.4a5fbd54ee7ac07b6e065a9789c20223.txt,cate7-00090,24,0,-,8,"13, 14, 16, 26, 38, 46, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+295,cate7-00090_jpg.rf.98f32b3bd40828c489ef1d0a4feba900.txt,cate7-00090,24,0,-,8,"13, 14, 16, 26, 38, 46, 47, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+296,cate5-00042_jpg.rf.7713259d2f6689ca2eed49211bb937da.txt,cate5-00042,24,0,-,8,"11, 15, 18, 21, 24, 25, 38, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+297,cate8-00131_jpg.rf.f81c3f35e9cf176f67e0b9b2e844c4c8.txt,cate8-00131,24,0,-,8,"14, 15, 18, 24, 35, 36, 38, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+298,cate8-00131_jpg.rf.9755ad7a2010d677500a57fe7291285f.txt,cate8-00131,24,0,-,8,"14, 15, 18, 24, 35, 36, 38, 48",0,0,False,-,0.4,missing_codes,missing_codes(+0.40)
+299,cate7-00025_jpg.rf.839c0fd90ce38db7084f9ba0f27ba355.txt,cate7-00025,25,0,-,7,"18, 22, 28, 36, 38, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+300,cate7-00025_jpg.rf.9299711031b683352bcfabbe085efad0.txt,cate7-00025,25,0,-,7,"18, 22, 28, 36, 38, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+301,cate8-00173_jpg.rf.65cbebd6fd72042ab10e7be23f2b2d22.txt,cate8-00173,25,0,-,7,"15, 18, 25, 38, 45, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+302,cate8-00227_jpg.rf.cddcd0e4da2ff3d4056715919d180468.txt,cate8-00227,25,0,-,7,"17, 18, 28, 34, 36, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+303,cate7-00025_jpg.rf.00d895357624d877d0ad3b23e1dcc34d.txt,cate7-00025,25,0,-,7,"18, 22, 28, 36, 38, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+304,cate8-00354_jpg.rf.7bed4acd4e2854ec8d844acd24d44af5.txt,cate8-00354,25,0,-,7,"14, 24, 36, 37, 38, 46, 47",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+305,cate5-00024_jpg.rf.56e9a8ce944902108d3fc06b7e082c18.txt,cate5-00024,25,0,-,7,"15, 27, 28, 38, 46, 47, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+306,cate5-00024_jpg.rf.02951956ca210fbfaabbfb56e7e86a68.txt,cate5-00024,25,0,-,7,"15, 27, 28, 38, 46, 47, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+307,cate8-00173_jpg.rf.7b0e3c8a22a80631d5991c9b1609b8ca.txt,cate8-00173,25,0,-,7,"15, 18, 25, 38, 45, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+308,cate8-00181_jpg.rf.1de69e87dabc3e8a344754cd3c3021f9.txt,cate8-00181,25,0,-,7,"24, 25, 36, 38, 45, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+309,cate8-00181_jpg.rf.54bc1d793ffc53d9c3e5b6cb3662822e.txt,cate8-00181,25,0,-,7,"24, 25, 36, 38, 45, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+310,cate8-00181_jpg.rf.d5a041a8fb6cd04009afe799f84b10c2.txt,cate8-00181,25,0,-,7,"24, 25, 36, 38, 45, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+311,cate8-00185_jpg.rf.956835f4c90d8fe1295d6fdcdf9e7619.txt,cate8-00185,25,0,-,7,"17, 18, 24, 28, 32, 38, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+312,cate8-00185_jpg.rf.a235f5dc06a6d41c81acf0761af250e3.txt,cate8-00185,25,0,-,7,"17, 18, 24, 28, 32, 38, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+313,cate8-00185_jpg.rf.c2ab476b7c5a11cb3ef9904b7d510788.txt,cate8-00185,25,0,-,7,"17, 18, 24, 28, 32, 38, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+314,cate8-00354_jpg.rf.d1a994fe051c919749684bedfb97989c.txt,cate8-00354,25,0,-,7,"14, 24, 36, 37, 38, 46, 47",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+315,cate8-00354_jpg.rf.c24ef893d230f9667bac4236b11f2ee6.txt,cate8-00354,25,0,-,7,"14, 24, 36, 37, 38, 46, 47",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+316,cate8-00173_jpg.rf.3d98db800bc7773fe1edb36422489925.txt,cate8-00173,25,0,-,7,"15, 18, 25, 38, 45, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+317,cate8-00227_jpg.rf.223c6f3947f2a93775e124289bd76f21.txt,cate8-00227,25,0,-,7,"17, 18, 28, 34, 36, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+318,cate8-00227_jpg.rf.8e255275d235b91a7230c68c45c7af55.txt,cate8-00227,25,0,-,7,"17, 18, 28, 34, 36, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+319,cate5-00024_jpg.rf.69e475da0851eb3c5be3404bf8304014.txt,cate5-00024,25,0,-,7,"15, 27, 28, 38, 46, 47, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+320,cate7-00069_jpg.rf.a356ede0d031c0626edf3735fc00bb93.txt,cate7-00069,25,0,-,7,"18, 23, 28, 36, 38, 46, 48",0,0,False,-,0.35,missing_codes,missing_codes(+0.35)
+321,cate5-00096_jpg.rf.be916e1d7bdc5cc5a425ae0318caacf9.txt,cate5-00096,26,0,-,6,"11, 14, 24, 25, 37, 47",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+322,cate5-00096_jpg.rf.9bc17333c79e62d51e0e47c5d10bdbbb.txt,cate5-00096,26,0,-,6,"11, 14, 24, 25, 37, 47",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+323,cate5-00096_jpg.rf.442eb55bbdc18b6aff7f7306862cf2fe.txt,cate5-00096,26,0,-,6,"11, 14, 24, 25, 37, 47",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+324,cate5-00037_jpg.rf.39eae58614e1bacddf56561ab1eaf29f.txt,cate5-00037,26,0,-,6,"18, 25, 28, 38, 45, 46",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+325,cate8-00251_jpg.rf.966e45eac4abc2b871f572e26592a206.txt,cate8-00251,26,0,-,6,"18, 28, 37, 38, 46, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+326,cate8-00251_jpg.rf.f8f232af7579d0c67832c1aca2fbd9fc.txt,cate8-00251,26,0,-,6,"18, 28, 37, 38, 46, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+327,cate8-00179_jpg.rf.6410fa5aefa2db951e892e744662d49d.txt,cate8-00179,26,0,-,6,"18, 28, 36, 38, 46, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+328,cate8-00179_jpg.rf.6f0c4dbeed4a89778a562a5642f77b9a.txt,cate8-00179,26,0,-,6,"18, 28, 36, 38, 46, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+329,cate8-00125_jpg.rf.be77720c6715655405d20285b20b1d7d.txt,cate8-00125,26,0,-,6,"16, 17, 26, 36, 37, 46",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+330,cate8-00125_jpg.rf.56c0a0550ce966f875a18ad289bd5277.txt,cate8-00125,26,0,-,6,"16, 17, 26, 36, 37, 46",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+331,cate5-00037_jpg.rf.7d0267789ce123c38b73fec08118cd2a.txt,cate5-00037,26,0,-,6,"18, 25, 28, 38, 45, 46",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+332,cate7-00086_jpg.rf.ab178a3f5b034bae32a55b769faf7168.txt,cate7-00086,26,0,-,6,"18, 24, 25, 37, 44, 46",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+333,cate8-00233_jpg.rf.5d209bfd3a36caf45ac60476df41c403.txt,cate8-00233,26,0,-,6,"18, 24, 28, 36, 37, 46",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+334,cate8-00233_jpg.rf.c65e9af46706d8c0e67766450e775979.txt,cate8-00233,26,0,-,6,"18, 24, 28, 36, 37, 46",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+335,cate8-00233_jpg.rf.fccdf75c2c0e5b817e86a7be0d18ecad.txt,cate8-00233,26,0,-,6,"18, 24, 28, 36, 37, 46",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+336,cate8-00238_jpg.rf.788f2557da9def8a8e2ff843e4ce9e8e.txt,cate8-00238,26,0,-,6,"18, 28, 36, 38, 43, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+337,cate8-00251_jpg.rf.7bf674716e46049af88bbc6fd0177355.txt,cate8-00251,26,0,-,6,"18, 28, 37, 38, 46, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+338,cate8-00125_jpg.rf.fea9db534d4f5069646acaa76d650c8d.txt,cate8-00125,26,0,-,6,"16, 17, 26, 36, 37, 46",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+339,cate8-00179_jpg.rf.42c525b0e06616cafa26bd93fbaba770.txt,cate8-00179,26,0,-,6,"18, 28, 36, 38, 46, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+340,cate7-00056_jpg.rf.04bf152367412f58dbcd612a4429bda4.txt,cate7-00056,26,0,-,6,"15, 18, 25, 28, 38, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+341,cate8-00080_jpg.rf.758467a9ec1fdcee42573e0dccb3c4b0.txt,cate8-00080,26,0,-,6,"16, 26, 27, 38, 46, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+342,cate9-00004_jpg.rf.89c18db03607eaf502cd61c92877e251.txt,cate9-00004,26,0,-,6,"12, 18, 22, 28, 38, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+343,cate8-00080_jpg.rf.748e9f718da334ce7b7fd4c912227da4.txt,cate8-00080,26,0,-,6,"16, 26, 27, 38, 46, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+344,cate5-00037_jpg.rf.9fec1ae9aa6fa2275c42f92252750104.txt,cate5-00037,26,0,-,6,"18, 25, 28, 38, 45, 46",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+345,cate10-00063_jpg.rf.94670f63657ade16a19bf7d454ecea01.txt,cate10-00063,26,0,-,6,"12, 18, 28, 38, 47, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+346,cate10-00063_jpg.rf.8450bcdf86ec06e344a7bcae354a9941.txt,cate10-00063,26,0,-,6,"12, 18, 28, 38, 47, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+347,cate10-00063_jpg.rf.3a093b85e3f523f0d21ecbb2c60bab35.txt,cate10-00063,26,0,-,6,"12, 18, 28, 38, 47, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+348,cate8-00080_jpg.rf.531deff8fdabd68fd7cd085e6de32e28.txt,cate8-00080,26,0,-,6,"16, 26, 27, 38, 46, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+349,cate9-00004_jpg.rf.d4e1fd9a3fb500f23b1413c14fe1ebe3.txt,cate9-00004,26,0,-,6,"12, 18, 22, 28, 38, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+350,cate9-00004_jpg.rf.a84c049fd7c8c3ba18a4155a6c9e0bde.txt,cate9-00004,26,0,-,6,"12, 18, 22, 28, 38, 48",0,0,False,-,0.3,missing_codes,missing_codes(+0.30)
+351,cate8-00395_jpg.rf.1d2c177544f79a26637e84fa83ccecf9.txt,cate8-00395,27,0,-,5,"18, 34, 38, 44, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+352,cate8-00109_jpg.rf.5c4f7521a35b1c67b8abe0a47cba2a99.txt,cate8-00109,27,0,-,5,"14, 15, 36, 37, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+353,cate8-00109_jpg.rf.7dfadf103fc1f654d2d9518debe08129.txt,cate8-00109,27,0,-,5,"14, 15, 36, 37, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+354,cate8-00109_jpg.rf.e44bfe4207af86e7d7ce5ea2bd2db298.txt,cate8-00109,27,0,-,5,"14, 15, 36, 37, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+355,cate10-00060_jpg.rf.49a69a671bd365a7282c5a449ede5306.txt,cate10-00060,27,0,-,5,"16, 24, 26, 36, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+356,cate8-00231_jpg.rf.2486fb8e48ad86d48572207f2b0d72f8.txt,cate8-00231,27,0,-,5,"18, 26, 28, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+357,cate8-00167_jpg.rf.2212a8c10ac470bbf18d9be06e6fb552.txt,cate8-00167,27,0,-,5,"18, 28, 36, 46, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+358,cate8-00368_jpg.rf.f866b3218ff9cb914a6b81b1ffd23f51.txt,cate8-00368,27,0,-,5,"14, 25, 37, 46, 47",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+359,cate8-00368_jpg.rf.d1227e25f010277472f8202e2703bad5.txt,cate8-00368,27,0,-,5,"14, 25, 37, 46, 47",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+360,cate8-00368_jpg.rf.8ab3f1ae318692e580edbe5dbb527b5c.txt,cate8-00368,27,0,-,5,"14, 25, 37, 46, 47",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+361,cate8-00231_jpg.rf.1b78811025d5625eb91ce156d6532d93.txt,cate8-00231,27,0,-,5,"18, 26, 28, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+362,cate8-00066_jpg.rf.d7e268d3d0fb275c263af52637a648c7.txt,cate8-00066,27,0,-,5,"18, 28, 35, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+363,cate8-00231_jpg.rf.601086830cc1bd86b05d7f5718b46e74.txt,cate8-00231,27,0,-,5,"18, 26, 28, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+364,cate8-00253_jpg.rf.00abf6ca77c6a36704e4001ed1076df3.txt,cate8-00253,27,0,-,5,"15, 23, 26, 35, 45",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+365,cate8-00253_jpg.rf.47540e75af74eaf9018fe7adca7e7404.txt,cate8-00253,27,0,-,5,"15, 23, 26, 35, 45",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+366,cate8-00253_jpg.rf.ea84a9f38e3dfb75aeda9c55b636661b.txt,cate8-00253,27,0,-,5,"15, 23, 26, 35, 45",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+367,cate8-00260_jpg.rf.4e1c028e82c14b42b3c287561a11e3b4.txt,cate8-00260,27,0,-,5,"14, 16, 26, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+368,cate8-00260_jpg.rf.d03427019b70094be862d65d92451c32.txt,cate8-00260,27,0,-,5,"14, 16, 26, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+369,cate8-00260_jpg.rf.f2cf1266938f9dbf246f44646768b857.txt,cate8-00260,27,0,-,5,"14, 16, 26, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+370,cate8-00447_jpg.rf.f7bb88cbe24ed7b983a5e3713165d75c.txt,cate8-00447,27,0,-,5,"28, 35, 36, 37, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+371,cate8-00047_jpg.rf.69a380386f73f406924619374d41cfe3.txt,cate8-00047,27,0,-,5,"18, 28, 38, 47, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+372,cate8-00066_jpg.rf.9081297a114855d57ecf25793abbb2eb.txt,cate8-00066,27,0,-,5,"18, 28, 35, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+373,cate8-00066_jpg.rf.37b7b6313b22e517866d74c3d9a906ab.txt,cate8-00066,27,0,-,5,"18, 28, 35, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+374,cate10-00060_jpg.rf.9229aaba46ac406820e4211afc4bc8e2.txt,cate10-00060,27,0,-,5,"16, 24, 26, 36, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+375,cate10-00060_jpg.rf.2816cea6b37b148e5321d939e94a6a80.txt,cate10-00060,27,0,-,5,"16, 24, 26, 36, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+376,cate7-00033_jpg.rf.4f58d6ee48fbac3831e4befe6b0c6660.txt,cate7-00033,27,0,-,5,"15, 25, 38, 43, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+377,cate7-00033_jpg.rf.9927f64df67790b3567ca5a703c8d8ee.txt,cate7-00033,27,0,-,5,"15, 25, 38, 43, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+378,cate7-00033_jpg.rf.b3078e1975d2ae34ee2a2bf6305c9f93.txt,cate7-00033,27,0,-,5,"15, 25, 38, 43, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+379,cate9-00010_jpg.rf.0fe694399f8c36de4f138b2a9a62f736.txt,cate9-00010,27,0,-,5,"15, 25, 28, 33, 45",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+380,cate9-00010_jpg.rf.5c4a5d1756220eb669d901f88d804346.txt,cate9-00010,27,0,-,5,"15, 25, 28, 33, 45",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+381,cate9-00010_jpg.rf.f0a77c820423a875f9de755435eb9f84.txt,cate9-00010,27,0,-,5,"15, 25, 28, 33, 45",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+382,cate7-00074_jpg.rf.12a01f3dc902c5e705afe61f89aa0f44.txt,cate7-00074,27,0,-,5,"15, 18, 28, 37, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+383,cate7-00074_jpg.rf.2d7a3ff83fe3c3508632b92f3a48bd3a.txt,cate7-00074,27,0,-,5,"15, 18, 28, 37, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+384,cate7-00074_jpg.rf.618caf6e21b2d84b56fc6f11ecb93d57.txt,cate7-00074,27,0,-,5,"15, 18, 28, 37, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+385,cate7-00083_jpg.rf.5039c430c9724ce99702fdf0815dcd6f.txt,cate7-00083,27,0,-,5,"15, 37, 38, 47, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+386,cate7-00097_jpg.rf.95e4d33330de7632ce7d1409c3240706.txt,cate7-00097,27,0,-,5,"15, 25, 36, 45, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+387,cate10-00070_jpg.rf.16c0aa0f85b4226272b67ba8723cf5cf.txt,cate10-00070,27,0,-,5,"16, 22, 26, 34, 44",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+388,cate8-00395_jpg.rf.ad7f94ddf29369b47defa5e501632079.txt,cate8-00395,27,0,-,5,"18, 34, 38, 44, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+389,cate8-00008_jpg.rf.0a856fa29635fd5b031af912f695613a.txt,cate8-00008,27,0,-,5,"18, 28, 38, 47, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+390,cate8-00440_jpg.rf.96c2a413adfa78c0f9235a79ab983206.txt,cate8-00440,27,0,-,5,"18, 28, 36, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+391,cate8-00047_jpg.rf.921d5a76e559c3eaad17172814d9d8cf.txt,cate8-00047,27,0,-,5,"18, 28, 38, 47, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+392,cate8-00047_jpg.rf.5903ebda298460f4cd2b2f1d95619ae1.txt,cate8-00047,27,0,-,5,"18, 28, 38, 47, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+393,cate8-00305_jpg.rf.5172a77628189ce7ecafff1509621f07.txt,cate8-00305,27,0,-,5,"14, 18, 28, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+394,cate8-00305_jpg.rf.8c8278b3305348748e46af2f33e2e538.txt,cate8-00305,27,0,-,5,"14, 18, 28, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+395,cate10-00070_jpg.rf.314fc4568fa0ea36e4854bc770c55005.txt,cate10-00070,27,0,-,5,"16, 22, 26, 34, 44",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+396,cate10-00070_jpg.rf.2a28f041ccdf198a2d42cee379940ee0.txt,cate10-00070,27,0,-,5,"16, 22, 26, 34, 44",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+397,cate8-00447_jpg.rf.6d0ceea5f2ec048faa29479d3e538311.txt,cate8-00447,27,0,-,5,"28, 35, 36, 37, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+398,cate8-00447_jpg.rf.555e087c41682275bb44555b40adca25.txt,cate8-00447,27,0,-,5,"28, 35, 36, 37, 46",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+399,cate8-00395_jpg.rf.3eac8882a9cb33056f12a2b918c3390f.txt,cate8-00395,27,0,-,5,"18, 34, 38, 44, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+400,cate8-00008_jpg.rf.c388019fcbc6058d8b2645d44711596a.txt,cate8-00008,27,0,-,5,"18, 28, 38, 47, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+401,cate8-00008_jpg.rf.2cc888fee5099703c3037e129ea399ac.txt,cate8-00008,27,0,-,5,"18, 28, 38, 47, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+402,cate8-00440_jpg.rf.c7ee201dce9fef44a3e274ec565afccf.txt,cate8-00440,27,0,-,5,"18, 28, 36, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+403,cate8-00440_jpg.rf.a6ee2ea22ff03515ba9f9a19203532bc.txt,cate8-00440,27,0,-,5,"18, 28, 36, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+404,cate8-00305_jpg.rf.25336bbb6768536d1b7d0ca1352ce0f5.txt,cate8-00305,27,0,-,5,"14, 18, 28, 38, 48",0,0,False,-,0.25,missing_codes,missing_codes(+0.25)
+405,cate9-00040_jpg.rf.805968c6c04c49f78fd484bdad794d26.txt,cate9-00040,28,0,-,4,"15, 25, 35, 45",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+406,cate9-00040_jpg.rf.96293e484ff7270d66bd5cdd43a9901a.txt,cate9-00040,28,0,-,4,"15, 25, 35, 45",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+407,cate8-00281_jpg.rf.d80e055a68c129dd4fce709deb754d2c.txt,cate8-00281,28,0,-,4,"14, 18, 36, 47",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+408,cate8-00296_jpg.rf.d228b1cb6ea7981ec5756b34ee705c5f.txt,cate8-00296,28,0,-,4,"16, 26, 36, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+409,cate7-00105_jpg.rf.bb2e51a30cab5788f809eb420b2ff9b6.txt,cate7-00105,28,0,-,4,"14, 24, 34, 44",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+410,cate7-00105_jpg.rf.daf2fd9f3c80a1d37415747e5e83a068.txt,cate7-00105,28,0,-,4,"14, 24, 34, 44",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+411,cate8-00404_jpg.rf.402e14292cdaf9dd1b4e68ca94baaae4.txt,cate8-00404,28,0,-,4,"36, 37, 38, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+412,cate8-00401_jpg.rf.2a8f186411ae92fb54571575a8b88368.txt,cate8-00401,28,0,-,4,"18, 28, 36, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+413,cate8-00015_jpg.rf.ad9871585214d333e1ed323e40d13f2c.txt,cate8-00015,28,0,-,4,"15, 18, 26, 37",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+414,cate8-00029_jpg.rf.d7de8d30e40ec7f6102668693f1f3fd5.txt,cate8-00029,28,0,-,4,"25, 26, 36, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+415,cate8-00296_jpg.rf.95e9e4fa74799d3cdc335c02e04d23bf.txt,cate8-00296,28,0,-,4,"16, 26, 36, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+416,cate8-00296_jpg.rf.583f506b5ba59f3a4f5f20d0e9cfa285.txt,cate8-00296,28,0,-,4,"16, 26, 36, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+417,cate8-00051_jpg.rf.ae3b7a2a0c9d715ddd69eeddb066855f.txt,cate8-00051,28,0,-,4,"16, 26, 45, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+418,cate8-00102_jpg.rf.cee7888c447da5759b13399d44a0637c.txt,cate8-00102,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+419,cate8-00107_jpg.rf.76f5dde1b9aef90e4e28e1d99d94a3f1.txt,cate8-00107,28,0,-,4,"18, 28, 36, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+420,cate8-00107_jpg.rf.8c669c1f58479b7e33509c981a071843.txt,cate8-00107,28,0,-,4,"18, 28, 36, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+421,cate8-00107_jpg.rf.99223437a418214b5539b3e137e98085.txt,cate8-00107,28,0,-,4,"18, 28, 36, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+422,cate8-00377_jpg.rf.102c0ff39ae9e055d8bb4f76dffaa85e.txt,cate8-00377,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+423,cate8-00371_jpg.rf.30602f943e8a893fe43b7c5e1f98ea1a.txt,cate8-00371,28,0,-,4,"18, 25, 28, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+424,cate8-00289_jpg.rf.35a6942decf00c0bc55131bb93b267cb.txt,cate8-00289,28,0,-,4,"24, 36, 37, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+425,cate8-00289_jpg.rf.26350e9552ec3bbc0ca382d617b7c1c6.txt,cate8-00289,28,0,-,4,"24, 36, 37, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+426,cate8-00289_jpg.rf.0f39509e55f9a0c2a59a89980a18a29c.txt,cate8-00289,28,0,-,4,"24, 36, 37, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+427,cate8-00145_jpg.rf.8422a0e4de12ea2ba9da6632e1aa97ea.txt,cate8-00145,28,0,-,4,"21, 22, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+428,cate8-00145_jpg.rf.b9ad63d7c69316de930fe54ef0b2ac5b.txt,cate8-00145,28,0,-,4,"21, 22, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+429,cate8-00145_jpg.rf.ceb52284b7592a256b45a48755399b49.txt,cate8-00145,28,0,-,4,"21, 22, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+430,cate8-00281_jpg.rf.229fdfa927f7a7ef0a53d53a10c44446.txt,cate8-00281,28,0,-,4,"14, 18, 36, 47",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+431,cate7-00105_jpg.rf.c78ec07e8fd0e62ebf9cdabca0ec4770.txt,cate7-00105,28,0,-,4,"14, 24, 34, 44",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+432,cate7-00080_jpg.rf.a2d872feea4a01def68aee2026aef100.txt,cate7-00080,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+433,cate6-00009_jpg.rf.cb2f9d02d718a9fbe6515a74e7a0728d.txt,cate6-00009,28,0,-,4,"12, 22, 42, 44",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+434,cate7-00068_jpg.rf.89180b06ee83a983a161563b1fc465f2.txt,cate7-00068,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+435,cate8-00437_jpg.rf.ad26c049794c36d231e96951bd0482c6.txt,cate8-00437,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+436,cate8-00437_jpg.rf.698a3864a8332510783110161c0a0479.txt,cate8-00437,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+437,cate8-00437_jpg.rf.035b6baf7cef73892fde2c5de8081174.txt,cate8-00437,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+438,cate8-00311_jpg.rf.01c8c4b6e41f02c88a473ea853f07c50.txt,cate8-00311,28,0,-,4,"18, 26, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+439,cate8-00311_jpg.rf.5bbbee6c9e2c1cc6201a37de1820414a.txt,cate8-00311,28,0,-,4,"18, 26, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+440,cate8-00311_jpg.rf.c0380dbdc4518f0ab81bacb539abb162.txt,cate8-00311,28,0,-,4,"18, 26, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+441,cate6-00115_jpg.rf.4c525a1e07293b84ad8ee02893dccd9d.txt,cate6-00115,28,0,-,4,"16, 26, 44, 45",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+442,cate6-00115_jpg.rf.a03a9a455540bae5a987b78c9b06e164.txt,cate6-00115,28,0,-,4,"16, 26, 44, 45",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+443,cate6-00115_jpg.rf.d342545c260af4797e803c06ea96541a.txt,cate6-00115,28,0,-,4,"16, 26, 44, 45",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+444,cate7-00008_jpg.rf.73d8483560b93e61974c5bd0cb8e15b0.txt,cate7-00008,28,0,-,4,"14, 18, 24, 28",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+445,cate7-00008_jpg.rf.af82de70575e1a1fa19b364217c51f34.txt,cate7-00008,28,0,-,4,"14, 18, 24, 28",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+446,cate7-00020_jpg.rf.156cd76ee010462b75b1992d5bbf95da.txt,cate7-00020,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+447,cate7-00020_jpg.rf.2531ebb50b4c5a73a4f454312be08822.txt,cate7-00020,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+448,cate7-00020_jpg.rf.84608ed6844762a7342990d821d0ab42.txt,cate7-00020,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+449,cate8-00317_jpg.rf.7b8345ded3b4e1c41dae9af5a8b25cf5.txt,cate8-00317,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+450,cate8-00317_jpg.rf.c1cb14a5a2affc177e329ee15edc977c.txt,cate8-00317,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+451,cate8-00317_jpg.rf.d7bee381b0d65835ad8a8cbb80ca7dc0.txt,cate8-00317,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+452,cate7-00044_jpg.rf.ae1cd65e6b07ed1d1aa580a7c3b01920.txt,cate7-00044,28,0,-,4,"18, 28, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+453,cate7-00062_jpg.rf.3f2b9aa095949c194a1376f20d1f8805.txt,cate7-00062,28,0,-,4,"16, 26, 36, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+454,cate7-00062_jpg.rf.d09401206a92456ef1e617de6991a3e4.txt,cate7-00062,28,0,-,4,"16, 26, 36, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+455,cate8-00281_jpg.rf.8b0e7c9f7818acaa43137e41fb2fb226.txt,cate8-00281,28,0,-,4,"14, 18, 36, 47",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+456,cate7-00062_jpg.rf.e832b8dc0590022546159b093f9dd51d.txt,cate7-00062,28,0,-,4,"16, 26, 36, 46",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+457,cate9-00040_jpg.rf.ac665e4a5574a7653c1d0bdcf0c028b4.txt,cate9-00040,28,0,-,4,"15, 25, 35, 45",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+458,cate10-00090_jpg.rf.56cc8f337841b2f5d5c6b59eaff05e3b.txt,cate10-00090,28,0,-,4,"36, 38, 46, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+459,cate10-00018_jpg.rf.e2fee68ab8c4d58743e6099bb6ccb597.txt,cate10-00018,28,0,-,4,"16, 18, 26, 28",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+460,cate10-00090_jpg.rf.ce2db00d6aa9309866f2126dcfedb998.txt,cate10-00090,28,0,-,4,"36, 38, 46, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+461,cate10-00114_jpg.rf.8bd5efa8118e62908fc3eb558cab6855.txt,cate10-00114,28,0,-,4,"16, 36, 37, 47",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+462,cate10-00114_jpg.rf.ff6a82716e5952b5fe2335cc49c4ce48.txt,cate10-00114,28,0,-,4,"16, 36, 37, 47",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+463,cate10-00114_jpg.rf.0b4b5fb255f359f67147cbba792fa32b.txt,cate10-00114,28,0,-,4,"16, 36, 37, 47",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+464,cate10-00090_jpg.rf.00f0e4d69b4463067ab4cfd5861d03fb.txt,cate10-00090,28,0,-,4,"36, 38, 46, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+465,cate10-00077_jpg.rf.55ee1c2653c81cd69cbbb3c35f5ce8cf.txt,cate10-00077,28,0,-,4,"16, 26, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+466,cate10-00077_jpg.rf.ec56afc535c753c1dec0416c28550d02.txt,cate10-00077,28,0,-,4,"16, 26, 38, 48",0,0,False,-,0.2,missing_codes,missing_codes(+0.20)
+467,cate8-00058_jpg.rf.d31b88e25962a40a2ef50b160c2bbdbe.txt,cate8-00058,29,0,-,3,"38, 45, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+468,cate8-00269_jpg.rf.52b23eb0ac69e7b6a44858b3ac7d5ec6.txt,cate8-00269,29,0,-,3,"35, 45, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+469,cate8-00347_jpg.rf.96e7af522f1791ea3f35180495dfff37.txt,cate8-00347,29,0,-,3,"26, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+470,cate8-00347_jpg.rf.b91e56f649425c08edd69986ca9c971e.txt,cate8-00347,29,0,-,3,"26, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+471,cate8-00347_jpg.rf.d2137257ed6addf1b5b510110e6f0780.txt,cate8-00347,29,0,-,3,"26, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+472,cate8-00269_jpg.rf.46734ed793a21757802f9c3eab4bbc92.txt,cate8-00269,29,0,-,3,"35, 45, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+473,cate8-00267_jpg.rf.8303c47ab0c59b7d7ae202f0041fcf20.txt,cate8-00267,29,0,-,3,"18, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+474,cate8-00044_jpg.rf.6f53af0516b769771c3f85558f053841.txt,cate8-00044,29,0,-,3,"18, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+475,cate8-00058_jpg.rf.b34ab25bbecaa34eec1dc53b63b7a3ed.txt,cate8-00058,29,0,-,3,"38, 45, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+476,cate8-00044_jpg.rf.a69aebc8cbfdd1f94e0d317baea0dcc4.txt,cate8-00044,29,0,-,3,"18, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+477,cate8-00267_jpg.rf.448731e1dbac9e27b7874299936762dc.txt,cate8-00267,29,0,-,3,"18, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+478,cate8-00341_jpg.rf.678cf2814ef186d40a05a7e3895fbb6d.txt,cate8-00341,29,0,-,3,"18, 28, 36",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+479,cate8-00419_jpg.rf.6a17107da8a839b1deb9a60897586bdc.txt,cate8-00419,29,0,-,3,"18, 38, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+480,cate8-00058_jpg.rf.955a022020549a935388bc82e8e8bf8b.txt,cate8-00058,29,0,-,3,"38, 45, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+481,cate8-00341_jpg.rf.940a243594c649eb26266b317d349e51.txt,cate8-00341,29,0,-,3,"18, 28, 36",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+482,cate8-00335_jpg.rf.949ac5f470711f6ace15d5e12c297595.txt,cate8-00335,29,0,-,3,"12, 22, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+483,cate8-00341_jpg.rf.64724001e9633ae9ed9dae0026b7d7e1.txt,cate8-00341,29,0,-,3,"18, 28, 36",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+484,cate8-00335_jpg.rf.cde34b5580804d14e0d0a53c2774526c.txt,cate8-00335,29,0,-,3,"12, 22, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+485,cate7-00038_jpg.rf.febaeccf29df150d7273eb01633e9dee.txt,cate7-00038,29,0,-,3,"36, 46, 47",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+486,cate7-00038_jpg.rf.a932728303d10187182ed8a5ace16523.txt,cate7-00038,29,0,-,3,"36, 46, 47",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+487,cate7-00038_jpg.rf.2eaf40996204f27d193683f7f1901521.txt,cate7-00038,29,0,-,3,"36, 46, 47",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+488,cate10-00036_jpg.rf.ea49679c987ad05267c5c26db898aaa5.txt,cate10-00036,29,0,-,3,"36, 37, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+489,cate7-00112_jpg.rf.1b66981cb850d62bcd202c52d6ac303e.txt,cate7-00112,29,0,-,3,"15, 36, 44",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+490,cate7-00112_jpg.rf.32932ed7776334b0f531295a27f30e59.txt,cate7-00112,29,0,-,3,"15, 36, 44",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+491,cate8-00005_jpg.rf.6cf69d25c438988ebddc53c9c676bd31.txt,cate8-00005,29,0,-,3,"36, 37, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+492,cate7-00014_jpg.rf.b6e7d5cf3469969cd7fdb18f45969c2f.txt,cate7-00014,29,0,-,3,"14, 28, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+493,cate7-00014_jpg.rf.818ab9ba82fa72e19ee05158d92fc984.txt,cate7-00014,29,0,-,3,"14, 28, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+494,cate7-00014_jpg.rf.1c66ed69d704bbe59a516a3358f48f49.txt,cate7-00014,29,0,-,3,"14, 28, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+495,cate10-00006_jpg.rf.c6d7873a0bfd6fef3c22ccd7237b8263.txt,cate10-00006,29,0,-,3,"18, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+496,cate10-00006_jpg.rf.b74997f6dded56cc38eed5a381ef5047.txt,cate10-00006,29,0,-,3,"18, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+497,cate10-00006_jpg.rf.4066f0fa821c8e29b311f4b9b822e17c.txt,cate10-00006,29,0,-,3,"18, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+498,cate8-00335_jpg.rf.854d187e3b781f7026d6aa417b80d1ad.txt,cate8-00335,29,0,-,3,"12, 22, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+499,cate8-00269_jpg.rf.83df70b18e2c31704d8d0dafdfce5460.txt,cate8-00269,29,0,-,3,"35, 45, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+500,cate8-00017_jpg.rf.d33a36a6e5743f8b8d81b77ca7901dba.txt,cate8-00017,29,0,-,3,"16, 26, 36",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+501,cate8-00419_jpg.rf.9b8063931a5f0eca0de6c74f8f920049.txt,cate8-00419,29,0,-,3,"18, 38, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+502,cate8-00419_jpg.rf.888808684f432f6b4e303958df0039a0.txt,cate8-00419,29,0,-,3,"18, 38, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+503,cate8-00044_jpg.rf.5b6da0ed336f868917b811e0aee97a91.txt,cate8-00044,29,0,-,3,"18, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+504,cate9-00028_jpg.rf.efc51f48960760aff64535936dd7669c.txt,cate9-00028,29,0,-,3,"14, 25, 45",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+505,cate8-00166_jpg.rf.76201a51aaebc0e1813c8d203a2deafa.txt,cate8-00166,29,0,-,3,"26, 38, 48",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+506,cate8-00443_jpg.rf.4efdaa52bab906febfe1407e8c6f129f.txt,cate8-00443,29,0,-,3,"26, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+507,cate8-00433_jpg.rf.42d90162547c2ab8267eb9393bee2621.txt,cate8-00433,29,0,-,3,"18, 28, 38",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+508,cate8-00433_jpg.rf.d2de4b621c8e1324dfa0f74674070cc3.txt,cate8-00433,29,0,-,3,"18, 28, 38",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+509,cate8-00210_jpg.rf.976add877ebfcf75311ab074d9c88a52.txt,cate8-00210,29,0,-,3,"18, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+510,cate8-00443_jpg.rf.74089925ff6624b59cfeb919c75548f4.txt,cate8-00443,29,0,-,3,"26, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+511,cate8-00433_jpg.rf.2ebc99343ff70c6cd48b32bb39d4f1d9.txt,cate8-00433,29,0,-,3,"18, 28, 38",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+512,cate8-00119_jpg.rf.793b5f9bd2145f2640b4973075cd6c2e.txt,cate8-00119,29,0,-,3,"28, 34, 38",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+513,cate8-00119_jpg.rf.da38166875d4321c3e24ce39701807c3.txt,cate8-00119,29,0,-,3,"28, 34, 38",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+514,cate8-00119_jpg.rf.de2a3e8afca1e0515691839709fa1e50.txt,cate8-00119,29,0,-,3,"28, 34, 38",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+515,cate8-00443_jpg.rf.35063d3dec7ab93e4e2b9361552342b6.txt,cate8-00443,29,0,-,3,"26, 36, 46",0,0,False,-,0.15,missing_codes,missing_codes(+0.15)
+516,cate8-00001_jpg.rf.9d4edda05a747daa5731fe2b6807d334.txt,cate8-00001,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+517,cate8-00318_jpg.rf.d49e004dc3eabd9c92027cd9ce640a35.txt,cate8-00318,30,0,-,2,"36, 38",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+518,cate10-00012_jpg.rf.cd660ac6ee607fc1e309c9ecf1c4884d.txt,cate10-00012,30,0,-,2,"16, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+519,cate8-00209_jpg.rf.5275ee11926b2ff80eae18e3062bf23a.txt,cate8-00209,30,0,-,2,"18, 28",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+520,cate10-00012_jpg.rf.056712c3b19c9ecf7373baebfad6f66a.txt,cate10-00012,30,0,-,2,"16, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+521,cate8-00318_jpg.rf.9c38532c41038b46ed0c9cbc143e63d5.txt,cate8-00318,30,0,-,2,"36, 38",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+522,cate8-00318_jpg.rf.a2e1126927fa2e8add5870ab9785636b.txt,cate8-00318,30,0,-,2,"36, 38",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+523,cate10-00012_jpg.rf.e59bcf8d667a84971a6d1dd831c4b9f9.txt,cate10-00012,30,0,-,2,"16, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+524,cate8-00149_jpg.rf.74b75219fd6c9070f717103be835a675.txt,cate8-00149,30,0,-,2,"16, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+525,cate8-00087_jpg.rf.d9c6653928f68d7da040913e8a2cf79d.txt,cate8-00087,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+526,cate8-00323_jpg.rf.40365ebe31bd5ff73e44c6aba65928dc.txt,cate8-00323,30,0,-,2,"16, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+527,cate8-00323_jpg.rf.8f0f641400afdb2aaaeb3426b1da0807.txt,cate8-00323,30,0,-,2,"16, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+528,cate8-00152_jpg.rf.1554096b21f0bcd0fb09e83dd41602f1.txt,cate8-00152,30,0,-,2,"37, 47",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+529,cate8-00011_jpg.rf.c1505231652c384d6c4796287ade1cfb.txt,cate8-00011,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+530,cate8-00209_jpg.rf.a6065d2c02bea08bd06e3de1030a0536.txt,cate8-00209,30,0,-,2,"18, 28",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+531,cate8-00209_jpg.rf.f35127c88c5873b2f8ac36a2c620acd7.txt,cate8-00209,30,0,-,2,"18, 28",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+532,cate8-00087_jpg.rf.0a59a1556ec1e253da571f4575b7cfb3.txt,cate8-00087,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+533,cate8-00023_jpg.rf.184ac11d1b3c0f4a1b030d9e1526b705.txt,cate8-00023,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+534,cate8-00215_jpg.rf.82010df7c6366f93700f04dd4e7bbdc6.txt,cate8-00215,30,0,-,2,"38, 48",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+535,cate8-00217_jpg.rf.4239ab7eb56769ea00ffe002e21f10b8.txt,cate8-00217,30,0,-,2,"15, 48",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+536,cate8-00323_jpg.rf.ad7283a7025b536be75c730465565c9a.txt,cate8-00323,30,0,-,2,"16, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+537,cate7-00032_jpg.rf.7eb63fb11fac0b62f8af7efaa8194328.txt,cate7-00032,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+538,cate7-00032_jpg.rf.5056d50080bfacbdb3aee8826ea21fee.txt,cate7-00032,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+539,cate7-00098_jpg.rf.2bf50d90633f155086b34495c9d6f562.txt,cate7-00098,30,0,-,2,"18, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+540,cate5-00030_jpg.rf.004b42c07455ba42f53a07a344cc4109.txt,cate5-00030,30,0,-,2,"16, 25",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+541,cate10-00084_jpg.rf.85ec6a4ebe490441c7810204ac7349e8.txt,cate10-00084,30,0,-,2,"38, 48",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+542,cate10-00092_jpg.rf.07a3664696ead2eca398494a634c93cf.txt,cate10-00092,30,0,-,2,"18, 28",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+543,cate10-00092_jpg.rf.800868a96cc8774b7afdd82da821d055.txt,cate10-00092,30,0,-,2,"18, 28",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+544,cate10-00084_jpg.rf.28a9a7a29e2435a28672832b6f727d59.txt,cate10-00084,30,0,-,2,"38, 48",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+545,cate10-00084_jpg.rf.026c68517cabe3cb29fc79ac09c50793.txt,cate10-00084,30,0,-,2,"38, 48",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+546,cate8-00152_jpg.rf.cd421f20aa5c6e68f137d622b3448781.txt,cate8-00152,30,0,-,2,"37, 47",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+547,cate10-00072_jpg.rf.b728d79504745fe3873553eb51d780a2.txt,cate10-00072,30,0,-,2,"15, 25",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+548,cate10-00072_jpg.rf.91d3de6f73923fd0b7dc3625708dd903.txt,cate10-00072,30,0,-,2,"15, 25",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+549,cate10-00072_jpg.rf.103bc7aee3af6b953a340774e274ee2b.txt,cate10-00072,30,0,-,2,"15, 25",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+550,cate10-00092_jpg.rf.f0cfeaea8954fc1227e2c6b581200760.txt,cate10-00092,30,0,-,2,"18, 28",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+551,cate7-00098_jpg.rf.45684eeb6a0b1b34aa4c04c8170616c3.txt,cate7-00098,30,0,-,2,"18, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+552,cate8-00023_jpg.rf.69362c6be68b1d4e0f724f8f8e398f86.txt,cate8-00023,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+553,cate7-00098_jpg.rf.f85ba27bca73b47ff666a2613dd0e397.txt,cate7-00098,30,0,-,2,"18, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+554,cate7-00104_jpg.rf.755fda6da3d9dbafaff1c7be18013a48.txt,cate7-00104,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+555,cate7-00104_jpg.rf.88dc4ab1c10a426ce2a3f6348a5ca5c9.txt,cate7-00104,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+556,cate7-00104_jpg.rf.f776b4064893c3c43d0af221c79478cf.txt,cate7-00104,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+557,cate9-00034_jpg.rf.f67af3c1225f6f27f7527e09a3160288.txt,cate9-00034,30,0,-,2,"38, 48",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+558,cate9-00034_jpg.rf.83b481150a51a0b186a1f4bb0f1910a6.txt,cate9-00034,30,0,-,2,"38, 48",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+559,cate9-00034_jpg.rf.2cd22751de9c09771af40b6e6caf18a0.txt,cate9-00034,30,0,-,2,"38, 48",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+560,cate8-00152_jpg.rf.8e3406e148effb6d0c5e89a1a1929c5d.txt,cate8-00152,30,0,-,2,"37, 47",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+561,cate10-00027_jpg.rf.dcef59f7280d31971dfa021de87c46d6.txt,cate10-00027,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+562,cate10-00020_jpg.rf.854908ccabca768285c56c1fe9a7981a.txt,cate10-00020,30,0,-,2,"38, 48",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+563,cate7-00032_jpg.rf.fc1e4fb732ca24041661d1e805432319.txt,cate7-00032,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+564,cate8-00123_jpg.rf.dc09677b0cc42d1f1d4f7b2619759349.txt,cate8-00123,30,0,-,2,"18, 26",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+565,cate5-00030_jpg.rf.c5b81054ce093534f94022eb9b2a1545.txt,cate5-00030,30,0,-,2,"16, 25",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+566,cate8-00023_jpg.rf.b2e358f22850af1b16d860cc49bd25fc.txt,cate8-00023,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+567,cate8-00407_jpg.rf.d4d8a2efa2ee0879c0287c4ef370e123.txt,cate8-00407,30,0,-,2,"16, 26",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+568,cate8-00065_jpg.rf.1950a5f867fd319f4085138a13bf80cb.txt,cate8-00065,30,0,-,2,"18, 28",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+569,cate8-00382_jpg.rf.6509b2217ce00a598880c341bf23b72f.txt,cate8-00382,30,0,-,2,"38, 48",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+570,cate8-00382_jpg.rf.751b3b3d72c793e7acfdadd058bb75bf.txt,cate8-00382,30,0,-,2,"38, 48",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+571,cate6-00022_jpg.rf.174b97655544845cc0a0f9c83df52d7a.txt,cate6-00022,30,0,-,2,"35, 45",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+572,cate8-00382_jpg.rf.b15b5fc2ba64ab191e962dde3fef7395.txt,cate8-00382,30,0,-,2,"38, 48",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+573,cate8-00059_jpg.rf.d0bd3cb39cc429692abe9c8cf6f9c75e.txt,cate8-00059,30,0,-,2,"35, 45",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+574,cate8-00397_jpg.rf.eb7faf7d09153e1c2d3ef9e353ea715d.txt,cate8-00397,30,0,-,2,"34, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+575,cate8-00383_jpg.rf.0c819da589fc6a22551c5fadc48cfeef.txt,cate8-00383,30,0,-,2,"18, 25",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+576,cate8-00059_jpg.rf.994e96ae1f8dd0df99e185317bf43587.txt,cate8-00059,30,0,-,2,"35, 45",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+577,cate8-00383_jpg.rf.ae2c13dba01cfae2c7928315b0c128a4.txt,cate8-00383,30,0,-,2,"18, 25",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+578,cate8-00383_jpg.rf.dbe3d3c51f18b3e36983399b4496d062.txt,cate8-00383,30,0,-,2,"18, 25",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+579,cate8-00123_jpg.rf.d0f24482f83d2fd074e369a34ad24777.txt,cate8-00123,30,0,-,2,"18, 26",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+580,cate8-00059_jpg.rf.420768f9135f713d1965159d0ca6c3e5.txt,cate8-00059,30,0,-,2,"35, 45",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+581,cate8-00397_jpg.rf.8ccc23412af94ef90976e09ce1f4982e.txt,cate8-00397,30,0,-,2,"34, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+582,cate8-00397_jpg.rf.67741e07f54c52f814f046c1f69f8f16.txt,cate8-00397,30,0,-,2,"34, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+583,cate10-00108_jpg.rf.250d257e97f1d69977a952e815ea59cb.txt,cate10-00108,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+584,cate10-00108_jpg.rf.912ca1f68f0307534ff59a071ed40224.txt,cate10-00108,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+585,cate10-00108_jpg.rf.bb679aa97b13f1601c1926e499e25189.txt,cate10-00108,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+586,cate8-00101_jpg.rf.3d707b62cf05fb548590cee862bd3e89.txt,cate8-00101,30,0,-,2,"18, 28",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+587,cate8-00101_jpg.rf.78b7b2e99396b761eb54e7d9322d5cf5.txt,cate8-00101,30,0,-,2,"18, 28",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+588,cate8-00375_jpg.rf.d85f5051e65719dc76fefba3d37b291e.txt,cate8-00375,30,0,-,2,"18, 36",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+589,cate8-00065_jpg.rf.255ac519b2fcea2c745610ffb85285a1.txt,cate8-00065,30,0,-,2,"18, 28",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+590,cate8-00073_jpg.rf.227f997e934b2d7ba5a29101620e8a57.txt,cate8-00073,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+591,cate8-00030_jpg.rf.844bed08b47e4bf086281d9293b92ca3.txt,cate8-00030,30,0,-,2,"28, 38",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+592,cate8-00123_jpg.rf.28b8f4b0e00a7ff7084ef2052da86c17.txt,cate8-00123,30,0,-,2,"18, 26",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+593,cate8-00030_jpg.rf.a75379401a6e2310534d9dda7b69e511.txt,cate8-00030,30,0,-,2,"28, 38",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+594,cate8-00030_jpg.rf.baed0d9a3af0ab0ea38d059e7b5e83be.txt,cate8-00030,30,0,-,2,"28, 38",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+595,cate8-00073_jpg.rf.8d60c922ef30ec29a79135ea7df24706.txt,cate8-00073,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+596,cate8-00037_jpg.rf.71b42100cd702d16a58d8b855dcf0a67.txt,cate8-00037,30,0,-,2,"25, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+597,cate8-00073_jpg.rf.84d1378af018dde186adf89d2c49ab0f.txt,cate8-00073,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+598,cate8-00413_jpg.rf.213add826f8153ddae13737dc8913817.txt,cate8-00413,30,0,-,2,"33, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+599,cate8-00037_jpg.rf.d74dbfb0ce0eba70551d954e2504be71.txt,cate8-00037,30,0,-,2,"25, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+600,cate8-00087_jpg.rf.e632d3538a2e68e1a69f3efc72273473.txt,cate8-00087,30,0,-,2,"36, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+601,cate8-00101_jpg.rf.15de1fa858753fa3fd206599bff901f8.txt,cate8-00101,30,0,-,2,"18, 28",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+602,cate8-00037_jpg.rf.ecc698db6897d3b0c50ea1e901b6df2d.txt,cate8-00037,30,0,-,2,"25, 46",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+603,cate8-00065_jpg.rf.e9397184c7101fc96d6882eca2a360e4.txt,cate8-00065,30,0,-,2,"18, 28",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+604,cate5-00030_jpg.rf.22bcc9a1dc55163412f25b89ec70aa84.txt,cate5-00030,30,0,-,2,"16, 25",0,0,False,-,0.1,missing_codes,missing_codes(+0.10)
+605,cate7-00092_jpg.rf.55f0968c3264a468d04e836e58ffa384.txt,cate7-00092,31,0,-,1,46,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+606,cate10-00096_jpg.rf.7e87642d67920f133fa3b2bae53a0e23.txt,cate10-00096,31,0,-,1,38,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+607,cate8-00071_jpg.rf.ffd834734258d2b4573f7fb350accf1f.txt,cate8-00071,31,0,-,1,18,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+608,cate10-00096_jpg.rf.847ccd33e35016442a58b3832dfcc488.txt,cate10-00096,31,0,-,1,38,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+609,cate2-00004_jpg.rf.1fb15fe8ac6efd72e12e1eb323fe15c2.txt,cate2-00004,31,0,-,1,24,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+610,cate8-00071_jpg.rf.428172fb9a908c9ac241ffb58df3709a.txt,cate8-00071,31,0,-,1,18,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+611,cate8-00071_jpg.rf.03da7b65707ea6f08434c6d658b29def.txt,cate8-00071,31,0,-,1,18,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+612,cate10-00106_jpg.rf.faad589d7bdc19f7175a1607749b83a0.txt,cate10-00106,31,0,-,1,18,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+613,cate8-00113_jpg.rf.1b6e00ca57bbce75b5c17e1fd20fdb3a.txt,cate8-00113,31,0,-,1,28,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+614,cate10-00096_jpg.rf.9d5064ec3114a03e8e97a90f710e4cb9.txt,cate10-00096,31,0,-,1,38,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+615,cate8-00022_jpg.rf.6208f4e5ec4a46deba50a85d7c78ed46.txt,cate8-00022,31,0,-,1,46,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+616,cate10-00106_jpg.rf.87a979c10735a55fc4d04e3b2decac07.txt,cate10-00106,31,0,-,1,18,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+617,cate8-00022_jpg.rf.07b6dc47894bcf08f86cf5a469fa3429.txt,cate8-00022,31,0,-,1,46,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+618,cate8-00137_jpg.rf.34823f8760ec5c1519d7ca8cdc4c4de2.txt,cate8-00137,31,0,-,1,37,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+619,cate8-00137_jpg.rf.3de696daa5fb8ec94cc0fd53b74a8ac3.txt,cate8-00137,31,0,-,1,37,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+620,cate8-00137_jpg.rf.987505d549c3382fd6c4a1f500f9bf2f.txt,cate8-00137,31,0,-,1,37,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+621,cate8-00138_jpg.rf.812b92a6c7752d24cef67b74d8a01045.txt,cate8-00138,31,0,-,1,37,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+622,cate8-00138_jpg.rf.a2fb3413f74d192300858f2eb815823c.txt,cate8-00138,31,0,-,1,37,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+623,cate8-00274_jpg.rf.a1faa79540a89f57833fd41a51a48405.txt,cate8-00274,31,0,-,1,18,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+624,cate8-00274_jpg.rf.c0366908848aa380e34e9c2307cebe8b.txt,cate8-00274,31,0,-,1,18,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+625,cate8-00274_jpg.rf.ee9e51c2c4497ce432e236769beccc6f.txt,cate8-00274,31,0,-,1,18,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+626,cate8-00041_jpg.rf.3f776daf5ea80c80e434a403c7baf77c.txt,cate8-00041,31,0,-,1,47,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+627,cate8-00041_jpg.rf.4bd92073e0e902e2857d07871b54086f.txt,cate8-00041,31,0,-,1,47,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+628,cate8-00041_jpg.rf.a4d9fb37e2da1408b2b6b1d0286c3026.txt,cate8-00041,31,0,-,1,47,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+629,cate8-00113_jpg.rf.e711fdb40db6f1fd0af5ff676caa2e6c.txt,cate8-00113,31,0,-,1,28,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+630,cate8-00138_jpg.rf.bbb4b2155971024e3d35807ccb6f350c.txt,cate8-00138,31,0,-,1,37,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+631,cate8-00203_jpg.rf.a19549725499919b0628681946ce1d80.txt,cate8-00203,31,0,-,1,46,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+632,cate8-00202_jpg.rf.482f78de446d3a2357221c74686d9709.txt,cate8-00202,31,0,-,1,16,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+633,cate10-00106_jpg.rf.37c6f00fad5fef61c4c74820c8c46dac.txt,cate10-00106,31,0,-,1,18,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+634,cate8-00113_jpg.rf.48f94b9740c7214b9aae11b56c028224.txt,cate8-00113,31,0,-,1,28,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+635,cate7-00110_jpg.rf.bcb435feaf7db6cf64b91eaa76340d95.txt,cate7-00110,31,0,-,1,13,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+636,cate7-00110_jpg.rf.65944f41039a863ee29ef9b87843463d.txt,cate7-00110,31,0,-,1,13,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+637,cate7-00110_jpg.rf.2c956279ca0dad0eab5bd6d0171eae28.txt,cate7-00110,31,0,-,1,13,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+638,cate8-00022_jpg.rf.8b75fc9ae6d4f52fab0679df8aee69fb.txt,cate8-00022,31,0,-,1,46,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+639,cate10-00042_jpg.rf.d1a7265353b131896cd479112a69a551.txt,cate10-00042,31,0,-,1,28,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+640,cate7-00076_jpg.rf.cd7d55b244aef8143b825ddf1669b2be.txt,cate7-00076,31,0,-,1,15,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+641,cate6-00063_jpg.rf.ac7f40e1228de6c900c569a5d9f8b044.txt,cate6-00063,31,0,-,1,35,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+642,cate6-00122_jpg.rf.83a34eeb48a30429e949b04145c8b4aa.txt,cate6-00122,31,0,-,1,48,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+643,cate8-00346_jpg.rf.11b061e808a839a3a030b80256b840f0.txt,cate8-00346,31,0,-,1,26,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+644,cate8-00346_jpg.rf.60d6f299903a2108d62b30c06f7f921a.txt,cate8-00346,31,0,-,1,26,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+645,cate8-00346_jpg.rf.7128c76093f5a267dbc003cb7032bae7.txt,cate8-00346,31,0,-,1,26,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+646,cate8-00361_jpg.rf.46e08ec0ba94e5fa72b83b9d34394d23.txt,cate8-00361,31,0,-,1,36,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+647,cate8-00365_jpg.rf.4ac74d1d16385878c326c4b7777389c2.txt,cate8-00365,31,0,-,1,45,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+648,cate4-00113_jpg.rf.239bf24468fa8c46ccf721c6515d5b3a.txt,cate4-00113,31,0,-,1,42,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+649,cate8-00390_jpg.rf.6488a2560a89a2f4e0dc1b2755b6421f.txt,cate8-00390,31,0,-,1,38,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+650,cate8-00390_jpg.rf.791a4aac9afb21061a301a25a940edcc.txt,cate8-00390,31,0,-,1,38,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+651,cate8-00390_jpg.rf.eb1ab1028af98aa88e55c7302014dc54.txt,cate8-00390,31,0,-,1,38,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+652,cate9-00022_jpg.rf.b8b63c2f44c568efca270710d25ff5d2.txt,cate9-00022,31,0,-,1,38,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+653,cate6-00063_jpg.rf.a01dcf69493c8eb9c4d8f39bb3a010ed.txt,cate6-00063,31,0,-,1,35,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+654,cate10-00005_jpg.rf.c49013bcaa37725c1bc8b2380f7fe4e3.txt,cate10-00005,31,0,-,1,26,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+655,cate6-00063_jpg.rf.1de234c2cdc9079dd4ea04770d464153.txt,cate6-00063,31,0,-,1,35,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+656,cate6-00039_jpg.rf.94cba00684b88294b4926d2ead2f577e.txt,cate6-00039,31,0,-,1,16,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+657,cate6-00039_jpg.rf.7592ec5571642cf1cfde5194b97def55.txt,cate6-00039,31,0,-,1,16,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+658,cate6-00039_jpg.rf.5fb70b58b3e80909d052f0e1f38f8520.txt,cate6-00039,31,0,-,1,16,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+659,cate9-00022_jpg.rf.2b5741d452bce88c97025d7ea4a35cfc.txt,cate9-00022,31,0,-,1,38,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+660,cate9-00016_jpg.rf.71e7d819e23adb49f9a81da637c1a021.txt,cate9-00016,31,0,-,1,46,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+661,cate8-00411_jpg.rf.2e2ceeedbe132938a911fefecf6ac3ea.txt,cate8-00411,31,0,-,1,36,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+662,cate8-00455_jpg.rf.a7c58894213e16c969726e244c5b10f5.txt,cate8-00455,31,0,-,1,38,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+663,cate8-00455_jpg.rf.8e80789ad78df1b7a463e8e13c2a4dd3.txt,cate8-00455,31,0,-,1,38,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+664,cate8-00455_jpg.rf.828df3c7c4c675d0c99821a405703257.txt,cate8-00455,31,0,-,1,38,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+665,cate7-00076_jpg.rf.c64b927bc1251e2bed1e2b64c4a89ae3.txt,cate7-00076,31,0,-,1,15,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+666,cate10-00005_jpg.rf.6b80359142218960a16f351cf7832915.txt,cate10-00005,31,0,-,1,26,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+667,cate9-00022_jpg.rf.bed596edcecf1f2b424a5741e3bb6806.txt,cate9-00022,31,0,-,1,38,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+668,cate6-00158_jpg.rf.941860b4c3985753de84963ba2ae964c.txt,cate6-00158,31,0,-,1,44,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+669,cate7-00018_jpg.rf.43b411df058815e8b08c6aa100710187.txt,cate7-00018,31,0,-,1,36,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+670,cate10-00013_jpg.rf.10de44f8963729975e3eac586f54333f.txt,cate10-00013,31,0,-,1,47,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+671,cate10-00013_jpg.rf.6611586688f26e8e71280fb4c94ae494.txt,cate10-00013,31,0,-,1,47,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+672,cate10-00013_jpg.rf.6c68ca8fc383c83885ee68fbb9eec558.txt,cate10-00013,31,0,-,1,47,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+673,cate8-00310_jpg.rf.9ca875396f270366be21b2d4f70a1253.txt,cate8-00310,31,0,-,1,28,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+674,cate8-00310_jpg.rf.7ef0747ff73330b776c0187b3df6a9b0.txt,cate8-00310,31,0,-,1,28,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+675,cate8-00310_jpg.rf.76dcc6d12047b213edee1ea6f022e92c.txt,cate8-00310,31,0,-,1,28,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+676,cate10-00041_jpg.rf.8db20339594f1e2be76139e95ceb6dd3.txt,cate10-00041,31,0,-,1,36,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+677,cate10-00041_jpg.rf.9b9336bda9e74b24b3ea11fdc88f3a66.txt,cate10-00041,31,0,-,1,36,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+678,cate10-00041_jpg.rf.d0b28afbdf3cd79d61728e1e50ba997e.txt,cate10-00041,31,0,-,1,36,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+679,cate6-00158_jpg.rf.9d05f57c2e69ca9091fd2aacedfc1312.txt,cate6-00158,31,0,-,1,44,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+680,cate10-00042_jpg.rf.ac4c7d9a140004c1478deba941a7d750.txt,cate10-00042,31,0,-,1,28,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+681,cate7-00061_jpg.rf.3b7744e143b8d087bfbbaa883469f197.txt,cate7-00061,31,0,-,1,36,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+682,cate7-00061_jpg.rf.595285a77bc1e22ebdba4fe311754099.txt,cate7-00061,31,0,-,1,36,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+683,cate7-00061_jpg.rf.e2d12b0de88f3f76ead612a948131a10.txt,cate7-00061,31,0,-,1,36,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+684,cate7-00076_jpg.rf.1d47255251b8cac6487b4e99cf651e45.txt,cate7-00076,31,0,-,1,15,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+685,cate7-00018_jpg.rf.4ad7fa64ce5feba3d1b576d1ef00a112.txt,cate7-00018,31,0,-,1,36,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+686,cate10-00042_jpg.rf.4e8b10e6472c22db33c0ae12e5a71969.txt,cate10-00042,31,0,-,1,28,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+687,cate8-00329_jpg.rf.90b7103bfb85c5374052b7f7161adba8.txt,cate8-00329,31,0,-,1,46,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+688,cate6-00158_jpg.rf.b53fd92ea4446991b66da5a3283ee406.txt,cate6-00158,31,0,-,1,44,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+689,cate7-00018_jpg.rf.05cd46c0b7a1722804c3699f71594488.txt,cate7-00018,31,0,-,1,36,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+690,cate8-00325_jpg.rf.4e58fcfd7a6915b8b0678cf322d6c417.txt,cate8-00325,31,0,-,1,35,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+691,cate8-00325_jpg.rf.8634aff82b7f16dfc422b11471dda8c2.txt,cate8-00325,31,0,-,1,35,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+692,cate8-00325_jpg.rf.6cbdfaffbfa225a907e3780fe83894ef.txt,cate8-00325,31,0,-,1,35,0,0,False,-,0.05,missing_codes,missing_codes(+0.05)
+693,cate1-00017_jpg.rf.2e6315d4e63cf6957204b573cad616d4.txt,cate1-00017,32,0,-,0,-,0,0,False,-,0.0,none,-
+694,cate1-00011_jpg.rf.8a5912281957cd055b390274289bde8e.txt,cate1-00011,32,0,-,0,-,0,0,False,-,0.0,none,-
+695,cate1-00014_jpg.rf.35b346d991cc15ccd3041ca12411ceeb.txt,cate1-00014,32,0,-,0,-,0,0,False,-,0.0,none,-
+696,cate2-00013_jpg.rf.8182c09690596e2b2d7873ff1811866f.txt,cate2-00013,32,0,-,0,-,0,0,False,-,0.0,none,-
+697,cate2-00012_jpg.rf.0484e22a6f13c36d8fc5ae4bbbf568c6.txt,cate2-00012,32,0,-,0,-,0,0,False,-,0.0,none,-
+698,cate2-00011_jpg.rf.f249193f4e79801e8bc58274deffcbaa.txt,cate2-00011,32,0,-,0,-,0,0,False,-,0.0,none,-
+699,cate2-00011_jpg.rf.c674abf6eac6ba63fe750af2bc726afb.txt,cate2-00011,32,0,-,0,-,0,0,False,-,0.0,none,-
+700,cate1-00014_jpg.rf.ec1e433bb6e41264fa4819877fe7486a.txt,cate1-00014,32,0,-,0,-,0,0,False,-,0.0,none,-
+701,cate1-00014_jpg.rf.f1afa904f5d4308830e38b50caac9d36.txt,cate1-00014,32,0,-,0,-,0,0,False,-,0.0,none,-
+702,cate1-00017_jpg.rf.64ff6967f5d736e8a146556885ff4494.txt,cate1-00017,32,0,-,0,-,0,0,False,-,0.0,none,-
+703,cate1-00011_jpg.rf.47ccf7fe31ffb18535ce3f21a183326a.txt,cate1-00011,32,0,-,0,-,0,0,False,-,0.0,none,-
+704,cate1-00020_jpg.rf.392bf5571557ee5e11e3d6aec75ae2fe.txt,cate1-00020,32,0,-,0,-,0,0,False,-,0.0,none,-
+705,cate1-00020_jpg.rf.39ef8bdd86011ce21e3b0e9b6eaa82b6.txt,cate1-00020,32,0,-,0,-,0,0,False,-,0.0,none,-
+706,cate2-00011_jpg.rf.ad2efe7bc151b5cfcf887b6b63e8de0b.txt,cate2-00011,32,0,-,0,-,0,0,False,-,0.0,none,-
+707,cate2-00010_jpg.rf.fb22b13b5764dfcf9f15095a7b4da38a.txt,cate2-00010,32,0,-,0,-,0,0,False,-,0.0,none,-
+708,cate2-00010_jpg.rf.8deab81916101ce7c23a61d31df4459b.txt,cate2-00010,32,0,-,0,-,0,0,False,-,0.0,none,-
+709,cate1-00020_jpg.rf.f4c70edc17011ffeb55b15dfd009c239.txt,cate1-00020,32,0,-,0,-,0,0,False,-,0.0,none,-
+710,cate1-00023_jpg.rf.0a0fc70a8ed87a9e87bea2eeca7086b0.txt,cate1-00023,32,0,-,0,-,0,0,False,-,0.0,none,-
+711,cate1-00023_jpg.rf.1287f8d884de2defdce2ac0ec01eee60.txt,cate1-00023,32,0,-,0,-,0,0,False,-,0.0,none,-
+712,cate2-00010_jpg.rf.840b78b87aefc5c054c0a14ce7343e65.txt,cate2-00010,32,0,-,0,-,0,0,False,-,0.0,none,-
+713,cate2-00009_jpg.rf.38aa1ae602bcd22a117d6e0969472bfa.txt,cate2-00009,32,0,-,0,-,0,0,False,-,0.0,none,-
+714,cate2-00017_jpg.rf.5e6addfda949536cf79186d34733685a.txt,cate2-00017,32,0,-,0,-,0,0,False,-,0.0,none,-
+715,cate1-00005_jpg.rf.3a82543ca8d87b55292df4fd9e7a289e.txt,cate1-00005,32,0,-,0,-,0,0,False,-,0.0,none,-
+716,cate2-00017_jpg.rf.e3d44f3f0c6fa4ff4cea988c35366643.txt,cate2-00017,32,0,-,0,-,0,0,False,-,0.0,none,-
+717,cate2-00014_jpg.rf.d7f786ae7e337fd90b4661215a8692fb.txt,cate2-00014,32,0,-,0,-,0,0,False,-,0.0,none,-
+718,cate2-00009_jpg.rf.082aa3c91b00706981080aa3a2f4d028.txt,cate2-00009,32,0,-,0,-,0,0,False,-,0.0,none,-
+719,cate2-00014_jpg.rf.e8650704f7c348fe85b2b51e56b42f15.txt,cate2-00014,32,0,-,0,-,0,0,False,-,0.0,none,-
+720,cate2-00015_jpg.rf.4988361d8610350ebfdf3bbbacf9a0a5.txt,cate2-00015,32,0,-,0,-,0,0,False,-,0.0,none,-
+721,cate2-00014_jpg.rf.0091b35af2de3ee57c6a3c68477dff0c.txt,cate2-00014,32,0,-,0,-,0,0,False,-,0.0,none,-
+722,cate2-00015_jpg.rf.4f900758238cf313599b7ed8600214c8.txt,cate2-00015,32,0,-,0,-,0,0,False,-,0.0,none,-
+723,cate2-00015_jpg.rf.d3b78ffba65dc849457d7be87cfa8f31.txt,cate2-00015,32,0,-,0,-,0,0,False,-,0.0,none,-
+724,cate2-00013_jpg.rf.efc626f58bc2c1e92655a6e732b61545.txt,cate2-00013,32,0,-,0,-,0,0,False,-,0.0,none,-
+725,cate1-00002_jpg.rf.e0c956c6468ef96b53c862916e6fb6e8.txt,cate1-00002,32,0,-,0,-,0,0,False,-,0.0,none,-
+726,cate2-00013_jpg.rf.da4935dbff7e1b6b9d792b2066a57033.txt,cate2-00013,32,0,-,0,-,0,0,False,-,0.0,none,-
+727,cate2-00016_jpg.rf.15d1a53b4685edbeb668ebb8577490b0.txt,cate2-00016,32,0,-,0,-,0,0,False,-,0.0,none,-
+728,cate2-00016_jpg.rf.3bf5e65b6ef163995c1b94b1e7abb400.txt,cate2-00016,32,0,-,0,-,0,0,False,-,0.0,none,-
+729,cate2-00016_jpg.rf.f946abb272ede06f67d1102c72c9cc8a.txt,cate2-00016,32,0,-,0,-,0,0,False,-,0.0,none,-
+730,cate2-00017_jpg.rf.0bebc451d13abceed31b4882387c9410.txt,cate2-00017,32,0,-,0,-,0,0,False,-,0.0,none,-
+731,cate1-00005_jpg.rf.4b952e7932d0d8febfddcee089168d68.txt,cate1-00005,32,0,-,0,-,0,0,False,-,0.0,none,-
+732,cate1-00005_jpg.rf.59ad39ad4248e62f80b40fdc589e82df.txt,cate1-00005,32,0,-,0,-,0,0,False,-,0.0,none,-
+733,cate1-00008_jpg.rf.10436fa8d35c0764df5402f3a6f093dc.txt,cate1-00008,32,0,-,0,-,0,0,False,-,0.0,none,-
+734,cate1-00008_jpg.rf.3f73860592a2aef8cf53b9031356ffbb.txt,cate1-00008,32,0,-,0,-,0,0,False,-,0.0,none,-
+735,cate1-00008_jpg.rf.bd52f3e93a205ce4f81a74a113d8677d.txt,cate1-00008,32,0,-,0,-,0,0,False,-,0.0,none,-
+736,cate1-00011_jpg.rf.18a3e57b79347fc9759d4b5a162a88ec.txt,cate1-00011,32,0,-,0,-,0,0,False,-,0.0,none,-
+737,cate1-00023_jpg.rf.a14af26ab3a09c81f16c707f6f0daa53.txt,cate1-00023,32,0,-,0,-,0,0,False,-,0.0,none,-
+738,cate2-00002_jpg.rf.71a7ae5a01b66928665aa306bd1aee43.txt,cate2-00002,32,0,-,0,-,0,0,False,-,0.0,none,-
+739,cate2-00009_jpg.rf.04cf3ada666bdd2e73ca64960cd6baaa.txt,cate2-00009,32,0,-,0,-,0,0,False,-,0.0,none,-
+740,cate1-00062_jpg.rf.35e5b385c0d5970753e864741be4bf1f.txt,cate1-00062,32,0,-,0,-,0,0,False,-,0.0,none,-
+741,cate2-00001_jpg.rf.c3b2aa9110036dcca66072a10dff749f.txt,cate2-00001,32,0,-,0,-,0,0,False,-,0.0,none,-
+742,cate2-00001_jpg.rf.95401933f6d6af5265fdc1a36a627697.txt,cate2-00001,32,0,-,0,-,0,0,False,-,0.0,none,-
+743,cate1-00041_jpg.rf.08c050565c2241e65e4ca3ce7f714368.txt,cate1-00041,32,0,-,0,-,0,0,False,-,0.0,none,-
+744,cate1-00044_jpg.rf.b36e4113555ae485a444f914baf9ec12.txt,cate1-00044,32,0,-,0,-,0,0,False,-,0.0,none,-
+745,cate1-00050_jpg.rf.b3601c7dfe121061a892cd6f16b8b27a.txt,cate1-00050,32,0,-,0,-,0,0,False,-,0.0,none,-
+746,cate1-00053_jpg.rf.b2b1daf8086bd0629a7d3b72b37ccaf6.txt,cate1-00053,32,0,-,0,-,0,0,False,-,0.0,none,-
+747,cate2-00001_jpg.rf.13aeed63eabfa67e673076522fbd80b0.txt,cate2-00001,32,0,-,0,-,0,0,False,-,0.0,none,-
+748,cate1-00056_jpg.rf.e32ad1ffb82e718b99dd09c52782890d.txt,cate1-00056,32,0,-,0,-,0,0,False,-,0.0,none,-
+749,cate1-00059_jpg.rf.5274a2e90f902b214f5a4f9add2c447f.txt,cate1-00059,32,0,-,0,-,0,0,False,-,0.0,none,-
+750,cate1-00059_jpg.rf.92c9ae7ec180673dc6165bcb6a8e7148.txt,cate1-00059,32,0,-,0,-,0,0,False,-,0.0,none,-
+751,cate1-00059_jpg.rf.a9e11268c4bba51e9373b827dc1b9753.txt,cate1-00059,32,0,-,0,-,0,0,False,-,0.0,none,-
+752,cate1-00062_jpg.rf.626864addd6028b0980d80dbd0f702cb.txt,cate1-00062,32,0,-,0,-,0,0,False,-,0.0,none,-
+753,cate2-00008_jpg.rf.8c78605c9b5a4c0ddc8bfbef1a731f28.txt,cate2-00008,32,0,-,0,-,0,0,False,-,0.0,none,-
+754,cate1-00062_jpg.rf.cee82a77a644b2fae3b8d2aa2adfdb7f.txt,cate1-00062,32,0,-,0,-,0,0,False,-,0.0,none,-
+755,cate1-00065_jpg.rf.13b31542eab0bd3f045736a1d935221c.txt,cate1-00065,32,0,-,0,-,0,0,False,-,0.0,none,-
+756,cate1-00065_jpg.rf.7a710e6eddcb3ced08814a62a93143a6.txt,cate1-00065,32,0,-,0,-,0,0,False,-,0.0,none,-
+757,cate1-00065_jpg.rf.c33faed67e6ccbea5d3fcdb666169022.txt,cate1-00065,32,0,-,0,-,0,0,False,-,0.0,none,-
+758,cate1-00068_jpg.rf.7053b967f1a29660587386e1dc0b8a99.txt,cate1-00068,32,0,-,0,-,0,0,False,-,0.0,none,-
+759,cate1-00068_jpg.rf.bc26c960dbfd07f091ce15d91b348014.txt,cate1-00068,32,0,-,0,-,0,0,False,-,0.0,none,-
+760,cate1-00068_jpg.rf.f9e5e1d821dd0c82fe3224544a745710.txt,cate1-00068,32,0,-,0,-,0,0,False,-,0.0,none,-
+761,cate1-00071_jpg.rf.b39f1ea88d5665838cad95481830f028.txt,cate1-00071,32,0,-,0,-,0,0,False,-,0.0,none,-
+762,cate1-00071_jpg.rf.c21bb8f317002ad33d2b93003224a551.txt,cate1-00071,32,0,-,0,-,0,0,False,-,0.0,none,-
+763,cate1-00071_jpg.rf.de9b6e67d43a02106a0cb46bc49fb0ad.txt,cate1-00071,32,0,-,0,-,0,0,False,-,0.0,none,-
+764,cate2-00018_jpg.rf.5727e4a622c59be60ccffa85fa092acc.txt,cate2-00018,32,0,-,0,-,0,0,False,-,0.0,none,-
+765,cate2-00002_jpg.rf.398f5483e8c9e10877b5f07319d9ea7d.txt,cate2-00002,32,0,-,0,-,0,0,False,-,0.0,none,-
+766,cate1-00038_jpg.rf.73f49cda3d147b65a746463a4d7499df.txt,cate1-00038,32,0,-,0,-,0,0,False,-,0.0,none,-
+767,cate1-00038_jpg.rf.69e28b79d95e827709721cddf17107a4.txt,cate1-00038,32,0,-,0,-,0,0,False,-,0.0,none,-
+768,cate1-00038_jpg.rf.3c63a693eae24c5155b6f1282928630d.txt,cate1-00038,32,0,-,0,-,0,0,False,-,0.0,none,-
+769,cate2-00008_jpg.rf.2a6a886fa46a067e37e6ce01241f5c71.txt,cate2-00008,32,0,-,0,-,0,0,False,-,0.0,none,-
+770,cate1-00026_jpg.rf.365e2e2d1d708d69d19a27a09f0b05de.txt,cate1-00026,32,0,-,0,-,0,0,False,-,0.0,none,-
+771,cate1-00029_jpg.rf.97fe17dca11f631d02b8290db8b4c8de.txt,cate1-00029,32,0,-,0,-,0,0,False,-,0.0,none,-
+772,cate1-00029_jpg.rf.e7a2481e049e4936cefe587d6e5957e3.txt,cate1-00029,32,0,-,0,-,0,0,False,-,0.0,none,-
+773,cate2-00008_jpg.rf.10358f5cbbca8147ea334370e1ee92a6.txt,cate2-00008,32,0,-,0,-,0,0,False,-,0.0,none,-
+774,cate2-00007_jpg.rf.d7753ecf517d9a439fe7de643301610f.txt,cate2-00007,32,0,-,0,-,0,0,False,-,0.0,none,-
+775,cate2-00006_jpg.rf.e180b1c0e276253bd178ab34c9647b08.txt,cate2-00006,32,0,-,0,-,0,0,False,-,0.0,none,-
+776,cate2-00006_jpg.rf.d99b5adc593a61cc345549ce7f3ded7b.txt,cate2-00006,32,0,-,0,-,0,0,False,-,0.0,none,-
+777,cate2-00006_jpg.rf.4118a17dc9e8d0206f314ec25be6228c.txt,cate2-00006,32,0,-,0,-,0,0,False,-,0.0,none,-
+778,cate2-00005_jpg.rf.c8270cb28a9a16cd71c2d3a5874720fd.txt,cate2-00005,32,0,-,0,-,0,0,False,-,0.0,none,-
+779,cate2-00005_jpg.rf.8d82c4c33dfa7d65d3f2eef3d684494a.txt,cate2-00005,32,0,-,0,-,0,0,False,-,0.0,none,-
+780,cate1-00029_jpg.rf.fd58d0d68868049f710e893c59801bf2.txt,cate1-00029,32,0,-,0,-,0,0,False,-,0.0,none,-
+781,cate1-00032_jpg.rf.77108e8b74f9a152b099512e60f79b09.txt,cate1-00032,32,0,-,0,-,0,0,False,-,0.0,none,-
+782,cate1-00032_jpg.rf.ae32059cc3a14daeee304d986af6df35.txt,cate1-00032,32,0,-,0,-,0,0,False,-,0.0,none,-
+783,cate2-00005_jpg.rf.0c97882aaa66d6f3a45ea997755cde65.txt,cate2-00005,32,0,-,0,-,0,0,False,-,0.0,none,-
+784,cate1-00032_jpg.rf.eb7da146237078d22e5eb8426dfdf08c.txt,cate1-00032,32,0,-,0,-,0,0,False,-,0.0,none,-
+785,cate2-00003_jpg.rf.ee753866ade30285aa03556cdfbb28d5.txt,cate2-00003,32,0,-,0,-,0,0,False,-,0.0,none,-
+786,cate2-00003_jpg.rf.afa79e0ec99e842018d86d31b5cbdf52.txt,cate2-00003,32,0,-,0,-,0,0,False,-,0.0,none,-
+787,cate2-00003_jpg.rf.97f51317ee5851f101839f10764c288a.txt,cate2-00003,32,0,-,0,-,0,0,False,-,0.0,none,-
+788,cate2-00002_jpg.rf.88df00cce5a1d60ebf0e6b7fd48b8e71.txt,cate2-00002,32,0,-,0,-,0,0,False,-,0.0,none,-
+789,cate1-00035_jpg.rf.1b0e337b9456278b94cbd484f9889e83.txt,cate1-00035,32,0,-,0,-,0,0,False,-,0.0,none,-
+790,cate1-00035_jpg.rf.c9bfeb3c8fad98601f86f34317ac85e7.txt,cate1-00035,32,0,-,0,-,0,0,False,-,0.0,none,-
+791,cate1-00035_jpg.rf.e82433024ad10ea2a258614c2a8d3c5f.txt,cate1-00035,32,0,-,0,-,0,0,False,-,0.0,none,-
+792,cate2-00018_jpg.rf.40d9a5763138d8cca6d0183ee6ceec45.txt,cate2-00018,32,0,-,0,-,0,0,False,-,0.0,none,-
+793,cate2-00030_jpg.rf.fa2addd1d466f0f70e5486aacaafbead.txt,cate2-00030,32,0,-,0,-,0,0,False,-,0.0,none,-
+794,cate2-00018_jpg.rf.65fd6c10119a204d9e5e3070f297c216.txt,cate2-00018,32,0,-,0,-,0,0,False,-,0.0,none,-
+795,cate6-00099_jpg.rf.66421231c2c5a935538c461b06d72087.txt,cate6-00099,32,0,-,0,-,0,0,False,-,0.0,none,-
+796,cate3-00018_jpg.rf.2e21792886ec1e51c1756c7b9b109ee5.txt,cate3-00018,32,0,-,0,-,0,0,False,-,0.0,none,-
+797,cate3-00018_jpg.rf.51a9baa986aa7438d3195a6b6e40f78e.txt,cate3-00018,32,0,-,0,-,0,0,False,-,0.0,none,-
+798,cate3-00018_jpg.rf.d99d061518b9763e9d9f304c995ba031.txt,cate3-00018,32,0,-,0,-,0,0,False,-,0.0,none,-
+799,cate3-00019_jpg.rf.56b667ba9827c4ee002b6e09340225c5.txt,cate3-00019,32,0,-,0,-,0,0,False,-,0.0,none,-
+800,cate3-00019_jpg.rf.99434bff32d2808f7633e6b301ab854f.txt,cate3-00019,32,0,-,0,-,0,0,False,-,0.0,none,-
+801,cate3-00019_jpg.rf.fa423c37b003079477882b2c899c6b5e.txt,cate3-00019,32,0,-,0,-,0,0,False,-,0.0,none,-
+802,cate6-00086_jpg.rf.c2a1d99859b4ee0e1ce29299a8ea403d.txt,cate6-00086,32,0,-,0,-,0,0,False,-,0.0,none,-
+803,cate6-00086_jpg.rf.3a82a7e3f578e2b20def54b9cce22356.txt,cate6-00086,32,0,-,0,-,0,0,False,-,0.0,none,-
+804,cate6-00086_jpg.rf.3095fa29861cd35bffe474b3e7f9106a.txt,cate6-00086,32,0,-,0,-,0,0,False,-,0.0,none,-
+805,cate3-00020_jpg.rf.10cddb9724f110337a80a95e65753161.txt,cate3-00020,32,0,-,0,-,0,0,False,-,0.0,none,-
+806,cate3-00020_jpg.rf.30158a47fb132163a00241bd1c406067.txt,cate3-00020,32,0,-,0,-,0,0,False,-,0.0,none,-
+807,cate3-00020_jpg.rf.f28784186493ffe4ec2f0f074702f379.txt,cate3-00020,32,0,-,0,-,0,0,False,-,0.0,none,-
+808,cate6-00069_jpg.rf.f6d5c4f63c0be142252591ef2105a1cb.txt,cate6-00069,32,0,-,0,-,0,0,False,-,0.0,none,-
+809,cate6-00069_jpg.rf.54e5aaa0018927b91dcc3a17116b86d9.txt,cate6-00069,32,0,-,0,-,0,0,False,-,0.0,none,-
+810,cate6-00069_jpg.rf.1d2b55062ed75dda29be8f13083f59a0.txt,cate6-00069,32,0,-,0,-,0,0,False,-,0.0,none,-
+811,cate3-00021_jpg.rf.36033329e8a28d934d0fddcc13952400.txt,cate3-00021,32,0,-,0,-,0,0,False,-,0.0,none,-
+812,cate3-00021_jpg.rf.aeacd9839f0cba986b922228ef2183bc.txt,cate3-00021,32,0,-,0,-,0,0,False,-,0.0,none,-
+813,cate3-00021_jpg.rf.b5998a27b3b37748b645eb4cb3e41305.txt,cate3-00021,32,0,-,0,-,0,0,False,-,0.0,none,-
+814,cate6-00051_jpg.rf.ed18717c0445e3ff13946012f8c244da.txt,cate6-00051,32,0,-,0,-,0,0,False,-,0.0,none,-
+815,cate6-00051_jpg.rf.9563de25132b83dc8ac78ab5ef3e5ed4.txt,cate6-00051,32,0,-,0,-,0,0,False,-,0.0,none,-
+816,cate6-00051_jpg.rf.117e23e7e710bf1772fd334b0b4b67b4.txt,cate6-00051,32,0,-,0,-,0,0,False,-,0.0,none,-
+817,cate6-00036_jpg.rf.3e8b730477e2ddea033e7f85464cd962.txt,cate6-00036,32,0,-,0,-,0,0,False,-,0.0,none,-
+818,cate6-00027_jpg.rf.f527451eb9f5af83370ee7c4211d5b00.txt,cate6-00027,32,0,-,0,-,0,0,False,-,0.0,none,-
+819,cate6-00021_jpg.rf.a5a374247826ed31cded9a43e2982f6e.txt,cate6-00021,32,0,-,0,-,0,0,False,-,0.0,none,-
+820,cate3-00023_jpg.rf.3b0997a5dd8180db00b5f81de194d2c8.txt,cate3-00023,32,0,-,0,-,0,0,False,-,0.0,none,-
+821,cate6-00099_jpg.rf.0bdfa0071839d98321af5dbb34694983.txt,cate6-00099,32,0,-,0,-,0,0,False,-,0.0,none,-
+822,cate6-00099_jpg.rf.f835c8f253aebeee115ecd9b446d4730.txt,cate6-00099,32,0,-,0,-,0,0,False,-,0.0,none,-
+823,cate2-00019_jpg.rf.6d116a95bccbf92df7347d8f87232e09.txt,cate2-00019,32,0,-,0,-,0,0,False,-,0.0,none,-
+824,cate6-00101_jpg.rf.06d96abae08674eb0f1936fb9a8eb4eb.txt,cate6-00101,32,0,-,0,-,0,0,False,-,0.0,none,-
+825,cate3-00006_jpg.rf.aae79168d88bf4e20f6bfc51f3dd0f29.txt,cate3-00006,32,0,-,0,-,0,0,False,-,0.0,none,-
+826,cate3-00007_jpg.rf.b918c1031f894027acaa12ad1f8a8142.txt,cate3-00007,32,0,-,0,-,0,0,False,-,0.0,none,-
+827,cate3-00008_jpg.rf.758b1b82f2f13e5beee30274c1c295f1.txt,cate3-00008,32,0,-,0,-,0,0,False,-,0.0,none,-
+828,cate6-00159_jpg.rf.d670e83aa91a1a86fe0596aa604d6bf4.txt,cate6-00159,32,0,-,0,-,0,0,False,-,0.0,none,-
+829,cate6-00159_jpg.rf.4c38fc9c6b5e8eb8f160510a65b1b758.txt,cate6-00159,32,0,-,0,-,0,0,False,-,0.0,none,-
+830,cate6-00159_jpg.rf.3d33d3d3dcdfa262940ccc96a5876071.txt,cate6-00159,32,0,-,0,-,0,0,False,-,0.0,none,-
+831,cate3-00008_jpg.rf.a3b375a95b6ccd9fe89a6c1823e36ec8.txt,cate3-00008,32,0,-,0,-,0,0,False,-,0.0,none,-
+832,cate6-00151_jpg.rf.e35e483dfeba488d47f3f3fd704172e8.txt,cate6-00151,32,0,-,0,-,0,0,False,-,0.0,none,-
+833,cate6-00147_jpg.rf.a1ad961c2145387bf9233353abd43f72.txt,cate6-00147,32,0,-,0,-,0,0,False,-,0.0,none,-
+834,cate3-00008_jpg.rf.b75dae6c62ee59c4cc299ad5c7c458b7.txt,cate3-00008,32,0,-,0,-,0,0,False,-,0.0,none,-
+835,cate6-00141_jpg.rf.2cccae1daf54f19feee6d6293d0a2d83.txt,cate6-00141,32,0,-,0,-,0,0,False,-,0.0,none,-
+836,cate3-00009_jpg.rf.8863a6fcb029e6d6766933be7c236cf7.txt,cate3-00009,32,0,-,0,-,0,0,False,-,0.0,none,-
+837,cate3-00009_jpg.rf.abb3b23bf8d13e169421ac2b2e2f4d9e.txt,cate3-00009,32,0,-,0,-,0,0,False,-,0.0,none,-
+838,cate3-00009_jpg.rf.e2c89d8bf5a5bacb87c60cad536fd9b2.txt,cate3-00009,32,0,-,0,-,0,0,False,-,0.0,none,-
+839,cate3-00013_jpg.rf.792f8537dbcd3ee15ae1bff55fdee873.txt,cate3-00013,32,0,-,0,-,0,0,False,-,0.0,none,-
+840,cate3-00014_jpg.rf.8042132daeee070cd7bf4fb49c14f85a.txt,cate3-00014,32,0,-,0,-,0,0,False,-,0.0,none,-
+841,cate3-00016_jpg.rf.d93c71c586be9b9c8ffb0e596b8904d1.txt,cate3-00016,32,0,-,0,-,0,0,False,-,0.0,none,-
+842,cate6-00108_jpg.rf.e97afb958df650207cf954506ced7c8d.txt,cate6-00108,32,0,-,0,-,0,0,False,-,0.0,none,-
+843,cate6-00108_jpg.rf.e852ad137ec0ed547f51d8114d6a4844.txt,cate6-00108,32,0,-,0,-,0,0,False,-,0.0,none,-
+844,cate6-00108_jpg.rf.b005f3792107fb97f46564e3abe2fe38.txt,cate6-00108,32,0,-,0,-,0,0,False,-,0.0,none,-
+845,cate6-00105_jpg.rf.c96876eb5971806078e3c43e0a32f505.txt,cate6-00105,32,0,-,0,-,0,0,False,-,0.0,none,-
+846,cate6-00105_jpg.rf.8bfca665aed9ad8bd5871d71fc09e5f5.txt,cate6-00105,32,0,-,0,-,0,0,False,-,0.0,none,-
+847,cate6-00105_jpg.rf.4746ba084ecfb3a47996c5bcc4ba8950.txt,cate6-00105,32,0,-,0,-,0,0,False,-,0.0,none,-
+848,cate6-00101_jpg.rf.27ed4471932f755f9bb621416bced5f5.txt,cate6-00101,32,0,-,0,-,0,0,False,-,0.0,none,-
+849,cate6-00101_jpg.rf.0db87da9b970b4d46eb5212be560e35e.txt,cate6-00101,32,0,-,0,-,0,0,False,-,0.0,none,-
+850,cate3-00023_jpg.rf.831b9eb2ec935063ca51e398d7b8fd3b.txt,cate3-00023,32,0,-,0,-,0,0,False,-,0.0,none,-
+851,cate3-00023_jpg.rf.c0a91bde7954b7a7bb9794469862378a.txt,cate3-00023,32,0,-,0,-,0,0,False,-,0.0,none,-
+852,cate3-00026_jpg.rf.2b4f0ff61158f77465fbd8dc532c4660.txt,cate3-00026,32,0,-,0,-,0,0,False,-,0.0,none,-
+853,cate3-00026_jpg.rf.e4c4b547dc19149926e48cbe99a5d8cd.txt,cate3-00026,32,0,-,0,-,0,0,False,-,0.0,none,-
+854,cate4-00091_jpg.rf.a305343401dd3ee09d9cb4f5395fa184.txt,cate4-00091,32,0,-,0,-,0,0,False,-,0.0,none,-
+855,cate4-00091_jpg.rf.bf7c1497519e5357b7eca5796144544e.txt,cate4-00091,32,0,-,0,-,0,0,False,-,0.0,none,-
+856,cate4-00094_jpg.rf.566e53592bf2d7c502cd122e6ff0a4d8.txt,cate4-00094,32,0,-,0,-,0,0,False,-,0.0,none,-
+857,cate4-00094_jpg.rf.75f97439f6514548ed5deec49508d88c.txt,cate4-00094,32,0,-,0,-,0,0,False,-,0.0,none,-
+858,cate4-00094_jpg.rf.faf3f62b9faa8eb81853fe4452ae3604.txt,cate4-00094,32,0,-,0,-,0,0,False,-,0.0,none,-
+859,cate4-00095_jpg.rf.3f28659275788ec201a5684ede15074b.txt,cate4-00095,32,0,-,0,-,0,0,False,-,0.0,none,-
+860,cate4-00095_jpg.rf.aa4224c1152488922e2b7944a83bf692.txt,cate4-00095,32,0,-,0,-,0,0,False,-,0.0,none,-
+861,cate4-00095_jpg.rf.da7ee68b3c7d4726f45ebb0f3a2ee4cf.txt,cate4-00095,32,0,-,0,-,0,0,False,-,0.0,none,-
+862,cate4-00099_jpg.rf.710e9edac74fdf77a1a2feb13d809232.txt,cate4-00099,32,0,-,0,-,0,0,False,-,0.0,none,-
+863,cate4-00100_jpg.rf.0b9e55f417166a10342b47142e3928b0.txt,cate4-00100,32,0,-,0,-,0,0,False,-,0.0,none,-
+864,cate4-00102_jpg.rf.3f2e28e5dde71ef1bd67ee6ac392bbcb.txt,cate4-00102,32,0,-,0,-,0,0,False,-,0.0,none,-
+865,cate4-00103_jpg.rf.94b7fefebda62b27d129be8738b98299.txt,cate4-00103,32,0,-,0,-,0,0,False,-,0.0,none,-
+866,cate4-00104_jpg.rf.940afd43ec0f7710998e2aa2afd6ad39.txt,cate4-00104,32,0,-,0,-,0,0,False,-,0.0,none,-
+867,cate4-00105_jpg.rf.31fe9209cd5160d7535877a3b8d56e01.txt,cate4-00105,32,0,-,0,-,0,0,False,-,0.0,none,-
+868,cate4-00106_jpg.rf.0b94a0c5f3ce997322d764ff6f7eca16.txt,cate4-00106,32,0,-,0,-,0,0,False,-,0.0,none,-
+869,cate4-00107_jpg.rf.d28348f3fd74ad59bd11cdab2fbab85b.txt,cate4-00107,32,0,-,0,-,0,0,False,-,0.0,none,-
+870,cate4-00108_jpg.rf.000ca062d66714a61412029be4008841.txt,cate4-00108,32,0,-,0,-,0,0,False,-,0.0,none,-
+871,cate4-00108_jpg.rf.0059daca135a8379dfe298cecffbd0e3.txt,cate4-00108,32,0,-,0,-,0,0,False,-,0.0,none,-
+872,cate4-00108_jpg.rf.89923db5b141a97f1a0ee29f3c1b9c9b.txt,cate4-00108,32,0,-,0,-,0,0,False,-,0.0,none,-
+873,cate4-00112_jpg.rf.8888c76673fdb18c3510b7fe28dab826.txt,cate4-00112,32,0,-,0,-,0,0,False,-,0.0,none,-
+874,cate4-00114_jpg.rf.ca966fe9e68f24c9582d86c1e0317e6a.txt,cate4-00114,32,0,-,0,-,0,0,False,-,0.0,none,-
+875,cate4-00116_jpg.rf.99afef2d5c49533ec4a4912063dee9cf.txt,cate4-00116,32,0,-,0,-,0,0,False,-,0.0,none,-
+876,cate4-00131_jpg.rf.19cf0831d650103c2bc5729cb99b738c.txt,cate4-00131,32,0,-,0,-,0,0,False,-,0.0,none,-
+877,cate4-00131_jpg.rf.7c55c77ecccd98edc76fddff53152638.txt,cate4-00131,32,0,-,0,-,0,0,False,-,0.0,none,-
+878,cate4-00131_jpg.rf.dceada043e33cbad1bc1b57ed1243bfc.txt,cate4-00131,32,0,-,0,-,0,0,False,-,0.0,none,-
+879,cate4-00091_jpg.rf.9799a67dec4ffacb9ebdf7f64aacd10a.txt,cate4-00091,32,0,-,0,-,0,0,False,-,0.0,none,-
+880,cate4-00089_jpg.rf.6a2aeed3b1c4b9c2fcacff9124a98b63.txt,cate4-00089,32,0,-,0,-,0,0,False,-,0.0,none,-
+881,cate4-00088_jpg.rf.d5f9b0e2f64eb033dcf8f86c5f0374a5.txt,cate4-00088,32,0,-,0,-,0,0,False,-,0.0,none,-
+882,cate4-00073_jpg.rf.42e2dae6771a43bf524a930eb73e6ebb.txt,cate4-00073,32,0,-,0,-,0,0,False,-,0.0,none,-
+883,cate6-00003_jpg.rf.a74ff38dfc403c36db0b4677b6499b09.txt,cate6-00003,32,0,-,0,-,0,0,False,-,0.0,none,-
+884,cate6-00003_jpg.rf.966cf8ffe4c650b2e3eebd67ec383d9a.txt,cate6-00003,32,0,-,0,-,0,0,False,-,0.0,none,-
+885,cate3-00026_jpg.rf.e8ce18b46f5df23cf4f7d0232fe373ba.txt,cate3-00026,32,0,-,0,-,0,0,False,-,0.0,none,-
+886,cate1-00002_jpg.rf.92038c2caa928c247e3671c407fc613c.txt,cate1-00002,32,0,-,0,-,0,0,False,-,0.0,none,-
+887,cate3-00027_jpg.rf.50142b1ee65e4bac04d968c5b0afce55.txt,cate3-00027,32,0,-,0,-,0,0,False,-,0.0,none,-
+888,cate3-00027_jpg.rf.9a432908669dc9b82a86ff232a55ff45.txt,cate3-00027,32,0,-,0,-,0,0,False,-,0.0,none,-
+889,cate3-00027_jpg.rf.acf2219b34a18375ce91b128b6cc11f8.txt,cate3-00027,32,0,-,0,-,0,0,False,-,0.0,none,-
+890,cate4-00069_jpg.rf.3c40af59574c0b84e63758676751923e.txt,cate4-00069,32,0,-,0,-,0,0,False,-,0.0,none,-
+891,cate4-00069_jpg.rf.bfe8bb0f739dd93ede943edb54ae490e.txt,cate4-00069,32,0,-,0,-,0,0,False,-,0.0,none,-
+892,cate4-00070_jpg.rf.9f0a5a0a2310b7fbcd76c6870d316074.txt,cate4-00070,32,0,-,0,-,0,0,False,-,0.0,none,-
+893,cate4-00072_jpg.rf.0fbed3f154747c201c7c216b2634bd66.txt,cate4-00072,32,0,-,0,-,0,0,False,-,0.0,none,-
+894,cate4-00075_jpg.rf.c1a9139dafc147b05de83f14df06b083.txt,cate4-00075,32,0,-,0,-,0,0,False,-,0.0,none,-
+895,cate4-00087_jpg.rf.e2589d13c8b91c6573de7bec96a91cdd.txt,cate4-00087,32,0,-,0,-,0,0,False,-,0.0,none,-
+896,cate4-00077_jpg.rf.26f7c103bb785f607d093996c2377a22.txt,cate4-00077,32,0,-,0,-,0,0,False,-,0.0,none,-
+897,cate4-00079_jpg.rf.44212701404990930df37a49386adae6.txt,cate4-00079,32,0,-,0,-,0,0,False,-,0.0,none,-
+898,cate4-00079_jpg.rf.d9df3614b2f590b9e5510ac539049249.txt,cate4-00079,32,0,-,0,-,0,0,False,-,0.0,none,-
+899,cate4-00085_jpg.rf.3ecc95a9063d28a145e773b1354c967e.txt,cate4-00085,32,0,-,0,-,0,0,False,-,0.0,none,-
+900,cate4-00085_jpg.rf.a7d4df905289220b2fa91fe0b672cf19.txt,cate4-00085,32,0,-,0,-,0,0,False,-,0.0,none,-
+901,cate4-00085_jpg.rf.e47e1700bb730c2962b24d4faadc51e8.txt,cate4-00085,32,0,-,0,-,0,0,False,-,0.0,none,-
+902,cate4-00086_jpg.rf.3a2d5855fb0d8616af3481b8a0d6d7a6.txt,cate4-00086,32,0,-,0,-,0,0,False,-,0.0,none,-
+903,cate4-00086_jpg.rf.3ec590ec594942db54b4fdc761b22466.txt,cate4-00086,32,0,-,0,-,0,0,False,-,0.0,none,-
+904,cate4-00086_jpg.rf.5cf34b9934336f1da2d0cc111733f200.txt,cate4-00086,32,0,-,0,-,0,0,False,-,0.0,none,-
+905,cate4-00087_jpg.rf.683024bf11640b35d6bb716f41c33562.txt,cate4-00087,32,0,-,0,-,0,0,False,-,0.0,none,-
+906,cate4-00087_jpg.rf.cc485441335c2f1f9be018eb5133a886.txt,cate4-00087,32,0,-,0,-,0,0,False,-,0.0,none,-
+907,cate3-00003_jpg.rf.242fe63ad7de085f4641dfa555cefc93.txt,cate3-00003,32,0,-,0,-,0,0,False,-,0.0,none,-
+908,cate2-00136_jpg.rf.5a4262b479d47c5fb50d58531ed744d2.txt,cate2-00136,32,0,-,0,-,0,0,False,-,0.0,none,-
+909,cate2-00136_jpg.rf.5436d3c7bd9d034e430a58cdb02ca6d9.txt,cate2-00136,32,0,-,0,-,0,0,False,-,0.0,none,-
+910,cate2-00039_jpg.rf.6e30ed8c13e37e37aee804a111dea8e0.txt,cate2-00039,32,0,-,0,-,0,0,False,-,0.0,none,-
+911,cate2-00028_jpg.rf.e24bd2cce2923ea431883eec5de1da5f.txt,cate2-00028,32,0,-,0,-,0,0,False,-,0.0,none,-
+912,cate2-00030_jpg.rf.41c468c20878228e848f3552a6384511.txt,cate2-00030,32,0,-,0,-,0,0,False,-,0.0,none,-
+913,cate2-00030_jpg.rf.8307131537f45894936cb1d6cc1945de.txt,cate2-00030,32,0,-,0,-,0,0,False,-,0.0,none,-
+914,cate2-00031_jpg.rf.0ed22bc14c06241172f64aba42211818.txt,cate2-00031,32,0,-,0,-,0,0,False,-,0.0,none,-
+915,cate2-00031_jpg.rf.8072470d88ef5495882a7c4a73349b16.txt,cate2-00031,32,0,-,0,-,0,0,False,-,0.0,none,-
+916,cate2-00031_jpg.rf.ec73411fa95d19c5db10278856dc6cbf.txt,cate2-00031,32,0,-,0,-,0,0,False,-,0.0,none,-
+917,cate2-00032_jpg.rf.08ee0db4735d7ccc05e91c92b8a104d4.txt,cate2-00032,32,0,-,0,-,0,0,False,-,0.0,none,-
+918,cate2-00032_jpg.rf.2274d2ec38d0dd7e45b3b0e53489d18d.txt,cate2-00032,32,0,-,0,-,0,0,False,-,0.0,none,-
+919,cate2-00032_jpg.rf.d3bd650cb3f289e25499faecea917b8f.txt,cate2-00032,32,0,-,0,-,0,0,False,-,0.0,none,-
+920,cate2-00033_jpg.rf.7c7306aa4870999d53ccd8706af7e2c4.txt,cate2-00033,32,0,-,0,-,0,0,False,-,0.0,none,-
+921,cate2-00033_jpg.rf.a17266f91a41813a3f83cf611dae1847.txt,cate2-00033,32,0,-,0,-,0,0,False,-,0.0,none,-
+922,cate2-00033_jpg.rf.be21367a39c7c9d752c39ab094e83347.txt,cate2-00033,32,0,-,0,-,0,0,False,-,0.0,none,-
+923,cate2-00034_jpg.rf.0e0e7d635b90bd3fef1f1e1f1dd4ce00.txt,cate2-00034,32,0,-,0,-,0,0,False,-,0.0,none,-
+924,cate2-00034_jpg.rf.35a0cbab89b1a5230413673468ade569.txt,cate2-00034,32,0,-,0,-,0,0,False,-,0.0,none,-
+925,cate2-00034_jpg.rf.64636032271eb42f7c9b617ed1b6aac1.txt,cate2-00034,32,0,-,0,-,0,0,False,-,0.0,none,-
+926,cate2-00035_jpg.rf.903bb19bbb06a11739abeb245ad6d4c9.txt,cate2-00035,32,0,-,0,-,0,0,False,-,0.0,none,-
+927,cate2-00035_jpg.rf.e8a4620898f6a7277632a67595d8732d.txt,cate2-00035,32,0,-,0,-,0,0,False,-,0.0,none,-
+928,cate2-00036_jpg.rf.04475dac8669951e56ad23596433a278.txt,cate2-00036,32,0,-,0,-,0,0,False,-,0.0,none,-
+929,cate2-00036_jpg.rf.133ac183ca7b6d510e723354ba231052.txt,cate2-00036,32,0,-,0,-,0,0,False,-,0.0,none,-
+930,cate2-00036_jpg.rf.5246ad8e1dc36f55114045c59978b45b.txt,cate2-00036,32,0,-,0,-,0,0,False,-,0.0,none,-
+931,cate2-00037_jpg.rf.0a4f698422b06987e6421461fb192765.txt,cate2-00037,32,0,-,0,-,0,0,False,-,0.0,none,-
+932,cate2-00037_jpg.rf.87058b67873cff49107908294d11ab73.txt,cate2-00037,32,0,-,0,-,0,0,False,-,0.0,none,-
+933,cate2-00037_jpg.rf.af90517abe70a6b86d62746ce9be6ce3.txt,cate2-00037,32,0,-,0,-,0,0,False,-,0.0,none,-
+934,cate2-00038_jpg.rf.2423b6801a5648d37ff9149efb311ab8.txt,cate2-00038,32,0,-,0,-,0,0,False,-,0.0,none,-
+935,cate2-00038_jpg.rf.b4ef5151bae96f4de7f613fb96b7735e.txt,cate2-00038,32,0,-,0,-,0,0,False,-,0.0,none,-
+936,cate2-00028_jpg.rf.c5b6260053b2b2a38ea6753f20ee39a7.txt,cate2-00028,32,0,-,0,-,0,0,False,-,0.0,none,-
+937,cate2-00028_jpg.rf.3bbdbf6a4947e8d6899d00f97cdcb663.txt,cate2-00028,32,0,-,0,-,0,0,False,-,0.0,none,-
+938,cate2-00027_jpg.rf.cf608bef7b2d8bb65a96dbc4d793ccd7.txt,cate2-00027,32,0,-,0,-,0,0,False,-,0.0,none,-
+939,cate2-00023_jpg.rf.2bf5cb84759d6150c23b9c50393c410e.txt,cate2-00023,32,0,-,0,-,0,0,False,-,0.0,none,-
+940,cate2-00019_jpg.rf.977dd2814e6e79d10ebfc73bcee11279.txt,cate2-00019,32,0,-,0,-,0,0,False,-,0.0,none,-
+941,cate2-00019_jpg.rf.bbf854cfb5bb343ba6faca4993eebca6.txt,cate2-00019,32,0,-,0,-,0,0,False,-,0.0,none,-
+942,cate2-00020_jpg.rf.16b91f29e3feccbedf95e0ab37e4dd37.txt,cate2-00020,32,0,-,0,-,0,0,False,-,0.0,none,-
+943,cate2-00020_jpg.rf.1c2a690fd0d482c589834bd4a609d86c.txt,cate2-00020,32,0,-,0,-,0,0,False,-,0.0,none,-
+944,cate2-00020_jpg.rf.51f2e8c33c9c24fa143f697745948236.txt,cate2-00020,32,0,-,0,-,0,0,False,-,0.0,none,-
+945,cate2-00021_jpg.rf.3020e6ff8fcee3073b723f6a5d904cf7.txt,cate2-00021,32,0,-,0,-,0,0,False,-,0.0,none,-
+946,cate2-00021_jpg.rf.a7766bb31902e0bc793a6a34a9c29284.txt,cate2-00021,32,0,-,0,-,0,0,False,-,0.0,none,-
+947,cate2-00021_jpg.rf.b7ebb4be90676f76ecc58586e34e17b4.txt,cate2-00021,32,0,-,0,-,0,0,False,-,0.0,none,-
+948,cate2-00022_jpg.rf.01f388558413301107d4a9f1a7a0d410.txt,cate2-00022,32,0,-,0,-,0,0,False,-,0.0,none,-
+949,cate2-00022_jpg.rf.12d3698fd949a8fa087d0c230d023a7a.txt,cate2-00022,32,0,-,0,-,0,0,False,-,0.0,none,-
+950,cate2-00022_jpg.rf.7168afb0522a71057177d2d04b7178fe.txt,cate2-00022,32,0,-,0,-,0,0,False,-,0.0,none,-
+951,cate2-00023_jpg.rf.6a182c232906217c5f14b12c0bd4be35.txt,cate2-00023,32,0,-,0,-,0,0,False,-,0.0,none,-
+952,cate2-00027_jpg.rf.74e0ed0085cddfd95a9e7a8bd618d064.txt,cate2-00027,32,0,-,0,-,0,0,False,-,0.0,none,-
+953,cate2-00023_jpg.rf.97dcbbf065f1ad42649975d017340293.txt,cate2-00023,32,0,-,0,-,0,0,False,-,0.0,none,-
+954,cate2-00024_jpg.rf.404b937a18b09deae32b32635746f24a.txt,cate2-00024,32,0,-,0,-,0,0,False,-,0.0,none,-
+955,cate2-00024_jpg.rf.55ee5e910d8c2bfb220cd2f31f5738c8.txt,cate2-00024,32,0,-,0,-,0,0,False,-,0.0,none,-
+956,cate2-00024_jpg.rf.fcdad1d1e96e782bead30ea33af7ed9f.txt,cate2-00024,32,0,-,0,-,0,0,False,-,0.0,none,-
+957,cate2-00025_jpg.rf.665e96ac42b4c75bcf365658166937c1.txt,cate2-00025,32,0,-,0,-,0,0,False,-,0.0,none,-
+958,cate2-00025_jpg.rf.dc865af8fb9f78a9586c217e61b0c1ac.txt,cate2-00025,32,0,-,0,-,0,0,False,-,0.0,none,-
+959,cate2-00025_jpg.rf.e5bd68e3b7098b3eb60706dbf0d07913.txt,cate2-00025,32,0,-,0,-,0,0,False,-,0.0,none,-
+960,cate2-00026_jpg.rf.52f53f396eede9b33d3f2d0c4c26d419.txt,cate2-00026,32,0,-,0,-,0,0,False,-,0.0,none,-
+961,cate2-00026_jpg.rf.6dbefa91fe277f3ada49a35384938405.txt,cate2-00026,32,0,-,0,-,0,0,False,-,0.0,none,-
+962,cate2-00026_jpg.rf.fdd7c8ae644076200b72b495ba9ae9a9.txt,cate2-00026,32,0,-,0,-,0,0,False,-,0.0,none,-
+963,cate2-00027_jpg.rf.31cdfcb8d4b7cd5fd6f6a31883120c98.txt,cate2-00027,32,0,-,0,-,0,0,False,-,0.0,none,-
+964,cate2-00038_jpg.rf.d2c9b3799254cc04594f41691f96629a.txt,cate2-00038,32,0,-,0,-,0,0,False,-,0.0,none,-
+965,cate2-00039_jpg.rf.a52bd9d0bd3316813f11dd9768ac5c71.txt,cate2-00039,32,0,-,0,-,0,0,False,-,0.0,none,-
+966,cate2-00136_jpg.rf.1f53a04c920b94dc21eed48cf4366b5a.txt,cate2-00136,32,0,-,0,-,0,0,False,-,0.0,none,-
+967,cate2-00039_jpg.rf.e914eb6b8b6bddae5842c8781739adc5.txt,cate2-00039,32,0,-,0,-,0,0,False,-,0.0,none,-
+968,cate2-00120_jpg.rf.41925bd41fb5fa6be214f35064de5dbc.txt,cate2-00120,32,0,-,0,-,0,0,False,-,0.0,none,-
+969,cate2-00122_jpg.rf.4a780e764402cd957f577459947608ae.txt,cate2-00122,32,0,-,0,-,0,0,False,-,0.0,none,-
+970,cate2-00122_jpg.rf.6e5ae3adde62c5a8c40a9de486c83b94.txt,cate2-00122,32,0,-,0,-,0,0,False,-,0.0,none,-
+971,cate2-00122_jpg.rf.c96f9469996974940a9b5670df63d63f.txt,cate2-00122,32,0,-,0,-,0,0,False,-,0.0,none,-
+972,cate2-00123_jpg.rf.04cea0c639924c6d34f298e703be9267.txt,cate2-00123,32,0,-,0,-,0,0,False,-,0.0,none,-
+973,cate2-00123_jpg.rf.be4e67664acd0c72c3960f09d879821a.txt,cate2-00123,32,0,-,0,-,0,0,False,-,0.0,none,-
+974,cate2-00123_jpg.rf.f28cf0e30b2c60d6826177f572800fd6.txt,cate2-00123,32,0,-,0,-,0,0,False,-,0.0,none,-
+975,cate2-00124_jpg.rf.1520d9f59ab5269e30bb66af1dc211e0.txt,cate2-00124,32,0,-,0,-,0,0,False,-,0.0,none,-
+976,cate2-00124_jpg.rf.98cc5484a96e6c818f2e60958081f51d.txt,cate2-00124,32,0,-,0,-,0,0,False,-,0.0,none,-
+977,cate2-00124_jpg.rf.b94378b347005894adbaef813fe8dc76.txt,cate2-00124,32,0,-,0,-,0,0,False,-,0.0,none,-
+978,cate2-00127_jpg.rf.18c8c7a200ae4f5a3516d2049473274e.txt,cate2-00127,32,0,-,0,-,0,0,False,-,0.0,none,-
+979,cate2-00127_jpg.rf.857694ce7d74f25cdcf6b67c93aa9590.txt,cate2-00127,32,0,-,0,-,0,0,False,-,0.0,none,-
+980,cate2-00127_jpg.rf.aaba4e5e69cf5a828885a05115aa8d11.txt,cate2-00127,32,0,-,0,-,0,0,False,-,0.0,none,-
+981,cate2-00128_jpg.rf.4709db857d9fd9dec8abec8fb1897cd2.txt,cate2-00128,32,0,-,0,-,0,0,False,-,0.0,none,-
+982,cate2-00128_jpg.rf.f98190fd7b358e0f89efb7202a2c3caa.txt,cate2-00128,32,0,-,0,-,0,0,False,-,0.0,none,-
+983,cate2-00129_jpg.rf.f341f1cc565a40e9be61f8ba8cf2d12c.txt,cate2-00129,32,0,-,0,-,0,0,False,-,0.0,none,-
+984,cate2-00133_jpg.rf.648bdd48e51142797f7fd146c4f2ed2c.txt,cate2-00133,32,0,-,0,-,0,0,False,-,0.0,none,-
+985,cate2-00133_jpg.rf.80fe64612c7cf667a459c51e95936dc8.txt,cate2-00133,32,0,-,0,-,0,0,False,-,0.0,none,-
+986,cate2-00133_jpg.rf.d094f570793bdc55a97d9b9919a236de.txt,cate2-00133,32,0,-,0,-,0,0,False,-,0.0,none,-
+987,cate2-00134_jpg.rf.176f9f3dc7fcfcc35fb2abbdd10065e3.txt,cate2-00134,32,0,-,0,-,0,0,False,-,0.0,none,-
+988,cate2-00134_jpg.rf.17b588bb30739d642ece5deaab39e1d7.txt,cate2-00134,32,0,-,0,-,0,0,False,-,0.0,none,-
+989,cate2-00134_jpg.rf.a9bff963bec7e92f2aa5199494cc1e16.txt,cate2-00134,32,0,-,0,-,0,0,False,-,0.0,none,-
+990,cate2-00135_jpg.rf.6bb6191f10c229d990f2fbc2bcc757fd.txt,cate2-00135,32,0,-,0,-,0,0,False,-,0.0,none,-
+991,cate2-00135_jpg.rf.cdafe75bd3d65976ff657c26da2907ca.txt,cate2-00135,32,0,-,0,-,0,0,False,-,0.0,none,-
+992,cate2-00135_jpg.rf.e3988f97c01947120c42d2477f751e97.txt,cate2-00135,32,0,-,0,-,0,0,False,-,0.0,none,-
+993,cate2-00120_jpg.rf.3eaeb08aff6b2d5c27fa9d58fba44a4e.txt,cate2-00120,32,0,-,0,-,0,0,False,-,0.0,none,-
+994,cate2-00120_jpg.rf.02b06ca6dbfbb7d6e25405d2e8cbb11a.txt,cate2-00120,32,0,-,0,-,0,0,False,-,0.0,none,-
+995,cate2-00119_jpg.rf.a4a02bb0ab11d99d6ce4f46f4aeafb55.txt,cate2-00119,32,0,-,0,-,0,0,False,-,0.0,none,-
+996,cate2-00108_jpg.rf.ee25bd60b1d1727459f4b81b513fd67f.txt,cate2-00108,32,0,-,0,-,0,0,False,-,0.0,none,-
+997,cate2-00040_jpg.rf.10df1c6a1bf0dd15c52662e6445e19e3.txt,cate2-00040,32,0,-,0,-,0,0,False,-,0.0,none,-
+998,cate2-00040_jpg.rf.611a724ab77f4f0b58a3872c672bc109.txt,cate2-00040,32,0,-,0,-,0,0,False,-,0.0,none,-
+999,cate2-00040_jpg.rf.88717da458f128f3344a00f8af30a7cc.txt,cate2-00040,32,0,-,0,-,0,0,False,-,0.0,none,-
+1000,cate2-00101_jpg.rf.9f60235642c365cc56434856eef4ee09.txt,cate2-00101,32,0,-,0,-,0,0,False,-,0.0,none,-
+1001,cate2-00102_jpg.rf.65c9c658282d3cde127278893e6dc9c9.txt,cate2-00102,32,0,-,0,-,0,0,False,-,0.0,none,-
+1002,cate2-00103_jpg.rf.ec685b214407d3293af1801239821564.txt,cate2-00103,32,0,-,0,-,0,0,False,-,0.0,none,-
+1003,cate2-00104_jpg.rf.eaa5f028720c00a5d75a34fdd945799a.txt,cate2-00104,32,0,-,0,-,0,0,False,-,0.0,none,-
+1004,cate2-00105_jpg.rf.45cac4248100d4856cc4a83d20298685.txt,cate2-00105,32,0,-,0,-,0,0,False,-,0.0,none,-
+1005,cate2-00106_jpg.rf.c9b9875046320ef052a8807e49a365ca.txt,cate2-00106,32,0,-,0,-,0,0,False,-,0.0,none,-
+1006,cate2-00108_jpg.rf.54bf9e089516e49f2bc8ec2b779389e1.txt,cate2-00108,32,0,-,0,-,0,0,False,-,0.0,none,-
+1007,cate2-00108_jpg.rf.e840f24b9375263c05d361a616ec8022.txt,cate2-00108,32,0,-,0,-,0,0,False,-,0.0,none,-
+1008,cate2-00110_jpg.rf.819b67e36abf7ab9a1d7ad6f89b72767.txt,cate2-00110,32,0,-,0,-,0,0,False,-,0.0,none,-
+1009,cate2-00119_jpg.rf.415ee55c8d2cce1bad090e88328db634.txt,cate2-00119,32,0,-,0,-,0,0,False,-,0.0,none,-
+1010,cate2-00111_jpg.rf.9501b5f21a6741a69453c5660ce8353e.txt,cate2-00111,32,0,-,0,-,0,0,False,-,0.0,none,-
+1011,cate2-00112_jpg.rf.2acee4ae1d94cb4342a95211a91f401b.txt,cate2-00112,32,0,-,0,-,0,0,False,-,0.0,none,-
+1012,cate2-00113_jpg.rf.13ff40ae6bbb7cddc3abb1bbda329c1e.txt,cate2-00113,32,0,-,0,-,0,0,False,-,0.0,none,-
+1013,cate2-00114_jpg.rf.1187a09bcb3a05a2fe0cb942506602e3.txt,cate2-00114,32,0,-,0,-,0,0,False,-,0.0,none,-
+1014,cate2-00115_jpg.rf.feb85e64865d69bce1e36077deaeab61.txt,cate2-00115,32,0,-,0,-,0,0,False,-,0.0,none,-
+1015,cate2-00116_jpg.rf.d08949dc3fd667f83674ae6735292f10.txt,cate2-00116,32,0,-,0,-,0,0,False,-,0.0,none,-
+1016,cate2-00117_jpg.rf.6e1ff77390e8fd69fe7e24b569c486ed.txt,cate2-00117,32,0,-,0,-,0,0,False,-,0.0,none,-
+1017,cate2-00118_jpg.rf.22cdc88bee09962310d19ce17c820d77.txt,cate2-00118,32,0,-,0,-,0,0,False,-,0.0,none,-
+1018,cate2-00118_jpg.rf.542d865e75a076fce0a3b52e95ff0b3e.txt,cate2-00118,32,0,-,0,-,0,0,False,-,0.0,none,-
+1019,cate2-00118_jpg.rf.ee14ee96d3a4ae70c830c24d7f4ff1a7.txt,cate2-00118,32,0,-,0,-,0,0,False,-,0.0,none,-
+1020,cate2-00119_jpg.rf.27e3c35516878e069e760a1d90da0191.txt,cate2-00119,32,0,-,0,-,0,0,False,-,0.0,none,-
+1021,cate1-00002_jpg.rf.69248919c2bc1558c19f755d875c1771.txt,cate1-00002,32,0,-,0,-,0,0,False,-,0.0,none,-
