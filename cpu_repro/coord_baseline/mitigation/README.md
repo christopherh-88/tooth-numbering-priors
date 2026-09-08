@@ -186,6 +186,18 @@ success after the fact.
   spot-checked `MIRROR_MAP[0] == 8` (FDI 11 -> 21) and
   `MIRROR_MAP[8] == 0` (FDI 21 -> 11) in the verification run below.
 
+  **Full 32-class correctness proof (not just the one spot-checked pair):
+  `verify_mirror_map.py`, run 2026-09-08 - all 10 checks pass.** Confirms,
+  for every one of the 32 classes, not just FDI 11/21: `MIRROR_MAP` is a
+  genuine bijection (no class dropped or duplicated), an involution
+  (applying it twice returns the identity), has no fixed points (every
+  class maps to a genuinely different partner), and every pair correctly
+  preserves the tooth-type digit while swapping to a valid mirror
+  quadrant - and each quadrant block (1, 2, 3, 4) maps entirely into its
+  correct mirror block, not some other mixture. This removes any residual
+  doubt from the single-pair spot-check before Friday's GPU run relies on
+  it.
+
   **Correction to this document's own earlier spec:** the original
   remediation note here said to check
   `flipped_by_channel[0] == pre-flip binary_map[8]` as the post-fix

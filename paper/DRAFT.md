@@ -193,6 +193,19 @@ source of truth.
 - [PENDING, if unresolved by submission] No real detector evaluated - if
   this is still open at submission time, this becomes the single most
   important line in the limitations section, not a minor caveat.
+- **Multiplicity / analysis transparency.** A number of exploratory
+  checks were run across this project beyond the headline results
+  (significance tests, a detectability power check, a geometric-ceiling
+  check, and a supernumerary error-rate follow-up with several
+  sub-analyses). State plainly that `RESULTS.md` is an append-only, dated
+  log of every analysis run, including ones that didn't pan out - e.g. a
+  localized-adjacency refinement of the supernumerary check
+  (`RESULTS.md` Section 17) initially looked like a strong, significant
+  result but was identified as a class-composition confound and is
+  recorded as withdrawn rather than quietly dropped. This is offered as
+  evidence against selective reporting, not as a claim that every
+  possible analysis was pre-registered - it wasn't (see the falsification
+  threshold caveat above).
 
 ## 7. Ethics / data statement
 
