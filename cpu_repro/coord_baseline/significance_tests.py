@@ -1,8 +1,8 @@
 """Paired significance tests for the coordinate-only baseline results.
 
-STATUS: prepared, not yet run (no CPU/network available at time of writing).
-Consumes only files that already exist in this directory - no new data
-collection, no retraining. Run with: python3 significance_tests.py
+STATUS: run 2026-09-08, results in RESULTS.md Section 12. Consumes only
+files that already exist in this directory - no new data collection, no
+retraining. Run with: python3 significance_tests.py
 
 Two tests, both paired on seed (same 5 seeds, same image-level splits,
 so pairing removes seed-to-seed split variance rather than treating the

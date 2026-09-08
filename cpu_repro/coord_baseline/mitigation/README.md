@@ -152,34 +152,77 @@ success after the fact.
   augmented training views**, on every box in the image simultaneously
   (not per-box independent).
 
-  **Remediation needed (spec only - do not implement until Friday):**
-  1. In `build_coord_baseline.py`'s `FDI_CODES` order (or equivalently
-     wherever this notebook's own class-id ordering is defined - **must
-     be re-confirmed to be the same 32-class ordering before reuse**,
-     not assumed), build `MIRROR_MAP: list[int]` of length 32 where
-     `MIRROR_MAP[i]` = the channel index of class `i`'s mirror-quadrant,
-     same-tooth-type partner, using the existing `MIRROR_QUADRANTS`
-     relation. This is a fixed involution (self-inverse permutation) -
-     every class has exactly one partner, no class maps to itself.
-  2. In `augment()` (cell 21), inside the `if np.random.uniform() > 0.5:`
-     branch, immediately after `input_bb = np.fliplr(input_bb)`, add a
-     channel permutation in lockstep:
-     ```
-     input_bb = input_bb[:, :, MIRROR_MAP]
-     ```
-     (channel axis is last, per the `(H, W, C)` shape at that point in
-     the pipeline - confirm axis position matches at implementation
-     time, don't assume it's stayed `(H, W, C)` if surrounding code
-     changes before Friday).
-  3. Re-run this same verification script after the fix and confirm
-     `flipped_by_channel[0] == pre-flip binary_map[8]` (exact match, not
-     just non-overlapping) for a mirror-quadrant pair - that's the
-     correct post-fix invariant, replacing the current confirmed-bug
-     invariant (`flipped_by_channel[0] == fliplr(pre-flip binary_map[0])`).
+  **Remediation: IMPLEMENTED and verified, 2026-09-08.** Only
+  `notebooks/yolov8+unet/yolov8+unet_training.ipynb` cell 21 was touched
+  (nothing else in the notebook). New cell 21 source:
+  ```python
+  FDI_CODES = [
+      "11", "12", "13", "14", "15", "16", "17", "18",
+      "21", "22", "23", "24", "25", "26", "27", "28",
+      "31", "32", "33", "34", "35", "36", "37", "38",
+      "41", "42", "43", "44", "45", "46", "47", "48",
+  ]
+  MIRROR_QUADRANTS = {("1", "2"), ("2", "1"), ("3", "4"), ("4", "3")}
+  MIRROR_MAP = [
+      next(j for j, c2 in enumerate(FDI_CODES)
+           if c2[1] == c[1] and (c[0], c2[0]) in MIRROR_QUADRANTS)
+      for c in FDI_CODES
+  ]
+
+  def augment(input_image,input_mask,input_bb):
+      if np.random.uniform() > 0.5:
+          input_image = np.fliplr(input_image)
+          input_mask = np.fliplr(input_mask)
+          input_bb = np.fliplr(input_bb)
+          input_bb = input_bb[:, :, MIRROR_MAP]
+
+      return input_image,input_mask,input_bb
+  ```
+  `FDI_CODES`/`MIRROR_QUADRANTS` are copied verbatim from
+  `build_coord_baseline.py` (confirmed identical to this dataset's own
+  `Dataset/yolo_train_dataset/data.yaml` `names:` ordering - same 32
+  codes, same index order - so reusing that class-id assumption here is
+  justified, not assumed blind). `MIRROR_MAP` is a 32-entry involution;
+  spot-checked `MIRROR_MAP[0] == 8` (FDI 11 -> 21) and
+  `MIRROR_MAP[8] == 0` (FDI 21 -> 11) in the verification run below.
+
+  **Correction to this document's own earlier spec:** the original
+  remediation note here said to check
+  `flipped_by_channel[0] == pre-flip binary_map[8]` as the post-fix
+  invariant. That was imprecise and, on reflection, wrong as literally
+  stated - two independent real teeth (FDI 11 and FDI 21 in this same
+  test image) are not exact pixel-for-pixel mirrors of each other, so
+  that exact equality would not hold even with a fully correct fix. The
+  invariant that actually must hold, and the one checked below, is:
+  post-fix, channel `MIRROR_MAP[c]` contains `fliplr(pre-flip channel c)`
+  - the (correctly mirrored) *pixel content* moves to the class-correct
+  channel, rather than coincidentally matching a different tooth's
+  independent box.
+
+  **Re-verification (same real UFBA-425 box data as the bug-confirmation
+  run, plus the fix applied):**
+  ```
+  MIRROR_MAP[0] (FDI 11 -> ?) = 8 (FDI 21)
+  MIRROR_MAP[8] (FDI 21 -> ?) = 0 (FDI 11)
+
+  post-fix channel 8 == fliplr(pre-flip channel 0)  [class-correct]: True
+  post-fix channel 0 == fliplr(pre-flip channel 8)  [class-correct]: True
+  (sanity) post-fix channel 0 still == fliplr(pre-flip channel 0)
+    [old buggy behavior, should now be False]: False
+
+  PASS
+  ```
+  Confirms the fix: mirrored pixel content now lands under the
+  class-correct channel, and the old buggy behavior (content staying
+  under its original channel) no longer occurs.
 - Measure the dataset's natural positional variance (not yet done) to pick
   a jitter magnitude that is deliberately larger than it, rather than an
   arbitrary number.
 - Requires GPU (Kaggle or equivalent) - blocked until compute is available.
+  Task 2 (error-pattern correlation check) now depends on this fix being
+  in place before any detector is trained on this notebook - training on
+  the pre-fix pipeline would confound Claim-B evidence with this labeling
+  artifact.
 
 ## Related audit: error-taxonomy correctness (`build_coord_baseline.py`)
 

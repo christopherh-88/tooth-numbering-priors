@@ -528,6 +528,32 @@ Verification script: `cpu_repro/coord_baseline/numbering_convention_check.py`.
   `cpu_repro/coord_baseline/mitigation/README.md` - design only, blocked
   on GPU access to train a real detector with/without the intervention.
 
+## 12. Coordinate-only baseline - paired significance tests
+
+**Script:** `cpu_repro/coord_baseline/significance_tests.py` · **Split:**
+same 5 seeds (0-4) as Section 2 · **Date:** 2026-09-08
+
+Supplements the 5-seed mean ± 95% CI already reported in Sections 2 and 4
+with paired (by seed) permutation tests, rather than relying on CI
+overlap alone. Two comparisons, both using exact sign-flip enumeration
+over the 5 seeds (2^5 = 32 arrangements):
+
+| comparison | classifier | mean diff | paired permutation p |
+|---|---|---|---|
+| real vs. shuffled-per-image control (top1_acc) | logistic regression | 0.6347 | 0.0625 |
+| real vs. shuffled-per-image control (top1_acc) | gradient-boosted tree | 0.6625 | 0.0625 |
+| top1_acc vs. majority-class baseline | logistic regression | 0.6344 | 0.0625 |
+| top1_acc vs. majority-class baseline | gradient-boosted tree | 0.6586 | 0.0625 |
+
+**p = 0.0625 is the floor of this test's resolution at n=5 seeds, not a
+borderline result.** With exact sign-flip enumeration over 5 seeds, the
+smallest achievable two-sided p-value is 2/32 = 0.0625, and all four
+comparisons hit exactly that floor because every one of the 5 seeds
+agreed in direction (real > shuffled, real > majority baseline, with no
+exceptions). This is the strongest significance this specific test can
+express at this sample size - it should not be read as "marginal" or
+"just below the conventional 0.05 threshold" in any writeup.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the
