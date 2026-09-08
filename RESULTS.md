@@ -59,6 +59,13 @@ purpose):
 Full data: `cpu_repro/coord_baseline/summary.csv`,
 `per_seed_results.csv`, `confusion_matrix_*_seed0.csv/.png`.
 
+**Falsification threshold:** we treat top-1 accuracy within 2x of the
+majority-class baseline (~7.3%, given the ~3.63% majority baseline on
+UFBA-425) as the region that would falsify the claim that geometry
+meaningfully predicts tooth identity; this threshold is stated here
+explicitly for clarity but was not pre-registered before the initial
+experiment was run.
+
 ## 3. Coordinate baseline - tooth-type and teeth-count-in-crop breakdown
 
 **Script:** `cpu_repro/coord_baseline/error_breakdown.py` · **Split:** same

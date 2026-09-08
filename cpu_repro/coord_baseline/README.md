@@ -26,6 +26,13 @@ to solving tooth numbering on this dataset.
 Full per-seed numbers: `per_seed_results.csv`. Machine-readable summary:
 `summary.csv`.
 
+**Falsification threshold:** we treat top-1 accuracy within 2x of the
+majority-class baseline (~7.3%, given the ~3.63% majority baseline on
+UFBA-425) as the region that would falsify the claim that geometry
+meaningfully predicts tooth identity; this threshold is stated here
+explicitly for clarity but was not pre-registered before the initial
+experiment was run.
+
 **Controls** (shuffled-geometry negative control, position-only,
 size-only): see `controls/README.md`. Short version: shuffling box
 coordinates within each image collapses accuracy to the majority-class
