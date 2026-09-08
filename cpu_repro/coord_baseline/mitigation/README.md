@@ -215,9 +215,16 @@ success after the fact.
   Confirms the fix: mirrored pixel content now lands under the
   class-correct channel, and the old buggy behavior (content staying
   under its original channel) no longer occurs.
-- Measure the dataset's natural positional variance (not yet done) to pick
-  a jitter magnitude that is deliberately larger than it, rather than an
-  arbitrary number.
+- ~~Measure the dataset's natural positional variance~~ **Done,
+  2026-09-08 - see `RESULTS.md` Section 13.** Mean per-class std is
+  0.0267 (x) / 0.0490 (y), normalized units. Jitter magnitude for this
+  experiment should be at least 0.0535 (x) / 0.0979 (y) - 2x the natural
+  spread - as a starting point.
+- **Task 2 detectability pre-check: done, 2026-09-08 - see `RESULTS.md`
+  Section 14.** Confirms Task 2 is statistically well-powered across a
+  plausible range of detector accuracies (75-95%), so it's worth running
+  as planned rather than redesigning it or worrying it would compare
+  noise to noise.
 - Requires GPU (Kaggle or equivalent) - blocked until compute is available.
   Task 2 (error-pattern correlation check) now depends on this fix being
   in place before any detector is trained on this notebook - training on

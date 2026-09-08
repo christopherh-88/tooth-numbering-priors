@@ -554,6 +554,72 @@ exceptions). This is the strongest significance this specific test can
 express at this sample size - it should not be read as "marginal" or
 "just below the conventional 0.05 threshold" in any writeup.
 
+## 13. Natural positional variance by FDI class
+
+**Script:** `cpu_repro/coord_baseline/measure_positional_variance.py` ·
+**Data:** all 27,563 pooled instances (`Dataset/yolo_train_dataset`,
+same loader as Section 2) · **Date:** 2026-09-08
+
+Measures the per-class spread of (x_center, y_center) already naturally
+present across images, to size the geometry-jitter magnitude for the
+mitigation experiment (`cpu_repro/coord_baseline/mitigation/README.md`)
+rather than picking an arbitrary value. Descriptive statistics only, no
+model fitting.
+
+| | x (normalized) | y (normalized) |
+|---|---|---|
+| mean per-class std | 0.0267 | 0.0490 |
+| median per-class std | 0.0248 | 0.0481 |
+| mean per-class IQR | 0.0306 | 0.0628 |
+
+Full per-class breakdown: `cpu_repro/coord_baseline/positional_variance_by_class.csv`.
+
+**Resulting jitter magnitude for the mitigation experiment:** at least
+0.0535 in x and 0.0979 in y (normalized units, 2x mean per-class std) -
+a starting point to be revisited once the mitigation experiment actually
+runs, not a tuned final value.
+
+## 14. Task 2 pre-registered detectability check (before GPU training)
+
+**Script:** `cpu_repro/coord_baseline/task2_power_check.py` · **Date:**
+2026-09-08 · **Status:** a decision check run before training any
+detector, not a measured result - no real detector exists yet.
+
+Question: given how few "wrong" predictions a real, reasonably-accurate
+detector will actually produce on this test set (n=5491), would Task 2
+(comparing the coordinate-only model's neighbor-error-fraction, 0.8287
+GBT, against a real detector's) even be statistically well-powered, or
+would it risk comparing noise to noise? One-sample proportion test,
+normal approximation, alpha=0.05 two-sided, power=0.80, swept across a
+plausible detector-accuracy range (not a prediction of the real
+detector's actual accuracy, which is unknown until it's trained):
+
+| detector accuracy | n_wrong (of 5491) | minimum detectable difference |
+|---|---|---|
+| 75% | 1373 | 2.8 pp |
+| 80% | 1098 | 3.2 pp |
+| 85% | 824 | 3.7 pp |
+| 90% | 549 | 4.5 pp |
+| 95% | 275 | 6.4 pp |
+
+**Conclusion: Task 2 is well-powered across the full plausible accuracy
+range.** Even at a conservative 95% detector accuracy (only ~275 wrong
+predictions to work with), a difference as small as ~6.4 percentage
+points from the coordinate-only model's neighbor-error-fraction would be
+detectable - and a detector relying on genuinely different cues than
+geometry would plausibly produce a far larger gap than that. This
+de-risks proceeding with Task 2 as planned; it does not need to be
+redesigned or abandoned for lack of statistical power.
+
+**Caveat, stated here rather than glossed over:** this uses a normal
+approximation and does not model clustering by image (multiple teeth per
+image are not independent draws) - the same issue Section 10's
+image+seed random-effects model was built to correct for. Once real
+detector output exists, the actual Task 2 analysis should use a
+clustered/robust variance estimate, not this simplified power check -
+this section only establishes that the comparison is worth running, not
+how to run it.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the
