@@ -245,8 +245,11 @@ framing originally recorded here overstated the effect and did not lead
 with the composition fact that determines how to read it. Corrected below;
 see `cpu_repro/coord_baseline/dentex/composition_check.py` and the
 "Composition check" section of `cpu_repro/coord_baseline/dentex/README.md`
-for the full analysis. The dissociation row above is unaffected by this
-correction (its drop survives composition control - see below).
+for the full analysis. The dissociation row above is addressed separately:
+composition does not explain its drop away, but the drop itself is
+directionally consistent, not statistically significant at conventional
+thresholds given only 5 independent seed splits - see the paired-seed
+statistics in "Corrected reading" below.
 
 **Composition fact, stated first because it determines how every
 impacted-stratum number should be read:** DENTEX's "Impacted" diagnosis
@@ -274,10 +277,26 @@ mix - the part of the gap tooth-type mix does not explain.)
 
 **Corrected reading:**
 
-- **Dissociation drop is not a composition artifact.** Controlling for
-  tooth-type mix does not shrink it (-6.1pp raw vs. -6.4pp controlled);
-  excluding third molars entirely widens it further to -8.5pp. The
-  original dissociation finding stands as reported.
+- **Dissociation drop is not a composition artifact, but it is not
+  established as significant either.** Controlling for tooth-type mix does
+  not shrink it (-6.1pp raw vs. -6.4pp controlled); excluding third molars
+  entirely widens it further to -8.5pp - composition is not the
+  explanation. But those composition-controlled numbers are pooled point
+  estimates, not a per-seed significance test. Computed directly as a
+  paired comparison across the same 5 seeds (dissociation vs. canonical,
+  GBT): mean paired diff **-6.32pp**, 95% CI **[-12.67pp, +0.03pp]**,
+  paired t(4) = -2.76, **p = 0.0506**, direction consistent in all 5/5
+  seeds. That is **directionally consistent but not significant at
+  conventional thresholds given n=5 independent splits** - do not describe
+  this as "surviving" or "holding up"; it is an unresolved, marginal
+  result, not an established finding.
+  **Untested hypothesis, not a fact:** the true per-tooth effect on
+  genuinely anomalous instances is likely larger than -6.3pp, because the
+  dissociation flag is image-level, not tooth-level - a flagged image
+  still contains mostly well-behaved teeth, which dilutes the
+  stratum-average estimate toward zero. This dilution has not been
+  quantified and is not evidence the effect is actually stronger; it is a
+  caveat about interpretation, not a result.
 - **Impacted "23pp easier" claim is corrected.** Restricting to a matched
   third-molars-only subset (the cleanest apples-to-apples control):
   impacted third molars score 0.9121 vs. canonical third molars at 0.7354
@@ -294,6 +313,124 @@ mix - the part of the gap tooth-type mix does not explain.)
   impacted third molars may sit in more extreme or less-crowded positions
   than erupted ones - are stated as open, untested hypotheses, not
   conclusions; this dataset does not distinguish between them.
+
+## 11. Framing decision (2026-09-08)
+
+This section records a framing decision reached in discussion but never
+previously written into any file - it did not exist in committed form
+before this entry. It supersedes any earlier informal framing ("engineered
+priors must fail on anomalies," "implicit shortcut learning") to the
+extent that framing appears elsewhere in this repo or in chat.
+
+### 11.1 Primary framing: diagnostic tool, not a claim about detector internals
+
+The paper's primary framing is: **the coordinate-only baseline is a
+diagnostic/audit tool** - a cheap sanity-check ablation that should be run
+before crediting any tooth-numbering model's reported accuracy to
+appearance understanding. If a coordinate-only model trained on nothing
+but box geometry gets within a few points of a full image-based detector,
+that is a signal the dataset's label space may be substantially
+recoverable from position alone, and any accuracy claims for the
+image-based model should be read with that in mind.
+
+This is a **methods contribution** (a check anyone can run on their own
+tooth-numbering dataset/model), not a claim about what any specific
+trained detector's weights are actually doing internally.
+
+### 11.2 What is and is not supported: claim A vs. claim B
+
+Two distinct claims must be kept separate, because the evidence in this
+repo supports only one of them:
+
+- **Claim A: FDI tooth identity correlates strongly with bounding-box
+  geometry alone**, independent of image appearance. **Well-supported.**
+  Cross-dataset replicated (UFBA-425 and DENTEX, Sections 2 and 10, within
+  ~1 point of each other), with clean controls (Section 4 and the DENTEX
+  controls in Section 10 - shuffling collapses to majority-baseline,
+  position-only recovers nearly all of the signal, size-only recovers
+  little).
+- **Claim B: trained image-based detectors (OralBBNet, HierarchicalDet-style
+  architectures) exploit this correlation as an implicit shortcut instead
+  of, or in addition to, learning genuine appearance features.** **Not
+  directly measured anywhere in this repo.** No real trained detector's
+  predictions, confusion matrix, or internal representations have been
+  examined here (see Section 11.5, item 1, for the check that would begin
+  to close this gap).
+
+**This repo provides strong evidence for A and no direct evidence for B.**
+Claiming B on the basis of the results recorded here would overstate what
+was actually measured. Any writeup drawing on this repo should state A as
+a finding and B as a motivated, falsifiable hypothesis this data does not
+test - not as a conclusion.
+
+### 11.3 Foreground quadrant vs. tooth-type - don't bury this distinction
+
+Quadrant accuracy (96.5% UFBA-425, 98.0% DENTEX GBT) is **close to
+definitional**: FDI's first digit literally encodes quadrant, which is
+itself a spatial concept (which side of which jaw), so a geometry-only
+model recovering it at near-ceiling accuracy is close to restating what
+the labeling scheme already means, not a surprising empirical finding.
+
+The actual finding is narrower and less trivial: **tooth-type accuracy -
+the second digit, which specific tooth within a quadrant - is also ~70-72%
+recoverable from geometry alone** (Section 2: 72.0% GBT; Section 10: 70.1%
+GBT), with **no definitional reason this should be true**. Nothing about
+FDI numbering requires that the 3rd vs. 4th vs. 5th tooth in a quadrant
+occupy sufficiently distinct, consistent pixel-space slots for box
+geometry alone to tell them apart most of the time - that they do is an
+empirical property of panoramic radiograph acquisition and jaw anatomy,
+not a restatement of the label scheme. This distinction should be
+foregrounded in any writeup, not left as a footnote to the quadrant
+number.
+
+### 11.4 Generalization boundary, stated as a falsifiable hypothesis
+
+Rather than a vague disclaimer ("this may not generalize"), the boundary
+condition is stated here as a **testable, falsifiable hypothesis**: the
+coordinate-only shortcut should appear wherever both of the following
+hold, and should vanish where either breaks -
+
+1. a small, structured label space with a **near-deterministic spatial
+   slot per class** (FDI numbering: 32 codes, each with an anatomically
+   consistent quadrant-and-position meaning), and
+2. a **canonicalized acquisition protocol** that pins that slot to a
+   consistent pixel-space location across the dataset (panoramic
+   radiographs: fixed patient positioning, fixed sensor geometry, minimal
+   rotation/zoom variation).
+
+**Tested so far: FDI numbering, panoramic radiographs only** (UFBA-425,
+DENTEX). No claim is made here about Universal or Palmer numbering, about
+non-panoramic imaging (bitewing, periapical, CBCT), or about landmark
+detection tasks outside dentistry - those are the natural next tests of
+the hypothesis (see Section 11.5, item 2, for the cheapest of these), not
+yet-covered special cases of an established general result.
+
+### 11.5 Open items
+
+- **Error-pattern correlation check.** Compare a real trained detector's
+  confusion matrix (mirror-quadrant swaps, neighbor-tooth confusions)
+  against the coordinate-only model's, using the existing
+  `is_mirror_quadrant_error` / `is_neighbor_error` taxonomy code in
+  `cpu_repro/coord_baseline/build_coord_baseline.py`. No retraining
+  needed - run existing trained-detector predictions through the existing
+  error-taxonomy code. This is the cheapest available step toward
+  evidence on claim B (Section 11.2).
+- **Universal/Palmer relabeling check.** Remap the existing FDI labels
+  (UFBA-425 and/or DENTEX) to Universal and Palmer numbering conventions,
+  and rerun the identical coordinate-only classifier on the same box
+  coordinates. A free additional data point on the generalization boundary
+  (Section 11.4) - no new data collection needed, only a relabeling of
+  data already on disk.
+- **Dissociation-stratum precision.** Per the go/no-go-style decision in
+  Section 10's paired-seed statistics (mean -6.32pp, 95% CI
+  [-12.67pp, +0.03pp], p = 0.0506): run a **mixed-effects model** treating
+  image as a random effect over the full 1,291 dissociation-stratum
+  instances, rather than collecting more seeds. Chosen over more seeds
+  because the dissociation number is now **illustrative** - supporting the
+  diagnostic-tool framing in Section 11.1 - rather than **load-bearing**
+  for a specific point estimate; a model that uses the full instance-level
+  data (not a 5-point seed mean) is the more informative use of further
+  effort than shrinking the same 5-seed CI with additional seeds.
 
 ## Adding a new entry
 

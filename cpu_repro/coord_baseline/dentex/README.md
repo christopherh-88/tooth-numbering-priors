@@ -132,8 +132,10 @@ support the comparison below.
   does worse on them. The drop is real but modest (not catastrophic),
   because a flagged *image* still contains mostly well-behaved boxes; only
   a minority of the ~13 teeth in a typical flagged image are the actual
-  anomalous ones. See "Composition check" below - this drop survives
-  controlling for tooth-type mix, it is not a compositional artifact.
+  anomalous ones. See "Composition check" below - tooth-type composition
+  does not explain this drop away, but the drop itself is directionally
+  consistent, not statistically significant at conventional thresholds
+  (see the paired-seed statistics there).
 - **impacted: no - accuracy goes up, but the original "23 points"
   framing overstated why.** See "Composition check" immediately below
   before reading any impacted-stratum number on its own - the raw
@@ -193,12 +195,24 @@ gap tooth-type mix does not explain. Full numbers: `composition_summary.csv`,
 
 **Corrected reading:**
 
-- **Dissociation: not a composition artifact.** Dissociation's third-molar
-  share (14.2%) is only mildly higher than canonical's (8.7%), and
-  controlling for it does not shrink the drop - it is slightly larger
-  controlled (-6.4pp) than raw (-6.1pp), and excluding third molars
-  entirely widens it further (-8.5pp). Controlling for tooth type does not
-  explain this stratum's lower accuracy away.
+- **Dissociation: not a composition artifact, but not an established
+  finding either.** Dissociation's third-molar share (14.2%) is only
+  mildly higher than canonical's (8.7%), and controlling for it does not
+  shrink the drop - it is slightly larger controlled (-6.4pp) than raw
+  (-6.1pp), and excluding third molars entirely widens it further
+  (-8.5pp). Composition is not the explanation. But those are pooled point
+  estimates, not a significance test. Computed as a paired comparison
+  across the same 5 seeds (dissociation vs. canonical, GBT): mean paired
+  diff **-6.32pp**, 95% CI **[-12.67pp, +0.03pp]**, paired t(4) = -2.76,
+  **p = 0.0506**, direction consistent in 5/5 seeds -
+  **directionally consistent but not significant at conventional
+  thresholds given n=5 independent splits**. Do not describe this as
+  "surviving" or "holding up."
+  **Untested hypothesis, not a fact:** the dissociation flag is
+  image-level, not tooth-level, so a flagged image still contains mostly
+  well-behaved teeth; this likely dilutes the stratum-average estimate
+  toward zero relative to the true per-tooth effect on genuinely anomalous
+  instances, but that dilution has not been quantified here.
 - **Impacted: the raw "23pp easier" framing conflated two effects.**
   Restricting the comparison to third-molars-only (the matched-subset
   table above) removes the tooth-type-mix confound directly: impacted
