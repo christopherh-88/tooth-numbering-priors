@@ -693,8 +693,115 @@ result. It confirms real, annotated supernumerary-tooth cases exist and
 are usable, which is relevant substrate for the clinical-stakes argument
 (`paper/DRAFT.md`) - it does **not** show the coordinate-only model (or
 any detector) is actually worse on these instances than on typical ones.
-That would require running the existing feature pipeline against these
-24 instances specifically, which has not been done.
+See Section 17 for that follow-up.
+
+## 17. Does the coordinate-only model perform worse near supernumerary teeth?
+
+**Script:** `cpu_repro/dual_labeled_dataset/supernumerary_error_check.py`
+· **Date:** 2026-09-08 · **Design:** GBT trained on 100% of pooled
+UFBA-425 (no held-out split - evaluation is entirely on the separate
+Dual-Labeled Dataset, so no leakage concern), evaluated on that dataset's
+own standard-FDI-labeled teeth (13,168 instances, 500 paired-image
+label files), split into the 23 images containing a supernumerary tooth
+(Section 16) vs. the other 477.
+
+**Coordinate-convention check (run first, per `cpu_repro/CONVENTIONS.md`
+protocol - required before any cross-dataset comparison):** both
+datasets place quadrant-1 classes at a lower mean x_center than
+quadrant-2 classes, matching UFBA-425's established convention (UFBA-425
+reference: 0.3559 vs. 0.6646; Dual-Labeled Dataset: 0.4003 vs. 0.6053).
+**Passed - safe to proceed.**
+
+**Bonus finding: cross-dataset transfer of Claim A.** Overall accuracy on
+this third, independent dataset: **32.9%** (13,168 instances) vs. a
+majority baseline of **3.76%** - about 8.8x baseline. Real signal
+transfers to an unseen dataset, but at roughly half the in-domain
+accuracy (69.3% GBT on UFBA-425, Section 2) - consistent with genuine
+domain shift (different clinic/scanner/population), not evidence the
+in-domain number was inflated.
+
+**Supernumerary-present vs. control comparison:**
+
+| | accuracy | n |
+|---|---|---|
+| supernumerary-present instances | 0.2953 | 596 |
+| control instances | 0.3302 | 12,572 |
+| supernumerary-present images (mean) | 0.2880 | 23 images |
+| control images (mean) | 0.3230 | 477 images |
+
+Two-proportion z-test (per-instance): z = -1.771, **p = 0.0765**.
+Mann-Whitney U test (per-image, accounts for image-level clustering):
+**p = 0.3615**.
+
+**Honest reading: the direction matches the clinical-stakes hypothesis
+(lower accuracy near supernumerary teeth) but neither test reaches
+conventional significance.** The per-image test - the more appropriate
+one, since teeth within an image aren't independent draws - is not close
+(p=0.36). With only 23 supernumerary-present images, this comparison is
+underpowered to detect anything but a large effect.
+
+**Follow-up 1: localized adjacency test (attempted strengthening -
+result withdrawn as confounded, not reported as evidence).** Whole-image
+averaging dilutes the signal with teeth far from the actual
+supernumerary tooth. Attempted a sharper test: for each supernumerary
+instance, its K=3 nearest standard teeth (by centroid distance, same
+image) as a "near" set (n=72), vs. the remaining same-image teeth ("far,
+same-image," n=524) and the full control set (n=12,572):
+
+| group | accuracy | n |
+|---|---|---|
+| near (K=3 nearest to supernumerary) | 0.5556 | 72 |
+| far, same image | 0.2595 | 524 |
+| control (all 477 images) | 0.3302 | 12,572 |
+
+Raw result looked dramatic (near vs. far-same-image: p<0.0001; near vs.
+control: p=0.0001) - but a class-composition audit
+(`supernumerary_error_check.py`, run after this result, same date)
+found it's confounded: **92% of the "near" set (66/72) is drawn from
+just 6 anterior classes (11/12/13/21/22/23)**, because supernumerary
+teeth (mesiodens) are anatomically concentrated in the anterior maxilla,
+not randomly positioned. Those anterior classes are already
+differentially easy/hard for the coordinate-only model regardless of any
+supernumerary connection (e.g. control-only accuracy: FDI 12 = 0.871,
+FDI 13 = 0.313 - a 56pp spread among classes that make up the "near" set
+by anatomical necessity, not because of proximity). The matched
+per-class comparison is noisy and inconsistent in direction (FDI 11:
+0.857 near vs. 0.626 control, n=14; FDI 13: 0.111 near vs. 0.313
+control, n=9) - too few instances per class to mean anything, and no
+consistent sign. **Conclusion: the localized test's apparent
+significance is a class-composition artifact, not evidence about
+proximity to a supernumerary tooth in either direction. This result is
+withdrawn, not used to support or contradict the clinical-stakes claim.**
+Recorded here specifically so this confound isn't rediscovered the hard
+way in a future session.
+
+**Follow-up 2: control for teeth-count/crowding.** Fit per-image
+accuracy ~ supernumerary_present + n_teeth (OLS, all 500 images):
+
+| term | coef | p |
+|---|---|---|
+| const | 0.0512 | 0.275 |
+| supernumerary_present | -0.0304 | 0.399 |
+| n_teeth | +0.0103 | <0.001 |
+
+The supernumerary-present effect persists in the same direction after
+controlling for teeth-count, still not significant (p=0.40, consistent
+with the whole-image test above). **Bonus finding:** n_teeth itself is
+positively and strongly associated with accuracy (r=0.2556, p<0.0001) -
+images with more visible teeth are easier for the coordinate-only model,
+plausibly because a fuller arch looks more like a canonical/complete
+layout. This is a real, separate finding worth citing on its own,
+unrelated to the supernumerary question.
+
+**Overall conclusion after both follow-ups: this should be reported as
+suggestive-but-inconclusive, not as confirmed evidence for the
+clinical-stakes claim** - an honest downgrade from what
+`paper/DRAFT.md`'s `[PENDING]` note hoped this follow-up might show, but
+the accurate one. The attempt to sharpen the test (localized adjacency)
+backfired into a confound rather than a stronger result - a real finding
+about this analysis, even though not the one being looked for. More
+supernumerary-present images (from the undownloaded remainder of this
+dataset, or elsewhere) would be needed to settle the direction.
 
 ## Adding a new entry
 

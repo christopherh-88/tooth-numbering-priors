@@ -69,13 +69,12 @@ is relevant substrate for the clinical-stakes argument in `paper/DRAFT.md`
 (a coordinate-shortcutting model would plausibly mislabel exactly these
 anomalous-position cases). **No accuracy comparison has been run on
 them** - nothing here shows the coordinate-only model (or any detector)
-is actually worse on these 24 instances than on typical ones. Turning
-this into real evidence would require running the existing coordinate-
-only model's features against these 24 instances (after converting the
-labelme polygon annotations to the same bounding-box feature
-representation used elsewhere in this project) and checking whether
-predicted-FDI-vs-true-FDI error rates are elevated on them specifically -
-not yet done, and not attempted as part of this write-up.
+is actually worse on these 24 instances than on typical ones. **Update, 2026-09-08: this follow-up has now been run** - see
+`supernumerary_error_check.py` and `RESULTS.md` Section 17. Result:
+direction matches the hypothesis (lower accuracy in supernumerary-present
+images) but is not statistically significant (p=0.36 at the image
+level, the appropriate unit of analysis) - report as suggestive, not
+confirmed, and note n=23 supernumerary-present images is underpowered.
 
 ## Raw run output (inspect_labels.py, 2026-09-08)
 

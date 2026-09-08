@@ -1,4 +1,4 @@
-# Handoff (last updated 2026-09-08)
+# Handoff (last synced 2026-09-08, later same day)
 
 Read this first in the next session before doing anything else. It exists
 so nothing has to be re-derived from chat history.
@@ -10,12 +10,12 @@ venue) as-is; main-conference strength requires closing Claim B (see
 `RESULTS.md` Section 11.2) - real detector evidence, not just the
 coordinate-only diagnostic.
 
-**Git state as of this write-up:** the MIRROR_MAP fix, significance
-tests, positional-variance measurement, and Task 2 power check are all
-**committed** (commits `7f420b2`, `2423646`). The geometric-ceiling
-check (Section 15 below) may still be uncommitted depending on when this
-is read - run `git status --short` first thing next session to check,
-don't assume.
+**Git state as of this sync:** everything through the geometric-ceiling
+check and the Dual-Labeled Dataset verification is **committed**
+(commits `7f420b2`, `2423646`, `510ff2d`, `7b3d94e`). The supernumerary
+follow-up analysis (Section 17 below, including the withdrawn confounded
+result) may still be uncommitted depending on when this is read - run
+`git status --short` first thing next session to check, don't assume.
 
 **Standing rules still in force** (given by the user earlier, still
 apply): show diffs before committing anything; grep for AI attribution
@@ -36,13 +36,13 @@ the user explicitly says so.
    Learning in Medical Image Segmentation") scanned for numbering-terms x
    shortcut-terms co-occurrence. **0 hits** - genuine negative result,
    supports novelty.
-3. **Dual-Labeled Dataset verification (Task 3):** label 91 (supernumerary)
-   present, but only 24 usable instances across 23 images (dataset is an
-   admitted partial release, 500 of 2,000 stated images). 0 filename or
-   perceptual-hash overlap with UFBA-425. **Findings reported in chat only
-   - per explicit earlier instruction, NOT written into RESULTS.md.**
-   Still an open decision whether/how to incorporate (see
-   `paper/DRAFT.md` Section 7).
+3. **Dual-Labeled Dataset verification (Task 3): written into
+   `RESULTS.md` Section 16, resolved.** Label 91 (supernumerary) present,
+   24 usable instances across 23 images (dataset is an admitted partial
+   release, 500 of 2,000 stated images - license "unknown," re-verified
+   live against the dataset's own Kaggle metadata). 0 filename or
+   perceptual-hash overlap with UFBA-425. Scripts and raw output in
+   `cpu_repro/dual_labeled_dataset/`.
 4. **Falsification threshold:** added to `RESULTS.md` Section 2 and
    `cpu_repro/coord_baseline/README.md`, committed.
 5. **Flip/label-mismatch bug in the training notebook: found, confirmed,
@@ -80,6 +80,35 @@ the user explicitly says so.
     GBT). Supports reading the accuracy number as genuine geometric class
     overlap, not an under-fit classifier - stated as a moderate,
     non-overstated claim (not a rigorous Bayes-error proof).
+13. **Dual-Labeled Dataset supernumerary error-rate follow-up**
+    (`RESULTS.md` Section 17, script
+    `cpu_repro/dual_labeled_dataset/supernumerary_error_check.py`) - does
+    the coordinate-only model (trained on 100% of UFBA-425) do worse on
+    standard teeth in images that also contain a supernumerary tooth?
+    **Coordinate-convention check passed first** (required before any
+    cross-dataset comparison, per `cpu_repro/CONVENTIONS.md`). Whole-image
+    result: direction matches the clinical-stakes hypothesis (29.5% vs.
+    33.0% per-instance, 28.8% vs. 32.3% per-image) but **not significant**
+    (p=0.077 per-instance, p=0.36 per-image - underpowered at n=23
+    supernumerary-present images). Persists after controlling for
+    teeth-count/crowding (OLS), still not significant.
+14. **Bonus finding, same script:** Claim A transfers to this third,
+    independent dataset (32.9% accuracy vs. 3.76% majority baseline,
+    roughly half UFBA-425's in-domain 69.3%) - cite as further
+    cross-dataset replication alongside DENTEX. Also: images with more
+    visible teeth are easier for the coordinate-only model (r=0.2556,
+    p<0.0001) - a fuller arch looks more canonical.
+15. **A withdrawn result - do not resurrect this number.** A "localized
+    adjacency" refinement (comparing teeth nearest to each supernumerary
+    tooth vs. farther-away teeth) initially looked like a strong,
+    significant finding (55.6% near-accuracy vs. 26.0%/33.0%, p<0.0001) -
+    but a class-composition audit showed it's confounded: supernumerary
+    teeth cluster anatomically in the anterior maxilla, so their "nearest
+    teeth" are disproportionately anterior classes (11/12/13/21/22/23)
+    that are already easy/hard regardless of proximity. **This 55.6%
+    number is withdrawn, not evidence, and must not be cited or
+    reintroduced** if this section of the paper gets drafted from memory
+    instead of re-reading `RESULTS.md` Section 17 directly.
 
 ## The flip/label-mismatch bug, in detail
 
@@ -108,7 +137,8 @@ working tree, before the GPU run.
 don't reorder or add items ahead of this without asking)
 
 All CPU-only prep (fix, significance tests, positional variance, Task 2
-power check, geometric ceiling check) is done. The MIRROR_MAP fix is
+power check, geometric ceiling check, Dual-Labeled Dataset verification
+and its supernumerary follow-up) is done. The MIRROR_MAP fix is
 committed and confirmed well-powered to detect a real effect once
 trained. **Nothing further is CPU-blocked - the only remaining blocker
 for the next step is GPU access.**
@@ -137,9 +167,12 @@ for the next step is GPU access.**
 
 - Don't re-run the Semantic Scholar novelty check (Task 1) - it's done,
   cached results exist, real negative result.
-- Don't re-download or re-verify the Dual-Labeled Dataset (Task 3) - done,
-  findings are above and in chat history, just needs a decision on
-  whether/how to write into RESULTS.md, not more data-gathering.
+- Don't re-download or re-verify the Dual-Labeled Dataset (Task 3) -
+  fully done and written into `RESULTS.md` Sections 16-17, including the
+  supernumerary error-rate follow-up. No open decision remains here.
+- Don't re-attempt the localized-adjacency refinement or re-derive the
+  55.6% near-accuracy number as if it were a real finding - it's a
+  documented, withdrawn confound (item 15 above / Section 17).
 - Don't re-audit `is_mirror_quadrant_error`/`is_neighbor_error` - already
   statically audited, clean, documented in `mitigation/README.md`.
 - Don't propose a different mitigation design from scratch - one is

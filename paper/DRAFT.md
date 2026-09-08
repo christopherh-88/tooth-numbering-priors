@@ -155,16 +155,34 @@ source of truth.
   mislabel exactly the cases most likely to be clinically flagged -
   supernumerary or ectopically-positioned teeth, whose position deviates
   from the canonical FDI slot the shortcut relies on. Tie this to the
-  UFBA-425 annotation-anomaly scan (Section 5) and the Dual-Labeled
-  Dataset supernumerary check (`RESULTS.md` Section 16 - written in,
-  2026-09-08). **Note the honest scope limit stated there:** Section 16
-  is existence-proof (24 real supernumerary instances exist and are
-  usable), not a measured accuracy comparison - it does not yet show the
-  coordinate-only model is actually worse on these cases.
-  [PENDING, optional strengthening: run the existing coordinate-only
-  feature pipeline against these 24 instances specifically and report
-  whether error rates are elevated - would upgrade this from substrate
-  to actual evidence for the clinical-stakes claim.]
+  UFBA-425 annotation-anomaly scan (Section 5), the Dual-Labeled Dataset
+  supernumerary existence-proof (`RESULTS.md` Section 16), and the
+  follow-up accuracy comparison (Section 17, run 2026-09-08). **State
+  Section 17's result honestly, don't oversell it:** direction matches
+  the hypothesis (accuracy near supernumerary teeth is lower - 29.5% vs.
+  33.0% per-instance, 28.8% vs. 32.3% per-image) but neither test reaches
+  significance (p=0.077 per-instance, p=0.36 per-image, the more
+  appropriate test given image-level clustering) - report this as
+  suggestive-but-inconclusive in the discussion, explicitly flagging that
+  n=23 supernumerary-present images is underpowered, not as confirmed
+  evidence. **A follow-up attempt to sharpen this (localized adjacency to
+  the supernumerary tooth) produced an apparently dramatic, highly
+  significant result that turned out to be a class-composition confound
+  (supernumerary teeth cluster anatomically in the anterior maxilla, so
+  their "nearest teeth" are disproportionately drawn from classes that
+  are already easy/hard regardless of proximity) - withdrawn, not
+  reportable as evidence either way. If this section is drafted from
+  memory rather than re-reading `RESULTS.md` Section 17, do not
+  accidentally resurrect the withdrawn 55.6%-near-accuracy number.**
+  Controlling for teeth-count/crowding doesn't change the (still
+  non-significant) whole-image conclusion either. Section 17 does have
+  two genuine bonus findings worth using regardless of the supernumerary
+  result: (1) Claim A transfers to this third, independent dataset (32.9%
+  vs. 3.76% majority baseline), roughly half the in-domain accuracy -
+  worth citing as further cross-dataset replication of Claim A alongside
+  DENTEX (Section 10); (2) images with more visible teeth are easier for
+  the coordinate-only model (r=0.2556, p<0.0001) - plausibly because a
+  fuller arch looks more like a canonical/complete layout.
 
 ## 6. Limitations
 
