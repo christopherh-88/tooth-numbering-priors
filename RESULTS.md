@@ -509,6 +509,24 @@ Verification script: `cpu_repro/coord_baseline/numbering_convention_check.py`.
   check explained why the simpler estimators overstated the effect (a
   small cluster of large, low-accuracy images, not a single outlier and
   not teeth-count/crowding).
+- **Boundary-condition dataset (not yet chosen/run).** Section 11.4 states
+  the shortcut should vanish where either precondition breaks. Candidates,
+  not yet searched for or downloaded:
+  1. **Bitewing/periapical radiographs** (breaks precondition 2 -
+     acquisition is per-tooth/angled, not a fixed whole-jaw layout;
+     same clinical domain and FDI-adjacent labeling as the existing work,
+     no volumetric complexity). Current leading candidate.
+  2. **CBCT slices** (breaks precondition 2 more severely, but adds
+     volumetric/3D framing that complicates the box-geometry setup and
+     may distract from the core comparison).
+  3. **A structurally different label space on the same panoramic
+     modality**, e.g. a landmark-detection task (breaks precondition 1
+     instead of 2, isolating that variable rather than conflating both).
+  None of these have been located, downloaded, or run yet - this is a
+  target list, not a result.
+- **Mitigation experiment (not yet run).** See
+  `cpu_repro/coord_baseline/mitigation/README.md` - design only, blocked
+  on GPU access to train a real detector with/without the intervention.
 
 ## Adding a new entry
 
