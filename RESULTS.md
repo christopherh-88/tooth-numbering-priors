@@ -620,6 +620,43 @@ clustered/robust variance estimate, not this simplified power check -
 this section only establishes that the comparison is worth running, not
 how to run it.
 
+## 15. Geometric ceiling check - is GBT leaving headroom unexploited?
+
+**Script:** `cpu_repro/coord_baseline/geometric_ceiling_check.py` ·
+**Split:** identical seed-0 grouped split as Section 2, same 6 features ·
+**Date:** 2026-09-08
+
+Question: is the reported 69.3% GBT top-1 accuracy a property of the
+underlying geometric structure, or an artifact of that specific
+classifier under-fitting real signal a less parametric method would
+recover? A k-NN classifier with a large neighborhood approximates the
+nonparametric (Bayes-error-adjacent) ceiling without assuming a linear
+(logistic regression) or fixed-tree-depth (GBT) decision boundary.
+
+| k | top1_acc | quadrant_acc | tooth_type_acc |
+|---|---|---|---|
+| 5 | 0.6361 | 0.9556 | 0.6673 |
+| 15 | 0.6560 | 0.9608 | 0.6820 |
+| 25 | 0.6551 | 0.9616 | 0.6809 |
+| 50 | 0.6507 | 0.9594 | 0.6786 |
+| 100 | 0.6358 | 0.9590 | 0.6625 |
+
+Best k-NN top1_acc (k=15): 0.6560, vs. GBT 0.6928 (seed-0 point value,
+Section 2) - **k-NN does not exceed GBT at any tested k; GBT is 3.7pp
+above the best k-NN result.**
+
+**Reading this correctly:** this does NOT mean 69.3% is a rigorously
+proven Bayes-error ceiling - k-NN with Euclidean distance on standardized
+features doesn't automatically adapt to the differing importance of the
+6 features the way GBT's axis-aligned tree splits do, so k-NN
+underperforming isn't formal proof nothing is left on the table. What it
+does support: **a standard nonparametric method finds no evidence of
+headroom GBT is leaving unexploited** - the accuracy number looks like a
+property of genuine class overlap in geometric space, not an artifact of
+an under-fit classifier that a fancier model would meaningfully beat.
+This is worth stating in any writeup as a checked, moderate claim, not
+overstated as "we found the exact ceiling."
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

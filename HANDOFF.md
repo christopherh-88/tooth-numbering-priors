@@ -10,17 +10,12 @@ venue) as-is; main-conference strength requires closing Claim B (see
 `RESULTS.md` Section 11.2) - real detector evidence, not just the
 coordinate-only diagnostic.
 
-**Git state as of this write-up:** two changes are made, verified, and
-shown to the user, but **NOT staged or committed** - waiting on an
-explicit "go":
-- `notebooks/yolov8+unet/yolov8+unet_training.ipynb` - the MIRROR_MAP fix
-  (cell 21 only).
-- `cpu_repro/coord_baseline/mitigation/README.md` - updated with the
-  confirmed bug, the fix, and the corrected re-verification.
-
-Run `git status --short` and `git diff` first thing next session to see
-these before doing anything else - do not assume they're already
-committed just because this file describes them as done.
+**Git state as of this write-up:** the MIRROR_MAP fix, significance
+tests, positional-variance measurement, and Task 2 power check are all
+**committed** (commits `7f420b2`, `2423646`). The geometric-ceiling
+check (Section 15 below) may still be uncommitted depending on when this
+is read - run `git status --short` first thing next session to check,
+don't assume.
 
 **Standing rules still in force** (given by the user earlier, still
 apply): show diffs before committing anything; grep for AI attribution
@@ -51,8 +46,7 @@ the user explicitly says so.
 4. **Falsification threshold:** added to `RESULTS.md` Section 2 and
    `cpu_repro/coord_baseline/README.md`, committed.
 5. **Flip/label-mismatch bug in the training notebook: found, confirmed,
-   fixed, re-verified** (see below) - currently uncommitted, see git
-   state above.
+   fixed, re-verified** (see below) - committed.
 6. **Mitigation experiment: designed, not run.**
    `cpu_repro/coord_baseline/mitigation/README.md` - geometry-jitter
    augmentation (primary) or a decorrelation loss (fallback), evaluation
@@ -67,11 +61,25 @@ the user explicitly says so.
    majority baseline), written against the actual CSV columns, **not yet
    run**. Committed.
 9. **Boundary-condition dataset candidates** (not yet searched for or
-   downloaded), noted in `RESULTS.md` Section 11.5: bitewing/periapical
-   radiographs (leading candidate - breaks the acquisition-canonicalization
+   downloaded - deliberately not started, see sequencing note below),
+   noted in `RESULTS.md` Section 11.5: bitewing/periapical radiographs
+   (leading candidate - breaks the acquisition-canonicalization
    precondition cleanly), CBCT slices (messier, adds volumetric
    complexity), a differently-structured label space on panoramic
    radiographs (isolates the other precondition).
+10. **Natural positional variance measured** (`RESULTS.md` Section 13) -
+    mean per-class std 0.0267 (x) / 0.0490 (y), normalized. Sizes the
+    mitigation experiment's jitter magnitude (>= 0.0535 x / 0.0979 y).
+11. **Task 2 pre-registered detectability check** (`RESULTS.md`
+    Section 14) - confirms Task 2 is statistically well-powered across a
+    75-95% plausible detector-accuracy range (minimum detectable gap
+    2.8-6.4pp). Task 2 is worth running as planned, not underpowered.
+12. **Geometric ceiling check** (`RESULTS.md` Section 15) - a k-NN
+    nonparametric check found no evidence GBT is leaving headroom
+    unexploited (best k-NN 65.6% vs. GBT 69.3%, k-NN does not exceed
+    GBT). Supports reading the accuracy number as genuine geometric class
+    overlap, not an under-fit classifier - stated as a moderate,
+    non-overstated claim (not a rigorous Bayes-error proof).
 
 ## The flip/label-mismatch bug, in detail
 
@@ -99,22 +107,31 @@ working tree, before the GPU run.
 ## Exact next steps, in order (per the user's explicit sequencing -
 don't reorder or add items ahead of this without asking)
 
-1. **Commit the pending diff** (MIRROR_MAP fix + README update) - once
-   the user says go. Not done automatically even if this file is read at
-   the start of a new session.
-2. **GPU training run (Task 2 setup), once Kaggle access resumes Friday:**
+All CPU-only prep (fix, significance tests, positional variance, Task 2
+power check, geometric ceiling check) is done. The MIRROR_MAP fix is
+committed and confirmed well-powered to detect a real effect once
+trained. **Nothing further is CPU-blocked - the only remaining blocker
+for the next step is GPU access.**
+
+1. **GPU training run (Task 2 setup), once Kaggle access resumes Friday:**
    run `notebooks/yolov8+unet/yolov8+unet_training.ipynb` (now with the
-   fix in place) or the plain YOLOv8 notebook, to get a real trained
-   detector's predictions.
-3. **Task 2 itself:** run those predictions through the existing
+   MIRROR_MAP fix in place - confirm `git log` shows commit `7f420b2` or
+   later is checked out) or the plain YOLOv8 notebook, to get a real
+   trained detector's predictions.
+2. **Task 2 itself:** run those predictions through the existing
    `is_mirror_quadrant_error` / `is_neighbor_error` taxonomy in
    `build_coord_baseline.py` (already static-audited, no bugs found) and
    compare against the coordinate-only model's error pattern. This is
-   the result that determines whether Claim B has any support.
-4. **Only after 1-3:** the mitigation experiment
-   (`cpu_repro/coord_baseline/mitigation/README.md`) and the
-   boundary-condition dataset work. These were already explicitly
-   sequenced behind Task 2 by the user - don't front-run them.
+   the result that determines whether Claim B has any support. The
+   power check (Section 14) confirms this comparison is well-powered
+   even if the detector turns out quite accurate.
+3. **Only after 1-2:** the mitigation experiment
+   (`cpu_repro/coord_baseline/mitigation/README.md` - jitter magnitude
+   already sized in Section 13) and the boundary-condition dataset work
+   (candidates listed, none searched for/downloaded yet - deliberately
+   not started; the user was explicit that these come after Task 2, so
+   don't front-run them without asking first even though they're
+   CPU-only and could technically be done now).
 
 ## Things NOT to re-litigate or redo
 
