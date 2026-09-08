@@ -657,6 +657,45 @@ an under-fit classifier that a fancier model would meaningfully beat.
 This is worth stating in any writeup as a checked, moderate claim, not
 overstated as "we found the exact ceiling."
 
+## 16. Dual-Labeled Dataset (Zhou et al., BMC Oral Health 2024) - supernumerary and overlap verification
+
+**Scripts:** `cpu_repro/dual_labeled_dataset/inspect_labels.py`,
+`cpu_repro/dual_labeled_dataset/phash_overlap.py` · **Source:** Kaggle
+`zwbzwb12341234/a-dual-labeled-dataset`, license "unknown" per its own
+metadata (re-verified live) · **Date:** 2026-09-08 · **Full findings and
+raw run output:** `cpu_repro/dual_labeled_dataset/findings.md`
+
+**Partial-release status, exact quote from the dataset's own metadata**
+(re-fetched live, not from memory): "Our dataset comprises a total of
+2,000 panoramic radiographs... Currently, 500 panoramic images and their
+label files have been uploaded. For the remaining data, please contact
+the author..." Only this 500-image tranche was downloaded/analyzed.
+
+| item | count |
+|---|---|
+| total label files in download | 2,066 |
+| label files with a paired image (500-image tranche) | 500 |
+| label "91" (supernumerary) total instances | 53 |
+| distinct label files containing label 91 | 49 |
+| of those, with a paired image (usable) | 23 files, 24 instances |
+| filename-stem overlap with UFBA-425 | 0 |
+| perceptual-hash near-duplicate matches with UFBA-425 (Hamming <=8, hash_size=16) | 0 |
+
+**Usable supernumerary evidence in this download: 24 instances across 23
+images** - the real number this tranche supports, not a larger figure
+extrapolated from the dataset's stated total. No overlap detected with
+UFBA-425 in the downloaded tranche (supports treating them as
+independent datasets, does not rule out overlap in the undownloaded
+remainder).
+
+**Scope of what this supports:** existence-proof only, not a measured
+result. It confirms real, annotated supernumerary-tooth cases exist and
+are usable, which is relevant substrate for the clinical-stakes argument
+(`paper/DRAFT.md`) - it does **not** show the coordinate-only model (or
+any detector) is actually worse on these instances than on typical ones.
+That would require running the existing feature pipeline against these
+24 instances specifically, which has not been done.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

@@ -156,8 +156,15 @@ source of truth.
   supernumerary or ectopically-positioned teeth, whose position deviates
   from the canonical FDI slot the shortcut relies on. Tie this to the
   UFBA-425 annotation-anomaly scan (Section 5) and the Dual-Labeled
-  Dataset supernumerary check (Task 3 findings, not yet written into
-  RESULTS.md - decide whether/how to incorporate).
+  Dataset supernumerary check (`RESULTS.md` Section 16 - written in,
+  2026-09-08). **Note the honest scope limit stated there:** Section 16
+  is existence-proof (24 real supernumerary instances exist and are
+  usable), not a measured accuracy comparison - it does not yet show the
+  coordinate-only model is actually worse on these cases.
+  [PENDING, optional strengthening: run the existing coordinate-only
+  feature pipeline against these 24 instances specifically and report
+  whether error rates are elevated - would upgrade this from substrate
+  to actual evidence for the clinical-stakes claim.]
 
 ## 6. Limitations
 
