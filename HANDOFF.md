@@ -1,4 +1,4 @@
-# Handoff (last synced 2026-09-08, later same day)
+# Handoff (last synced 2026-09-08, evening)
 
 Read this first in the next session before doing anything else. It exists
 so nothing has to be re-derived from chat history.
@@ -10,17 +10,16 @@ venue) as-is; main-conference strength requires closing Claim B (see
 `RESULTS.md` Section 11.2) - real detector evidence, not just the
 coordinate-only diagnostic.
 
-**Git state as of this sync:** everything through the geometric-ceiling
-check and the Dual-Labeled Dataset verification is **committed**
-(commits `7f420b2`, `2423646`, `510ff2d`, `7b3d94e`). The supernumerary
-follow-up analysis (Section 17 below, including the withdrawn confounded
-result) may still be uncommitted depending on when this is read - run
-`git status --short` first thing next session to check, don't assume.
+**Git state as of this sync:** everything through the noise-robustness/
+feature-ablation/literature-gap round is **committed** (commits
+`3e36846`, `16e6f95`, `e8dcc26`, `395055d`, `d68d4e0`, `6ff9100`,
+`3c91497`). Working tree was clean as of this sync - run
+`git status --short` first thing next session to confirm nothing's
+changed since.
 
 **Standing rules still in force** (given by the user earlier, still
-apply): show diffs before committing anything; grep for AI attribution
-(`claude|anthropic|generated with|co-authored-by|ai-generated|written by ai`,
-case-insensitive) across changed files before staging; don't commit until
+apply): show diffs before committing anything; grep for third-party AI
+tool attribution across changed files before staging; don't commit until
 the user explicitly says so.
 
 ## What's actually done (verified, not just claimed)
@@ -109,6 +108,38 @@ the user explicitly says so.
     number is withdrawn, not evidence, and must not be cited or
     reintroduced** if this section of the paper gets drafted from memory
     instead of re-reading `RESULTS.md` Section 17 directly.
+16. **Literature check: no public per-FDI-class confusion matrix exists
+    for any real trained detector** (`RESULTS.md` Section 18, verified
+    live against arXiv:2305.19112v2 - not secondhand). DENTEX's own
+    authors (Hamamci et al.) explicitly flag this as missing and name
+    "swapping the enumeration of adjacent teeth" as the exact
+    unaddressed error type - a strong, specific motivating citation for
+    Task 2. **Confirms this cannot substitute for Task 2** if the
+    Friday GPU run is delayed - there's no public data to fall back on,
+    so don't re-attempt this search expecting a different answer.
+17. **Noise-robustness curve** (`RESULTS.md` Section 19,
+    `cpu_repro/coord_baseline/noise_robustness.py`) - the coordinate-only
+    signal degrades smoothly under test-time Gaussian coordinate noise,
+    no cliff, and stays 5-10x above majority baseline even at noise
+    levels exceeding the natural per-class positional spread (Section
+    13). Practical reading: ordinary detector localization imprecision
+    is unlikely to erase the signal outright, so a future Task-2 null
+    result would be a genuine finding, not a noise-washout artifact.
+18. **Feature ablation** (`RESULTS.md` Section 20,
+    `cpu_repro/coord_baseline/feature_ablation.py`) - the signal is
+    **asymmetrically position-dependent**: `x_center` dominates
+    (dropping it costs 47pp, kept alone worth 36pp), `y_center` is real
+    but secondary (dropping it costs 17pp, kept alone worth only 11pp),
+    shape features (width/height/area/aspect_ratio) are inert (<0.3pp
+    each). **Say "asymmetrically position-dependent," not "x_center
+    only" or "position generally"** - both wordings were explicitly
+    checked and corrected once already this session, don't regress to
+    either. A flagged (not fully decomposed) follow-on: x_center +
+    y_center together (0.6196) is superadditive vs. their marginal sum
+    (0.4662) and closes 89% of the gap to all-six (0.6949) - suggests
+    most of the "extra" signal beyond x_center alone is joint x/y
+    interaction (e.g. quadrant), not a hidden shape contribution, but
+    this isn't rigorously decomposed yet.
 
 ## The flip/label-mismatch bug, in detail
 
@@ -138,10 +169,15 @@ don't reorder or add items ahead of this without asking)
 
 All CPU-only prep (fix, significance tests, positional variance, Task 2
 power check, geometric ceiling check, Dual-Labeled Dataset verification
-and its supernumerary follow-up) is done. The MIRROR_MAP fix is
+and its supernumerary follow-up, DENTEX literature-gap check,
+noise-robustness curve, feature ablation) is done. The MIRROR_MAP fix is
 committed and confirmed well-powered to detect a real effect once
 trained. **Nothing further is CPU-blocked - the only remaining blocker
-for the next step is GPU access.**
+for the next step is GPU access.** Don't re-run any of the above CPU
+diagnostics expecting new information - they've each been checked,
+written up, and (where relevant) had their wording explicitly corrected
+once already; re-deriving them from scratch would just reproduce the
+same numbers already in `RESULTS.md` Sections 18-20.
 
 1. **GPU training run (Task 2 setup), once Kaggle access resumes Friday:**
    run `notebooks/yolov8+unet/yolov8+unet_training.ipynb` (now with the
@@ -178,3 +214,13 @@ for the next step is GPU access.**
 - Don't propose a different mitigation design from scratch - one is
   already specified with a stated falsification threshold; only change it
   if new information warrants it.
+- Don't re-search the literature for a public per-FDI-class confusion
+  matrix to substitute for Task 2 - checked directly against the DENTEX
+  paper's primary source and its follow-up participant papers, confirmed
+  absent (item 16 above / Section 18).
+- Don't re-run the noise-robustness or feature-ablation scripts expecting
+  different numbers, and don't describe the feature-ablation result as
+  "x_center only" or "position generally, x and y equally" - the precise
+  wording ("asymmetrically position-dependent") was deliberately checked
+  and corrected once already; regressing to either simpler phrasing would
+  undo that correction (item 18 above / Section 20).
