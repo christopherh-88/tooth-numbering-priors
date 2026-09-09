@@ -803,6 +803,186 @@ about this analysis, even though not the one being looked for. More
 supernumerary-present images (from the undownloaded remainder of this
 dataset, or elsewhere) would be needed to settle the direction.
 
+## 18. Literature check: does a public per-FDI-class confusion matrix from a real trained detector already exist?
+
+**Date:** 2026-09-08 · **Method:** targeted web search + primary-source
+verification (arXiv HTML), not a script.
+
+**Motivation:** if a published DENTEX/HierarchicalDet-adjacent paper
+already reported a per-class confusion matrix or per-FDI-class accuracy
+for a real trained detector, it could be correlated against this
+project's coordinate-only error taxonomy (Section 2's mirror-quadrant/
+neighbor error fractions) as independent corroborating evidence for
+Claim B - without waiting on the Friday GPU run. Checked: the DENTEX
+benchmark paper itself (Hamamci et al., "DENTEX: An Abnormal Tooth
+Detection with Dental Enumeration and Diagnosis Benchmark for Panoramic
+X-rays," arXiv:2305.19112), the DENTEX GitHub repo/challenge page, and
+the follow-up participant papers (He L. et al., DentexSegAndDet; Mei S.
+et al., YOLOrtho; Choi K. et al., DETDet).
+
+**Result: no such data exists publicly - and the benchmark authors say
+so explicitly.** Verified directly against arXiv:2305.19112v2, Section
+V-C ("Limitation of the Study"), subsection "Evaluation Metric
+Constraints":
+
+> "...it doesn't explicitly distinguish the type of error. Failure to
+> detect a tooth altogether is fundamentally different from correctly
+> locating a tooth but assigning the wrong number."
+
+> "...understanding the prevalence of specific error types, such as
+> swapping the enumeration of adjacent teeth, is crucial."
+
+> "Future work could supplement AP with detailed error analysis, such as
+> confusion matrix for the enumeration classes."
+
+The follow-up participant papers checked report only aggregate AP/AR per
+task, not per-class confusion matrices.
+
+**What this does and does not support:**
+- Does NOT substitute for Task 2 - there is no public per-class error
+  data to correlate against, so this cannot become an alternative
+  evidence source if the Friday GPU run is delayed or fails. That
+  possibility (item 1 of the CPU-in-the-meantime list) is closed off,
+  not open.
+- DOES strengthen the paper's motivation for Task 2: the benchmark's own
+  authors identify exactly this gap - a confusion-matrix-level error
+  analysis distinguishing error types (naming "swapping the enumeration
+  of adjacent teeth" specifically) - as missing from the literature and
+  valuable future work. This is a stronger, more specific motivating
+  citation than an assertion that this analysis "would be interesting."
+  Cite Hamamci et al. (arXiv:2305.19112) directly in the paper's
+  Introduction/Related Work when introducing Task 2, not just DENTEX as
+  a dataset/challenge source.
+
+## 19. Robustness of the coordinate-only signal to test-time coordinate noise
+
+**Script:** `cpu_repro/coord_baseline/noise_robustness.py` · **Split:**
+same image-level grouped 80/20, 5 seeds (0-4), as the main baseline ·
+**Date:** 2026-09-08 · **Data:** `noise_robustness_summary.csv`,
+`noise_robustness_raw.csv`, `noise_robustness.png`.
+
+**Motivation:** a real trained detector's predicted boxes are never
+pixel-perfect copies of ground truth. This asks how much coordinate
+imprecision the shortcut signal can tolerate before it disappears -
+context for interpreting Task 2 once a real detector's boxes are
+available, and a standalone sensitivity characterization of Claim A.
+Method: train on clean boxes, add independent Gaussian noise (std in
+normalized 0-1 units) to x_center/y_center/width/height at test time
+only, recompute area/aspect_ratio from the jittered width/height,
+re-evaluate. For reference, Section 13 measured the natural per-class
+positional std at 0.0267 (x) / 0.0490 (y).
+
+| noise std | GBT top-1 acc | logreg top-1 acc |
+|---|---|---|
+| 0.00 (clean) | 0.6949 ± 0.0077 | 0.6706 ± 0.0095 |
+| 0.01 | 0.6109 ± 0.0086 | 0.5812 ± 0.0076 |
+| 0.02 | 0.4948 ± 0.0129 | 0.4544 ± 0.0096 |
+| 0.04 | 0.3484 ± 0.0094 | 0.2910 ± 0.0041 |
+| 0.08 | 0.2067 ± 0.0105 | 0.1624 ± 0.0054 |
+| 0.16 | 0.1078 ± 0.0045 | 0.0908 ± 0.0034 |
+| 0.32 | 0.0615 ± 0.0019 | 0.0559 ± 0.0048 |
+
+Majority baseline: 0.0363 ± 0.0019 (unchanged across noise levels - it
+doesn't depend on coordinates at all).
+
+**Reading:** the signal degrades smoothly and monotonically, not as a
+sharp cliff - there's no single noise level where accuracy suddenly
+collapses. At std=0.04 (comparable in scale to the natural per-class y
+spread measured in Section 13), accuracy is roughly half the clean
+value but still ~9.6x the majority baseline. Even at std=0.08 (larger
+than any measured natural per-class spread), accuracy remains ~5.7x
+baseline. Accuracy only approaches majority-baseline territory at
+std=0.32, an implausibly large amount of box noise for any reasonable
+detector. **Practical reading for Task 2:** ordinary detector
+localization error is very unlikely to erase this signal outright, so
+if a real trained detector shows no shortcut-consistent error pattern,
+that would be a genuine negative result rather than an artifact of
+coordinate imprecision washing out the effect.
+
+## 20. Feature ablation: which geometry features actually carry the signal?
+
+**Script:** `cpu_repro/coord_baseline/feature_ablation.py` · **Split:**
+same image-level grouped 80/20, 5 seeds (0-4), as the main baseline ·
+**Classifier:** gradient-boosted tree only (matches the main baseline's
+stronger classifier) · **Date:** 2026-09-08 · **Data:**
+`feature_ablation.csv`, `feature_ablation.png`.
+
+**Motivation:** the main baseline's 69.5% uses all six features
+(x_center, y_center, width, height, area, aspect_ratio) as one black
+box. This asks which of them actually does the work - position
+("where on the jaw"), size/shape ("how big/what proportions"), or only
+their combination - turning the accuracy number into a mechanistic
+claim instead of an opaque one.
+
+**Single-feature accuracy** (mean ± 95% CI, 5 seeds):
+
+| feature | top-1 acc |
+|---|---|
+| x_center | 0.3608 ± 0.0094 |
+| y_center | 0.1054 ± 0.0051 |
+| width | 0.1167 ± 0.0069 |
+| height | 0.0716 ± 0.0043 |
+| area | 0.1010 ± 0.0051 |
+| aspect_ratio | 0.1057 ± 0.0085 |
+
+**Grouped feature sets:**
+
+| feature set | top-1 acc |
+|---|---|
+| position only (x_center, y_center) | 0.6196 ± 0.0058 |
+| shape only (width, height, area, aspect_ratio) | 0.1434 ± 0.0032 |
+| all six (main baseline) | 0.6949 ± 0.0077 |
+
+**Leave-one-out (all six minus one):**
+
+| dropped feature | top-1 acc |
+|---|---|
+| x_center | 0.2198 ± 0.0066 |
+| y_center | 0.5266 ± 0.0112 |
+| width | 0.6942 ± 0.0070 |
+| height | 0.6953 ± 0.0101 |
+| area | 0.6930 ± 0.0104 |
+| aspect_ratio | 0.6972 ± 0.0077 |
+
+(majority baseline for reference: 0.0363 ± 0.0019)
+
+**Reading: the signal is asymmetrically position-dependent - `x_center`
+dominates, `y_center` is real but secondary, and shape is inert.**
+Dropping `x_center` costs 47pp (0.6949 -> 0.2198); kept alone it's worth
+36pp (0.3608) - the single strongest feature by a wide margin. Dropping
+`y_center` costs 17pp (0.6949 -> 0.5266), well outside `x_center`'s CI
+and far larger than any shape feature's cost, so it is a real,
+non-trivial contributor and not noise - but kept alone it is worth only
+11pp (0.1054), barely above shape-feature-alone territory (0.07-0.12).
+Shape features (width, height, area, aspect_ratio) are inert either
+way: dropping any single one changes accuracy by less than 0.3pp - well
+within each other's 95% CIs, i.e. indistinguishable from no effect.
+`x_center` alone is a plausible proxy for quadrant/left-right side,
+consistent with the main baseline's separately-measured 96-97% quadrant
+accuracy (Section 2). The correct summary is **"asymmetrically
+position-dependent, dominated by `x_center` but not `x_center`-only"** -
+not "position generally, x and y equally," and not "x_center only."
+
+**Follow-on observation (not fully decomposed here):** kept together,
+x_center+y_center reach 0.6196 - well above the sum of their individual
+marginals (0.3608 + 0.1054 = 0.4662), a superadditive interaction of
+about 15pp, consistent with the pair jointly encoding something (e.g.
+quadrant) that neither axis alone captures as cleanly. That combined
+figure also closes most (89%, 0.6196/0.6949) of the gap to the full
+six-feature accuracy, leaving only a 7.5pp residual attributable to
+shape features and/or higher-order interactions - suggesting most of
+what looked like "unexplained" signal beyond `x_center` alone is
+joint x/y interaction, not a hidden contribution from shape. This is
+flagged as an observation for a future, more rigorous decomposition
+(e.g. explicit quadrant/tooth-type features), not a new claim.
+
+**Why this matters for the paper:** it sharpens Claim A from "geometry
+predicts identity" to the more specific and more interpretable
+"asymmetrically position-dependent identity prediction, independent of
+box size or shape" - a cleaner, more falsifiable mechanistic story, and
+useful framing for the mitigation experiment (which perturbs position,
+the features that actually matter, not the shape features that don't).
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

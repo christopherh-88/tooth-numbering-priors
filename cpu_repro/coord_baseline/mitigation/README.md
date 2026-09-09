@@ -42,6 +42,18 @@ notebook), as an additional transform applied before/alongside existing
 augmentations - not yet located precisely in the notebook, needs a read-
 through of the current augmentation block before wiring this in.
 
+**Confirms the right target to perturb:** `RESULTS.md` Section 20 (feature
+ablation, run 2026-09-08) found the coordinate-only signal is
+asymmetrically position-dependent - `x_center` dominates (dropping it
+alone collapses accuracy 0.6949 -> 0.2198), `y_center` is real but
+secondary (dropping it costs 17pp, to 0.5266) - and essentially
+independent of box size/shape (dropping width/height/area/aspect_ratio
+individually changes accuracy by <0.3pp each, within noise). This
+confirms jittering position (both axes, not just x) is attacking the
+actual signal, not a side channel - a shape-only jitter would have been
+a much weaker intervention, and an x-only jitter would leave a real
+secondary y-axis signal untouched.
+
 ### Secondary / fallback: decorrelation auxiliary loss
 
 Train the detector's classification head jointly with a penalty term that

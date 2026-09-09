@@ -86,6 +86,20 @@ panoramic-radiograph-quality/detection-error correlation paper (PMC,
 2025) if it strengthens the "multiple known confounds in this exact
 domain" point in the intro.]
 
+Notably, Hamamci et al. themselves flag the exact gap this paper's Task 2
+is designed to close: their own Limitations section (V-C, "Evaluation
+Metric Constraints") states that aggregate AP "doesn't explicitly
+distinguish the type of error," that "understanding the prevalence of
+specific error types, such as swapping the enumeration of adjacent
+teeth, is crucial," and calls for "detailed error analysis, such as
+confusion matrix for the enumeration classes" as future work. A targeted
+literature check (`RESULTS.md` Section 18) confirmed no public
+per-FDI-class confusion matrix exists for any DENTEX-trained detector,
+including the follow-up participant papers (DentexSegAndDet, YOLOrtho,
+DETDet) - only aggregate AP/AR per task is reported anywhere in this
+line of work. This is cited here as the motivating gap for Task 2, not
+just DENTEX-as-a-dataset.
+
 **Novelty positioning.** A citation-graph check (not a keyword web
 search) of papers citing DENTEX, HierarchicalDet, and three shortcut-
 learning-in-medical-imaging papers found 0 of 132 unique citing papers
@@ -127,6 +141,20 @@ source of truth.
 
 - 4.1 Coordinate-only baseline recovers FDI identity far above chance
   (Section 2, Section 10).
+- 4.1a Feature ablation: the signal is asymmetrically position-dependent
+  - `x_center` dominates (dropping it costs 47pp), `y_center` is real
+  but secondary (dropping it costs 17pp, well above any shape feature's
+  <0.3pp), shape features are inert (Section 20) - sharpens Claim A from
+  "geometry predicts identity" to "asymmetrically position-dependent
+  identity prediction," a cleaner mechanistic claim than "x_center
+  only." Also motivates the mitigation experiment's choice to jitter
+  position, not size/shape.
+- 4.1b Robustness to test-time coordinate noise (Section 19): accuracy
+  degrades smoothly, not as a cliff, and stays well above the majority
+  baseline even at noise levels exceeding the natural per-class spread -
+  supports reading a future null result in Task 2 (if a real detector
+  shows no shortcut-consistent error pattern) as genuine, not an
+  artifact of detector localization imprecision washing the signal out.
 - 4.2 Negative controls confirm the signal is genuine, not an artifact
   (Section 4).
 - 4.3 Quadrant vs. tooth-type: the non-trivial part of the finding

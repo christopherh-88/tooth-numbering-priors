@@ -1,0 +1,16 @@
+feature_set,features,top1_acc_mean,top1_acc_ci95
+single:x_center,x_center,0.3607650423561876,0.009445387330247272
+single:y_center,y_center,0.10537124093979375,0.005112924583936547
+single:width,width,0.11667481875080137,0.006855640613369732
+single:height,height,0.0716401400720734,0.004295919268978388
+single:area,area,0.10098905890375184,0.005126739691171379
+single:aspect_ratio,aspect_ratio,0.10573631790923285,0.008535115283950321
+"position_only (x,y)","x_center,y_center",0.6195531078896948,0.005833107484302105
+"shape_only (w,h,area,aspect)","width,height,area,aspect_ratio",0.1434179394707767,0.0031716730498098696
+all_six (main baseline),"x_center,y_center,width,height,area,aspect_ratio",0.694879109601514,0.007663382799445114
+all_minus_x_center,"y_center,width,height,area,aspect_ratio",0.219806415324329,0.006575189448512579
+all_minus_y_center,"x_center,width,height,area,aspect_ratio",0.526577921962474,0.011244009278661544
+all_minus_width,"x_center,y_center,height,area,aspect_ratio",0.6942268719015853,0.007005474287572247
+all_minus_height,"x_center,y_center,width,area,aspect_ratio",0.6953037863244507,0.010106934639952178
+all_minus_area,"x_center,y_center,width,height,aspect_ratio",0.6929785874027042,0.010448826315882485
+all_minus_aspect_ratio,"x_center,y_center,width,height,area",0.6972385460191548,0.007673250764989228
