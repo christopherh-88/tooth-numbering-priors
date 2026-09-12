@@ -187,6 +187,12 @@ def train(data_yaml):
             single_cls=SINGLE_CLS,
             save_period=SAVE_PERIOD,
             val=True,
+            fliplr=0.0,  # FDI class ids encode left/right quadrant; Ultralytics'
+                         # default fliplr=0.5 mirrors box coordinates but does not
+                         # remap the class id, which would reintroduce the same
+                         # label-mismatch confound as the MIRROR_MAP bug fixed in
+                         # notebooks/yolov8+unet/yolov8+unet_training.ipynb - see
+                         # HANDOFF.md. Disabled rather than remapped, for now.
         )
     return results
 
@@ -320,8 +326,13 @@ def evaluate(weights_path):
         total_unmatched_gt += n_unmatched_gt
         total_unmatched_pred += n_unmatched_pred
 
-    y_true = np.array(all_true)
-    y_pred = np.array(all_pred)
+    # dtype=int matters even when all_true/all_pred are non-empty in the
+    # common case: an empty list defaults to float64, and quadrant_of()/
+    # tooth_type_of() in build_coord_baseline.py use these arrays to index
+    # FDI_CODES, which raises IndexError on a float array. Zero matched
+    # detections is a real possibility early in training or on a bad run.
+    y_true = np.array(all_true, dtype=int)
+    y_pred = np.array(all_pred, dtype=int)
 
     metrics = coord_evaluate(y_true, y_pred, train_y)
     metrics["seed"] = SEEDS[0]  # the split file is generated from this same seed - see export_split.py
@@ -334,31 +345,42 @@ def evaluate(weights_path):
 
     pd.DataFrame([metrics]).to_csv(EVAL_RESULTS_DIR / "summary.csv", index=False)
 
-    cm = confusion_matrix(y_true, y_pred, labels=list(range(32)))
-    pd.DataFrame(cm, index=FDI_CODES, columns=FDI_CODES).to_csv(
-        EVAL_RESULTS_DIR / "confusion_matrix_yolov8_seed0.csv"
-    )
+    # summary.csv (the metrics that actually drive the GO_NO_GO comparison) is
+    # written above unconditionally. The confusion matrix is diagnostic detail
+    # on top of that - if there were zero matched detections at all (a
+    # pathologically bad run), sklearn's confusion_matrix() raises rather than
+    # returning zeros, so guard it here rather than losing summary.csv (and an
+    # entire completed training run's results) to a crash at the last step.
+    if len(y_true) == 0:
+        print("WARNING: zero matched detections across the whole val split - "
+              "skipping confusion matrix. summary.csv above still has "
+              "detection_recall/n_unmatched_* to diagnose why.")
+    else:
+        cm = confusion_matrix(y_true, y_pred, labels=list(range(32)))
+        pd.DataFrame(cm, index=FDI_CODES, columns=FDI_CODES).to_csv(
+            EVAL_RESULTS_DIR / "confusion_matrix_yolov8_seed0.csv"
+        )
 
-    try:
-        import matplotlib
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as plt
+        try:
+            import matplotlib
+            matplotlib.use("Agg")
+            import matplotlib.pyplot as plt
 
-        fig, ax = plt.subplots(figsize=(11, 10))
-        im = ax.imshow(cm, cmap="viridis")
-        ax.set_xticks(range(32))
-        ax.set_yticks(range(32))
-        ax.set_xticklabels(FDI_CODES, rotation=90, fontsize=7)
-        ax.set_yticklabels(FDI_CODES, fontsize=7)
-        ax.set_xlabel("Predicted FDI code")
-        ax.set_ylabel("True FDI code")
-        ax.set_title("yolov8 - confusion matrix (matched detections, seed 0 split)")
-        fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
-        fig.tight_layout()
-        fig.savefig(EVAL_RESULTS_DIR / "confusion_matrix_yolov8_seed0.png", dpi=150)
-        plt.close(fig)
-    except ImportError:
-        pass
+            fig, ax = plt.subplots(figsize=(11, 10))
+            im = ax.imshow(cm, cmap="viridis")
+            ax.set_xticks(range(32))
+            ax.set_yticks(range(32))
+            ax.set_xticklabels(FDI_CODES, rotation=90, fontsize=7)
+            ax.set_yticklabels(FDI_CODES, fontsize=7)
+            ax.set_xlabel("Predicted FDI code")
+            ax.set_ylabel("True FDI code")
+            ax.set_title("yolov8 - confusion matrix (matched detections, seed 0 split)")
+            fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+            fig.tight_layout()
+            fig.savefig(EVAL_RESULTS_DIR / "confusion_matrix_yolov8_seed0.png", dpi=150)
+            plt.close(fig)
+        except ImportError:
+            pass
 
     print("\n" + "=" * 70)
     print("YOLOv8 evaluation (matched detections vs. ground truth, seed-0 split)")
