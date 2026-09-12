@@ -203,6 +203,11 @@ format as Section 2 (it's evaluated with the identical
 directly comparable) - do not just update `eval_results/summary.csv` and
 consider it logged.
 
+**Update (2026-09-11): run completed - see Section 21 for the result and
+Section 22 for the Task 2 error-pattern comparison.** This section is
+left as-is above (historical record of the pre-run plan) rather than
+rewritten, per this file's own append-only convention.
+
 Pre-registered thresholds (from `GO_NO_GO.md`, frozen before any YOLO
 output is seen): C = 0.6928 (GBT, seed-0 split, Section 2 table above).
 COMMIT if (Y-C) ≤ 5 points, PIVOT if ≥ 15 points, EXTEND if in between;
@@ -982,6 +987,125 @@ predicts identity" to the more specific and more interpretable
 box size or shape" - a cleaner, more falsifiable mechanistic story, and
 useful framing for the mitigation experiment (which perturbs position,
 the features that actually matter, not the shape features that don't).
+
+## 21. YOLOv8 training run (Task 2 setup) - GO/NO-GO result: PIVOT
+
+**Script:** `cpu_repro/yolo_training/train_yolo.py` (run via a Kaggle GPU
+kernel, Tesla T4) · **Split:** same persisted image-level seed-0 split as
+the coordinate baseline (`cpu_repro/coord_baseline/image_split_seed0.csv`,
+820 train / 201 val images pre-exclusion) · **Model:** yolov8x.pt, 30
+epochs, batch 10, imgsz 640, `fliplr=0.0` (disabled - see note below) ·
+**Date:** 2026-09-11 · **Pre-registered rule:** `cpu_repro/yolo_training/GO_NO_GO.md`
+· **Data:** `cpu_repro/yolo_training/eval_results/summary.csv`,
+`confusion_matrix_yolov8_seed0.csv/.png`.
+
+This completes Section 9's placeholder and answers Claim B (RESULTS.md
+Section 11.2): does a real trained detector exploit visual signal beyond
+what bounding-box position alone predicts?
+
+**Note on `fliplr`:** Ultralytics' default `fliplr=0.5` mirrors box
+coordinates during training augmentation but does not remap the FDI class
+label, which encodes left/right quadrant - this would have reintroduced
+the same label-mismatch confound as the `MIRROR_MAP` bug fixed in
+`notebooks/yolov8+unet/yolov8+unet_training.ipynb` (see the flip/label-mismatch
+section of `HANDOFF.md`), except silently, inside Ultralytics' own
+augmentation pipeline rather than this repo's code. Disabled rather than
+remapped, for this run.
+
+**Result** (matched-detections-only accuracy, per the coordinate baseline's
+`evaluate()` function - see `cpu_repro/yolo_training/README.md` for why
+detection recall is reported separately rather than folded into top-1):
+
+| metric | coordinate-only baseline (C, GBT, seed 0) | YOLOv8 (Y, seed 0) |
+|---|---|---|
+| top-1 accuracy | 0.6928 | 0.9558 |
+| quadrant accuracy | 0.9661 | 0.9959 |
+| tooth-type accuracy | 0.7186 | 0.9587 |
+| majority-class baseline | 0.0353 | 0.0359 |
+| n_test (instances) | 5491 | 5406 (matched detections only) |
+| detection recall | n/a (given ground-truth boxes) | 0.9845 |
+
+`n_test` differs because YOLO's number is matched detections only (85
+ground-truth boxes went undetected, 98 spurious predictions - both
+excluded from the accuracy figures, per the README's stated methodology).
+
+**GO/NO-GO call: Y - C = 0.9558 - 0.6928 = 0.2630 (26.3 percentage
+points).** Per the pre-registered rule (frozen before this run, Section 1
+of `GO_NO_GO.md`): COMMIT if ≤5pp, PIVOT if ≥15pp, EXTEND if in between.
+**26.3pp is a PIVOT**, called against the seed-0-specific baseline value
+(0.6928), not the 5-seed aggregate (0.6949 ± 0.0077), per the rule's own
+note on which C to use.
+
+**Detection-recall guard (Section 2 of `GO_NO_GO.md`): passed.** 98.45%
+recall is well above the 90% minimum, so Y is not an artifact of the
+detector only finding easy teeth - the penalized/recall-adjusted Y'
+variant specified for a recall failure is not needed here.
+
+**Where the gap comes from (Section 5 of `GO_NO_GO.md`, read
+diagnostically alongside the top-1 call, not as an independent
+threshold):** quadrant accuracy is flat and near-ceiling for both models
+(0.9661 -> 0.9959, +3pp, already close to the 100% ceiling on either
+side). The gap is concentrated in tooth-type accuracy (0.7186 -> 0.9587,
++24pp) - precisely the sub-task the coordinate-only model was already
+weakest at. Per the pre-written interpretation, this pattern "is
+consistent with vision adding value specifically where the coordinate
+baseline was already weakest," supporting the PIVOT reading rather than
+some other artifact (e.g. a detector that's simply better at the
+near-solved quadrant task, which would look different).
+
+**What PIVOT means (Section 3 of `GO_NO_GO.md`), stated but not acted on
+here:** the "numbering is primarily a geometric problem" framing is not
+well supported by this dataset's own strongest available baseline. The
+pre-registered next steps for this branch (error analysis on
+detector-right/coordinate-wrong cases; reframing the contribution around
+positional priors improving a vision model rather than showing priors
+are sufficient alone; or reconsidering whether UFBA-425 is the right
+testbed) are a separate decision, not made in this entry.
+
+## 22. Task 2 - YOLOv8 error-pattern comparison against the coordinate-only baseline
+
+**Scripts:** `cpu_repro/coord_baseline/build_coord_baseline.py`
+(`is_mirror_quadrant_error`, `is_neighbor_error` - already statically
+audited, see `cpu_repro/coord_baseline/mitigation/README.md`) ·
+**Data:** `cpu_repro/coord_baseline/per_seed_results.csv` (seed 0),
+`cpu_repro/yolo_training/eval_results/summary.csv` · **Date:** 2026-09-11
+
+This is Task 2 proper: given Section 21's real trained-detector
+predictions, do YOLO's wrong predictions fall into the same error
+categories (mirror-quadrant swaps, same-quadrant neighbor swaps) as the
+coordinate-only baseline's, computed the same way, on the same seed-0
+split?
+
+| metric | coordinate-only baseline (GBT, seed 0) | YOLOv8 (seed 0) |
+|---|---|---|
+| n wrong | 1687 (of 5491) | 239 (of 5406 matched) |
+| mirror-quadrant error fraction | 0.0753 | 0.0669 |
+| mirror-quadrant error count | 127 | 16 |
+| neighbor error fraction | 0.8417 | 0.8996 |
+| neighbor error count | 1420 | 215 |
+| other (neither category) | 140 (8.3%) | 8 (3.3%) |
+
+**Reading:** the two models' wrong predictions land in the *same two
+error categories at similar relative rates* - both are overwhelmingly
+same-quadrant neighbor swaps (84.2% vs. 90.0% of errors) with a smaller
+mirror-quadrant component (7.5% vs. 6.7%), and few errors fall outside
+both categories (8.3% vs. 3.3%). YOLO's error-type *distribution* does
+not diverge from the coordinate-only baseline's in a way that would
+suggest a qualitatively different failure mode - despite YOLO making far
+fewer absolute errors (239 vs. 1687, consistent with Section 21's 26.3pp
+accuracy gap), the errors it does make are concentrated in the same
+anatomically-adjacent-class confusions as the geometry-only model's.
+Read this as a similarity-in-error-structure result, not a magnitude
+comparison - the mirror/neighbor fractions being close does not offset
+or qualify the large top-1 gap in Section 21, which remains the
+controlling number for the GO/NO-GO call.
+
+**Not done here (separate, deferred step - see Section 21's closing
+note and `HANDOFF.md`):** characterizing *which specific cases* YOLO
+gets right that the coordinate-only model gets wrong, i.e. what visual
+signal is doing the work on the 26.3pp of accuracy that position alone
+does not explain. That is the PIVOT-branch error analysis named in
+`GO_NO_GO.md` Section 3, and is not part of this entry.
 
 ## Adding a new entry
 

@@ -136,8 +136,13 @@ cpu_repro/outputs/
 # inside are machine-specific, e.g. different on Kaggle vs local)
 cpu_repro/yolo_training/prepared/
 cpu_repro/yolo_training/runs/
-cpu_repro/yolo_training/eval_results/
 *.pt
+# cpu_repro/yolo_training/eval_results/ is NOT ignored - it holds only
+# summary.csv and confusion_matrix_*.csv/.png (small, deterministic result
+# files), no checkpoint weights (those live in runs/, still ignored above,
+# and *.pt still catches weights anywhere). Same committed-results
+# convention as cpu_repro/coord_baseline/summary.csv and its confusion
+# matrices.
 
 # Spyder project settings
 .spyderproject
