@@ -1,0 +1,2 @@
+n_total,n_both_correct,n_both_wrong,n_yolo_only_correct,n_coord_only_correct,p_yolo_wrong,p_coord_wrong,expected_both_wrong_frac,expected_both_wrong_n,observed_both_wrong_n,observed_over_expected_ratio,phi_coefficient
+5491,3677,197,1490,127,0.05900564560189403,0.30723001274813333,0.01812830525048174,99.54252413039524,197,1.9790536930924196,0.16326649575977736
