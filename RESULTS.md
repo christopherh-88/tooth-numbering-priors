@@ -1107,6 +1107,334 @@ signal is doing the work on the 26.3pp of accuracy that position alone
 does not explain. That is the PIVOT-branch error analysis named in
 `GO_NO_GO.md` Section 3, and is not part of this entry.
 
+**Update (2026-09-11): done - see Section 23.**
+
+## 23. PIVOT-branch case study: what is YOLO getting right that the coordinate-only model gets wrong?
+
+**Script:** `cpu_repro/yolo_training/case_study_yolo_vs_coord.py` · **Split:**
+same seed-0 split as Sections 21/22 · **Date:** 2026-09-11 · **Data:**
+`cpu_repro/yolo_training/eval_results/case_study_yolo_correct_coord_wrong.csv`
+(full case set), `cpu_repro/yolo_training/eval_results/case_study_crops/`
+(18 sampled image crops + `manifest.csv`).
+
+**Exploratory/diagnostic - this is the PIVOT-branch next step named in
+`GO_NO_GO.md` Section 3 and flagged as not-yet-done at the close of
+Section 22. No pre-registered pass/fail rule applies here; nothing below
+is a GO/NO-GO call.** The framing decision this analysis feeds into
+(positional priors as a complement to vision vs. reconsidering whether
+UFBA-425 is the right testbed) is explicitly not made here.
+
+**Method:** the coordinate-only GBT model was refit locally (seed 0,
+identical to Section 2/21's own training) with per-instance identity
+retained, and YOLO's `best.pt` checkpoint (downloaded from the Kaggle
+run behind Section 21) was re-run locally on CPU over the same val
+images. Both pipelines parse the same label files in the same line
+order, so `(label_file, line_idx)` is an exact join key identifying the
+same physical tooth annotation in both - verified by an assertion in the
+script rather than assumed. This reproduces Section 21/22's numbers
+exactly at the aggregate level (5491 joined instances) while keeping the
+per-instance predictions both models discard once evaluated.
+
+**Case set:** instances where YOLO's prediction equals ground truth and
+the coordinate-only model's does not - **1490 of 5491 instances
+(27.1%).**
+
+**Error-type breakdown of the coordinate model's own mistakes, within
+this case set** (using the same `is_mirror_quadrant_error`/
+`is_neighbor_error` taxonomy as Section 22):
+
+| error type | count | % of case set | for comparison, Section 22's overall coord-baseline rate |
+|---|---|---|---|
+| neighbor | 1272 | 85.4% | 84.2% |
+| mirror-quadrant | 112 | 7.5% | 7.5% |
+| other | 106 | 7.1% | 8.3% |
+
+These percentages closely track the coordinate model's overall
+error-type mix from Section 22 (84.2% / 7.5% / 8.3%). **Reading: YOLO is
+not preferentially fixing one error category over another - it corrects
+the coordinate model's mistakes in roughly the same proportions those
+mistakes already occur in.** There is no evidence here that YOLO is
+specifically better at, say, mirror-quadrant confusions while leaving
+neighbor confusions untouched, or vice versa.
+
+**Ground-truth quadrant distribution in the case set:** 1=374, 2=384,
+3=404, 4=328 - roughly even across all four quadrants, no strong
+clustering.
+
+**Ground-truth tooth-type distribution in the case set** (digit 2 of the
+FDI code: 1/2=incisors, 3=canine, 4/5=premolars, 6/7/8=molars):
+4 (first premolar) and 1 (central incisor) are the two largest groups
+(256, 254), 8 (third molar/wisdom tooth) the smallest (68) - but the
+case set spans all eight tooth-type groups without an extreme
+concentration in any one, consistent with Section 21's finding that the
+top-1 gap is broadly concentrated in tooth-type accuracy rather than one
+specific tooth class.
+
+**Qualitative review of sampled crops (8 of the 18 sampled crops
+directly inspected, stratified across the three error-type categories
+above; full manifest of all 18 in `case_study_crops/manifest.csv`).**
+The initial crop (tight, 15% padding around the box) showed only the
+single tooth with no surrounding context and was not usable for judging
+crowding or adjacent-tooth patterns - crops were regenerated with 150%
+padding to show local arch context before this review. Two patterns
+were visually consistent across the inspected sample, stated as
+observations from a small manually-reviewed set, not a quantified claim:
+
+1. **Mirror-quadrant cases sit visually near the anatomical midline**,
+   as expected given `x_center` is the dominant coordinate feature
+   (Section 20) - the sampled 31/41 and 11/21 crops show the box
+   genuinely close to the jaw's central axis, where left/right position
+   alone is inherently close to ambiguous, rather than showing any
+   obvious image-quality problem.
+2. **Several neighbor/other-category cases show visible irregular tooth
+   spacing** - a missing-tooth gap or a visibly tilted/atypically-placed
+   tooth in the local arch (most clearly in `case_17_true36_coordpred26_other.jpg`,
+   which shows a gap in the lower arch and what looks like a displaced
+   upper molar, and `case_13_true33_coordpred35_other.jpg` and
+   `case_14_true15_coordpred17_other.jpg`, both showing a visible gap
+   near the case tooth). This is consistent with a mechanistic story:
+   irregular spacing shifts a tooth's pixel position away from where a
+   geometry-only model expects that FDI class to sit, while shape/local
+   anatomy still identifies it correctly regardless of position -
+   exactly the kind of case a coordinate-only model cannot get right by
+   construction, and a real detector can.
+
+**Not a claim:** that missing-tooth/irregular-spacing images make up a
+majority of the 1490-case set - only 8 of 1490 cases were actually
+looked at. A systematic pass (e.g. an automated crowding/spacing proxy
+computed per image, correlated against case-set membership) would be
+needed to turn this from a qualitative observation into a quantified
+one, and is not done here.
+
+## 24. Framing resolution after the PIVOT result (2026-09-11)
+
+This section records the framing decision made after Section 21's PIVOT
+result, resolving the open item Sections 21-23 each explicitly declined
+to resolve on their own.
+
+**A timing fact worth being explicit about:** `cpu_repro/yolo_training/GO_NO_GO.md`
+was written 2026-09-08T07:55:30-07:00. Section 11's framing decision
+("the coordinate-only baseline is a diagnostic/audit tool, not a claim
+about detector internals") was written 2026-09-08T08:24:52-07:00 - 29
+minutes later, same session - and Section 11 explicitly states it
+"supersedes any earlier informal framing ... to the extent that framing
+appears elsewhere in this repo." `GO_NO_GO.md` Section 3's prose
+interpretation of what a PIVOT result would mean for the paper ("the
+'numbering is primarily geometric' framing is not well supported...
+vulnerable to the obvious rebuttal") was therefore written for a framing
+Section 11 replaced less than half an hour later. This does not change
+the pre-registered *numeric* thresholds (Section 1 of `GO_NO_GO.md`,
+which correctly governed the COMMIT/PIVOT/EXTEND call in Section 21) -
+only the prose interpretation of what a PIVOT outcome means for the
+paper's contribution, which this section supersedes in turn.
+
+**Decision: keep the diagnostic-tool framing (Section 11.1) as the
+paper's primary contribution.** Claim A (Section 11.2: FDI tooth
+identity correlates strongly with bounding-box geometry alone,
+well-supported, cross-dataset replicated) is untouched by the YOLO
+result - nothing in Sections 21-23 weakens it. What Section 21 actually
+measured is whether a specific real trained detector relies on that
+geometric correlation as a shortcut, and the answer is a clear **no**:
+a detector "gaming" the shortcut would plateau near the coordinate-only
+ceiling (69.28%), not exceed it by 26.3 points concentrated almost
+entirely in tooth-type accuracy - the exact sub-task Section 20's
+feature-ablation already showed geometry cannot push further (shape
+features inert, `x_center`/`y_center` together topping out around 62%
+even with their superadditive interaction). A detector that were merely
+exploiting position would have no way to reach 95.9% tooth-type accuracy
+when position alone tops out well below that.
+
+**What this means going forward:** Sections 21-23 are not a pivot away
+from the project's contribution - they are the diagnostic-tool framing's
+own audit, carried out and quantified, with a clean and interpretable
+answer. Future work (the mitigation experiment, boundary-condition
+dataset search - both still to be done, see Sections 25+) should be
+written up under this framing: not "does the shortcut break under
+pressure" as the central question, but continuing to build out the
+diagnostic tool and its worked examples (UFBA-425 seed-0 YOLO comparison
+being the first full worked example, DENTEX/boundary-condition datasets
+as further ones) - a methods contribution, per Section 11.1, not a claim
+about what any specific detector's weights are doing internally beyond
+what Section 21-23's direct measurement already supports.
+
+**Not decided here:** the mitigation experiment's original framing
+(`cpu_repro/coord_baseline/mitigation/README.md`) still describes itself
+partly in shortcut-reliance terms ("if accuracy collapses, that itself
+is further... evidence for Claim B"). That document's own framing should
+be revisited when the mitigation experiment is actually run (Section 25+),
+not silently reinterpreted here without re-reading it directly.
+
+## 25. Boundary-condition dataset test: DenPAR periapical radiographs
+
+**Script:** `cpu_repro/boundary_condition/denpar_periapical/build_coord_baseline_denpar.py`
+· **Dataset:** DenPAR (Rasnayaka et al., *Scientific Data* 12:1615, 2025),
+1000 intra-oral periapical (IOPA) radiographs, CC BY 4.0,
+[10.5281/zenodo.16645076](https://doi.org/10.5281/zenodo.16645076) -
+downloaded directly from Zenodo (md5 `4fcecde6bfa4dc47daec83b1f7856c7f`,
+matches the record's published checksum) · **Split:** own image-level
+grouped 80/20, 5 seeds (0-4) · **Date:** 2026-09-12.
+
+This is the first real test of the falsifiable boundary-condition
+hypothesis stated in Section 11.4: the coordinate-only shortcut should
+weaken where the **canonicalized acquisition protocol** precondition
+breaks, even with the **structured FDI label space** precondition intact.
+UFBA-425 and DENTEX (Sections 2, 10) are both panoramic radiographs - a
+full jaw in one consistently-framed image. DenPAR is periapical: each
+image shows a small, variable subset of teeth (this dataset: 1-8 teeth,
+mean 3.96 after filtering - see below), framed however that exposure
+happened to be positioned, with no consistent "where quadrant 3 sits in
+the frame" the way a panoramic radiograph has.
+
+**Data construction - the box-to-FDI-code correspondence is not given
+directly by the dataset and was independently verified, not assumed.**
+DenPAR provides pixel-space bounding boxes per image (`Key Points
+Annotations/<id>.json`) and, separately, a spreadsheet giving each
+image's visible teeth as an FDI code list in ascending numeric order
+(`RawData/Characteristics.xlsx`) - but no documented rule links a
+specific box to a specific code in that list. Two images were checked by
+hand before writing the loader: image 1 (lower-right, codes
+44,45,46,47,48) and image 2 (lower-left, codes 36,37,38). For both,
+sorting that image's boxes by x-center ascending and zipping with the
+FDI list in the order given produced anatomically correct results -
+premolar-shaped crowns at the 44/36 end progressing to molar/wisdom-tooth
+shapes toward 48/38, confirmed by directly viewing both radiographs
+crop-by-crop. This rule is what the script uses throughout, with an
+additional automatic per-image check (the FDI list must itself be
+strictly ascending) that drops rather than guesses at any row where the
+convention doesn't hold.
+
+**Exclusions, all counted rather than silently dropped:** of 1000 images,
+221 excluded for primary/deciduous-tooth FDI codes (51-85 range - pediatric
+radiographs, outside this repo's 32-class permanent-tooth `FDI_CODES`) or
+malformed spreadsheet entries; a further 146 excluded where the box count
+didn't match the FDI-list count for that image (ambiguous correspondence -
+dropped rather than guessed at). **Final: 2505 tooth instances from 633
+images**, substantially smaller than UFBA-425's 27,563 or DENTEX's 4,872,
+which widens this result's confidence intervals accordingly.
+
+**Result** (mean ± 95% CI over 5 seeds):
+
+| metric | UFBA-425 (Section 2, GBT) | DENTEX (Section 10, GBT) | DenPAR periapical (GBT) |
+|---|---|---|---|
+| top-1 accuracy | 0.6949 ± 0.0077 | 0.6847 ± 0.0124 | **0.2658 ± 0.0277** |
+| quadrant accuracy | 0.9653 ± 0.0035 | ~0.98 | **0.4553 ± 0.0236** |
+| tooth-type accuracy | 0.7200 ± 0.0084 | - | **0.4501 ± 0.0228** |
+| majority-class baseline | 0.0363 ± 0.0019 | - | 0.0759 ± 0.0103 |
+
+Full data: `summary.csv`, `per_seed_results.csv`,
+`confusion_matrix_gradient_boosted_tree_seed0.csv`.
+
+**Shuffled-label negative control (seed 0, GBT):** top-1 collapses to
+4.2% (below the 8.0% majority baseline, as expected for a genuinely
+shuffled/noise classifier) - confirming the 26.6% real result reflects a
+real geometry-label correlation, not a training-pipeline artifact on
+this much smaller dataset.
+
+**Reading, against the pre-stated falsification threshold (Section 2:
+top-1 within 2x of majority baseline falsifies the geometry-predicts-identity
+claim):** 2x majority baseline here is 15.2%; the real result (26.6%) is
+above that line, so the coordinate-only shortcut has **not** vanished
+entirely - but it has dropped from ~69-70% on panoramic radiographs to
+~27% here, a collapse to roughly a third of its panoramic-dataset
+strength. **Quadrant accuracy is the more striking number**: it was
+"close to definitional" on panoramic radiographs (96.5-98%, Section
+11.3), but here sits at 45.5% - barely better than tooth-type accuracy
+(45.0%) on the same data, and nowhere near the near-ceiling regularity
+seen when a full jaw is canonically framed. This is consistent with the
+two-precondition hypothesis specifically, not just "harder dataset,
+lower accuracy generally": quadrant identity is exactly the coordinate
+information that should become unrecoverable once the frame no longer
+pins a consistent left/right position to a consistent pixel location,
+and that is the sharpest drop of the three accuracy numbers.
+
+**Not a full falsification, and not a clean confirmation either - a
+partial, quantified answer:** the hypothesis predicted the shortcut
+should *weaken* where the canonicalization precondition breaks while the
+label-structure precondition holds, and that is what happened (69-70% ->
+27%, above 2x-majority but far below panoramic levels). It does not
+predict the shortcut should vanish to noise, and it did not. Read this as
+one data point supporting the two-precondition framing, on one
+periapical dataset with a much smaller sample than the panoramic
+datasets - not as a definitive test of the hypothesis in general.
+
+**Not decided here:** whether/how to commit the raw DenPAR image data
+(`cpu_repro/boundary_condition/denpar_periapical/RawData/`, ~217MB) to
+this repository. UFBA-425's images are committed directly (existing
+project convention), but DenPAR is roughly 3.5x larger and a separate
+external license (CC BY 4.0, attribution required) - left as an open
+question for whoever commits this section's outputs, not decided
+unilaterally here.
+
+## 26. Do YOLO and the coordinate-only baseline fail on the same samples?
+
+**Script:** `cpu_repro/yolo_training/error_correlation_analysis.py` ·
+**Split:** same seed-0 split as Sections 21/22/23 · **Date:** 2026-09-12
+· **Data:** `cpu_repro/yolo_training/eval_results/error_correlation_joined.csv`
+(full per-instance joined table), `error_correlation_summary.csv`.
+
+**Exploratory/diagnostic - no GO/NO-GO rule applies here.** Sections
+21/22 compare error *rates* and error *taxonomy* between the two models
+but never joined their predictions to check whether they fail on the
+same samples. This fills that gap using data that already exists - the
+same deterministic coordinate-model refit and CPU YOLO inference as
+Section 23, unchanged, just without filtering down to one quadrant of
+the 2x2 table. No new training or GPU run.
+
+**2x2 breakdown** (5491 joined instances - undetected ground-truth boxes,
+85 of them, count as YOLO-wrong rather than being dropped, since the
+coordinate-only model is always given a box to classify and dropping
+YOLO's misses would understate its real miss rate on this joined set):
+
+| | coord correct | coord wrong |
+|---|---|---|
+| **YOLO correct** | 3677 (67.0%) | 1490 (27.1%) |
+| **YOLO wrong** | 127 (2.3%) | 197 (3.6%) |
+
+(The 1490 "YOLO correct, coord wrong" cell is exactly Section 23's case
+set - same number, same join, cross-checks cleanly.)
+
+**Overlap vs. independence:** P(YOLO wrong) = 0.0590, P(coord wrong) =
+0.3072. Under independence, P(both wrong) would be 0.0590 x 0.3072 =
+0.0181 (99.5 of 5491 instances). Observed both-wrong is **197 instances
+(3.59%) - 1.98x the independence expectation.** Phi coefficient (Pearson
+correlation between the two binary wrong/right indicators - chosen over
+Cohen's kappa because kappa corrects for chance *agreement*, counting
+"both right" and "both wrong" symmetrically, where phi is the direct
+correlation between the two error indicators and is numerically
+identical to the Matthews correlation coefficient for a 2x2 table) =
+**0.163** - a real but modest positive correlation, not independence and
+not a strong shared-blind-spot signal either.
+
+**Error-type breakdown on the 197 shared-failure instances**, using the
+same `is_mirror_quadrant_error`/`is_neighbor_error` taxonomy as Section
+22, computed separately against each model's own wrong prediction:
+
+| error type | coordinate model's own errors | YOLO's own errors |
+|---|---|---|
+| neighbor | 148 (75.1%) | 133 (88.1% of the 151 with a prediction) |
+| other | 34 (17.3%) | 8 (5.3%) |
+| mirror-quadrant | 15 (7.6%) | 10 (6.6%) |
+
+YOLO's column covers only 151 of the 197 shared-failure instances -
+the remaining 46 are cases where YOLO never detected the tooth at all
+(no prediction to categorize), not a wrong-class prediction. Both
+models' error-type mix on this shared subset tracks their own overall
+error-type mix from Section 22 (dominated by neighbor errors in both
+cases) - the shared-failure subset does not concentrate in a distinct
+error category relative to either model's general error pattern.
+
+**What this implies for the "complementary signal" framing (Section
+24), reported factually - not resolved here:** the dominant relationship
+in the 2x2 table is strongly asymmetric (27.1% YOLO-fixes-coord vs. 2.3%
+coord-fixes-YOLO, a ~12x imbalance), consistent with Section 21's
+26.3-point accuracy gap. The shared-failure cell is real and
+statistically above independence (1.98x expected, phi = 0.163) but
+small in absolute terms (3.6% of all instances) and not concentrated in
+a distinguishable error category from either model's general pattern.
+Both facts - the strong asymmetry and the modest-but-nonzero
+correlation - are in the data; which one matters more for how the paper
+frames "complementary" is not decided in this entry.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the
