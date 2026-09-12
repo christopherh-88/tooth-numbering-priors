@@ -1,0 +1,5 @@
+variant,n
+both_correct,5084
+both_wrong,251
+jittered_only_correct,83
+zerojitter_only_correct,73

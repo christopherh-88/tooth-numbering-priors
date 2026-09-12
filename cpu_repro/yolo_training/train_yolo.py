@@ -49,17 +49,31 @@ from build_coord_baseline import FDI_CODES, SEEDS  # noqa: E402
 # --------------------------------------------------------------------------
 REPO_ROOT = Path(__file__).resolve().parents[2]
 YOLO_SOURCE_ROOT = REPO_ROOT / "Dataset" / "yolo_train_dataset"
-SPLIT_FILE = REPO_ROOT / "cpu_repro" / "coord_baseline" / "image_split_seed0.csv"
 
-PREPARED_DIR = Path(__file__).resolve().parent / "prepared"
-EVAL_RESULTS_DIR = Path(__file__).resolve().parent / "eval_results"
+# SEED selects which of coord_baseline's persisted image-level splits this
+# run trains/evaluates on (image_split_seed<SEED>.csv, from export_split.py).
+# Every path/name below is derived from it so a per-seed runner (see
+# train_yolo_seed1.py etc., RESULTS.md Section 32's multi-seed replication)
+# only has to override this one constant, not re-derive the rest by hand.
+SEED = 0
+assert SEED in SEEDS, f"SEED={SEED} not in this project's SEEDS={SEEDS} - " \
+    f"every other 5-seed result in this repo uses these same seeds."
+SPLIT_FILE = REPO_ROOT / "cpu_repro" / "coord_baseline" / f"image_split_seed{SEED}.csv"
+
+# Seed 0's directories keep their original (non-suffixed) names for backward
+# compatibility - Sections 21/23/26-32 and their scripts/CSVs already
+# reference "eval_results/summary.csv" etc. directly, not a seed0/ subpath.
+# Any other seed gets its own seed<N>/ subdirectory instead, so multi-seed
+# runs can never collide with or overwrite seed 0's existing results.
+PREPARED_DIR = Path(__file__).resolve().parent / "prepared" / (f"seed{SEED}" if SEED != 0 else "")
+EVAL_RESULTS_DIR = Path(__file__).resolve().parent / "eval_results" / (f"seed{SEED}" if SEED != 0 else "")
 
 # Training hyperparameters - mirrors notebooks/yolov8/yolov8_train.ipynb's
 # CLI call as closely as possible, so this run is comparable to the
 # repo's original YOLOv8 training, just on our fixed comparable split.
 BASE_WEIGHTS = "yolov8x.pt"   # matches the original notebook; use yolov8n.pt for a fast local smoke test
 PROJECT_DIR = str(Path(__file__).resolve().parent / "runs")
-RUN_NAME = "yolov8_seed0split"
+RUN_NAME = f"yolov8_seed{SEED}split"
 EPOCHS = 30
 BATCH = 10
 IMGSZ = 640
@@ -71,6 +85,23 @@ WARMUP_EPOCHS = 10
 LRF = 0.005
 SINGLE_CLS = False
 SAVE_PERIOD = 5        # extra numbered checkpoint every N epochs, on top of the always-on last.pt/best.pt
+
+# Geometry-jitter augmentation (position/scale perturbation applied per
+# training sample) - previously left as Ultralytics' implicit defaults
+# (translate=0.1, scale=0.5), which was NOT "zero jitter" as the mitigation
+# design in cpu_repro/coord_baseline/mitigation/README.md assumed when it
+# described this run as a future "unjittered" baseline. Section 13 measured
+# the dataset's natural per-class positional spread at std 0.0267 (x) /
+# 0.0490 (y) normalized; the mitigation design's own pre-registered target
+# ("at least 2x natural spread") is 0.0535 (x) / 0.0979 (y) - and the
+# Ultralytics default translate=0.1 already exceeds the x-target and is
+# comparable to the y-target, with scale=0.5 adding substantial further
+# perturbation on top. This run (default TRANSLATE=0.1, SCALE=0.5,
+# RUN_NAME="yolov8_seed0split", matching Section 21 exactly) is therefore
+# correctly read as the *jittered* condition, not a jitter-free baseline.
+# See train_yolo_zerojitter.py for the true near-zero-jitter comparison arm.
+TRANSLATE = 0.1
+SCALE = 0.5
 
 # Evaluation
 EVAL_CONF = 0.5         # matches conf=0.5 used in notebooks/yolov8/yolo_test.ipynb and yolov8+unet predict calls
@@ -185,6 +216,8 @@ def train(data_yaml):
             warmup_epochs=WARMUP_EPOCHS,
             lrf=LRF,
             single_cls=SINGLE_CLS,
+            translate=TRANSLATE,
+            scale=SCALE,
             save_period=SAVE_PERIOD,
             val=True,
             fliplr=0.0,  # FDI class ids encode left/right quadrant; Ultralytics'
@@ -335,7 +368,7 @@ def evaluate(weights_path):
     y_pred = np.array(all_pred, dtype=int)
 
     metrics = coord_evaluate(y_true, y_pred, train_y)
-    metrics["seed"] = SEEDS[0]  # the split file is generated from this same seed - see export_split.py
+    metrics["seed"] = SEED  # the split file is generated from this same seed - see export_split.py
     metrics["classifier"] = "yolov8"
     metrics["detection_recall"] = (
         (total_gt - total_unmatched_gt) / total_gt if total_gt > 0 else float("nan")
@@ -358,7 +391,7 @@ def evaluate(weights_path):
     else:
         cm = confusion_matrix(y_true, y_pred, labels=list(range(32)))
         pd.DataFrame(cm, index=FDI_CODES, columns=FDI_CODES).to_csv(
-            EVAL_RESULTS_DIR / "confusion_matrix_yolov8_seed0.csv"
+            EVAL_RESULTS_DIR / f"confusion_matrix_yolov8_seed{SEED}.csv"
         )
 
         try:
@@ -374,10 +407,10 @@ def evaluate(weights_path):
             ax.set_yticklabels(FDI_CODES, fontsize=7)
             ax.set_xlabel("Predicted FDI code")
             ax.set_ylabel("True FDI code")
-            ax.set_title("yolov8 - confusion matrix (matched detections, seed 0 split)")
+            ax.set_title(f"yolov8 - confusion matrix (matched detections, seed {SEED} split)")
             fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
             fig.tight_layout()
-            fig.savefig(EVAL_RESULTS_DIR / "confusion_matrix_yolov8_seed0.png", dpi=150)
+            fig.savefig(EVAL_RESULTS_DIR / f"confusion_matrix_yolov8_seed{SEED}.png", dpi=150)
             plt.close(fig)
         except ImportError:
             pass
@@ -390,7 +423,7 @@ def evaluate(weights_path):
         print(f"  {key:32s} {metrics[key]}")
     print(f"  missed detections (unmatched GT)  {total_unmatched_gt} / {total_gt}")
     print(f"  spurious detections (unmatched pred) {total_unmatched_pred}")
-    print(f"\nSaved summary.csv and confusion_matrix_yolov8_seed0.csv/.png to {EVAL_RESULTS_DIR}")
+    print(f"\nSaved summary.csv and confusion_matrix_yolov8_seed{SEED}.csv/.png to {EVAL_RESULTS_DIR}")
 
     return metrics
 

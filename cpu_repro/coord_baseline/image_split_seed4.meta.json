@@ -1,0 +1,9 @@
+{
+  "seed": 4,
+  "test_fraction": 0.2,
+  "n_train_images": 340,
+  "n_test_images": 85,
+  "n_train_instances": 22582,
+  "n_test_instances": 4981,
+  "source": "build_coord_baseline.grouped_split(load_instances(), seed=4, TEST_FRACTION)"
+}

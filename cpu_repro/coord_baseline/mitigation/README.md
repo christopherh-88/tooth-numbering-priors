@@ -1,9 +1,19 @@
-# Mitigation experiment design (prepared, not yet run)
+# Mitigation experiment design (run, result: clean null)
 
-**Status: design only.** No code has been executed, no numbers exist yet.
-This document exists so the mitigation step can be run immediately once a
-trained detector is available (see `RESULTS.md` Section 11.5, "Error-pattern
-correlation check") rather than designed under time pressure.
+**Status: run and written up, 2026-09-12 - see `RESULTS.md` Sections 30/31.**
+The design below was prepared and executed as planned (geometry-jitter
+augmentation, primary intervention). Result: removing the jitter
+(`translate=0.0/scale=0.0` vs. Section 21's `translate=0.1/scale=0.5`) did
+**not** collapse accuracy - the two runs are statistically indistinguishable
+(paired bootstrap 95% CI on the top-1 delta spans zero) - so the
+"accuracy collapses" branch of this document's original reasoning (see the
+Primary intervention section below, left as originally written for the
+record) did not occur. Read as evidence the detector was not relying on
+the geometric shortcut in the first place, not as an inconclusive or
+failed mitigation attempt - see Section 31 for the full reasoning. The
+rest of this document is left as originally drafted (design-time
+reasoning, MIRROR_MAP bug fix, natural-variance measurement) since it
+remains an accurate record of what was decided and why before the run.
 
 ## Why this is needed
 
@@ -91,6 +101,18 @@ i.e., if the intervention barely moves the number relative to how far a
 model *could* be pushed away from the geometry correlation, it should be
 reported as a negative/inconclusive result, not reframed as a partial
 success after the fact.
+
+**As actually run (2026-09-12):** metric 2 exactly as specified here
+(agreement rate with the coordinate-only model, on the disagree-with-
+ground-truth subset) was **not** the metric computed in Section 31 - that
+section instead directly compared the two YOLO runs' predictions against
+each other (paired accuracy delta), since there was no accuracy collapse
+to explain in agreement-rate terms. This pre-stated threshold is
+therefore not literally applicable to what happened; flagged here rather
+than silently treated as satisfied or ignored. `RESULTS.md` Section 31 is
+the actual, load-bearing write-up of this experiment's result - this
+document's original threshold is left as historical record of the
+pre-registered design.
 
 ## Open items before this can run
 
