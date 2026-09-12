@@ -496,14 +496,14 @@ Verification script: `cpu_repro/coord_baseline/numbering_convention_check.py`.
 
 ### 11.5 Open items
 
-- **Error-pattern correlation check.** Compare a real trained detector's
-  confusion matrix (mirror-quadrant swaps, neighbor-tooth confusions)
-  against the coordinate-only model's, using the existing
-  `is_mirror_quadrant_error` / `is_neighbor_error` taxonomy code in
-  `cpu_repro/coord_baseline/build_coord_baseline.py`. No retraining
-  needed - run existing trained-detector predictions through the existing
-  error-taxonomy code. This is the cheapest available step toward
-  evidence on claim B (Section 11.2).
+- ~~**Error-pattern correlation check.**~~ **Resolved 2026-09-11/12** -
+  see Sections 22 (error-type taxonomy comparison), 23 (case study), 26
+  (2x2 agreement table and phi coefficient), and 33 (5-seed
+  replication of the phi result). Answer: the real detector does not
+  show shortcut-reliant error patterns (gap concentrated in tooth-type
+  accuracy, not explainable by a position-only signal), though a weak
+  but reliably nonzero error correlation with the coordinate-only model
+  exists (phi = 0.16-0.24 depending on seed).
 - ~~**Universal/Palmer relabeling check.**~~ **Resolved 2026-09-08** - see
   Section 11.4. Confirmed label-invariant (not a generalization data
   point; see that section for why).
@@ -514,24 +514,27 @@ Verification script: `cpu_repro/coord_baseline/numbering_convention_check.py`.
   check explained why the simpler estimators overstated the effect (a
   small cluster of large, low-accuracy images, not a single outlier and
   not teeth-count/crowding).
-- **Boundary-condition dataset (not yet chosen/run).** Section 11.4 states
-  the shortcut should vanish where either precondition breaks. Candidates,
-  not yet searched for or downloaded:
+- ~~**Boundary-condition dataset (not yet chosen/run).**~~ **Resolved
+  2026-09-12** - see Section 25. Candidate 1 below (periapical
+  radiographs) was the one actually run (DenPAR); candidates 2/3 remain
+  untried and are legitimate future extensions, not required to close
+  this item:
   1. **Bitewing/periapical radiographs** (breaks precondition 2 -
      acquisition is per-tooth/angled, not a fixed whole-jaw layout;
      same clinical domain and FDI-adjacent labeling as the existing work,
-     no volumetric complexity). Current leading candidate.
+     no volumetric complexity). **Run - Section 25.**
   2. **CBCT slices** (breaks precondition 2 more severely, but adds
      volumetric/3D framing that complicates the box-geometry setup and
-     may distract from the core comparison).
+     may distract from the core comparison). Not run.
   3. **A structurally different label space on the same panoramic
      modality**, e.g. a landmark-detection task (breaks precondition 1
      instead of 2, isolating that variable rather than conflating both).
-  None of these have been located, downloaded, or run yet - this is a
-  target list, not a result.
-- **Mitigation experiment (not yet run).** See
-  `cpu_repro/coord_baseline/mitigation/README.md` - design only, blocked
-  on GPU access to train a real detector with/without the intervention.
+     Not run.
+- ~~**Mitigation experiment (not yet run).**~~ **Resolved 2026-09-12** -
+  see Sections 30 (pre-commitments) and 31 (result: a clean null,
+  removing the position/scale jitter produced no detectable accuracy
+  change). `cpu_repro/coord_baseline/mitigation/README.md`'s status
+  header and falsification-threshold section were updated to match.
 
 ## 12. Coordinate-only baseline - paired significance tests
 
@@ -1025,6 +1028,25 @@ detection recall is reported separately rather than folded into top-1):
 | n_test (instances) | 5491 | 5406 (matched detections only) |
 | detection recall | n/a (given ground-truth boxes) | 0.9845 |
 
+**Bootstrap 95% CIs (2026-09-12 addition, image-level resampling, n=2000,
+`cpu_repro/yolo_training/robustness_analysis.py`, `bootstrap_ci_section21_26.csv`)
+- appended per external-review feedback that headline numbers were bare
+point estimates:**
+
+| metric | point | 95% CI |
+|---|---|---|
+| coord top-1 | 0.6928 | [0.6598, 0.7253] |
+| coord quadrant | 0.9661 | [0.9572, 0.9732] |
+| coord tooth-type | 0.7186 | [0.6881, 0.7483] |
+| YOLO top-1 | 0.9558 | [0.9333, 0.9758] |
+| YOLO quadrant | 0.9959 | [0.9932, 0.9984] |
+| YOLO tooth-type | 0.9587 | [0.9381, 0.9769] |
+
+Resampled at the image level (not per-instance), so within-image
+correlation between multiple teeth on the same radiograph is respected.
+None of the CIs overlap between coord and YOLO on any of the three
+metrics - the PIVOT call is not an artifact of point-estimate noise.
+
 `n_test` differs because YOLO's number is matched detections only (85
 ground-truth boxes went undetected, 98 spurious predictions - both
 excluded from the accuracy figures, per the README's stated methodology).
@@ -1248,8 +1270,8 @@ when position alone tops out well below that.
 from the project's contribution - they are the diagnostic-tool framing's
 own audit, carried out and quantified, with a clean and interpretable
 answer. Future work (the mitigation experiment, boundary-condition
-dataset search - both still to be done, see Sections 25+) should be
-written up under this framing: not "does the shortcut break under
+dataset search - both done as of 2026-09-12, see Sections 25 and 31)
+should be written up under this framing: not "does the shortcut break under
 pressure" as the central question, but continuing to build out the
 diagnostic tool and its worked examples (UFBA-425 seed-0 YOLO comparison
 being the first full worked example, DENTEX/boundary-condition datasets
@@ -1257,12 +1279,28 @@ as further ones) - a methods contribution, per Section 11.1, not a claim
 about what any specific detector's weights are doing internally beyond
 what Section 21-23's direct measurement already supports.
 
-**Not decided here:** the mitigation experiment's original framing
-(`cpu_repro/coord_baseline/mitigation/README.md`) still describes itself
-partly in shortcut-reliance terms ("if accuracy collapses, that itself
-is further... evidence for Claim B"). That document's own framing should
-be revisited when the mitigation experiment is actually run (Section 25+),
-not silently reinterpreted here without re-reading it directly.
+**Mitigation-experiment framing, revisited (2026-09-12) now that Section
+31's result exists.** `cpu_repro/coord_baseline/mitigation/README.md`
+described itself partly in shortcut-reliance terms ("if accuracy
+collapses, that itself is further... evidence for Claim B"). Section
+31's result was a clean null - removing the position/scale jitter Section
+21's run happened to train with did not move accuracy (paired top-1 CI
+[-0.74pp, +0.34pp], contains zero) - so there is no collapse to interpret
+either as evidence for or against Claim B under that document's own
+framing. Read together with this section's reasoning above (a detector
+gaming a coordinate shortcut would plateau near the coordinate-only
+ceiling, not exceed it by 26.3 points concentrated in tooth-type
+accuracy) and Section 20's feature-ablation ceiling (position alone tops
+out around 62%, far below either run's ~94-96%), Section 31 is read as
+**further support for the diagnostic-tool framing already adopted above,
+not a competing data point requiring its own resolution**: jitter
+magnitude does not move YOLO's tooth-identification accuracy because
+that accuracy was never substantially resting on position to begin with,
+consistent with "no" to Claim B rather than a result this section's
+framing needs to accommodate. `mitigation/README.md`'s own prose should
+still be updated to reflect this outcome rather than left describing a
+hypothetical collapse that did not occur - not done here, flagged for
+whoever next edits that file.
 
 ## 25. Boundary-condition dataset test: DenPAR periapical radiographs
 
@@ -1365,6 +1403,94 @@ external license (CC BY 4.0, attribution required) - left as an open
 question for whoever commits this section's outputs, not decided
 unilaterally here.
 
+**Bootstrap 95% CIs (2026-09-12 addition, image-level resampling,
+n=2000, `cpu_repro/boundary_condition/denpar_periapical/bootstrap_ci.py`,
+`bootstrap_ci_section25.csv`):**
+
+| metric | point | 95% CI |
+|---|---|---|
+| top-1 accuracy | 0.2535 | [0.2066, 0.3036] |
+| quadrant accuracy | 0.4467 | [0.4004, 0.4940] |
+| shuffled-control top-1 | 0.0423 | [0.0242, 0.0600] |
+
+The real-result and shuffled-control CIs do not overlap (real result's
+lower bound 0.2066 is well above the control's upper bound 0.0600),
+confirming the "not a training-pipeline artifact" claim above holds
+under resampling, not just at the point estimate.
+
+**Verification expansion (2026-09-12 addition,
+`cpu_repro/boundary_condition/denpar_periapical/verify_expanded.py`,
+`verification_review/`) - appended per external-review feedback that a
+2-image hand-check should not stand in for real reconciliation.**
+
+*(a) Programmatic check, full coverage (not a sample):* the
+spreadsheet's own Arch (Upper/Lower) and Site (Right/Left/Anterior)
+metadata was checked against the FDI quadrant digit implied by each
+row's own code list, across all 999 parseable spreadsheet rows (FDI
+quadrants 1/2/5/6 = upper, 3/4/7/8 = lower; 1/4/5/8 = right side,
+2/3/6/7 = left side, correctly including primary-tooth quadrants 5-8,
+not just the 32 permanent-tooth classes this repo otherwise uses - a
+first version of this check omitted them and reported an inflated
+failure count, caught before reporting). Result: **Arch consistent in
+979/999 rows (98.0%)**, **Site consistent in 941/999 rows (94.2%,
+excluding "Anterior" rows which legitimately span both sides)**. Of the
+inconsistent rows, **12 (Arch) and 35 (Site)** are part of Section 25's
+actual 633-image used set - e.g. image 81 labeled "Upper" with codes
+`42,43,44,45` (unambiguously quadrant 4, lower). This check verifies the
+spreadsheet's own internal consistency, not the box-to-code
+correspondence itself (no independent second source gives box identity
+directly) - but it surfaces real residual label-quality noise in the
+instance table beyond what the original exclusion filters (primary-tooth
+codes, non-ascending order, box-count mismatch) caught. Not corrected or
+re-run here - flagged for whoever next touches this dataset's pipeline.
+
+*(b) Visual spot-check, random sample (not hand-picked):* 20 images
+drawn via `numpy.random.RandomState(1)` (a seed distinct from the
+project's usual seed 0, and excluding the original 2 hand-picked images)
+from the 633-image used set. 2 were unrenderable (box/label count
+mismatch, same exclusion rule as the main pipeline - consistent with
+that filter's own logic). **Of the 18 renderable images, 10 were
+directly reviewed** (rendered with boxes and assigned FDI labels drawn
+on the actual radiograph) due to time budget, not all 18: **8/10
+anatomically plausible (tooth shape matches assigned label, consistent
+progression from premolar- to molar-shaped crowns along the assigned
+sequence), 2/10 flagged uncertain** - one (`review_574.jpg`) shows the
+radiograph at an atypical near-horizontal orientation, where the
+"sort by x-center" convention verified on normally-oriented images may
+not hold (the anatomical sequence in that image likely runs along a
+different axis); one (`review_1275.jpg`) has an ambiguous tooth-size
+judgment call not confidently resolved either way. **Zero clear
+failures** (no case where a label was confidently wrong). This is a
+larger and non-cherry-picked sample than the original 2-image check, but
+still a partial, self-graded visual read, not a ground-truth
+reconciliation against an independent label source - stated plainly as
+a limitation, not resolved further here.
+
+**Materiality check (2026-09-12 addition,
+`cpu_repro/boundary_condition/denpar_periapical/sensitivity_check.py`) -
+does the flagged label noise actually move the headline numbers?** The
+question raised by the 12/35 flagged rows above is whether they're
+concentrated enough in the seed-0 test split to be inflating or
+deflating the reported 25.35%/44.67% top-1/quadrant accuracy. Re-scored
+the same seed-0 model/test-set from Section 25 with the 15 flagged
+(Arch- or Site-inconsistent) images in that test split dropped entirely
+(497 instances/126 images -> 435 instances/111 images):
+
+| metric | full test set | excl. flagged images | delta |
+|---|---|---|---|
+| top-1 accuracy | 0.2535 | 0.2736 | +2.00pp |
+| quadrant accuracy | 0.4467 | 0.4782 | +3.15pp |
+
+Both deltas are well inside the bootstrap 95% CI half-widths reported
+above (top-1: +/-4.85pp; quadrant: +/-4.68pp) - the flagged rows nudge
+the point estimate slightly upward (consistent with them being noise
+that the model can't fit, not a source of inflated accuracy) but do not
+materially change either headline number or its interpretation. No
+correction to Section 25's reported figures is warranted; the flagged
+rows are left in for consistency with the rest of the pipeline (which
+does not hand-filter on this axis) and the finding is recorded here for
+anyone auditing the label-quality caveat above.
+
 ## 26. Do YOLO and the coordinate-only baseline fail on the same samples?
 
 **Script:** `cpu_repro/yolo_training/error_correlation_analysis.py` ·
@@ -1434,6 +1560,578 @@ a distinguishable error category from either model's general pattern.
 Both facts - the strong asymmetry and the modest-but-nonzero
 correlation - are in the data; which one matters more for how the paper
 frames "complementary" is not decided in this entry.
+
+**Leverage-point check (2026-09-12 addition,
+`cpu_repro/yolo_training/robustness_analysis.py`,
+`leverage_check_section26.csv`) - appended per external-review feedback
+that a phi of 0.163 risks being oversold and that no check had been made
+for whether one FDI class was driving it.** The most frequent single
+class among the 197 shared-failure instances is FDI 41 (20 instances,
+10.2% of the 197). Excluding every instance with true class 41 (5300 of
+5491 instances remain) and recomputing:
+
+| | original (n=5491) | FDI 41 excluded (n=5300) |
+|---|---|---|
+| phi | 0.1633 | 0.1546 |
+| observed/expected ratio | 1.979 | 1.963 |
+
+Both numbers move by less than 0.02 - the effect is not a leverage-point
+artifact of one class. **Bootstrap 95% CI on phi (image-level
+resampling, n=2000): [0.0985, 0.2202]** - reliably different from 0 (no
+correlation) but the interval sits entirely in weak-to-moderate
+territory by conventional phi/Cohen's-d-style benchmarks (roughly
+<0.1 negligible, 0.1-0.3 small) - consistent with this section's own
+"real but modest" characterization above, not a basis for a stronger
+claim than that.
+
+## 27. Per-FDI-class breakdown of the YOLO vs. coordinate-baseline gap
+
+**Script:** `cpu_repro/yolo_training/robustness_analysis.py` · **Split:**
+same seed-0 split as Sections 21/22/23/26 · **Date:** 2026-09-12 ·
+**Data:** `cpu_repro/yolo_training/eval_results/per_class_breakdown.csv`.
+
+**Why:** Sections 21/22 report aggregate top-1/quadrant/tooth-type
+accuracy only. A reviewer's first move on a result like this is to check
+whether the 26.3pp gap is roughly uniform across all 32 FDI classes or
+concentrated in a handful, with some classes possibly flat or reversed
+(YOLO losing to the coordinate baseline). Not previously checked.
+
+**Per-class accuracy, both models, sorted by delta (YOLO - coord):**
+
+| FDI | n | coord acc | YOLO acc | delta |
+|---|---|---|---|---|
+| 46 | 141 | 0.865 | 0.894 | +0.028 |
+| 48 | 147 | 0.898 | 0.973 | +0.075 |
+| 38 | 148 | 0.912 | 0.993 | +0.081 |
+| 18 | 141 | 0.879 | 0.965 | +0.085 |
+| 47 | 167 | 0.802 | 0.910 | +0.108 |
+| 45 | 169 | 0.769 | 0.929 | +0.160 |
+| 28 | 144 | 0.813 | 0.993 | +0.181 |
+| 26 | 170 | 0.735 | 0.918 | +0.182 |
+| 37 | 166 | 0.765 | 0.952 | +0.187 |
+| 36 | 132 | 0.735 | 0.924 | +0.189 |
+| 15 | 164 | 0.756 | 0.970 | +0.213 |
+| 21 | 179 | 0.760 | 0.983 | +0.223 |
+| 27 | 173 | 0.746 | 0.983 | +0.237 |
+| 13 | 184 | 0.707 | 0.946 | +0.239 |
+| 42 | 194 | 0.670 | 0.918 | +0.247 |
+| 16 | 170 | 0.688 | 0.941 | +0.253 |
+| 11 | 181 | 0.724 | 0.978 | +0.254 |
+| 35 | 163 | 0.663 | 0.926 | +0.264 |
+| 17 | 178 | 0.691 | 0.955 | +0.264 |
+| 25 | 174 | 0.672 | 0.948 | +0.276 |
+| 32 | 192 | 0.641 | 0.917 | +0.276 |
+| 12 | 179 | 0.693 | 0.972 | +0.279 |
+| 43 | 194 | 0.624 | 0.918 | +0.294 |
+| 44 | 184 | 0.630 | 0.935 | +0.304 |
+| 22 | 176 | 0.670 | 0.977 | +0.307 |
+| 23 | 179 | 0.609 | 0.939 | +0.330 |
+| 24 | 165 | 0.576 | 0.909 | +0.333 |
+| 34 | 192 | 0.547 | 0.885 | +0.339 |
+| 33 | 194 | 0.593 | 0.933 | +0.340 |
+| 41 | 191 | 0.508 | 0.874 | +0.366 |
+| 14 | 172 | 0.605 | 0.988 | +0.384 |
+| 31 | 188 | 0.473 | 0.899 | +0.426 |
+
+**Reversals: zero.** Every one of the 32 FDI classes shows YOLO accuracy
+≥ coordinate-only accuracy - not a single class where the coordinate
+baseline wins. Stated plainly, per the task's instruction not to soften
+whichever way the data goes: **the gap is not concentrated with
+reversals; it is uniformly positive and broadly distributed**, though
+its *magnitude* varies substantially (delta ranges from +0.028 for FDI
+46 to +0.426 for FDI 31).
+
+**Concentration check:** total net correct-count gain (sum of
+YOLO-correct minus coord-correct across all 32 classes) = 1363 instances.
+The top 5 contributing classes (31, 41, 14, 33, 34 - by share of that
+total, not by delta) account for **25.5%** of it. With 32 classes, a
+perfectly uniform contribution would put every class at 3.1%; the top 5
+(15.6% of classes) contributing 25.5% of the gain is a mild, not
+dramatic, over-representation - consistent with "broadly distributed"
+rather than "concentrated in a handful." Full per-class table with
+`n_instances` and `pct_of_total_gap` columns in `per_class_breakdown.csv`.
+
+**Scope note:** "zero reversals" above is the seed-0 result only, as
+explicitly stated. Section 33's multi-seed addition replicates this
+breakdown at seeds 1-4 and finds one reversal (seed 1, FDI 38, -1.6pp,
+2 instances) - see Section 33 for the full 5-seed picture before citing
+"zero reversals" as holding at every seed.
+
+## 28. Baseline hyperparameter effort audit
+
+**Date:** 2026-09-12. Code-reading audit, not a new experiment - checks
+whether the coordinate-only baseline and YOLO received comparably
+serious hyperparameter search, per external-review feedback that unequal
+tuning effort between two arms of a central comparison is a specific,
+common failure mode.
+
+**Coordinate-only baseline** (`cpu_repro/coord_baseline/build_coord_baseline.py`,
+line 198-199):
+```python
+"logistic_regression": lambda: LogisticRegression(max_iter=2000),
+"gradient_boosted_tree": lambda: HistGradientBoostingClassifier(random_state=0),
+```
+`max_iter=2000` on the logistic regression is a convergence-safety bump,
+not a tuned hyperparameter (`C`, the actual regularization strength,
+is left at sklearn's default of 1.0). `HistGradientBoostingClassifier`
+has no hyperparameters set at all beyond `random_state` - `learning_rate`,
+`max_iter`, `max_leaf_nodes`, `max_depth`, `min_samples_leaf`,
+`l2_regularization` are all left at sklearn's library defaults. No
+`GridSearchCV`, `RandomizedSearchCV`, or any cross-validation-based
+search appears anywhere in this file or elsewhere in the repo (checked
+by grep across `.py`/`.md` files for "hyperparameter search", "grid
+search", "tuned", "tuning" - no hits describing an actual search
+process for either model).
+
+**YOLO** (`cpu_repro/yolo_training/train_yolo.py`): `epochs=30, batch=10,
+imgsz=640, dropout=0.6, close_mosaic=0, cos_lr=True, warmup_epochs=10,
+lrf=0.005`. These are **not defaults** - Ultralytics' own defaults differ
+(e.g. default `lrf=0.01`, `warmup_epochs=3.0`, `dropout=0.0`). But they
+were not searched within this project either: they were copied verbatim
+from `notebooks/yolov8/yolov8_train.ipynb`'s single, pre-existing CLI
+invocation (`epochs=30 batch=10 imgsz=640 ... dropout=0.6 close_mosaic=0
+cos_lr=True ... warmup_epochs=10 lrf=0.005`) - one hardcoded command,
+written before this round of work, with no visible comparison across
+configurations in that notebook or anywhere else in the repo.
+
+**Finding, stated plainly: neither model's hyperparameters were tuned or
+searched within this project.** This is not the "deep model gets a real
+search, simple baseline gets a token effort" pattern the external
+reviews warn about - both arms used un-searched configurations. But
+there is a real, if hard-to-quantify, asymmetry worth naming: the
+coordinate baseline uses untouched library defaults, while YOLO's
+config reflects deliberate, non-default choices whose own tuning history
+(if any) predates and is external to this project and is not
+documented anywhere accessible here. Whether that undocumented prior
+effort matters for interpreting the 26.3pp gap is a judgment call this
+audit does not make. **Not acted on here** - per the task's instruction,
+this reports the current state; whether to run a real search on the
+coordinate baseline (the cheaper of the two to search, since it trains
+in seconds) before treating the full 26.3pp gap as attributable to
+signal type rather than partly to tuning effort is the user's call.
+
+**Decision (2026-09-12):** disclose, not fix. GPU/CPU budget for the rest
+of this project is committed to the mitigation experiment (the
+geometry-jitter follow-up to Section 21's PIVOT result, in progress on
+Kaggle GPU) and, after that, multi-seed replication of Sections
+21/22/25/26 - independently flagged as the
+single highest-value remaining investment across the external reviews.
+Running a real hyperparameter search now, on either model, would spend
+budget on a question this paper's central claim does not depend on: the
+claim is about the *relative* exploitability of geometric shortcuts
+under a structured label space and canonical framing (Section 11.2's
+claim A/B distinction), not about either model being optimally tuned in
+an absolute sense. Both models being under-tuned in an undirected way -
+neither favored by a search the other didn't get - does not itself bias
+that relative comparison; it only means the exact magnitude of the
+26.3pp gap should not be over-read as a precisely calibrated number.
+Committing to state this plainly in the paper's limitations section,
+rather than quietly closing it with a late search whose result could
+otherwise be mistaken for having settled the question.
+
+## 29. RESULTS.md internal consistency audit (Sections 21-26)
+
+**Date:** 2026-09-12. Read Sections 21 through 26 in full and
+cross-checked every number cited in a later section against the section
+where it was originally reported, per external-review feedback that a
+contradicted headline number (table vs. figure vs. prose) is a real,
+observed failure mode after heavy manual editing - which this file has
+had a lot of this session.
+
+**Checked, explicitly:**
+- Section 21's table values (0.6928/0.9558 top-1, 0.9661/0.9959
+  quadrant, 0.7186/0.9587 tooth-type, 0.0353/0.0359 majority, 26.3pp
+  gap) against `eval_results/summary.csv` and
+  `cpu_repro/coord_baseline/per_seed_results.csv` seed-0 rows directly -
+  match to the reported precision.
+- Section 22's n-wrong and error-type counts (1687/239 wrong,
+  127/16 mirror, 1420/215 neighbor, 140/8 other) - internally consistent
+  (each pair of counts sums to its stated n-wrong; fractions match counts
+  divided by n-wrong to the reported precision).
+- Section 23's case-set size (1490 of 5491, 27.1%) against Section 26's
+  2x2 table - **the 1490 "YOLO-correct/coord-wrong" cell in Section 26
+  matches Section 23's case-set count exactly**, and both were verified
+  today to also match this session's independently-rerun
+  `robustness_analysis.py` output (3677+1490+127+197=5491).
+- Section 23's error-type breakdown within the case set (1272/112/106,
+  summing to 1490) against Section 22's overall coordinate-model rates
+  (84.2%/7.5%/8.3%) - the percentages Section 23 quotes as "for
+  comparison" (84.2%/7.5%/8.3%) match Section 22's own reported
+  fractions exactly.
+- Section 24's citations of Section 21 (26.3pp, 69.28% ceiling, 95.9%
+  tooth-type) and Section 20 (position-only ceiling "around 62%",
+  actual value 0.6196) - all match their source sections.
+- Section 25's table values against `summary.csv`/`per_seed_results.csv`
+  in `cpu_repro/boundary_condition/denpar_periapical/` - match to the
+  reported precision, including the derived falsification-threshold
+  arithmetic (2 x 0.0759 = 0.1518, reported as "15.2%").
+- Section 26's P(YOLO wrong)/P(coord wrong) values (0.0590, 0.3072)
+  against independently recomputed wrong-counts (324 = 127+197 for
+  YOLO, 1687 = 127+... wait, 1490+197 for coord) - **P(coord
+  wrong)=0.3072 correctly reproduces Section 22's n-wrong=1687 exactly**
+  (1687/5491=0.3072), a cross-section match that would have surfaced a
+  stale number had one existed.
+- Section 26's shared-failure error-type breakdown (148/34/15 coord,
+  133/10/8 YOLO of 151) - independently reproduced by this session's own
+  `robustness_analysis.py` run today, exact match to the digit.
+
+**Result: no mismatches found.** Every cross-referenced number checked
+out against its source, including several that were independently
+recomputed from the raw prediction files today rather than just
+re-read from the prose - stated explicitly, per the task's instruction,
+rather than silently passing this check.
+
+**Update (2026-09-12): re-audit after today's Section 25/28 appendices.**
+The original pass above covers Sections 21-26 as they stood on
+2026-09-11 and predates today's three additions (Section 25's bootstrap
+CIs, verification expansion, and materiality check; Section 28's
+disclosure decision). Re-checked those specifically:
+- Section 25's bootstrap CI point estimates (0.2535 top-1, 0.4467
+  quadrant, 0.0423 shuffled-control) against `bootstrap_ci_section25.csv`
+  directly - match. The stated CI half-widths caught one real error in
+  this pass: quadrant accuracy's half-width was originally written as
+  "+/-4.66pp"; recomputed from the CSV ([0.40040, 0.49398] around point
+  0.44668) it is +/-4.68pp (averaging the asymmetric 4.63pp/4.73pp
+  bounds) - fixed in place, not left for a future pass.
+- Section 25's materiality-check table (497/126 -> 435/111
+  instances/images, 0.2535->0.2736 top-1, 0.4467->0.4782 quadrant)
+  against `sensitivity_check_section25.csv` directly - match.
+- Found and fixed a real stale cross-reference, independent of the new
+  numeric content: Section 24's closing paragraph pointed to "Section
+  25+" as where the mitigation experiment would eventually be written
+  up, written before Section 25 was assigned to the DenPAR
+  boundary-condition test instead. Corrected to point at "its own later
+  section, once the GPU run completes" rather than a stale section
+  number. Section 28's new decision paragraph had the same category of
+  error (attributed the mitigation experiment to being "Section 25/26's
+  own follow-up", which is wrong - it follows from Section 21's PIVOT
+  result, not the DenPAR/error-correlation sections) - corrected
+  alongside it.
+- No other mismatches found in Section 27 (per-class breakdown) or the
+  rest of Section 28 against their own cited source CSVs.
+
+## 30. Mitigation experiment - pre-commitments made before reading the zero-jitter run's results
+
+**Date:** 2026-09-12, written after `christopherhuang88/tooth-numbering-yolo-train-zerojitter`
+reached `KernelWorkerStatus.COMPLETE` on Kaggle but before downloading or
+reading its `summary.csv`/predictions - both items below were decided
+with no result numbers in hand, per external-review checklist items 2
+and 6.
+
+**Confound verification (checklist item 6):** `diff cpu_repro/yolo_training/train_yolo.py
+cpu_repro/yolo_training/train_yolo_zerojitter.py` reviewed line by line.
+`train_yolo_zerojitter.py` imports `EPOCHS, BATCH, IMGSZ, DEVICE, DROPOUT,
+CLOSE_MOSAIC, COS_LR, WARMUP_EPOCHS, LRF, SINGLE_CLS, SAVE_PERIOD,
+BASE_WEIGHTS` and the `fliplr=0.0` label-confound fix directly from
+`train_yolo` (module-level, not copy-pasted), uses the same persisted
+`image_split_seed0.csv` split, and calls `train_yolo`'s own `evaluate()`
+unchanged (`base_evaluate`). Its local `train()` override sets only
+`TRANSLATE=0.0, SCALE=0.0` plus `RUN_NAME`/`EVAL_RESULTS_DIR` (needed so
+this run cannot overwrite Section 21's checkpoint or `summary.csv`).
+**Confirmed: TRANSLATE/SCALE is the only intended difference between the
+two runs' training configuration.** Hardware: both runs were manually
+set to GPU T4 via the Kaggle web UI (per this session's earlier
+troubleshooting of the Kaggle API's unreliable `--accelerator` flag,
+documented in `HANDOFF.md`) - same accelerator type for both, not left
+to chance.
+
+**Analysis method, decided in advance (checklist item 2 - paired vs.
+marginal variance, already applied correctly to Section 26's phi
+coefficient via image-level bootstrap resampling):** the jittered
+(Section 21, `train_yolo.py`) vs. near-zero-jitter (this run,
+`train_yolo_zerojitter.py`) comparison will use **paired differences on
+the same held-out val images/instances**, not a marginal comparison of
+two independent summary numbers. Both runs share the identical seed-0
+image-level split (same `image_split_seed0.csv`), so every val instance
+has a prediction from both models and can be joined on
+`(label_file, line_idx)` exactly as Section 23/26 already do for the
+YOLO-vs-coordinate comparison. The write-up will report: (a) the
+marginal top-1/quadrant/tooth-type accuracy gap between the two runs,
+for direct comparability with Section 21's table format, and (b) a
+paired per-instance table (both-correct / jittered-only-correct /
+zerojitter-only-correct / both-wrong), a McNemar-style or bootstrap
+paired-difference CI on the accuracy gap (image-level resampling,
+consistent with every other CI in this document), and detection-recall
+for both runs side by side as a guard against jitter changing what gets
+detected at all, not just what gets classified once detected. This
+commitment is written down now specifically so the choice of paired vs.
+marginal analysis is not made after the numbers are already visible.
+
+## 31. Mitigation experiment result: near-zero-jitter vs. jittered YOLOv8
+
+**Scripts:** `cpu_repro/yolo_training/train_yolo_zerojitter.py` (training,
+run on Kaggle GPU T4), `cpu_repro/yolo_training/mitigation_analysis.py`
+(paired analysis, CPU) · **Split:** identical seed-0 split as Section 21
+· **Date:** 2026-09-12 · **Kernel:**
+`christopherhuang88/tooth-numbering-yolo-train-zerojitter`, status
+`COMPLETE`. Confound verification and the paired-analysis-method
+pre-commitment for this write-up are in Section 30, written before these
+numbers were read.
+
+**Marginal accuracy** (each run's own `summary.csv`, matched-detections
+only - `n_test` differs slightly between runs since detection recall
+differs slightly):
+
+| metric | jittered (Section 21) | near-zero-jitter | delta |
+|---|---|---|---|
+| top-1 accuracy | 0.9558 | 0.9525 | -0.33pp |
+| quadrant accuracy | 0.9959 | 0.9963 | +0.04pp |
+| tooth-type accuracy | 0.9587 | 0.9551 | -0.36pp |
+| detection recall | 0.9845 | 0.9860 | +0.15pp |
+| n_test (matched) | 5406 | 5414 | - |
+
+**Paired analysis** (per Section 30's pre-commitment - both checkpoints
+re-run locally on CPU over the identical 5491 ground-truth instances,
+joined on `(label_file, line_idx)`; here an undetected box counts as
+that run's own miss rather than being dropped, same convention as
+Section 26, which is why these top-1 numbers read slightly lower than
+the matched-only `summary.csv` figures above - they are over a larger,
+harder-by-construction denominator, not a different result):
+
+| | zerojitter correct | zerojitter wrong |
+|---|---|---|
+| **jittered correct** | 5084 (92.59%) | 83 (1.51%) |
+| **jittered wrong** | 73 (1.33%) | 251 (4.57%) |
+
+Marginal top-1 (this denominator): jittered=0.9410, zerojitter=0.9392,
+delta=-0.18pp. **Bootstrap 95% CI on the paired top-1 delta
+(image-level resampling, n=2000): [-0.74pp, +0.34pp] - contains zero.**
+Quadrant accuracy CIs also overlap heavily (jittered 99.59% [99.43,
+99.75], zerojitter 99.63% [99.47, 99.78]).
+
+**Reading: a clean null result, not an ambiguous one.** The
+pre-registered mitigation question (`cpu_repro/coord_baseline/mitigation/README.md`)
+was whether removing the position/scale jitter that Section 21's run
+happened to train with would collapse YOLO's accuracy - the signature
+predicted if that jitter had been suppressing reliance on a
+coordinate-based shortcut. It did not: the two runs are statistically
+indistinguishable on both top-1 (CI spans zero, both directions) and
+quadrant accuracy, with the jittered/zerojitter-only-correct cells
+(1.51%/1.33%) nearly balanced rather than lopsided in either direction.
+This is evidence *against* the shortcut-suppression framing specifically
+(there is no jitter-dependent robustness effect to explain, because
+jitter magnitude does not move accuracy at all here) - not merely an
+inconclusive result awaiting more power, since 5491 paired instances
+with a ~1pp-wide CI is a reasonably tight comparison for this effect
+size. Read together with Section 20's feature-ablation ceiling (position
+alone tops out around 62%) and Section 24's reasoning (a detector
+exploiting position as a shortcut could not reach 95.9% tooth-type
+accuracy), this closes the mitigation experiment's original
+shortcut-reliance framing with a direct answer: **no**, not "collapsed
+under pressure" and not "improved by forcing appearance-invariance to
+position" either - YOLO's tooth-type accuracy here does not depend on
+the jitter augmentation one way or the other, consistent with it not
+being position-reliant to begin with.
+
+**Update (2026-09-12):** Section 24's framing paragraph has since been
+revisited with this result in hand - see Section 24's "Mitigation-
+experiment framing, revisited" addition. Read as further support for the
+diagnostic-tool framing, not a competing data point.
+
+## 32. Multi-seed replication scoping (planning only - no new training run in this entry)
+
+**Date:** 2026-09-12. Scopes the single highest-value remaining
+investment flagged across all 12 external reviews (single-seed fragility
+of the YOLO-side headline numbers) before committing GPU time to it - a
+sizing exercise, not the replication itself.
+
+**1. Per-seed wall-clock time, measured directly (not estimated):** two
+real end-to-end Kaggle kernel runs exist at this exact configuration
+(30 epochs, batch 10, `yolov8x.pt`, 820 train/201 val images, GPU T4) -
+Section 21's original run (2133.0s) and Section 31's zero-jitter run
+(2144.9s), both read directly from each kernel's own downloaded log
+(`tooth-numbering-yolo-train.log`, `tooth-numbering-yolo-train-zerojitter.log`,
+last stdout/stderr event timestamp). **Mean: 2139s ≈ 35.6 minutes ≈ 0.594
+GPU-hours per seed**, essentially unaffected by the jitter setting (as
+expected - TRANSLATE/SCALE change what gets computed per augmented image,
+not how many images or epochs run). The derived CPU-only analyses
+(Section 22/26-style joins) add a few more minutes per seed on top - not
+GPU-bound, not a meaningful addition to this budget.
+
+**2. Feasibility against Kaggle's quota:** Kaggle's publicly documented
+default quota is 30 GPU-hours/week (account-wide, shared across all GPU
+kernels) and a 12-hour cap per individual session - **not verified
+against this specific account's actual remaining balance**, which this
+session has no API access to query (`kaggle kernels status` reports
+per-kernel run status, not account-level quota remaining); confirm the
+current remaining balance on the Kaggle account page before treating the
+plan below as final. At the measured ~0.6 GPU-hr/seed, **GPU-hours are
+not the binding constraint** even for a full run: 4 additional seeds
+(1-4, to reach 5 total and match Section 2/10/25's existing 5-seed
+convention) costs ~2.4 GPU-hours, under 10% of a full weekly budget, and
+each individual run (36 min) is nowhere near the 12-hour session cap.
+**The actual bottleneck observed this session was not compute-time but a
+manual step**: Kaggle's API `--accelerator` flag was unreliable at
+actually attaching a T4 (repeatedly defaulted to P100 regardless of the
+flag), and the fix both prior runs required was a human manually setting
+the accelerator in the Kaggle web UI before each "Save & Run All" -
+i.e., a per-kernel manual step, not a per-GPU-hour cost. Four more seeds
+means four more such manual kernel launches, not four more hours of
+waiting on quota.
+
+**3. Which sections to replicate:** narrower than "all four" once each
+section's actual dependency is checked:
+- **Section 25 (DenPAR) is already 5-seed** (seeds 0-4, `SEEDS` in
+  `build_coord_baseline_denpar.py`) - no new work needed, already
+  reported as mean ± 95% CI over 5 seeds.
+- **Section 21 (YOLO training)** is the one section that actually needs
+  new GPU runs - currently seed-0 only.
+- **Section 22 (error-pattern comparison) and Section 26 (error
+  correlation / phi)** are CPU-only analyses *derived* from a trained
+  YOLO checkpoint plus the coordinate baseline (already 5-seed) - once
+  Section 21 has checkpoints at seeds 1-4, these can be recomputed at
+  each seed for free (no additional GPU time), using the same join
+  pattern already built in `case_study_yolo_vs_coord.py`/
+  `error_correlation_analysis.py`/`mitigation_analysis.py`, generalized
+  to accept a seed parameter (currently hardcoded to seed 0's split
+  file and `runs/yolov8_seed0split/` path - a code change, not a new
+  method).
+  **Recommendation: replicate all four sections, not a subset** - since
+  the GPU cost of the one section that actually needs new training
+  (Section 21) is small enough (~2.4 GPU-hr for 4 seeds) that there is
+  no real budget pressure to prioritize among them.
+
+**4. What a material shift would mean for the paper:** Section 21's
+26.3pp gap is far larger than any seed-to-seed CI half-width measured
+anywhere else in this project - UFBA-425's coordinate baseline: ±0.77-
+1.8pp (Section 2/11.4); DenPAR: ±2.3-2.8pp (Section 25/materiality
+check above). A shift of that magnitude across 5 seeds reversing the
+qualitative PIVOT finding (Y-C gap collapsing under the pre-registered
+5pp GO threshold, `GO_NO_GO.md`) would be a genuine surprise, not a
+plausible outcome given the margin involved. **Pre-committing now, before
+any new seed is run:** the write-up will report the actual 5-seed mean ±
+95% CI honestly regardless of outcome. If the mean moves but the
+qualitative pattern (YOLO >> coordinate-only, gap far exceeding the
+5pp threshold) holds, that only **narrows or widens reported
+uncertainty** - Section 21's current single-seed CIs (Section 21's
+bootstrap addition) capture resampling variance within one training run,
+not across-training-run variance, so a real 5-seed CI is a strictly more
+honest number, not a correction implying the current one was wrong. Only
+a qualitative reversal (gap shrinking under 5pp, or a sign flip) would
+require reopening the framing decision (Section 24) - in which case that
+reopening happens the same way Section 31's result was handled: written
+up factually before deciding what it implies, not reframed after the
+fact to fit the existing conclusion.
+
+**Not started here:** no new Kaggle kernel has been launched for this -
+this entry is the sizing/scoping decision only, per the task's own
+framing ("scope," not "run"). Launching the 4 additional training runs
+is a small, well-bounded next step once this scope is confirmed.
+
+## 33. Multi-seed replication result (seeds 1-4, Section 32 executed)
+
+**Scripts:** `cpu_repro/yolo_training/train_yolo_seed{1,2,3,4}.py` (training,
+Kaggle GPU T4 each), `cpu_repro/yolo_training/multiseed_analysis.py`
+(CPU analysis, seed-parameterized generalization of
+`case_study_yolo_vs_coord.py`/`error_correlation_analysis.py`, verified
+against Section 21/26/31's published seed-0 numbers before being trusted
+for seeds 1-4 - see the script's own assertion, which passed) · **Splits:**
+`cpu_repro/coord_baseline/image_split_seed{1,2,3,4}.csv`, generated by the
+now-generalized `export_split.py` · **Date:** 2026-09-12 · **Kernels:**
+`christopherhuang88/tooth-numbering-yolo-train-seed{1,2,3,4}`, all
+`COMPLETE`. Every seed's first push landed on a P100 and fail-fasted in
+~10 seconds (same known issue as Sections 21/31 - `ensure_gpu()`'s real
+CUDA-matmul check correctly aborted before any GPU-hours were spent);
+all four succeeded on the second attempt after manually setting
+Accelerator to GPU T4 x2 in the Kaggle web UI before Save & Run All.
+
+**Per-seed results** (matched-detections-only convention, each seed's own
+`summary.csv` - directly comparable to Section 21's original table):
+
+| seed | top-1 | quadrant | tooth-type | detection recall | n_test |
+|---|---|---|---|---|---|
+| 0 (Section 21) | 0.9558 | 0.9959 | 0.9588 | 0.9845 | 5406 |
+| 1 | 0.9499 | 0.9970 | 0.9530 | 0.9832 | 5252 |
+| 2 | 0.9706 | 0.9983 | 0.9718 | 0.9788 | 5715 |
+| 3 | 0.9624 | 0.9981 | 0.9643 | 0.9900 | 5857 |
+| 4 | 0.9539 | 0.9980 | 0.9552 | 0.9803 | 4883 |
+
+**5-seed mean +/- 95% CI** (t-distribution, `mean_ci95` - same helper
+used everywhere else in this document):
+
+| metric | mean | 95% CI |
+|---|---|---|
+| top-1 accuracy | 0.9585 | [0.9485, 0.9686] |
+| quadrant accuracy | 0.9974 | [0.9962, 0.9987] |
+| tooth-type accuracy | 0.9606 | [0.9512, 0.9700] |
+| detection recall | 0.9834 | [0.9779, 0.9888] |
+
+**Section 26-style paired analysis, all 5 seeds** (undetected boxes count
+as wrong, per Section 26's convention - this is why these top-1 numbers
+read slightly lower than the matched-only table above; same denominator
+difference already explained in Section 31, not a new discrepancy):
+
+| seed | n | yolo top-1 | coord top-1 | gap | yolo quadrant | phi |
+|---|---|---|---|---|---|---|
+| 0 | 5491 | 0.9410 | 0.6928 | +24.8pp | 0.9959 | 0.163 |
+| 1 | 5342 | 0.9339 | 0.6937 | +24.0pp | 0.9970 | 0.235 |
+| 2 | 5839 | 0.9500 | 0.7025 | +24.7pp | 0.9983 | 0.133 |
+| 3 | 5916 | 0.9528 | 0.6990 | +25.4pp | 0.9981 | 0.179 |
+| 4 | 4981 | 0.9352 | 0.6864 | +24.9pp | 0.9980 | 0.209 |
+
+5-seed mean +/- 95% CI: **gap = 24.77pp +/- 0.61pp [24.16, 25.38]**,
+**phi = 0.184 +/- 0.049 [0.134, 0.233]**.
+
+**Reading, per Section 32's pre-commitment (report the honest 5-seed
+result regardless of outcome):** the qualitative PIVOT finding replicates
+cleanly and is not seed-fragile. The gap's 95% CI [24.16pp, 25.38pp] sits
+nowhere near the pre-registered 5pp GO threshold (`GO_NO_GO.md`) - the
+narrowest single-seed gap observed (seed 1, 24.0pp) is still nearly 5x
+that threshold. Seed-to-seed spread on the gap itself is small (+/-0.61pp
+half-width, tighter than Section 25/DenPAR's own seed spread), consistent
+with Section 32's prediction that this was very unlikely to reverse.
+**Phi (the error-correlation coefficient from Section 26) shows more
+seed-to-seed movement than the gap does** - ranging 0.133-0.235 across
+the 5 seeds, mean 0.184 with a 95% CI of [0.134, 0.233] - but every
+single seed lands in the same qualitative "real but modest positive
+correlation" territory Section 26 already reported for seed 0 alone; no
+seed shows independence (phi~0) or a strong correlation (phi>0.4). Per
+Section 32's Item 4: this is a **narrowing/widening of reported
+uncertainty, not a reversal** - the framing decision (Section 24) is not
+reopened. No qualitative surprise occurred; the single-seed fragility
+concern raised across the external reviews is answered directly: the
+headline numbers hold up under replication.
+
+**Update (2026-09-12): the deferred per-seed breakdowns were run after
+all**, using the cached per-seed joined tables `build_merged()` now
+saves (`cpu_repro/yolo_training/eval_results/multiseed/joined_seed{0-4}.csv`)
+- `cpu_repro/yolo_training/multiseed_analysis.py`'s new
+`per_class_breakdown()`/`error_taxonomy_breakdown()`/`run_breakdowns()`
+functions, generalizing `robustness_analysis.py`'s Section-27 logic and
+Section 22's error-type comparison to an arbitrary seed.
+
+**Per-seed error-taxonomy comparison** (Section 22-style, each model's
+own wrong predictions - `error_taxonomy_multiseed.csv`), 5-seed mean +/-
+95% CI:
+
+| | coordinate-only | YOLOv8 |
+|---|---|---|
+| mirror-quadrant fraction | 0.0748 +/- 0.0048 | 0.0492 +/- 0.0198 |
+| neighbor fraction | 0.8287 +/- 0.0148 | 0.9343 +/- 0.0244 |
+| other fraction | 0.0965 +/- 0.0147 | 0.0165 +/- 0.0177 |
+
+Consistent with Section 22's seed-0-only reading across all 5 seeds:
+both models' errors are dominated by same-quadrant neighbor confusions
+at every seed, with YOLO's error mix, if anything, *more* concentrated
+in the neighbor category (93.4% vs. 82.9%) and less in mirror-quadrant
+or other errors than the coordinate-only model - not a qualitatively
+different failure mode at any seed.
+
+**Per-seed per-class breakdown** (Section 27-style -
+`per_class_breakdown_multiseed.csv`): top-5-share-of-gain stays in a
+tight 25.0-28.2% band across all 5 seeds (seed 0: 25.5%, matching
+Section 27 exactly). **One reversal found, seed 1 only**: FDI 38, coord
+89.8% vs. YOLO 88.3% (delta -1.6pp, net -2 correct instances of 128) -
+the first reversal observed across 5 seeds x 32 classes = 160
+seed-class combinations. Read honestly rather than folded quietly into
+"zero reversals": this is a single class, single seed, -1.6pp magnitude,
+in a region where both models are already near-ceiling (~88-90%) and a
+2-instance swing is well within noise for n=128 - not evidence of a
+systematic YOLO weakness on FDI 38, but also not pretended away. Section
+27's "zero reversals across all 32 classes" claim was accurate as
+stated (it was explicitly scoped to seed 0) and remains true at seed 0;
+it does not generalize to "zero reversals at every seed," which this
+addition corrects with the actual 5-seed picture.
 
 ## Adding a new entry
 

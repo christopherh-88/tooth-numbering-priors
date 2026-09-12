@@ -1,0 +1,21 @@
+image_id,rendered,error,path
+391,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_391.jpg
+561,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_561.jpg
+865,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_865.jpg
+932,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_932.jpg
+456,False,box/label count mismatch (5 boxes vs 6 codes),
+1141,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_1141.jpg
+237,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_237.jpg
+574,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_574.jpg
+726,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_726.jpg
+1240,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_1240.jpg
+553,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_553.jpg
+619,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_619.jpg
+1275,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_1275.jpg
+372,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_372.jpg
+261,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_261.jpg
+441,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_441.jpg
+1020,False,box/label count mismatch (2 boxes vs 3 codes),
+1280,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_1280.jpg
+434,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_434.jpg
+623,True,,/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/cpu_repro/boundary_condition/denpar_periapical/verification_review/review_623.jpg
