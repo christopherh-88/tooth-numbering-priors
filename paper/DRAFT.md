@@ -4,7 +4,12 @@
 `RESULTS.md` (cite the section, don't retype/round further). Anything not
 yet measured is marked `[PENDING - see RESULTS.md Section 11.5]` and must
 not be filled in with an assumed or estimated value - replace only once
-the real script has been run and the number is in `RESULTS.md`.
+the real script has been run and the number is in `RESULTS.md`. **No
+inline figures or tables exist in this draft yet** - Results/Discussion
+point at `RESULTS.md`'s own tables by section number rather than
+embedding numbered Table/Figure objects; a real submission draft needs
+actual Table 1/Table 2/.../Fig 1 objects assigned and cross-referenced,
+which hasn't been done (reviewed 2026-09-12, RESULTS.md Section 36).
 
 ## Working title
 
@@ -16,7 +21,12 @@ and points the other way from what this note originally anticipated: the
 real detector does *not* show shortcut-reliant behavior (it exceeds the
 coordinate-only ceiling by ~25pp, concentrated in tooth-type accuracy,
 and a mitigation experiment removing position/scale jitter produced no
-measurable accuracy change - Sections 30/31). This does not justify
+measurable accuracy change - Sections 30/31). **Update (2026-09-12): a
+second, architecturally distinct detector (RT-DETR, transformer-based,
+NMS-free) was trained and evaluated the same way across 5 seeds and
+landed within noise of YOLOv8's result (gap +0.22pp, phi +0.0025 -
+`RESULTS.md` Section 40)** - this is no longer a single-detector finding,
+it is two independent detector families agreeing. This does not justify
 replacing "Risk" with a stronger positive claim about shortcut exploitation;
 if anything it reinforces the diagnostic-tool framing as the paper's
 actual contribution (`RESULTS.md` Section 24) rather than a "detector X
@@ -33,8 +43,8 @@ trained on nothing but bounding-box geometry (center, size, aspect ratio)
 - as a cheap pre-registration-style sanity check that should be run before
 crediting a tooth-numbering model's accuracy to image understanding. On
 two independent panoramic radiograph datasets (UFBA-425, DENTEX), geometry
-alone predicts FDI tooth identity at 67-72% top-1 accuracy (32-way
-classification) against a 3.6% majority-class baseline, with a shuffled-
+alone predicts FDI tooth identity at 67-70% top-1 accuracy (32-way
+classification) against a 3.6-3.8% majority-class baseline, with a shuffled-
 geometry negative control collapsing to majority-baseline as expected.
 A real trained detector (YOLOv8, identical split) exceeds the
 coordinate-only ceiling by 24.8 percentage points on average across 5
@@ -42,8 +52,13 @@ independent seeds (95.9% vs. 69.5% top-1, concentrated almost entirely in
 tooth-type rather than quadrant accuracy) - a pattern inconsistent with
 reliance on the geometric shortcut, though its errors do correlate with
 the coordinate-only model's errors weakly more than chance (phi = 0.18,
-5-seed 95% CI [0.13, 0.23]). A geometry-jitter mitigation experiment -
-training the same detector with position/scale augmentation removed -
+5-seed 95% CI [0.13, 0.23]). **A second, architecturally distinct
+detector (RT-DETR - transformer-based, anchor-free, NMS-free, evaluated
+with the identical protocol across the same 5 seeds) replicates this
+result within noise (gap 24.99pp, phi 0.187 - a 0.22-percentage-point and
+0.003 difference from YOLOv8, respectively), indicating the finding is
+not specific to one detector architecture.** A geometry-jitter mitigation
+experiment - training YOLOv8 with position/scale augmentation removed -
 produced no statistically detectable change in accuracy (paired 95% CI
 on the difference spans zero), giving no evidence the detector had been
 exploiting position as a shortcut to begin with. We release the diagnostic baseline, its negative controls, and
@@ -66,6 +81,18 @@ tooth-numbering research.
   precondition under which a position-based shortcut would be expected to
   work, per the two-precondition hypothesis (Section 11.4,
   `RESULTS.md`).
+- **Define Claim A and Claim B explicitly here, before either term is
+  used again** (currently they first appear undefined in Methods/
+  Results and aren't spelled out until Discussion 5.1 - fix this
+  ordering when drafting real prose, don't let a reviewer hit "Claim B"
+  in Section 3 without a definition). Claim A: geometry alone predicts
+  FDI tooth identity far above chance (the coordinate-only baseline's
+  finding). Claim B: a real trained detector relies on that same
+  positional shortcut rather than genuine appearance understanding
+  (the question the YOLOv8 experiment, mitigation, and error-
+  correlation analyses are designed to test). The paper's contribution
+  is establishing Claim A robustly and testing Claim B rigorously
+  (answer: largely no) - not assuming Claim B follows from Claim A.
 - State the contribution as a **diagnostic tool**, not a claim about any
   specific detector's internals (framing decision, `RESULTS.md`
   Section 11.1) - avoids overclaiming while the tool itself is the
@@ -87,22 +114,28 @@ artifacts as segmentation shortcuts, with proposed and evaluated
 mitigations (random cropping, annotation removal) - closest published
 structural comparable to this work. This paper closes the same structural
 gap they identify (measure the shortcut inside a real trained model, then
-evaluate a fix): Sections 21-33 (`RESULTS.md`) do so for tooth
-numbering, with a different qualitative outcome - here the real detector
-does not show shortcut-reliant behavior, so the "fix" (Sections 30/31)
-is better read as a robustness check than a correction.
+evaluate a fix): Sections 21-40 (`RESULTS.md`) do so for tooth
+numbering, with a different qualitative outcome - here the real
+detector(s) do not show shortcut-reliant behavior (replicated across
+two architecturally distinct detectors, Section 40), so the "fix"
+(Sections 30/31) is better read as a robustness check than a correction.
 
 **Dental/panoramic radiograph AI and dataset bias.** DENTEX (Hamamci et
 al., 2023, MICCAI challenge) and its HierarchicalDet baseline - the
-tooth-numbering benchmark this work's second dataset is drawn from. Zhou
-et al. (2024, BMC Oral Health), "Combining public datasets for automated
-tooth assessment in panoramic radiographs" - documents annotation-quality
-bias across combined public dental datasets (a different bias axis than
-the geometric one studied here; also the source of the Dual-Labeled
-Dataset used in this project's Task 3 verification). [Add the
-panoramic-radiograph-quality/detection-error correlation paper (PMC,
-2025) if it strengthens the "multiple known confounds in this exact
-domain" point in the intro.]
+tooth-numbering benchmark this work's second dataset is drawn from. Zhou,
+Lu, Zhao et al. (2024, BMC Oral Health), "A dual-labeled dataset and
+fusion model for automatic teeth segmentation, numbering, and state
+assessment on panoramic radiographs" - the source of the Dual-Labeled
+Dataset used in this project's Task 3 verification (`RESULTS.md`
+Section 16). Van Nistelrooij et al. (2024, BMC Oral Health), "Combining
+public datasets for automated tooth assessment in panoramic
+radiographs" - a separate paper documenting annotation-quality bias
+across combined public dental datasets (a different bias axis than the
+geometric one studied here; corrected 2026-09-12 from an earlier draft
+that misattributed this paper's title to Zhou et al. - citation audit,
+`RESULTS.md` Section 34). [Add the panoramic-radiograph-quality/
+detection-error correlation paper (PMC, 2025) if it strengthens the
+"multiple known confounds in this exact domain" point in the intro.]
 
 Notably, Hamamci et al. themselves flag the exact gap this paper's Task 2
 is designed to close: their own Limitations section (V-C, "Evaluation
@@ -119,12 +152,12 @@ line of work. This is cited here as the motivating gap for Task 2, not
 just DENTEX-as-a-dataset.
 
 **Novelty positioning.** A citation-graph check (not a keyword web
-search) of papers citing DENTEX, HierarchicalDet, and three shortcut-
-learning-in-medical-imaging papers found 0 of 132 unique citing papers
-combining tooth-numbering/FDI-enumeration language with shortcut/
-position-bias language in title or abstract - stated here as a genuine
-checked negative result, not an assumed gap. [Cite the three seed papers
-by full title/author once finalized for the reference list.]
+search) of papers citing five seed papers - DENTEX (Hamamci et al.
+2023), HierarchicalDet (Hamamci et al. 2023), Hill, Koback & Schilling
+(2024), SHORTKIT-ML (2026), and Lin et al. (2024, cited above) - found
+0 of 132 unique citing papers combining tooth-numbering/FDI-enumeration
+language with shortcut/position-bias language in title or abstract -
+stated here as a genuine checked negative result, not an assumed gap.
 
 ## 3. Methods
 
@@ -139,10 +172,24 @@ Point to, don't restate, the existing method sections:
   `RESULTS.md` Section 2 / `cpu_repro/coord_baseline/README.md`.
 - Numbering-convention invariance check (Universal/Palmer):
   `RESULTS.md` Section 11.4.
-- Real-detector training and evaluation (YOLOv8, GO/NO-GO protocol):
-  `RESULTS.md` Section 21, `cpu_repro/yolo_training/train_yolo.py`,
-  `cpu_repro/yolo_training/GO_NO_GO.md` for the pre-registered
-  COMMIT/PIVOT/EXTEND thresholds.
+- Real-detector training and evaluation (YOLOv8): `RESULTS.md`
+  Section 21, `cpu_repro/yolo_training/train_yolo.py`. **Define the
+  decision rule here before Results uses its outcome label:** a
+  pre-registered threshold on the gap between the real detector and the
+  coordinate-only ceiling (`GO_NO_GO.md`) - COMMIT (gap <=5pp, consistent
+  with shortcut reliance) / PIVOT (gap >=15pp, evidence against reliance)
+  / EXTEND (in between, inconclusive), plus a >=90% detection-recall
+  guard. The measured 5-seed gap (~24.8pp, Section 33) is a **PIVOT**.
+- Second detector architecture (RT-DETR, replication of the above):
+  `RESULTS.md` Sections 38 (scoping/architecture choice, including why
+  RT-DETR was chosen over a from-scratch Faster R-CNN pipeline), 39
+  (1-epoch smoke test/timing), 40 (full 5-seed result).
+  `cpu_repro/yolo_training/train_rtdetr.py`,
+  `train_rtdetr_seed{1,2,3,4}.py`. Same data pipeline, split, and
+  evaluation protocol as YOLOv8 (`build_coord_baseline.evaluate()` on
+  matched detections) - only the model class differs - and the same
+  hyperparameter-disclosure stance (Ultralytics' own default RT-DETR
+  recipe, not hand-tuned, per Section 28's precedent for YOLOv8).
 - Error-pattern correlation method (Claim B): `RESULTS.md` Sections 22
   (error-type taxonomy comparison), 23 (case study), 26 (2x2
   agreement/phi-coefficient analysis, `error_correlation_analysis.py`).
@@ -155,16 +202,21 @@ Point to, don't restate, the existing method sections:
   (Rasnayaka et al., *Scientific Data* 12:1615, 2025), chosen as the
   first real test of the two-precondition hypothesis - `RESULTS.md`
   Section 25, `cpu_repro/boundary_condition/denpar_periapical/`.
-- Multi-seed replication (Claim B headline numbers, 5 seeds total):
-  `RESULTS.md` Sections 32 (scoping) and 33 (result),
+- Multi-seed replication (Claim B headline numbers, 5 seeds total,
+  now for both detector architectures): `RESULTS.md` Sections 32
+  (scoping) and 33 (YOLOv8 result), 40 (RT-DETR result),
   `cpu_repro/yolo_training/train_yolo_seed{1,2,3,4}.py`,
-  `multiseed_analysis.py`.
-- Statistical testing: paired permutation tests,
-  `cpu_repro/coord_baseline/significance_tests.py` (prepared, not yet
-  run - see that file's docstring), supplementing the 5-seed mean ± 95%
-  CI reporting already in `RESULTS.md` (image-level bootstrap
-  resampling for the YOLO/DenPAR results, `mean_ci95`'s t-interval for
-  cross-seed results - both documented at each point of use).
+  `multiseed_analysis.py`, `rtdetr_multiseed_analysis.py` (structurally
+  identical paired-bootstrap-CI methodology, applied to the second
+  architecture).
+- Statistical testing: paired permutation tests over the 5 seeds,
+  `cpu_repro/coord_baseline/significance_tests.py` (Section 12 -
+  real vs. shuffled control and vs. majority baseline, both p=0.0625,
+  the floor of this test's resolution at n=5 seeds, not a borderline
+  result), supplementing the 5-seed mean ± 95% CI reporting already in
+  `RESULTS.md` (image-level bootstrap resampling for the YOLO/DenPAR
+  results, `mean_ci95`'s t-interval for cross-seed results - both
+  documented at each point of use).
 
 ## 4. Results
 
@@ -199,14 +251,22 @@ source of truth.
   misread as broader evidence than it is.
 - 4.5 A real trained detector does not show shortcut-reliant behavior
   (Section 21's GO/NO-GO result: PIVOT, YOLOv8 exceeds the
-  coordinate-only ceiling by 26.3pp at seed 0, replicated at 24.8pp
-  mean across 5 seeds - Section 33). The gap concentrates almost
+  coordinate-only ceiling by 26.3pp at seed 0 under the matched-
+  detections-only convention, replicated at 24.8pp mean across 5 seeds
+  under the undetected-counts-as-wrong convention used for the paired
+  analysis - Section 33; the two numbers differ in denominator, not in
+  finding - do not report them side by side in the paper text without
+  this qualifier, or a reader will read a shrinking effect that isn't
+  there). The gap concentrates almost
   entirely in tooth-type accuracy (Sections 21/27), which a
   position-only signal cannot reach per the feature-ablation ceiling
   (4.1a) - the central piece of evidence against Claim B's "real
   detectors exploit this" reading. A weak-but-nonzero error correlation
-  with the coordinate-only model does exist (phi = 0.16-0.18 depending
-  on seed, Sections 26/33) and should be reported honestly alongside the
+  with the coordinate-only model does exist (phi ranges 0.133-0.235
+  across the 5 seeds, mean 0.184, 95% CI [0.134, 0.233] - Sections
+  26/33; phi moves more across seeds than the gap does, but every seed
+  lands in the same "real but modest" range, none near independence or
+  strong correlation) and should be reported honestly alongside the
   gap, not omitted because it complicates a clean "no" - see Section
   24's discussion of how the two facts coexist.
 - 4.6 Mitigation result: training the same detector with the
@@ -233,6 +293,23 @@ source of truth.
   pre-registered 5pp GO/PIVOT threshold on any individual seed
   (Section 33). The framing decision (4.5, Section 24) is not reopened
   by this replication.
+- 4.9 Second detector architecture (RT-DETR) replicates Claim B's
+  finding within noise: the single-architecture concern raised by 4.5-4.8
+  answered directly - a transformer-based, anchor-free, NMS-free
+  detector, trained/evaluated with the identical pipeline across the
+  same 5 seeds, gives a gap of 24.99pp ± 0.78pp (95% CI [24.22, 25.77])
+  and phi of 0.187 ± 0.035 (95% CI [0.151, 0.222]) - differing from
+  YOLOv8's 5-seed numbers by only 0.22pp and 0.003 respectively, both
+  well inside either architecture's own confidence interval (Section
+  40). This is convergence, not merely "also a PIVOT": the two
+  architectures are statistically indistinguishable on both the
+  headline gap and the secondary error-correlation metric. State this
+  as strengthening evidence that the non-reliance finding is not an
+  artifact of YOLOv8 specifically - not as proof it holds for every
+  possible detector architecture, since both models here share the
+  Ultralytics training/augmentation/evaluation pipeline and a genuinely
+  different architecture family (e.g. a two-stage detector) was not
+  tested (Section 40's own stated limitation).
 
 ## 5. Discussion
 
@@ -241,7 +318,15 @@ source of truth.
   answer is largely no, with a weak-but-real error correlation as the
   qualifier) per `RESULTS.md` Section 11.2/24 - state plainly which of
   the two the paper is actually claiming, rather than letting the two
-  blur together in prose.
+  blur together in prose. Claim B's "largely no" answer is now supported
+  by **two** architecturally distinct detectors (YOLOv8, RT-DETR),
+  landing within noise of each other (Section 40) - state this as
+  meaningfully strengthening the claim's generalizability, since a
+  reviewer's most natural objection to a single-architecture result
+  ("maybe this is just how YOLO behaves") is answered directly, while
+  still being precise that this is two data points, not an exhaustive
+  architecture sweep (no two-stage detector tested, both share the
+  Ultralytics pipeline).
 - Generalization boundary as a falsifiable hypothesis (Section 11.4):
   state what would need to be true elsewhere (non-panoramic modality, or
   a differently-structured label space) for the finding to transfer.
@@ -298,29 +383,61 @@ source of truth.
   found not to materially move the headline numbers - Section 25's
   materiality-check addition) - one data point supporting the
   two-precondition hypothesis, not a broad generalization sweep.
-- Real detector evaluated (YOLOv8, 5 seeds - Sections 21/33), resolving
-  what had been the paper's single biggest open item. Neither this
-  detector nor the coordinate-only baseline had its hyperparameters
-  tuned or searched within this project (Section 28) - both used
-  un-searched configurations (sklearn defaults for the baseline,
-  values copied from a pre-existing notebook for YOLO), so the exact
-  magnitude of the ~25pp gap should not be read as a precisely
-  calibrated number, though the asymmetry does not bias the paper's
-  central *relative* claim in either direction (Section 28's disclosure
-  decision).
-- **Multiplicity / analysis transparency.** A number of exploratory
-  checks were run across this project beyond the headline results
+- Two real detectors evaluated (YOLOv8 and RT-DETR, 5 seeds each -
+  Sections 21/33, 38-40), resolving what had been the paper's single
+  biggest open item and then some. Neither detector nor the
+  coordinate-only baseline had its hyperparameters tuned or searched
+  within this project (Sections 28, 38) - both detectors used
+  un-searched configurations (values copied from a pre-existing
+  notebook for YOLOv8, Ultralytics' own default recipe for RT-DETR) and
+  the baseline used sklearn defaults, so the exact magnitude of the
+  ~25pp gap should not be read as a precisely calibrated number, though
+  the asymmetry does not bias the paper's central *relative* claim in
+  either direction (Section 28's disclosure decision). **Both
+  detectors share the Ultralytics training/augmentation/evaluation
+  pipeline** - the two-architecture agreement (Section 40) rules out a
+  YOLOv8-specific explanation, but cannot by itself rule out a
+  pipeline-level confound common to both (e.g. a shared augmentation
+  default or evaluation quirk); a genuinely independent training
+  framework or a structurally different detector family (e.g. a
+  two-stage detector like Faster R-CNN, considered and set aside in
+  Section 38 for engineering-effort reasons) was not tested and remains
+  the strongest remaining "is this architecture-specific" objection to
+  address, if pursued further.
+- **Multiplicity / analysis transparency.** This paper makes one
+  pre-registered claim pair (Claim A: geometry predicts identity; Claim
+  B: does a real detector rely on it) with a single GO/NO-GO decision
+  rule (`GO_NO_GO.md`), evaluated once against real data (Section 21)
+  and then replicated - not re-tested against new thresholds - across 5
+  seeds (Section 33) and, again, across a second detector architecture
+  (Section 40). The ~40 numbered sections in `RESULTS.md` are
+  converging diagnostics for that one claim pair - cross-dataset
+  replication (Sections 2, 10), negative controls (Section 4),
+  feature-ablation and noise-robustness checks (Sections 19, 20),
+  a mitigation experiment (Sections 30/31), a boundary-condition
+  test (Section 25), and a second-architecture replication (Sections
+  38-40) - not a battery of independent hypotheses each requiring its
+  own multiple-comparisons correction. State this
+  explicitly to pre-empt the reflexive "so many tests, where's the
+  Bonferroni correction" objection: a correction would be appropriate
+  if any individual diagnostic here were being used to support its own
+  standalone claim, but each is reported as one more angle on the same
+  underlying question, and the paper's central claim rests on the
+  GO/NO-GO result and its two independent replications (5 seeds, second
+  architecture), not on the p-value of any
+  single secondary check. Exploratory checks beyond the headline results
   (significance tests, a detectability power check, a geometric-ceiling
   check, and a supernumerary error-rate follow-up with several
-  sub-analyses). State plainly that `RESULTS.md` is an append-only, dated
-  log of every analysis run, including ones that didn't pan out - e.g. a
-  localized-adjacency refinement of the supernumerary check
-  (`RESULTS.md` Section 17) initially looked like a strong, significant
-  result but was identified as a class-composition confound and is
-  recorded as withdrawn rather than quietly dropped. This is offered as
-  evidence against selective reporting, not as a claim that every
-  possible analysis was pre-registered - it wasn't (see the falsification
-  threshold caveat above).
+  sub-analyses) were run and are reported regardless of outcome -
+  `RESULTS.md` is an append-only, dated log of every analysis run,
+  including ones that didn't pan out - e.g. a localized-adjacency
+  refinement of the supernumerary check (`RESULTS.md` Section 17)
+  initially looked like a strong, significant result but was identified
+  as a class-composition confound and is recorded as withdrawn rather
+  than quietly dropped. This is offered as evidence against selective
+  reporting, not as a claim that every possible analysis was
+  pre-registered - it wasn't (see the falsification threshold caveat
+  above).
 
 ## 7. Ethics / data statement
 
@@ -338,25 +455,57 @@ source of truth.
 
 ## References (to finalize)
 
-- Geirhos et al., "Shortcut Learning in Deep Neural Networks," Nature
-  Machine Intelligence, 2020.
+- Geirhos, Jacobsen, Michaelis et al., "Shortcut Learning in Deep Neural
+  Networks," Nature Machine Intelligence 2:665-673, 2020 (DOI:
+  10.1038/s42256-020-00257-z). Verified via web search 2026-09-12.
 - DeGrave, Janizek & Lee, "AI for radiographic COVID-19 detection selects
-  shortcuts over signal," Nature Machine Intelligence, 2021.
+  shortcuts over signal," Nature Machine Intelligence 3:610-619, 2021
+  (DOI: 10.1038/s42256-021-00338-7). Verified via web search 2026-09-12.
 - Winkler et al., "Association Between Surgical Skin Markings in
-  Dermoscopic Images and Diagnostic Performance of a Deep Learning CNN
-  for Melanoma Recognition," JAMA Dermatology, 2019.
-- Lin et al., "Shortcut Learning in Medical Image Segmentation," MICCAI
-  2024 (LNCS 15008, pp. 623-633).
+  Dermoscopic Images and Diagnostic Performance of a Deep Learning
+  Convolutional Neural Network for Melanoma Recognition," JAMA
+  Dermatology, 2019 (PMID: 31411641). Verified via web search
+  2026-09-12; title corrected from an earlier "Deep Learning CNN"
+  abbreviation to the paper's actual full title.
+- Lin, Weng, Mikolaj et al., "Shortcut Learning in Medical Image
+  Segmentation," MICCAI 2024 (LNCS 15008; DOI:
+  10.1007/978-3-031-72111-3_59; also arXiv:2403.06748). Title, authors,
+  venue and DOI verified via web search 2026-09-12; exact page range
+  could not be confirmed (Springer chapter page required login) - use
+  DOI, not page numbers, if precision is needed before submission.
 - Hamamci et al., "DENTEX: An Abnormal Tooth Detection with Dental
   Enumeration and Diagnosis Benchmark for Panoramic X-rays," 2023
   (arXiv:2305.19112).
-- Zhou et al., "Combining public datasets for automated tooth assessment
-  in panoramic radiographs," BMC Oral Health, 2024.
-- Rasnayaka et al., *Scientific Data* 12:1615, 2025 (DenPAR dataset -
-  [VERIFY EXACT TITLE before submission, not confirmed anywhere in this
-  repo; RESULTS.md Section 25 records author/journal/volume/year only,
-  via the Zenodo record at 10.5281/zenodo.16645076, not the paper title
-  itself]).
-- [Add exact citations for the three Task-1 seed papers once resolved
-  IDs are double-checked against `resolved_target_ids.json` in the
-  scratch directory from that run.]
+- Zhou, Lu, Zhao et al., "A dual-labeled dataset and fusion model for
+  automatic teeth segmentation, numbering, and state assessment on
+  panoramic radiographs," BMC Oral Health 24:1201, 2024 (DOI:
+  10.1186/s12903-024-04984-2). CORRECTED 2026-09-12: this entry
+  previously carried the title "Combining public datasets for automated
+  tooth assessment in panoramic radiographs," which is a real but
+  different BMC Oral Health 2024 paper by van Nistelrooij et al.
+  (DOI: 10.1186/s12903-024-04129-5) - title/author mismatch caught by
+  citation audit, not the same dataset used in RESULTS.md Section 16.
+- van Nistelrooij, Ghoul, Xi et al., "Combining public datasets for
+  automated tooth assessment in panoramic radiographs," BMC Oral
+  Health 24:387, 2024 (DOI: 10.1186/s12903-024-04129-5). Added
+  2026-09-12 as the correctly-attributed source for the annotation-
+  quality-bias point in Related Work (previously mis-cited under
+  "Zhou et al." - see the correction above).
+- Rasnayaka, Leuke Bandara, Jayasundara et al., "DenPAR: Annotated
+  Intra-Oral Periapical Radiographs Dataset for Machine Learning,"
+  *Scientific Data* 12:1615, 2025 (DOI: 10.1038/s41597-025-05906-9;
+  title/volume/article-number verified via web search 2026-09-12,
+  cross-checked against the Zenodo record at 10.5281/zenodo.16645076).
+- Hamamci et al., "Diffusion-Based Hierarchical Multi-Label Object
+  Detection to Analyze Panoramic Dental X-rays" (HierarchicalDet),
+  MICCAI 2023 (code/data: github.com/ibrahimethemhamamci/HierarchicalDet).
+  Verified via web search 2026-09-12.
+- Hill, Koback & Schilling, "The risk of shortcutting in deep learning
+  algorithms for medical imaging research," Scientific Reports 14:29224,
+  2024 (DOI: 10.1038/s41598-024-79838-6). Verified via web search
+  2026-09-12.
+- [SHORTKIT-ML author list/exact title], "Shortkit-ML: A Unified
+  Multi-Perspective Framework for Detecting Shortcut Learning in Medical
+  Imaging Embeddings," medRxiv, 2026 (PMID: 42094137). Title and venue
+  verified via web search 2026-09-12; author list not yet pulled - fill
+  in from the PMC/medRxiv page before submission.
