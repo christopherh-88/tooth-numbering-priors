@@ -2133,6 +2133,655 @@ stated (it was explicitly scoped to seed 0) and remains true at seed 0;
 it does not generalize to "zero reversals at every seed," which this
 addition corrects with the actual 5-seed picture.
 
+## 34. Citation audit (`paper/DRAFT.md` References section) - 2026-09-12
+
+**Method:** web search verification of every citation in `paper/DRAFT.md`'s
+References list (title, authors, venue, year, DOI/arXiv ID where
+available) - not a re-read of memory, an actual search per citation, per
+the same no-fabrication discipline as the DenPAR title flag earlier this
+session. **Date:** 2026-09-12.
+
+**Findings:**
+- Geirhos et al. 2020, DeGrave/Janizek/Lee 2021, Winkler et al. 2019,
+  Hamamci et al. (DENTEX) 2023: title/venue/year all verified correct
+  as previously written. Winkler et al.'s title had been informally
+  abbreviated ("Deep Learning CNN" -> corrected to full "Deep Learning
+  Convolutional Neural Network"); not a substantive error.
+- Lin et al., "Shortcut Learning in Medical Image Segmentation": title,
+  authors (Lin, Weng, Mikolaj et al.), venue (MICCAI 2024, LNCS 15008),
+  and arXiv ID (2403.06748) verified. The previously-written page range
+  ("pp. 623-633") could not be confirmed (Springer chapter page requires
+  login) - removed rather than left unverified; DOI substituted as the
+  precise locator.
+- **Real error found: Zhou et al. citation had the wrong title.** The
+  reference list paired author "Zhou et al." with the title "Combining
+  public datasets for automated tooth assessment in panoramic
+  radiographs" - that title belongs to a different, real BMC Oral
+  Health 2024 paper by van Nistelrooij et al. (DOI:
+  10.1186/s12903-024-04129-5), not Zhou. Zhou, Lu, Zhao et al.'s actual
+  2024 BMC Oral Health paper is "A dual-labeled dataset and fusion
+  model for automatic teeth segmentation, numbering, and state
+  assessment on panoramic radiographs" (BMC Oral Health 24:1201, DOI:
+  10.1186/s12903-024-04984-2) - this is the correct citation for the
+  Kaggle dual-labeled dataset used in Section 16, and DRAFT.md has been
+  corrected to it. The mistakenly-borrowed title belongs to a real,
+  separate paper (van Nistelrooij et al., same journal/year) that is
+  also relevant to this project's related-work discussion (annotation-
+  quality bias across combined public dental datasets) - added to
+  DRAFT.md as its own correctly-attributed citation rather than dropped.
+- DenPAR (Rasnayaka et al.): the `[VERIFY EXACT TITLE]` flag from
+  earlier this session is now resolved - "DenPAR: Annotated Intra-Oral
+  Periapical Radiographs Dataset for Machine Learning," *Scientific
+  Data* 12:1615, 2025 (DOI: 10.1038/s41597-025-05906-9), volume/article
+  number cross-checked against the Zenodo record already cited.
+  Authors: Rasnayaka, Leuke Bandara, Jayasundara et al.
+- The stale `[Add exact citations for the three Task-1 seed papers...
+  resolved_target_ids.json...]` placeholder pointed at a file
+  (`resolved_target_ids.json`) that does not exist anywhere in this
+  repo - a dangling reference to scratch state from an earlier session,
+  not a real blocker. Resolved by identifying the three papers from
+  `HANDOFF.md`'s description of the Task 1 novelty check (5 seed
+  papers total: DENTEX, HierarchicalDet, and three shortcut-learning
+  papers) and citing the two not already in the list:
+  HierarchicalDet (Hamamci et al., MICCAI 2023) and Hill, Koback &
+  Schilling, "The risk of shortcutting in deep learning algorithms for
+  medical imaging research" (Scientific Reports 14:29224, 2024, DOI:
+  10.1038/s41598-024-79838-6) - both verified. SHORTKIT-ML (medRxiv,
+  2026, PMID: 42094137) is cited with title/venue verified but full
+  author list still `[TODO before submission]` - not yet pulled from
+  the source page.
+
+**Not fabricated, but flagged as unverifiable within this session's
+tools:** Lin et al.'s exact page range (Springer login-gated).
+
+**Bottom line:** one real title/author mismatch found and fixed (Zhou
+et al.), one dangling placeholder resolved, all other pre-existing
+citations confirmed correct. Consistent with this session's other
+self-caught fabrication risk (the original DenPAR title guess) -
+citation content should not be trusted without an explicit per-entry
+verification pass, even when it "feels" plausible.
+
+## 35. Abstract/intro number-sync sweep and reproducibility packaging check - 2026-09-12
+
+**Number-sync sweep** (`paper/DRAFT.md` abstract, intro, related work,
+results outline, discussion, limitations - checked against the final
+values in this document, not against memory of earlier drafts):
+- Abstract's "67-72%" top-1 range for the coordinate-only baseline was
+  too wide at the top end - the actual GBT top-1 range across both
+  datasets and all 5 seeds is 66.97-70.25% (`per_seed_results.csv`,
+  both datasets). Corrected to "67-70%".
+- Abstract's "3.6% majority-class baseline" understated DENTEX's actual
+  value (UFBA-425 3.63%, DENTEX 3.75%). Corrected to "3.6-3.8%".
+- Results 4.5's side-by-side "26.3pp at seed 0 ... 24.8pp mean across 5
+  seeds" was individually correct but juxtaposed two different
+  denominator conventions (matched-detections-only vs.
+  undetected-counts-as-wrong) without saying so - a reader could
+  mistake this for a shrinking effect. Added an explicit qualifier.
+- Related work's Zhou et al. citation carried the wrong paper title
+  (see Section 34) - the in-text restatement at the top of the
+  "Dental/panoramic radiograph AI" paragraph had the same error and has
+  been corrected alongside the References-list fix, with the
+  correctly-titled paper (van Nistelrooij et al.) added as its own
+  citation rather than dropped.
+- Everything else checked (5-seed replication numbers in 4.8, DenPAR
+  numbers in 4.7/Discussion, Section 17's supernumerary numbers in
+  Discussion, Winkler et al.'s 84.1%->45.8% specificity claim) matched
+  the current source values exactly - no further changes needed.
+
+**Reproducibility packaging check**
+(`cpu_repro/yolo_training/README.md`, `cpu_repro/requirements.txt`):
+- `cpu_repro/requirements.txt` (the CPU-only analysis environment) was
+  already pinned and accurate - no changes needed.
+- `cpu_repro/yolo_training/README.md` was stale: written before any GPU
+  run happened, it still said `train_yolo.py` "has not been run as a
+  real training job" even though by this point it had been run 7 times
+  across seeds 0-4 plus a zero-jitter variant (Sections 21/30/31/33).
+  Rewritten to state the current status, document the exact run order
+  to regenerate every YOLO-derived table (`export_split.py` ->
+  `train_yolo*.py` -> `case_study_yolo_vs_coord.py`/
+  `error_correlation_analysis.py`/`robustness_analysis.py` ->
+  `mitigation_analysis.py` -> `multiseed_analysis.py`'s `main()` then
+  `run_breakdowns()`), and verify each documented command actually
+  matches the script (`export_split.py`'s CLI arg, `multiseed_analysis
+  .py`'s lack of a `run_breakdowns()` entry point in `__main__` -
+  caught before being written down incorrectly).
+- **Real, disclosed reproducibility gap:** GPU training ran on Kaggle's
+  provisioned notebook image, whose exact `torch`/`ultralytics` package
+  versions were never independently pinned or recorded by this project
+  (unlike the CPU-only `requirements.txt`, which is fully pinned).
+  Documented as a limitation in the README rather than silently left
+  unaddressed - a reviewer attempting exact reproduction should pin
+  those versions in `kernel-metadata.json` before rerunning and record
+  the resulting versions here. Not fixed retroactively (would require
+  a new GPU run to determine which versions were actually used, which
+  has not been done).
+- The `ensure_gpu()` fail-fast helper referenced in Sections 21/31/33
+  was Kaggle-kernel-launch scaffolding that lived only in the scratch
+  directory used to submit those jobs, not in this repo - noted in the
+  README as intentional (it guards against a Kaggle-specific failure
+  mode, not something a reviewer running on their own GPU needs), not
+  silently reconstructed from memory into a new committed file, which
+  would risk introducing a subtly different implementation than what
+  actually produced the published numbers.
+
+## 36. Fresh-clone reproducibility test and full read-through review of `paper/DRAFT.md` - 2026-09-12
+
+**Fresh-clone reproducibility test.** Cloned this repo into an isolated
+scratch directory (`git clone`, not the working copy - no local venvs,
+caches, or uncommitted state carried over), built a brand-new Python
+3.12 venv, and ran `ENVIRONMENT.md`'s exact documented setup sequence
+end to end:
+- `pip install -r cpu_repro/requirements.txt` followed by the
+  CPU-wheel-index torch/torchvision install - imports and versions
+  matched exactly (numpy 1.26.4, tensorflow 2.16.2, torch 2.14.0,
+  ultralytics 8.4.143), `pip check` reported "No broken requirements
+  found."
+- Ran `cpu_repro/coord_baseline/build_coord_baseline.py` from the clean
+  clone - reproduced Section 2's exact headline numbers (GBT top-1
+  0.6949 +/- 0.0077, quadrant 0.9653 +/- 0.0035, etc.) with no code
+  changes, confirming the committed `Dataset/` tree (661MB, fully
+  tracked in git) is sufficient on its own.
+- Ran `cpu_repro/coord_baseline/controls/run_controls.py` from the same
+  clone - reproduced Section 4's negative-control numbers exactly
+  (shuffled-per-image collapses to ~3.2-3.6% top-1, matching the
+  majority baseline as expected).
+
+**One real latent bug found and disclosed (not yet fixed in
+requirements.txt itself):** `cpu_repro/requirements.txt` lists
+`torch==2.14.0`/`torchvision==0.29.0` directly, so step 1
+(`pip install -r requirements.txt`) already installs them from plain
+PyPI - contradicting `ENVIRONMENT.md`'s claim that the separate step 2
+(CPU-wheel-index install) is what prevents a CUDA build. On macOS this
+is harmless (PyPI's macOS torch wheels have no CUDA build to
+accidentally pull), which is why this went undetected until now. **On
+Linux, step 1 would silently download the full CUDA-enabled torch
+wheel first** (large, and the opposite of what `ENVIRONMENT.md` says is
+being avoided) before step 2 overwrites it with the correct CPU build -
+wasteful but not actually broken, since step 2 still runs and still
+ends in the right state. Recorded here rather than fixed blind, since
+the real fix (pin `torch`/`torchvision` to `+cpu` wheel identifiers
+inside `requirements.txt` itself, or move them out of the file
+entirely with a comment) should be tested on an actual Linux machine
+before being called resolved - not done in this session (no Linux
+machine available to verify against).
+
+**Read-through review of `paper/DRAFT.md`, reviewer-style (not another
+targeted number check - a single top-to-bottom pass for structural/
+terminology coherence).** Findings, all fixed in `paper/DRAFT.md`:
+- **Claim A/Claim B used before being defined.** Both terms appear
+  repeatedly from Section 3 (Methods) onward, but were not explicitly
+  defined until Discussion (5.1) - a reviewer reading top-to-bottom
+  would hit "Claim B" in Methods with no definition yet given. Fixed by
+  adding an explicit Claim A/Claim B definition to the Introduction,
+  before either term's first use.
+- **GO/NO-GO jargon (COMMIT/PIVOT/EXTEND) used in Results without being
+  defined in Methods.** Methods only linked to `GO_NO_GO.md` by
+  filename; Results 4.5/4.8 then use "PIVOT" as a load-bearing term
+  with no in-paper definition. Fixed by inlining the threshold
+  definitions (COMMIT <=5pp, PIVOT >=15pp, EXTEND between, >=90%
+  detection-recall guard - verified against `GO_NO_GO.md` directly, not
+  from memory) into the Methods bullet.
+- **Stale phi range in Results 4.5.** Said "phi = 0.16-0.18 depending on
+  seed" - this understates the actual 5-seed spread (0.133-0.235, mean
+  0.184, Section 33) and was clearly written before the 5-seed data
+  existed, then never updated even though Section 33 explicitly calls
+  out this exact spread as a finding worth reporting. Fixed to state
+  the real range and CI, matching Section 33 and the abstract.
+- **Stale Methods claim that `significance_tests.py` is "prepared, not
+  yet run."** It has been run (Section 12, both permutation tests
+  p=0.0625, the floor of resolution at n=5 seeds). Fixed to cite
+  Section 12's actual result instead of describing it as pending.
+- Everything else checked (terminology use of "the gap," section
+  cross-references, whether Sections 30-35's additions read
+  consistently with the earlier sections) was internally consistent -
+  no further changes.
+- **Noted, not fixed:** `paper/DRAFT.md` has no inline Table/Figure
+  objects yet - every result is cited by pointing at a `RESULTS.md`
+  section number rather than an embedded, numbered table. Fine for a
+  structural skeleton, but flagged explicitly (top of `DRAFT.md`) since
+  it will need real Table 1/Table 2/Fig 1 assignment before submission,
+  not just before-the-fact awareness.
+- **Noted, not fixed:** the top-level `README.md` is still entirely the
+  original upstream OralBBNet/UFBA-425 README - it does not mention this
+  project's coordinate-only-baseline/shortcut-learning study, or point
+  a reader toward `HANDOFF.md`, `RESULTS.md`, `ENVIRONMENT.md`, or
+  `paper/DRAFT.md` at all. A reviewer cloning the repo from the
+  top-level README alone would have no way to discover this project's
+  actual contribution exists. Not fixed in this session (would mean
+  editing a README that also serves the pre-existing upstream project;
+  worth a short pointer section rather than a rewrite, but that's a
+  judgment call left for a future pass rather than made unilaterally
+  here).
+
+## 37. Kaggle GPU environment pin - attempted, blocked this session
+
+**Date:** 2026-09-12. Follow-up to Section 35's disclosed gap (GPU
+training's exact `torch`/`ultralytics` package versions were never
+independently recorded, unlike the pinned CPU `requirements.txt`).
+
+**Attempted fix:** retrieve the versions retroactively from a completed
+kernel's own log (`kaggle kernels output christopherhuang88/tooth-
+numbering-yolo-train-seed1 --file-pattern ".*\.log$"`), rather than
+re-running a GPU job just to check versions. **Blocked**: the Kaggle
+API's kernel-output endpoint returned `429 Too Many Requests` on three
+attempts (spaced ~30s, ~3min, and on-demand apart) - other endpoints
+(`kernels status`, `kernels list`) worked fine throughout, so this is
+specifically the output-download endpoint rate-limiting, plausibly a
+side effect of two earlier full-output downloads of the same kernel
+during this session's disk-cleanup work. Not resolved by waiting longer
+within this session.
+
+**Recommendation for next Kaggle run, so this doesn't recur:** have the
+kernel print `torch.__version__`, `ultralytics.__version__`, and
+`nvidia-smi` output explicitly to stdout at the very start of training
+(a few lines, negligible cost) rather than relying on Kaggle's own
+environment metadata or a retroactive log fetch after the fact. This
+turns "pin the environment" into a byproduct of the next real run
+instead of its own separate task. Until that happens, the gap disclosed
+in Section 35 stands as unresolved - do not claim it is pinned.
+
+**Update (2026-09-12): resolved via Section 39.** The recommendation
+above was followed for the RT-DETR smoke test kernel
+(`train_rtdetr_smoketest.py` prints exactly this at run start) and
+captured real versions directly in that run's log: `torch 2.10.0+cu128`,
+`ultralytics 8.4.143` (matches this project's CPU-side pin exactly),
+Tesla T4 GPU, driver `580.159.04`, CUDA 13.0. This confirms Kaggle's GPU
+image was not silently drifted from the CPU-pinned `ultralytics`
+version at the time of this run. Note this is a snapshot for
+2026-09-12's Kaggle base image specifically, not a permanent pin - if
+Kaggle updates its base image before a future run, re-check rather than
+assuming these versions still hold; the print-to-stdout habit (not a
+one-time retroactive fix) is what keeps this current going forward.
+
+## 38. Second detector architecture - scoping only, not executed
+
+**Date:** 2026-09-12. Scopes whether a second, architecturally distinct
+detector could replicate Claim B's non-reliance finding (Sections
+21/33), which would generalize the claim from "YOLOv8 specifically
+doesn't rely on the shortcut" to "detectors in general don't" - harder
+for a reviewer to dismiss as architecture-specific. Scoping only, per
+this session's instructions - no training run in this entry.
+
+**Candidate: RT-DETR (Ultralytics `RTDETR` class).** Confirmed importable
+from the already-pinned `ultralytics==8.4.143` (`from ultralytics import
+RTDETR` succeeds in `.venv312` - no new dependency). Architecturally
+distinct from YOLOv8 in the way that matters for this claim - transformer
+encoder-decoder, anchor-free, NMS-free prediction - while reusing this
+project's existing YOLO-format data pipeline, `data.yaml`, and (most
+importantly) the *exact same* IoU-matching/evaluation code
+(`build_coord_baseline.evaluate()` on matched detections) that produced
+Sections 21/26/31/33's numbers. This last point matters more than it
+looks: reusing the identical evaluation methodology removes an entire
+class of "different eval protocol, not different architecture" confound
+that a from-scratch reimplementation would risk.
+
+**Candidate considered and not recommended as the first attempt: Faster
+R-CNN (torchvision).** The architecturally *most* distinct option
+(two-stage, region-proposal-based, not just a different single-stage
+variant) - a reviewer could not plausibly call this "still basically the
+same detector family." But it requires building an entirely new
+training/evaluation pipeline outside Ultralytics (COCO-style targets, a
+custom training loop, and a from-scratch reimplementation of the
+matched-IoU evaluation logic to stay comparable to the existing numbers)
+- meaningfully higher engineering effort and, worse, real risk of
+introducing exactly the eval-protocol confound RT-DETR avoids. Noted as
+a stronger fallback if a reviewer specifically objects that RT-DETR is
+"still Ultralytics tooling," not as the first thing to build.
+
+**Expected GPU-hour cost per seed - estimated, not measured.**
+YOLOv8x's measured cost (Section 32) is ~0.594 GPU-hr/seed (2139s mean,
+30 epochs, batch 10, T4). RT-DETR's transformer attention is more
+compute-per-image than YOLOv8's CNN backbone, and T4 (no efficient
+flash-attention support, limited memory) is a worse fit for attention-
+heavy models than newer GPUs - published RT-DETR-vs-YOLOv8 comparisons
+at similar accuracy tiers generally show RT-DETR as more FLOPs-expensive
+per image. **No direct measurement exists for this exact setup**, so
+treat any specific number here as a rough planning estimate, not a
+result: a plausible range is 1.5-3x YOLOv8x's per-epoch cost on this
+hardware, i.e. roughly **0.9-1.8 GPU-hr/seed**. **Before committing to a
+full run, do a 1-epoch smoke test** (the same practice already used to
+validate `train_yolo.py` before its first full run, per
+`cpu_repro/yolo_training/README.md`) to replace this estimate with a
+real measurement at near-zero cost, rather than sizing the full plan
+against a guess.
+
+**Budget/feasibility, using the estimated range:** 5 seeds (to match the
+existing 5-seed convention, Sections 2/10/25/33) would cost an estimated
+4.5-9 GPU-hours - comfortably under Kaggle's ~30 GPU-hr/week budget even
+stacked on top of this project's other GPU usage. Consistent with
+Section 32's finding for YOLO, **GPU-hours are very unlikely to be the
+binding constraint here either** - the real cost is the same manual
+per-kernel Accelerator-selection step in the Kaggle web UI (Section 32),
+so 5 seeds means roughly 5 more such manual steps (fewer if seeds are
+chained sequentially within single 12-hour sessions, since even at the
+higher end of the cost estimate 2-3 seeds would fit in one session).
+
+**Hyperparameter-disclosure note, carried forward from Section 28:** use
+Ultralytics' own default RT-DETR training recipe as the starting
+configuration, not a hand-tuned one - mirrors this project's existing
+disclosed choice not to search hyperparameters for YOLOv8 either, so a
+second architecture doesn't introduce a new, differently-biased tuning
+asymmetry into the comparison.
+
+**Recommendation:** feasible and worth doing given the budget headroom,
+but not started in this session. Next step if greenlit: a 1-epoch
+RT-DETR smoke test on the seed-0 split (near-zero cost, per the pattern
+above) to get a real per-epoch timing and confirm the pipeline swap
+(`YOLO` -> `RTDETR`, base weights `rtdetr-x.pt` or `rtdetr-l.pt`) works
+end to end before sizing and launching the full 5-seed replication.
+
+## 39. RT-DETR 1-epoch smoke test result - executed, and a files-only GPU-accelerator fix confirmed
+
+**Date:** 2026-09-12. **Script:**
+`cpu_repro/yolo_training/train_rtdetr_smoketest.py`, launched via a
+Kaggle script kernel (`christopherhuang88/tooth-numbering-rt-detr-
+smoketest`, kernel version 6, `COMPLETE`, "Successfully ran in 246.7s").
+Executes Section 38's recommended next step: a 1-epoch RT-DETR run to
+replace its estimated cost with a real measurement and confirm the
+pipeline swap works end to end.
+
+**Major methodological finding, worth flagging prominently: the
+"manual Kaggle web UI accelerator step" this project treated as
+unavoidable all session (Sections 21/31/32/33) has a files-only fix.**
+Kaggle's `kernel-metadata.json` supports an undocumented-in-the-CLI-help
+`"machine_shape"` field (values `"NvidiaTeslaT4"`, `"NvidiaTeslaP100"`,
+`"Tpu1VmV38"` - found by reading `kagglesdk`'s source directly, not the
+CLI's own `--help` text, which doesn't mention it), and `kaggle kernels
+push` has a matching `--accelerator` flag that overrides it. Setting
+`"machine_shape": "NvidiaTeslaT4"` in `kernel-metadata.json` plus
+`--accelerator NvidiaTeslaT4` on push landed on a real Tesla T4 in **4
+consecutive pushes** (kernel versions 3, 4, 5, 6 of this same kernel),
+with zero P100 fallbacks - a real change from every prior kernel in this
+project (Sections 21/31/33), which needed a human to open the Kaggle web
+UI and manually set Accelerator before every single "Save & Run All."
+**Caveat, stated plainly:** confirmed only for this one script-type
+kernel pushed via the CLI, over 4 consecutive runs in one session - not
+yet stress-tested across many kernels, days, or account states, so
+treat as "very likely fixed" rather than "guaranteed" until a future
+multi-seed run also succeeds this way without manual intervention.
+`cpu_repro/yolo_training/README.md` and the Kaggle-kernel-launch
+scaffolding note in that file's "Hardware and environment" section
+should be updated to mention this if/when it's confirmed again.
+
+**Three real, distinct bugs were found and fixed in sequence getting
+here** (recorded for anyone reproducing this launch pattern):
+1. Kernel v1-v2 (`enable_gpu: true` only, no `machine_shape`): landed on
+   a P100 as usual, `ensure_gpu()` fail-fasted in ~6s as designed - no
+   GPU-hours wasted, but confirmed the boolean flag alone doesn't help.
+2. Kernel v3 (`machine_shape` added): got a real T4, but then
+   `shutil.copytree(INPUT_REPO, WORKING_REPO)` raised `FileNotFoundError`
+   - the dataset was not mounted at the expected `/kaggle/input/<dataset-
+   slug>/` path.
+3. Kernel v4 (added a same-level fallback to the only directory found
+   under `/kaggle/input`): copied the wrong directory - Kaggle had
+   actually mounted this dataset at `/kaggle/input/datasets/<owner>/
+   <slug>/`, one level deeper than the conventional path, under a
+   generic `datasets/` wrapper folder rather than the dataset's own
+   slug directly.
+4. Kernel v5 (fixed to search `/kaggle/input` recursively for a
+   directory containing `cpu_repro/`, rather than guessing a fixed
+   depth): correctly found and copied the repo, but then
+   `ModuleNotFoundError: No module named 'ultralytics'` - Kaggle's GPU
+   base image ships `torch` preinstalled (with a CUDA build matched to
+   whatever GPU it assigns) but not `ultralytics`.
+5. Kernel v6 (added `pip install ultralytics==8.4.143`, pinned to this
+   project's version): **succeeded end to end.**
+
+**GPU environment, captured directly in this run's log - closes
+Section 37's gap:**
+- `torch` version: `2.10.0+cu128` (CUDA 12.8 build)
+- `ultralytics` version: `8.4.143` (matches this project's pinned
+  version exactly - no drift from the CPU-side pin)
+- GPU: Tesla T4, driver `580.159.04`, CUDA 13.0 (per `nvidia-smi`)
+- Kaggle's GPU base image at the time of this run, 2026-09-12.
+
+**Timing result - replaces Section 38's estimate:** the run's own
+reported line, `"1 epochs completed in 0.024 hours"` = **86.4s for one
+epoch** of RT-DETR-l (32.9M params, 110 GFLOPs) at batch 10, imgsz 640,
+on a single T4. Compared to YOLOv8x's measured per-epoch cost (Section
+32: 2139s / 30 epochs = **71.3s/epoch**), RT-DETR-l is **~1.21x**
+YOLOv8x's per-epoch cost on this hardware - well under the 1.5-3x range
+estimated in Section 38, and using the smaller/faster `rtdetr-l`
+variant rather than `rtdetr-x` (a deliberate choice for the smoke test,
+noted in the script). Extrapolating to a full 30-epoch run: ~2592s
+(~0.72 GPU-hr) per seed, vs. YOLOv8x's measured 0.594 GPU-hr/seed - a
+5-seed RT-DETR-l replication would cost an estimated **~3.6 GPU-hours**,
+comfortably inside Kaggle's weekly budget and now a *files-only*
+operation if the accelerator fix continues to hold (no manual step
+needed, unlike every prior multi-seed run in this project).
+
+**Result quality, as expected for 1 epoch (not a real result, timing/
+pipeline check only):** `detection_recall = 0.0`, `top1_acc`/
+`quadrant_acc` = `nan` (no matched detections - box/cls/l1 losses were
+still ~1.4-2.1 after 1 epoch, mAP50 0.046). This is exactly what an
+undertrained detector should look like and is **not evidence about
+RT-DETR's eventual accuracy or Claim B behavior** - only that the
+pipeline (data prep, RT-DETR training call, evaluation via the same
+`build_coord_baseline.evaluate()` matched-IoU protocol used everywhere
+else in this project) runs end to end without error.
+
+**Status of Section 38's recommendation:** the scoped next step is
+complete. A full 5-seed RT-DETR-l replication is feasible (~3.6 GPU-hr
+total, files-only kernel launches if the accelerator fix holds) but
+**not started in this session** - remains a decision for the user on
+whether to proceed to execution.
+
+**Update (2026-09-12): executed - see Section 40 for the full result,
+and the update below for the accelerator-fix and download-mechanics
+findings from actually running all 5 seeds.**
+
+**Accelerator-fix update, larger sample:** the `machine_shape`/
+`--accelerator NvidiaTeslaT4` files-only fix held across **all 9 kernel
+pushes this session** (4 for the smoke test, kernel versions 3-6; 5 for
+the full replication, one push per seed 0-4) - **zero P100 fallbacks,
+zero manual Kaggle web UI intervention, across every push once the fix
+was in place.** This is a larger and more convincing sample than the
+smoke test's 4 attempts alone. Upgrading the framing from "very likely
+fixed, not yet guaranteed" to **"confirmed reliable for this exact
+mechanism (script-type kernel, `kaggle kernels push --accelerator
+NvidiaTeslaT4` with `machine_shape` also set in `kernel-metadata.json`)
+across 9 consecutive uses in one session"** - still not proven across
+different sessions, days, or account states, but no longer a
+single-digit-attempt result either.
+
+**A separate, real download-mechanics problem surfaced and is worth
+documenting for future sessions using this same Kaggle workflow:** the
+`kaggle kernels output` CLI command's underlying API endpoint
+(`ListKernelSessionOutput`) became persistently rate-limited (`429 Too
+Many Requests`) for **over 90 minutes** during this session, far longer
+than the shorter (~10-15 minute) rate-limit episodes seen earlier
+(Sections 37, 39). Other API endpoints (`kernels status`, `kernels
+list`, `kernels push`) were unaffected throughout, confirming this was
+specific to the output-download endpoint, not a global API or account
+block. **Workaround that actually worked:** downloading each kernel's
+weights manually via the Kaggle web UI's Output file browser (navigate
+into the folder tree - `repo -> cpu_repro -> yolo_training -> runs ->
+rtdetr_seed<N>split -> weights -> best.pt` - and download that one file
+directly), which uses a different mechanism than the CLI's API call and
+was unaffected by the rate limit. Note: the web UI's own "Download"
+button (near the top of the kernel page, separate from the file-browser
+navigation) is misleading - it does not trigger a browser download at
+all, it only displays the equivalent `kaggle kernels output` CLI command
+(the same one that was rate-limited), so it is not a real workaround by
+itself. Also note: the downloaded weight file is served with a `.zip`
+extension by the browser, but a PyTorch checkpoint file is *already* a
+zip archive internally (`torch.save`'s on-disk format since PyTorch
+1.6) - the correct handling is to rename `.zip` -> `.pt` directly, not
+extract it, which was confirmed by successfully loading the renamed
+file as a valid `ultralytics` checkpoint dict (keys: `model`,
+`train_args`, `epoch`, etc.) with `train_args['name']` matching the
+expected `rtdetr_seed<N>split` run name for each of the 5 downloads.
+**Practical implication for future sessions:** if `kaggle kernels
+output` starts returning persistent 429s, don't keep retrying
+indefinitely - switch to the web UI's Output file browser immediately,
+it is a reliable fallback, not just a last resort.
+
+## 40. RT-DETR 5-seed replication result - full execution, convergence with YOLOv8
+
+**Date:** 2026-09-12. **Scripts:** `cpu_repro/yolo_training/train_rtdetr.py`
+(seed 0) and `train_rtdetr_seed{1,2,3,4}.py` (seeds 1-4) - full 30-epoch
+RT-DETR-l training, identical hyperparameters/data pipeline/split to
+Sections 21/33's YOLOv8x runs except the model class itself (per Section
+38's design, to avoid an eval-protocol confound). `rtdetr_multiseed_analysis.py`
+- seed-parameterized paired analysis, structurally identical to
+`multiseed_analysis.py` (Sections 26/33), including the same image-level
+bootstrap-CI treatment used for YOLOv8's paired comparisons (Section 31).
+**Kernels:** `christopherhuang88/tooth-numbering-rtdetr-seed{0,1,2,3,4}`,
+all `COMPLETE`, all landed on a real Tesla T4 via the files-only
+accelerator fix (see Section 39's update above) - zero manual Kaggle web
+UI intervention across all 5. Weights downloaded via the Kaggle web UI's
+Output file browser (see Section 39's update - the CLI's output-download
+endpoint was rate-limited for over 90 minutes during this session) and
+verified as genuine `rtdetr_seed<N>split` checkpoints before use (each
+checkpoint's own `train_args['name']` field checked against the expected
+seed, not assumed from download order).
+
+**A real bug was found and fixed while writing `rtdetr_multiseed_analysis.py`,
+before any result was read:** `run_rtdetr_predictions()`'s per-instance
+rows included an `"image_id"` column, which `build_coord_predictions()`'s
+output also carries - since `"image_id"` wasn't part of the merge key
+(`["label_file", "line_idx"]`), pandas silently renamed both to
+`image_id_x`/`image_id_y` instead of erroring at merge time, and the
+failure only surfaced later as a `KeyError: 'image_id'` in
+`analyze_seed()`. Fixed by dropping the redundant `"image_id"` column
+from `run_rtdetr_predictions()`'s output (matching the original
+`multiseed_analysis.py`'s YOLO version, which never had this column and
+so never had this bug) - also had to delete one stale cached
+`joined_seed0.csv` that had already been written with the broken
+`image_id_x`/`image_id_y` columns before the fix, or the cache-read path
+would have kept serving the broken data silently.
+
+**Per-seed result** (paired against the coordinate-only baseline, same
+convention as Section 33's table, undetected-counts-as-wrong):
+
+| seed | n | RT-DETR top-1 | coord top-1 | gap | gap 95% CI (bootstrap) | RT-DETR quadrant | phi |
+|---|---|---|---|---|---|---|---|
+| 0 | 5491 | 0.9501 | 0.6928 | +25.7pp | [+22.9, +28.7] | 0.9961 | 0.172 |
+| 1 | 5342 | 0.9345 | 0.6937 | +24.1pp | [+20.6, +27.7] | 0.9964 | 0.236 |
+| 2 | 5839 | 0.9512 | 0.7025 | +24.9pp | [+22.1, +27.8] | 0.9971 | 0.169 |
+| 3 | 5916 | 0.9481 | 0.6990 | +24.9pp | [+22.1, +28.1] | 0.9968 | 0.170 |
+| 4 | 4981 | 0.9402 | 0.6864 | +25.4pp | [+22.1, +28.4] | 0.9966 | 0.185 |
+
+**5-seed mean +/- 95% CI** (`mean_ci95`, Section 33's convention):
+
+| metric | mean | 95% CI |
+|---|---|---|
+| gap (pp) | 24.99 | [24.22, 25.77] |
+| phi | 0.1865 | [0.1512, 0.2218] |
+| RT-DETR top-1 | 0.9448 | [0.9359, 0.9538] |
+| coordinate-only top-1 | 0.6949 | [0.6872, 0.7025] |
+| RT-DETR quadrant accuracy | 0.9966 | [0.9961, 0.9970] |
+
+**Direct comparison with YOLOv8x's 5-seed result (Section 33):**
+
+| metric | YOLOv8x (Section 33) | RT-DETR-l (this section) | difference |
+|---|---|---|---|
+| gap (pp) | 24.77 +/- 0.61 [24.16, 25.38] | 24.99 +/- 0.78 [24.22, 25.77] | +0.22pp |
+| phi | 0.184 +/- 0.049 [0.134, 0.233] | 0.1865 +/- 0.0353 [0.1512, 0.2218] | +0.0025 |
+
+**Reading: this is genuine convergence, not a coincidence of rounding.**
+The two architectures' 5-seed mean gaps differ by 0.22pp (RT-DETR
+slightly higher, both CIs overlapping almost entirely) and their phi
+coefficients differ by 0.0025 (functionally identical). Two
+architecturally distinct detectors - YOLOv8x (CNN backbone, anchor-free,
+NMS-based single-stage) and RT-DETR-l (transformer encoder-decoder,
+anchor-free, NMS-free) - trained on the identical split with the
+identical (unsearched, author-default) hyperparameter philosophy,
+evaluated with the identical protocol, produce statistically
+indistinguishable Claim-B behavior: both exceed the coordinate-only
+ceiling by ~25pp concentrated in tooth-type accuracy, and both show the
+same weak-but-real positive error correlation with the coordinate-only
+model (phi ~0.18-0.19, not ~0 and not >0.3, in both cases). **This
+meaningfully strengthens Claim B's generalization** - the paper's
+finding is no longer "YOLOv8 specifically does not rely on the
+geometric shortcut," it is now "two architecturally distinct detector
+families, evaluated the same way, both fail to rely on the shortcut,
+by a statistically indistinguishable margin." A single-architecture
+result inviting the objection "maybe this is just how YOLO happens to
+behave" is now answered directly with a second, different architecture
+landing in the same place. No divergence was found to explain away or
+soften - the honest finding is convergence, and it is reported as such.
+
+**What this does not do:** it does not test a third structurally
+different architecture (e.g. a genuine two-stage detector like Faster
+R-CNN, which Section 38 considered and set aside for engineering-effort
+reasons), and both architectures here share the Ultralytics training/
+augmentation/eval pipeline, so a pipeline-level confound common to both
+cannot be fully excluded by this comparison alone - flagged honestly,
+not overclaimed as "any detector architecture whatsoever."
+
+Full data: `cpu_repro/yolo_training/eval_results/rtdetr_multiseed/
+rtdetr_multiseed_summary.csv`, `joined_seed{0-4}.csv`.
+
+**Update (2026-09-12): checked whether the `image_id` merge bug found
+above was inherited from earlier YOLOv8 analysis scripts - it was not.**
+Read every YOLOv8-side script that performs a similar coord-vs-detector
+merge (`case_study_yolo_vs_coord.py`, `error_correlation_analysis.py`,
+`multiseed_analysis.py`, `mitigation_analysis.py`):
+- `case_study_yolo_vs_coord.py`'s `run_yolo_predictions()` (reused
+  unchanged by `error_correlation_analysis.py`, and the model
+  `multiseed_analysis.py`'s own `run_yolo_predictions()` follows) never
+  included an `"image_id"` column in the first place - its per-instance
+  rows carry `"image_path"` instead, a different name, so the collision
+  that hit `rtdetr_multiseed_analysis.py` was never possible there.
+- `mitigation_analysis.py` *does* join two dataframes that both carry
+  `"image_id"` (the jittered and zero-jitter YOLO predictions), but
+  handles it correctly and deliberately: explicit
+  `suffixes=("_jit", "_zero")` on the merge, followed by
+  `merged["image_id"] = merged["image_id_jit"].combine_first(...)` to
+  reconstruct a single clean column - this was written correctly the
+  first time, not a near-miss.
+**Conclusion: this was a new mistake specific to writing
+`rtdetr_multiseed_analysis.py` from scratch, not a copied bug.**
+Sections 21, 22, 23, 26, 27, 31, and 33's numbers are unaffected and do
+not need to be re-derived.
+
+## 41. Folding the RT-DETR result into `paper/DRAFT.md` and a final consistency check - 2026-09-12
+
+**Date:** 2026-09-12. Section 40's RT-DETR result had only been written
+into `RESULTS.md`; the paper draft itself still framed Claim B as a
+single-detector (YOLOv8) finding. Updated `paper/DRAFT.md` throughout:
+- Working-title note: added an update citing the RT-DETR convergence.
+- Abstract: added a sentence stating RT-DETR replicates YOLOv8's result
+  within noise (gap +0.22pp, phi +0.0025), so the abstract's headline
+  claim is no longer implicitly single-architecture.
+- Methods (Section 3): added a bullet for the RT-DETR method (Sections
+  38-40) and extended the multi-seed-replication bullet to cover both
+  architectures.
+- Results (Section 4): added 4.9 for the RT-DETR replication result,
+  stated as convergence (not just "also a PIVOT"), with the same honest
+  caveat as Section 40 (shared Ultralytics pipeline, no two-stage
+  detector tested).
+- Related work: updated the Lin et al. comparison paragraph and section
+  range ("Sections 21-33" -> "21-40") to reflect the two-detector result.
+- Discussion (Section 5): extended the Claim A/B separation bullet to
+  state the two-architecture convergence explicitly, with the same
+  precision about what it doesn't prove.
+- Limitations (Section 6): rewrote the "real detector evaluated" bullet
+  to cover both detectors and added the shared-pipeline/no-two-stage-
+  detector caveat explicitly (not previously stated anywhere in the
+  draft). Updated the multiplicity bullet's stale "~30 numbered
+  sections" figure to "~40" and added the second-architecture
+  replication to its list of converging diagnostics.
+
+**Verified before treating this as complete: checked whether the bug
+found while building `rtdetr_multiseed_analysis.py` (Section 40's
+write-up) was inherited from any earlier YOLOv8-side analysis script.**
+It was not - see the entry immediately above this one. No numbers in
+Sections 21-33 needed re-deriving as a result.
+
+**Final targeted consistency check across Sections 1-38 of
+`paper/DRAFT.md`** (not a full re-read - Section 36 already did that;
+this pass specifically hunted for stale single-architecture framing or
+"second architecture" listed as untested future work, now that Section
+40 exists): grepped for "single detector," "one detector," "second
+architecture... future," and "YOLOv8-specific" - found no leftover
+stale claims outside the sections just edited above. One phrase
+tightened for precision while here: Related Work's "the real detector
+does not show shortcut-reliant behavior" (singular, comparing against
+Lin et al.) updated to explicitly name the two-architecture replication
+rather than reading as YOLOv8-only.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the
