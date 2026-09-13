@@ -1,11 +1,84 @@
-# YOLOv8 training run - ready to start on GPU quota reset
+# YOLOv8 training - run, results in RESULTS.md Sections 21/26/31/33
 
-`train_yolo.py` is prepared but has **not been run as a real training job**
-(no GPU available while writing this). Everything needed to start
-immediately is in place: it reads the coordinate baseline's persisted
-image-level split, resumes cleanly across Kaggle's 12-hour session limit,
-and evaluates with the exact same metrics as `cpu_repro/coord_baseline` so
-the two are directly comparable.
+**Status (2026-09-12): this has been run for real, 7 times total** - seed
+0 (`train_yolo.py`, `RESULTS.md` Section 21), seeds 1-4
+(`train_yolo_seed{1,2,3,4}.py`, Section 33), and a zero-jitter mitigation
+variant (`train_yolo_zerojitter.py`, Sections 30/31) - all on Kaggle GPU
+(Tesla T4 x2; see "Hardware and environment actually used" below). The
+rest of this file was originally written before any GPU run happened and
+is kept below because the mechanics (split handling, resume, evaluation
+protocol) are still accurate - only the "not yet run" framing was stale.
+
+It reads the coordinate baseline's persisted image-level split, resumes
+cleanly across Kaggle's 12-hour session limit, and evaluates with the
+exact same metrics as `cpu_repro/coord_baseline` so the two are directly
+comparable.
+
+## Reproducing every YOLO-derived table/figure, in order
+
+1. `cd cpu_repro/coord_baseline && python export_split.py <seed>` for
+   each seed in `{0,1,2,3,4}` (seed 0 also has no-argument backward
+   compatibility) - produces `image_split_seed{N}.csv`/`.meta.json`.
+   Already committed in this repo; only rerun if you need to regenerate
+   from scratch.
+2. On a CUDA GPU (a real one - see the hardware note below, CPU-only
+   will not finish in a reasonable time): run `train_yolo.py` (seed 0,
+   jittered - the base config) and `train_yolo_seed{1,2,3,4}.py` (seeds
+   1-4, same jitter config) to reproduce Sections 21/33. Run
+   `train_yolo_zerojitter.py` (translate=0, scale=0) to reproduce
+   Sections 30/31's mitigation arm. Each writes its own
+   `eval_results/<run>/summary.csv` and
+   `runs/<run_name>/weights/best.pt`.
+3. CPU-only analysis scripts, run after the weights above exist:
+   - `python case_study_yolo_vs_coord.py` /
+     `error_correlation_analysis.py` /
+     `robustness_analysis.py` - seed-0-only breakdowns (Sections 22,
+     26, 27).
+   - `python mitigation_analysis.py` - paired jittered-vs-zerojitter
+     comparison (Section 31). Requires both `train_yolo.py`'s and
+     `train_yolo_zerojitter.py`'s weights to exist first.
+   - `python multiseed_analysis.py` - 5-seed replication summary
+     (Section 33's main table); verifies its own seed-0 output against
+     the already-published Section 21/26/31 numbers before trusting
+     seeds 1-4, and exits non-zero if that check fails. Requires all 5
+     seeds' weights to exist first.
+   - `python -c "from multiseed_analysis import run_breakdowns; run_breakdowns()"`
+     (there is no CLI entry point for this - `__main__` only calls
+     `main()`) - 5-seed error-taxonomy and per-class breakdowns
+     (Section 33's "deferred per-seed breakdowns" update). Uses
+     `build_merged()`'s on-disk cache
+     (`eval_results/multiseed/joined_seed{0-4}.csv`) so it does not
+     re-run CPU inference if that cache already exists from the
+     previous step (i.e. run `main()` first, or `run_breakdowns()` will
+     build the cache itself on first use).
+
+## Hardware and environment actually used
+
+All GPU training ran on **Kaggle notebooks, GPU T4 x2 accelerator**
+(selected manually in the Kaggle web UI Settings panel - the Kaggle API's
+`enable_gpu: true` flag repeatedly and unreliably assigned a Tesla P100
+instead, which this project's torch build cannot use - see `RESULTS.md`
+Sections 21/31/33 for the repeated fail-fast/retry log). Package versions
+on the Kaggle side were Kaggle's own current GPU-notebook image at the
+time each kernel ran (not independently pinned by this repo) - **this is
+a real reproducibility gap**: the exact `torch`/`ultralytics` build
+Kaggle provisions can drift over time, and this repo does not pin or
+snapshot it. `cpu_repro/requirements.txt` pins the CPU-only environment
+used for every analysis/evaluation script above, but explicitly does
+*not* cover the GPU training environment. If exact reproduction matters,
+pin `torch`/`ultralytics`/`opencv` versions in a Kaggle
+`kernel-metadata.json` before re-running, and record the resulting
+versions in `RESULTS.md` alongside the run.
+
+A small `ensure_gpu()` fail-fast helper (a real CUDA matmul check, not
+just `torch.cuda.is_available()`) was used as a wrapper around each
+Kaggle kernel invocation during this project, to abort in ~10 seconds
+rather than burn GPU-hours if Kaggle assigned an incompatible GPU. That
+wrapper was Kaggle-kernel-launch scaffolding, not part of the analysis
+pipeline itself, and was not committed to this repo - it is not needed
+to run `train_yolo.py` directly on a correctly-configured GPU machine,
+only to guard against Kaggle's specific flaky-accelerator-assignment
+failure mode.
 
 What has been verified without a GPU (see "What was and wasn't tested"
 below): the split file is generated and correct, the IoU-matching/scoring
