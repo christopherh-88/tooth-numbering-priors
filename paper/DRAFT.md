@@ -66,9 +66,10 @@ each evaluated with the identical protocol across the same 5 seeds -
 all three architectures' gap and phi confidence intervals overlap,
 indicating the finding is not specific to one detector architecture or
 detection paradigm.** A geometry-jitter mitigation
-experiment - training YOLOv8 with position/scale augmentation removed -
+experiment on YOLOv8 alone - training it with position/scale
+augmentation removed, not re-run on the other two architectures -
 produced no statistically detectable change in accuracy (paired 95% CI
-on the difference spans zero), giving no evidence the detector had been
+on the difference spans zero), giving no evidence that detector had been
 exploiting position as a shortcut to begin with. We release the diagnostic baseline, its negative controls, and
 a pre-registered falsification threshold as a reusable audit tool for
 tooth-numbering research.
