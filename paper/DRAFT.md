@@ -26,8 +26,14 @@ second, architecturally distinct detector (RT-DETR, transformer-based,
 NMS-free) was trained and evaluated the same way across 5 seeds and
 landed within noise of YOLOv8's result (gap +0.22pp, phi +0.0025 -
 `RESULTS.md` Section 40)** - this is no longer a single-detector finding,
-it is two independent detector families agreeing. This does not justify
-replacing "Risk" with a stronger positive claim about shortcut exploitation;
+it is two independent detector families agreeing. **Update (2026-09-13):
+a third, structurally different detector (Faster R-CNN, a genuine
+two-stage region-proposal architecture, unlike the two single-stage/
+DETR-style models above) was trained and evaluated the same way across
+the same 5 seeds and landed close to the other two (gap 23.83pp vs.
+24.77pp/24.99pp, phi 0.1798 vs. 0.184/0.187, all CIs overlapping -
+`RESULTS.md` Section 45)** - three architecturally distinct detector
+families now agree. This does not justify replacing "Risk" with a stronger positive claim about shortcut exploitation;
 if anything it reinforces the diagnostic-tool framing as the paper's
 actual contribution (`RESULTS.md` Section 24) rather than a "detector X
 was gaming position" result. Title kept as-is; revisit only if the
@@ -52,12 +58,14 @@ independent seeds (95.9% vs. 69.5% top-1, concentrated almost entirely in
 tooth-type rather than quadrant accuracy) - a pattern inconsistent with
 reliance on the geometric shortcut, though its errors do correlate with
 the coordinate-only model's errors weakly more than chance (phi = 0.18,
-5-seed 95% CI [0.13, 0.23]). **A second, architecturally distinct
-detector (RT-DETR - transformer-based, anchor-free, NMS-free, evaluated
-with the identical protocol across the same 5 seeds) replicates this
-result within noise (gap 24.99pp, phi 0.187 - a 0.22-percentage-point and
-0.003 difference from YOLOv8, respectively), indicating the finding is
-not specific to one detector architecture.** A geometry-jitter mitigation
+5-seed 95% CI [0.13, 0.23]). **Two further, architecturally distinct
+detectors replicate this result within noise: RT-DETR (transformer-based,
+anchor-free, NMS-free; gap 24.99pp, phi 0.187) and Faster R-CNN (a
+genuine two-stage, region-proposal architecture; gap 23.83pp, phi 0.180),
+each evaluated with the identical protocol across the same 5 seeds -
+all three architectures' gap and phi confidence intervals overlap,
+indicating the finding is not specific to one detector architecture or
+detection paradigm.** A geometry-jitter mitigation
 experiment - training YOLOv8 with position/scale augmentation removed -
 produced no statistically detectable change in accuracy (paired 95% CI
 on the difference spans zero), giving no evidence the detector had been
@@ -117,7 +125,7 @@ gap they identify (measure the shortcut inside a real trained model, then
 evaluate a fix): Sections 21-40 (`RESULTS.md`) do so for tooth
 numbering, with a different qualitative outcome - here the real
 detector(s) do not show shortcut-reliant behavior (replicated across
-two architecturally distinct detectors, Section 40), so the "fix"
+three architecturally distinct detectors, Sections 40/45), so the "fix"
 (Sections 30/31) is better read as a robustness check than a correction.
 
 **Dental/panoramic radiograph AI and dataset bias.** DENTEX (Hamamci et
@@ -190,6 +198,22 @@ Point to, don't restate, the existing method sections:
   matched detections) - only the model class differs - and the same
   hyperparameter-disclosure stance (Ultralytics' own default RT-DETR
   recipe, not hand-tuned, per Section 28's precedent for YOLOv8).
+- Third detector architecture (Faster R-CNN, a genuine two-stage,
+  region-proposal architecture rather than another single-stage/DETR
+  variant): `RESULTS.md` Sections 42 (scoping checklist, COCO-format
+  conversion and background-class off-by-one considerations), 43
+  (checklist execution), 44 (seed-0 result), 45 (full 5-seed result).
+  `cpu_repro/yolo_training/build_coco_dataset.py`,
+  `train_fasterrcnn.py`, `train_fasterrcnn_seed{1,2,3,4}.py`. Unlike
+  RT-DETR, does not share the Ultralytics training/augmentation/
+  evaluation pipeline with YOLOv8 - a torchvision `fasterrcnn_resnet50_fpn`
+  implementation with its own COCO-format data pipeline - so this
+  replication also addresses the shared-pipeline confound flagged as a
+  limitation of the YOLOv8/RT-DETR comparison alone (Section 40).
+  Evaluated with the same matched-IoU protocol
+  (`fasterrcnn_multiseed_analysis.py`, adapted from
+  `rtdetr_multiseed_analysis.py`) and the same author-default,
+  un-searched hyperparameter-disclosure stance.
 - Error-pattern correlation method (Claim B): `RESULTS.md` Sections 22
   (error-type taxonomy comparison), 23 (case study), 26 (2x2
   agreement/phi-coefficient analysis, `error_correlation_analysis.py`).
@@ -203,12 +227,13 @@ Point to, don't restate, the existing method sections:
   first real test of the two-precondition hypothesis - `RESULTS.md`
   Section 25, `cpu_repro/boundary_condition/denpar_periapical/`.
 - Multi-seed replication (Claim B headline numbers, 5 seeds total,
-  now for both detector architectures): `RESULTS.md` Sections 32
-  (scoping) and 33 (YOLOv8 result), 40 (RT-DETR result),
-  `cpu_repro/yolo_training/train_yolo_seed{1,2,3,4}.py`,
-  `multiseed_analysis.py`, `rtdetr_multiseed_analysis.py` (structurally
-  identical paired-bootstrap-CI methodology, applied to the second
-  architecture).
+  now for all three detector architectures): `RESULTS.md` Sections 32
+  (scoping) and 33 (YOLOv8 result), 40 (RT-DETR result), 45 (Faster
+  R-CNN result), `cpu_repro/yolo_training/train_yolo_seed{1,2,3,4}.py`,
+  `multiseed_analysis.py`, `rtdetr_multiseed_analysis.py`,
+  `fasterrcnn_multiseed_analysis.py` (structurally identical
+  paired-bootstrap-CI methodology, applied to the second and third
+  architectures).
 - Statistical testing: paired permutation tests over the 5 seeds,
   `cpu_repro/coord_baseline/significance_tests.py` (Section 12 -
   real vs. shuffled control and vs. majority baseline, both p=0.0625,
@@ -307,9 +332,28 @@ source of truth.
   as strengthening evidence that the non-reliance finding is not an
   artifact of YOLOv8 specifically - not as proof it holds for every
   possible detector architecture, since both models here share the
-  Ultralytics training/augmentation/evaluation pipeline and a genuinely
-  different architecture family (e.g. a two-stage detector) was not
-  tested (Section 40's own stated limitation).
+  Ultralytics training/augmentation/evaluation pipeline; 4.10 addresses
+  the genuinely different, non-Ultralytics-pipeline architecture this
+  section's own limitation flags as untested.
+- 4.10 Third detector architecture (Faster R-CNN) closes the
+  architecture-generality question: a genuine two-stage, region-proposal
+  detector - not sharing the Ultralytics pipeline either of the two
+  detectors above use, and evaluated with the identical protocol across
+  the same 5 seeds - gives a gap of 23.83pp ± 0.88pp (95% CI [22.96,
+  24.71]) and phi of 0.1798 ± 0.0335 (95% CI [0.1463, 0.2133])
+  (`RESULTS.md` Section 45). **Report honestly, not as flat uniformity:**
+  the gap mean sits about 1pp below both YOLOv8 (24.77pp) and RT-DETR
+  (24.99pp), though all three 95% CIs overlap - a plausible small
+  architecture effect between two-stage and single-stage/DETR-style
+  detection, not a discrepancy. phi is functionally identical across all
+  three (0.180-0.187). Three architecturally distinct detector
+  families - CNN-based single-stage/anchor-based (YOLOv8), transformer-
+  based anchor-free/NMS-free (RT-DETR), and CNN-based two-stage/
+  region-proposal (Faster R-CNN) - spanning two independent training/
+  evaluation pipelines (Ultralytics for the first two, torchvision for
+  the third), now converge on the same Claim-B finding. This resolves
+  the "is this an Ultralytics-pipeline artifact" objection 4.9 could not
+  rule out on its own (Section 45).
 
 ## 5. Discussion
 
@@ -319,14 +363,23 @@ source of truth.
   qualifier) per `RESULTS.md` Section 11.2/24 - state plainly which of
   the two the paper is actually claiming, rather than letting the two
   blur together in prose. Claim B's "largely no" answer is now supported
-  by **two** architecturally distinct detectors (YOLOv8, RT-DETR),
-  landing within noise of each other (Section 40) - state this as
-  meaningfully strengthening the claim's generalizability, since a
-  reviewer's most natural objection to a single-architecture result
-  ("maybe this is just how YOLO behaves") is answered directly, while
-  still being precise that this is two data points, not an exhaustive
-  architecture sweep (no two-stage detector tested, both share the
-  Ultralytics pipeline).
+  by **three** architecturally distinct detectors spanning the major
+  detection paradigms - YOLOv8 (CNN-based, single-stage, anchor-based),
+  RT-DETR (transformer-based, anchor-free, NMS-free), and Faster R-CNN
+  (CNN-based, two-stage, region-proposal) - landing within overlapping
+  confidence intervals of each other on both gap and phi (Sections 40,
+  45) - state this as meaningfully strengthening the claim's
+  generalizability, since a reviewer's most natural objection to a
+  single-architecture result ("maybe this is just how YOLO behaves") is
+  answered directly by a third, structurally different architecture that
+  does not even share a training/evaluation pipeline with the other two.
+  Report honestly, not as flat uniformity: Faster R-CNN's gap mean sits
+  about 1pp below the other two (23.83pp vs. 24.77pp/24.99pp), with CIs
+  overlapping in both comparisons - a plausible small architecture
+  effect, not a discrepancy, and not evidence of a qualitatively
+  different finding at the third architecture. This is now three data
+  points, not an exhaustive architecture sweep, but the earlier "no
+  two-stage detector tested" gap is closed (Section 45).
 - Generalization boundary as a falsifiable hypothesis (Section 11.4):
   state what would need to be true elsewhere (non-panoramic modality, or
   a differently-structured label space) for the finding to transfer.
@@ -383,48 +436,53 @@ source of truth.
   found not to materially move the headline numbers - Section 25's
   materiality-check addition) - one data point supporting the
   two-precondition hypothesis, not a broad generalization sweep.
-- Two real detectors evaluated (YOLOv8 and RT-DETR, 5 seeds each -
-  Sections 21/33, 38-40), resolving what had been the paper's single
-  biggest open item and then some. Neither detector nor the
-  coordinate-only baseline had its hyperparameters tuned or searched
-  within this project (Sections 28, 38) - both detectors used
-  un-searched configurations (values copied from a pre-existing
-  notebook for YOLOv8, Ultralytics' own default recipe for RT-DETR) and
-  the baseline used sklearn defaults, so the exact magnitude of the
-  ~25pp gap should not be read as a precisely calibrated number, though
-  the asymmetry does not bias the paper's central *relative* claim in
-  either direction (Section 28's disclosure decision). **Both
-  detectors share the Ultralytics training/augmentation/evaluation
-  pipeline** - the two-architecture agreement (Section 40) rules out a
-  YOLOv8-specific explanation, but cannot by itself rule out a
-  pipeline-level confound common to both (e.g. a shared augmentation
-  default or evaluation quirk); a genuinely independent training
-  framework or a structurally different detector family (e.g. a
-  two-stage detector like Faster R-CNN, considered and set aside in
-  Section 38 for engineering-effort reasons) was not tested and remains
-  the strongest remaining "is this architecture-specific" objection to
-  address, if pursued further.
+- Three real detectors evaluated (YOLOv8, RT-DETR, and Faster R-CNN,
+  5 seeds each - Sections 21/33, 38-40, 42-45), resolving what had been
+  the paper's single biggest open item and then some. Neither detector
+  nor the coordinate-only baseline had its hyperparameters tuned or
+  searched within this project (Sections 28, 38) - all three detectors
+  used un-searched configurations (values copied from a pre-existing
+  notebook for YOLOv8, Ultralytics' own default recipe for RT-DETR, a
+  standard torchvision `fasterrcnn_resnet50_fpn` recipe for Faster
+  R-CNN) and the baseline used sklearn defaults, so the exact magnitude
+  of the ~24-25pp gap should not be read as a precisely calibrated
+  number, though the asymmetry does not bias the paper's central
+  *relative* claim in either direction (Section 28's disclosure
+  decision). **YOLOv8 and RT-DETR share the Ultralytics training/
+  augmentation/evaluation pipeline; Faster R-CNN does not** (a
+  torchvision implementation with its own COCO-format data pipeline) -
+  this closes what had been the strongest remaining "is this
+  architecture-specific, or even just a shared-pipeline artifact"
+  objection (Section 45): a structurally different detector family
+  (two-stage, region-proposal), evaluated with an independent training/
+  evaluation pipeline, converges to the same finding, with only a small
+  (~1pp), CI-overlapping difference in gap magnitude and no meaningful
+  difference in phi. This is three data points, not an exhaustive
+  architecture sweep - a fourth or fifth architecture, or a genuinely
+  different training framework for YOLOv8/RT-DETR specifically, remain
+  open extensions but are not required to support the paper's current
+  claims.
 - **Multiplicity / analysis transparency.** This paper makes one
   pre-registered claim pair (Claim A: geometry predicts identity; Claim
   B: does a real detector rely on it) with a single GO/NO-GO decision
   rule (`GO_NO_GO.md`), evaluated once against real data (Section 21)
   and then replicated - not re-tested against new thresholds - across 5
-  seeds (Section 33) and, again, across a second detector architecture
-  (Section 40). The ~40 numbered sections in `RESULTS.md` are
-  converging diagnostics for that one claim pair - cross-dataset
-  replication (Sections 2, 10), negative controls (Section 4),
-  feature-ablation and noise-robustness checks (Sections 19, 20),
-  a mitigation experiment (Sections 30/31), a boundary-condition
-  test (Section 25), and a second-architecture replication (Sections
-  38-40) - not a battery of independent hypotheses each requiring its
-  own multiple-comparisons correction. State this
+  seeds (Section 33) and, again, across two further detector
+  architectures (Sections 40, 45). The ~45 numbered sections in
+  `RESULTS.md` are converging diagnostics for that one claim pair -
+  cross-dataset replication (Sections 2, 10), negative controls
+  (Section 4), feature-ablation and noise-robustness checks (Sections
+  19, 20), a mitigation experiment (Sections 30/31), a boundary-condition
+  test (Section 25), and second- and third-architecture replications
+  (Sections 38-45) - not a battery of independent hypotheses each
+  requiring its own multiple-comparisons correction. State this
   explicitly to pre-empt the reflexive "so many tests, where's the
   Bonferroni correction" objection: a correction would be appropriate
   if any individual diagnostic here were being used to support its own
   standalone claim, but each is reported as one more angle on the same
   underlying question, and the paper's central claim rests on the
-  GO/NO-GO result and its two independent replications (5 seeds, second
-  architecture), not on the p-value of any
+  GO/NO-GO result and its three independent replications (5 seeds,
+  second architecture, third architecture), not on the p-value of any
   single secondary check. Exploratory checks beyond the headline results
   (significance tests, a detectability power check, a geometric-ceiling
   check, and a supernumerary error-rate follow-up with several
