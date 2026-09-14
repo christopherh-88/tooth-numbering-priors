@@ -3349,6 +3349,138 @@ architecture-comparison table and Claim B language to reflect three
 architectures, mirroring Section 41's fold-in of the RT-DETR result) -
 a separate, explicit follow-up step, not part of this pass.
 
+## 46. Cross-architecture error agreement - a mechanistic read on the phi correlation
+
+**Date:** 2026-09-13. **Not pre-registered.** Unlike the jitter-ablation
+mitigation experiment (Section 30), where the confound check and the
+paired-analysis method were both committed in writing before the
+zero-jitter run's results were read, this analysis was run as a
+post-hoc follow-up: a box-targeted Grad-CAM attempt on YOLOv8x and
+Faster R-CNN checkpoints (visualizing per-box classification attribution
+via hooked activations, grid-alignment-verified against each model's own
+decoded boxes) came back genuinely mixed on both architectures - no
+clean localized-vs-diffuse pattern separated correct from
+phi-correlated-wrong instances - and RT-DETR-l's transformer-decoder
+head (classification from query embeddings via cross-attention, no
+spatial grid) has no analogous per-grid-cell target to build the same
+method against without a materially different implementation. While
+building the Faster R-CNN CAM pilot, all three matched phi-correlated-
+wrong instances turned out to get the identical wrong label from both
+YOLOv8x and Faster R-CNN, independently - which prompted this quantified
+follow-up using per-instance prediction tables that already existed for
+other purposes (`cpu_repro/yolo_training/eval_results/{multiseed,
+fasterrcnn_multiseed,rtdetr_multiseed}/joined_seed0.csv`, produced by
+Sections 33/40/45's own evaluation runs). No threshold or interpretation
+rule was decided before looking at the join - a reader should weight
+this section's numbers accordingly, as an exploratory finding, not a
+confirmatory one.
+
+**What this section is not:** a new, independent piece of evidence for
+the headline claim. The 24-25pp gap over the coordinate-only baseline
+(Sections 33/40/45) is untouched by anything here - this section only
+characterizes the small residual slice of instances where all three
+real detectors already fail. The claim below is a mechanistic account of
+what the existing phi correlation (Sections 33/40/45, phi = 0.18-0.19
+across all three architectures) is actually capturing, not a second
+correlation stacked on top of it.
+
+**Method:** joined all three architectures' seed-0 per-instance
+prediction tables on `(label_file, line_idx)` - sanity-checked first
+that `true_class`, `coord_pred`, and `coord_correct` are identical across
+all three tables for all 5491 joined instances (they must be, since all
+three share the same coordinate-only baseline and the same
+`image_split_seed0.csv` split; a mismatch would mean the join key or one
+of the source tables was wrong). For each pair of architectures,
+restricted to instances where both that pair AND the coordinate-only
+baseline are simultaneously wrong (the same "phi-correlated wrong"
+condition already used throughout this project) and both predictions are
+non-null (excludes missed detections, which have no predicted class to
+compare), computed the rate at which the two architectures predict the
+*identical* wrong FDI class - not just "both wrong," but the same wrong
+answer. Significance assessed by permutation: shuffle one architecture's
+predicted-wrong-class labels among that same joint-wrong instance set
+10,000 times (this preserves each architecture's own marginal
+wrong-class frequency but destroys instance-level pairing), giving a
+null distribution for "how often would these two architectures agree by
+chance, given only how often each one predicts each wrong class in
+general."
+
+**Pairwise and triple same-wrong-class agreement:**
+
+| comparison | n jointly wrong | same-wrong-class rate | permutation null mean | permutation p |
+|---|---|---|---|---|
+| YOLOv8x vs. Faster R-CNN | 123 | 96.7% (119/123) | 6.2% | <0.0001 |
+| YOLOv8x vs. RT-DETR-l | 121 | 98.3% (119/121) | 6.4% | <0.0001 |
+| Faster R-CNN vs. RT-DETR-l | 118 | 97.5% (115/118) | 6.1% | <0.0001 |
+| **all three simultaneously** | **110** | **97.3% (107/110)** | - | - |
+
+Of the pairwise identical-wrong-class instances, the great majority are
+off-by-one FDI confusions (adjacent tooth): 103/119 (86.6%) for
+YOLOv8x-vs-Faster R-CNN, 104/119 (87.4%) for YOLOv8x-vs-RT-DETR-l,
+99/115 (86.1%) for Faster R-CNN-vs-RT-DETR-l - consistently ~86-87% of
+shared errors are adjacent-tooth confusions, not scattered across
+unrelated classes. This is the signature of genuinely
+ambiguous visual cases (anatomically similar neighboring teeth), not
+architecture-specific idiosyncratic noise: three independently-trained,
+architecturally distinct models (single-stage anchor-based, anchor-free
+NMS-free transformer, and two-stage region-proposal) landing on the same
+specific misclassification at a rate roughly 15x their own random-chance
+baseline is not consistent with "each architecture happens to find
+different things hard."
+
+**The sharper result - checked against the coordinate-only baseline's
+own prediction:** among the same 107 triple-agreement instances, the
+identical wrong class the three real detectors converge on matches what
+the coordinate-only (position-only) baseline itself predicted in 95/107
+= **88.8%** of cases (permutation null mean 6.8%, p < 0.0001, same
+shuffle design applied to `coord_pred` instead). Context for reading
+that 88.8%: the coordinate-only baseline's own overall top-1 accuracy is
+69.3% (Section 33) - so this is not "the position model is usually right
+anyway, of course it matches." Conditional on all three real detectors
+already failing together on a hard instance, they fail in the
+*position-predicted* direction almost 9 times out of 10, far more often
+than the coordinate model's general hit rate would explain on its own.
+
+**Reading:** this is a mechanistic explanation of the existing phi
+correlation, not a new correlation. The three real detectors' 24-25pp
+accuracy gap over the coordinate-only baseline (Sections 33/40/45) shows
+they are not primarily relying on position - if they were, the gap would
+be far smaller. But on the small residual slice where visual evidence is
+genuinely ambiguous (adjacent, morphologically similar teeth) and all
+three real detectors fail anyway (110/5491 = 2.0% of instances), their
+failures are not independent noise: they converge on each other, and
+that convergent failure overwhelmingly lands on the answer a pure
+position-based heuristic would give. This reads as position functioning
+as a secondary, tie-breaking cue under visual ambiguity - consistent
+with, and a specific mechanistic account of, why phi (the aggregate
+error-correlation statistic in Sections 33/40/45) is small-but-nonzero
+(0.18-0.19) rather than exactly zero, rather than as independent
+evidence that would raise or lower confidence in the gap/phi findings
+themselves.
+
+**Scope limits, stated plainly:** n=110 out of 5491 instances (2.0%) -
+this describes a minority failure mode, not typical model behavior.
+Single-seed (seed 0) analysis, not yet replicated across seeds 1-4 the
+way the headline gap/phi numbers are. Exploratory/post-hoc as stated
+above - no pre-registered threshold exists for "how much agreement would
+be too much," so the honest reading is descriptive (this is what the
+residual failures look like) rather than a pass/fail test of any
+hypothesis.
+
+Full data and permutation code:
+`cpu_repro/yolo_training/eval_results/{multiseed,fasterrcnn_multiseed,
+rtdetr_multiseed}/joined_seed0.csv` (inputs, already existed),
+cross-architecture join/permutation script (this analysis) - not yet
+checked into the repo as of this entry, run from a scratch location;
+promoting it to a permanent `cpu_repro/` script is a candidate follow-up
+if this section is folded into the paper.
+
+**Not done in this entry:** 5-seed replication of this specific
+agreement analysis; `paper/DRAFT.md` integration (a separate, explicit
+follow-up step once this section itself has been reviewed, same
+sequencing discipline Sections 44-45 used before their own Section 41-
+style fold-in).
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the
