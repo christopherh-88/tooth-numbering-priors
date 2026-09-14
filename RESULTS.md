@@ -2782,6 +2782,573 @@ does not show shortcut-reliant behavior" (singular, comparing against
 Lin et al.) updated to explicitly name the two-architecture replication
 rather than reading as YOLOv8-only.
 
+## 42. Third detector architecture (Faster R-CNN) - scoping only, not executed
+
+**Date:** 2026-09-12. Section 38 flagged Faster R-CNN as the strongest
+remaining objection-closer for Claim B (a genuine two-stage,
+region-proposal architecture, not just another single-stage/DETR variant
+sharing the Ultralytics pipeline like RT-DETR does) but deliberately did
+not recommend it as the first attempt, citing conversion/eval-reimplementation
+risk. Scoping that risk properly before writing any code, per this
+session's hard rule: if COCO-format dataset conversion alone exceeds one
+focused work session (~6-8 hours), drop Faster R-CNN and call the
+two-architecture (YOLOv8 + RT-DETR, Section 40) convergence sufficient
+for Claim B.
+
+**1. What actually needs to convert - YOLO-txt to COCO JSON.**
+
+Source format (`Dataset/yolo_train_dataset/{train,valid,test}/labels/*.txt`,
+one file per image, verified above): each line is
+`<class_id> <cx> <cy> <w> <h>`, all four geometry values normalized to
+[0,1] relative to image width/height, `class_id` in [0,31] indexing
+`FDI_CODES`/`data.yaml`'s `names:` map. No confidence/score field (ground
+truth, not predictions). Images without any annotated tooth would be an
+empty (zero-line) label file - none observed in the one file spot-checked
+above, but the conversion script must not assume every label file is
+non-empty.
+
+Target format (COCO `instances_{train,val}.json`): a single JSON per
+split with three top-level lists -
+- `images`: `{id, file_name, width, height}` per image. **This is the
+  first real conversion cost**: COCO boxes are absolute pixel
+  coordinates, so every image's actual `(width, height)` must be read
+  (e.g. via `PIL.Image.open(path).size`), not assumed from the Roboflow
+  README's "Resize to 640x640" note - that note describes the
+  *preprocessing Roboflow applied before export*, not a guarantee every
+  file on disk is exactly 640x640; trusting it without checking is
+  exactly the kind of unverified assumption that produced the wrong
+  Kaggle mount-path guess in Section 39. Check a sample (or all 1022) at
+  conversion time and assert.
+- `annotations`: `{id, image_id, category_id, bbox: [x_min, y_min, w, h]
+  (absolute pixels), area, iscrowd: 0}` per box. Requires de-normalizing:
+  `x_min = (cx - w/2) * img_width`, etc. `id` must be a unique integer
+  across the whole file (not per-image), easy to get wrong by resetting
+  a counter per image.
+- `categories`: `{id, name}` per class.
+
+**Lossy/edge cases specific to this project's data, not generic COCO
+conversion:**
+- **Background-class off-by-one.** Torchvision's built-in
+  `FasterRCNN`/`fasterrcnn_resnet50_fpn*` reserves label `0` for an
+  implicit background class - it is not a free 33rd category, it's
+  required by the box predictor's softmax head. This project's
+  `class_id` values are 0-31 (32 real classes, background-free, per
+  `data.yaml`). **All category ids must be shifted +1 (labels 1-32)**
+  before use, with `num_classes=33` passed when replacing the box
+  predictor head. Missing this doesn't crash - it silently trains with
+  FDI 11 (class 0) treated as background, which would corrupt every
+  metric without an obvious error. This is exactly the "silent wrong
+  answer, not a loud crash" failure shape as the `image_id_x`/`image_id_y`
+  merge bug in Section 40 - verify it explicitly (e.g. assert no
+  ground-truth annotation ever has `category_id == 0` after conversion)
+  rather than trusting the shift was applied correctly everywhere it's
+  used.
+- **Roboflow's 3x augmented copies and the train/val split join.**
+  The dataset has 1022 image files but represents fewer unique source
+  images (Roboflow's README: "3 versions of each source image" via
+  random crop/brightness augmentation). The existing split
+  (`image_split_seed{N}.csv`, `base_image_id()`'s
+  `_jpg\.rf\.[0-9a-f]+$` suffix-stripping regex) assigns train/val at the
+  *base* image level specifically to prevent an augmented copy of a
+  validation image leaking into training (or vice versa) - this is
+  already-solved logic in `train_yolo.py`/`rtdetr_multiseed_analysis.py`,
+  not something to re-derive. The COCO conversion must reuse
+  `base_image_id()` + the persisted split file exactly as those scripts
+  do, one JSON file's `images` list per split, not attempt its own
+  split logic. Getting this wrong wouldn't crash either - it would just
+  quietly reintroduce train/val leakage.
+- **Empty-annotation images.** If any label file is genuinely empty (zero
+  teeth boxes - none confirmed in the file checked above, but not ruled
+  out across all 1022), it still needs an `images` entry with zero
+  matching `annotations`. Torchvision's reference training loops can
+  raise on an all-empty target tensor for a sampled image depending on
+  version; worth an explicit `len(annotations) == 0` count printed during
+  conversion so this isn't discovered mid-training-loop as a stack trace.
+- **Not a conversion bug, but adjacent: the eval-reimplementation risk
+  Section 38 already flagged.** COCO conversion only feeds training - it
+  does not touch evaluation. Comparability with Sections 21/33/40 still
+  requires reusing `build_coord_baseline.evaluate()`'s exact matched-IoU
+  logic on Faster R-CNN's raw box/label/score output, the same way
+  `run_rtdetr_predictions()` did in Section 40 (see its docstring's
+  "verification-before-use" note) - not `pycocotools`' COCO-mAP eval,
+  which is a different metric than this project's per-tooth top-1
+  accuracy and would not be comparable to any existing number.
+
+**2. Model choice and training-loop requirements for a fair-comparison
+protocol.**
+
+**Recommended starting point:** `torchvision.models.detection
+.fasterrcnn_resnet50_fpn_v2` with `weights="DEFAULT"` (COCO-pretrained),
+not the original (v1) `fasterrcnn_resnet50_fpn` - v2 uses a materially
+improved training recipe (better augmentation, different loss weighting)
+and is torchvision's current recommended detection baseline, making it
+the more defensible "this is what a competent implementation of this
+architecture looks like today" choice, consistent with using
+`rtdetr-l.pt` (a current, non-deprecated checkpoint) rather than an older
+RT-DETR release in Section 38-39. ResNet-50 backbone (not ResNet-101) is
+the standard/default tier and matches most published Faster R-CNN
+baselines that a reviewer would recognize, without needing a
+parameter-count-matching justification the paper doesn't otherwise make
+for YOLOv8x vs. RT-DETR-l either.
+
+**Fair-comparison protocol (Section 28's disclosed non-search stance
+extended, not identical hyperparameters):**
+- **Optimizer/LR schedule:** use torchvision's own published detection
+  reference-script recipe (SGD, momentum 0.9, weight_decay 5e-4, step or
+  multi-step LR decay) as the starting configuration, unmodified - the
+  same "don't hand-tune, use the framework's own default recipe" stance
+  already disclosed for YOLOv8 (untouched defaults) and RT-DETR
+  (Ultralytics' own default recipe, Section 38). This keeps the
+  disclosure symmetric across all three architectures rather than
+  introducing a new axis of asymmetric tuning effort.
+- **Epoch count:** default to the same 30-epoch budget as
+  YOLOv8x/RT-DETR-l (Sections 21/38) for direct comparability, but flag
+  explicitly (in whatever result is eventually written up) that
+  two-stage detectors are commonly trained longer than single-stage/DETR
+  models to converge, since each epoch does two forward passes
+  (region-proposal + per-region classification) rather than one - so a
+  fixed 30-epoch budget could plausibly under-train Faster R-CNN
+  relative to the other two architectures. **Do not silently give it more
+  epochs to "be fair" without disclosing it** - if 30 epochs looks clearly
+  under-converged (e.g. training loss still dropping steeply at epoch
+  30), that's a finding to report as a caveat on the comparison, not a
+  knob to quietly turn until the numbers look right.
+- **Eval-time settings to mirror `EVAL_CONF`/`EVAL_NMS_IOU`/
+  `MATCH_IOU_THRESHOLD`:** set `box_score_thresh=0.5` and
+  `box_nms_thresh=0.7` on the model's `roi_heads` at inference time (the
+  torchvision equivalents of `EVAL_CONF=0.5`/`EVAL_NMS_IOU=0.7` in
+  `train_yolo.py`/`train_rtdetr.py`) before running predictions through
+  the shared matched-IoU evaluation code, so the three architectures are
+  compared under the same confidence/NMS operating point rather than each
+  architecture's own untuned default.
+
+**3. Concrete go/no-go checkpoint for the "conversion taking too long"
+rule.**
+
+A vague feeling of "this is taking a while" is not a trigger anyone
+reliably notices in the moment (this is the same failure mode as
+under-specified time-boxes generally). Instead, **the day-1 checklist is
+three binary, checkable artifacts** - if all three are not true by the
+end of one focused work session, that is the bail signal, full stop, no
+extension "just to finish the current bug":
+1. A conversion script exists that produces `instances_train.json` and
+   `instances_val.json` from the existing label files + persisted split.
+2. **Verified, not assumed**: at least 5 spot-checked boxes (ideally
+   scripted, not manual) have their de-normalized COCO pixel coordinates
+   independently cross-checked against the original normalized YOLO-txt
+   values for the same image (e.g. recompute `cx, cy, w, h` back from the
+   COCO bbox and compare to the source line within floating-point
+   tolerance) - this is the check that would have caught an
+   off-by-one in the +1 category shift or a transposed width/height
+   before it trains silently wrong for hours.
+3. A `torchvision.datasets.CocoDetection`-based (or equivalent
+   hand-written) `Dataset`/`DataLoader` successfully produces one real
+   batch that passes through `fasterrcnn_resnet50_fpn_v2`'s forward pass
+   (in train mode, computing a loss dict) without a shape/dtype/label-range
+   error.
+
+If, at the end of that session, any of the three is still not done -
+not "almost done," not "just need to fix one more bug" - stop and revert
+to the two-architecture (YOLOv8 + RT-DETR) convergence as sufficient
+evidence for Claim B's generalization, per the pre-committed hard rule.
+Pre-committing to this now (before starting, mirroring Section 30's
+pre-registration discipline for the mitigation experiment) is the point -
+it prevents the same sunk-cost drift that a vaguer time-box invites.
+
+**4. The MIRROR_MAP bug's risk in a from-scratch training loop.**
+
+The original bug (`notebooks/yolov8+unet/yolov8+unet_training.ipynb`
+cell 21, per `HANDOFF.md` and the `fliplr=0.0` comment in
+`train_yolo.py`): Ultralytics' default `fliplr=0.5` horizontally mirrors
+box *coordinates* during training-time augmentation but does not remap
+the *class id* - and FDI tooth numbers encode left/right quadrant in
+their first digit (11-18 upper-right vs. 21-28 upper-left, 31-38 vs.
+41-48), so a horizontally-flipped image needs its class ids remapped
+quadrant 1<->2, 3<->4 (`MIRROR_MAP`, proven a correct 32-class involution
+in `cpu_repro/coord_baseline/mitigation/verify_mirror_map.py`) or the
+flipped training example teaches the model a physically wrong
+tooth-to-position association. `train_yolo.py`/`train_rtdetr.py` both
+sidestep this by setting `fliplr=0.0` (disabled, not remapped) - the bug
+itself was fixed once in the original notebook, but this project's
+current training scripts avoid the whole class by not flipping at all.
+
+**Why this can resurface in a hand-written torchvision loop specifically
+(the real risk, not a generic warning):** Ultralytics' YOLO/RTDETR
+`train()` calls have `fliplr`/`flipud` as explicit, named, defaulted
+arguments - the risk is visible in one line (`fliplr=0.0`, with a comment
+explaining why). A hand-written torchvision training loop has no such
+single knob - **augmentation is whatever transforms you explicitly
+compose**, and the overwhelming majority of publicly available
+torchvision detection reference scripts and tutorials (including
+torchvision's own `references/detection/transforms.py` reference
+training script) include `RandomHorizontalFlip(p=0.5)` in their default
+transform pipeline as a standard, unremarkable augmentation choice for
+generic object detection, where left-right symmetry is usually harmless.
+**Copying such a reference transform pipeline verbatim - which is exactly
+the kind of "use the framework's own default recipe, don't hand-tune"
+choice this section just recommended in Section 2 above - would silently
+reintroduce the identical bug in a new framework**, and torchvision's
+built-in `RandomHorizontalFlip` for detection only flips box coordinates,
+it has no concept of FDI quadrant semantics to remap a label with.
+
+**Concrete mitigation, to write into the training script itself before
+first run, not discover via a suspiciously bad result later:** explicitly
+exclude any horizontal-flip transform from the composed transform
+pipeline (equivalent of `fliplr=0.0`), and add a one-line comment at that
+point in the code citing this section and `train_yolo.py`'s existing
+comment, so the omission reads as a deliberate, explained choice rather
+than an accidental gap a future editor "fixes" by adding the flip back
+in. **Additionally new to this architecture** (YOLO/RT-DETR's augmentation
+sets don't include it, so it was never a risk there): if any candidate
+torchvision reference recipe also includes `RandomVerticalFlip` - top-bottom
+mirroring would require an entirely different, currently-nonexistent
+remap (quadrant 1<->4, 2<->3, upper<->lower jaw) that `MIRROR_MAP` does
+not cover at all (`MIRROR_MAP` is specifically a left-right involution,
+verified as such by `verify_mirror_map.py`'s quadrant-block checks) -
+exclude vertical flip too, for the same reason.
+
+**Recommendation:** proceed with scoping-informed implementation this
+week under the pre-committed go/no-go checklist above. Not started in
+this entry (scoping only, matching Section 38's convention).
+
+## 43. Faster R-CNN scoping-checklist execution - all 4 checkpoints, pass/fail
+
+**Date:** 2026-09-12. Executes the four-checkpoint go/no-go checklist
+pre-committed in Section 42, under its hard rule (drop Faster R-CNN if
+COCO conversion alone exceeds one focused session). Reporting against
+all four now, per instruction: pass or fail on each, no partial credit.
+
+**Checkpoint 1 - conversion script exists and produces
+`instances_train.json`/`instances_val.json`: PASS.**
+`cpu_repro/yolo_training/build_coco_dataset.py` reuses `base_image_id()`
+and `image_split_seed0.csv` exactly (not re-derived) and reads actual
+per-file `(width, height)` via `PIL.Image.size` (not the Roboflow
+README's stated 640x640). One real bug caught and fixed while writing
+it, worth recording: the split CSV's actual values are `"train"`/`"test"`,
+not `"train"`/`"val"` as I first assumed - `train_yolo.py`'s
+`prepare_yolo_dataset()` handles this via `(train_paths if split ==
+"train" else val_paths)`, i.e. anything not `"train"` is val. My first
+version compared against the literal string `"val"`, which matched
+nothing and silently produced a 0-image val split (no crash - it wrote a
+valid-looking, empty `instances_val.json`). Caught immediately by
+checkpoint 1's own output (`val: 0 images, 0 boxes`), not by a later
+checkpoint - fixed to mirror `train_yolo.py`'s exact conditional (`"train"`
+vs. everything else) before proceeding. Output: 820 train images / 22072
+boxes, 201 val images / 5491 boxes, 0 images with zero boxes, 1 label
+file skipped (no matching split entry - same convention/count class as
+`train_yolo.py`'s own `unmapped` warning).
+
+**Checkpoint 2 - ≥5 spot-checked boxes round-tripped against source
+YOLO-txt values: PASS.** `build_coco_dataset.py --verify` (also run
+automatically after conversion) recomputes normalized `(cx, cy, w, h)`
+from each written COCO bbox + the image's recorded dimensions, and
+matches it against the corresponding line in the *original* label file
+on disk (not against the conversion script's own intermediate values) -
+5/5 checked, exact match within 1e-6. `category_id` is asserted `!= 0`
+at write time for every annotation and category (the background-shift
+invariant from Section 42).
+
+**Checkpoint 3 - `Dataset`/`DataLoader` produces a real batch that
+passes through `fasterrcnn_resnet50_fpn_v2`'s forward pass with no
+shape/dtype/label-range error: PASS.**
+`cpu_repro/yolo_training/train_fasterrcnn.py`'s `smoke_test_forward()` -
+loads one real batch (`BATCH=2`) from the converted val set (small,
+fast to load), asserts every label is in `[1, NUM_CLASSES-1]` (background-
+shift invariant, checked at use time as well as at conversion time), runs
+the model in train mode (computing a real loss dict:
+`loss_classifier=3.6263, loss_box_reg=0.2660, loss_objectness=3.4424,
+loss_rpn_box_reg=0.2042`, total `7.5389` - a freshly-initialized box-predictor
+head on a COCO-pretrained backbone, so this number is meaningless as a
+result, only as a "did it run" signal) and in eval mode (`boxes/labels/
+scores` keys present; `boxes` shape `(0, 4)` - zero detections above
+`box_score_thresh=0.5` is expected from an untrained head, not a bug).
+Ran on CPU (no GPU needed for one batch) in a few seconds including the
+one-time COCO-pretrained-backbone weight download (~167MB).
+
+**Checkpoint 4 - transform-pipeline audit for MIRROR_MAP-risk and other
+box-coordinate-touching transforms: PASS (by construction + explicit
+audit).** `train_fasterrcnn.py`'s `train_transforms()` contains exactly
+`ToImage` + `ToDtype` - no `RandomHorizontalFlip`/`RandomVerticalFlip`
+anywhere in the composed pipeline (not toggled off via a parameter the
+way `fliplr=0.0` disables Ultralytics' default - simply never added).
+Audited against torchvision's own reference recipe (module docstring):
+its default `"hflip"` preset for Faster R-CNN contains only
+`RandomHorizontalFlip` + a dtype conversion, so excluding the flip
+leaves nothing else in that preset to scrutinize. The SSD-family preset
+variants (`RandomIoUCrop`, `RandomZoomOut`, `RandomPhotometricDistort`,
+`RandomShortestSize`) are not part of Faster R-CNN's own reference
+command and are not used here; noted for the record that none of them
+mirror the image, so even if adopted later they would reposition/rescale
+box coordinates together with the image content without needing a class
+remap - only flip-type transforms swap which physical side of the image
+a box ends up on while its class id (which encodes that side) stays
+fixed.
+
+**All four checkpoints pass. No bail triggered - the one-day rule was
+not tested against a real slowdown (conversion + smoke test together
+took well under a session), so it remains untested as a rule, not
+validated as correctly calibrated.**
+
+**Not done in this entry, explicitly out of scope for "one batch, no
+shape errors":** no real training run (`train()` in
+`train_fasterrcnn.py` is written but not invoked - GPU-only, same
+convention as `train_yolo.py`/`train_rtdetr.py`), no accuracy numbers,
+no comparison to YOLOv8x/RT-DETR-l. The matched-IoU evaluation adapter
+(the Faster R-CNN equivalent of `run_rtdetr_predictions()` in
+`rtdetr_multiseed_analysis.py`) also does not exist yet - required
+before any real result can be read, per Section 42's eval-reimplementation-
+risk note. Next step if continuing: a 1-epoch smoke test on Kaggle GPU
+(same pattern as Section 39's RT-DETR smoke test) to get a real
+per-epoch timing before sizing a full multi-seed run.
+
+## 44. Faster R-CNN seed-0 training run result - executed, converges with YOLOv8x/RT-DETR-l
+
+**Date:** 2026-09-13. Executes Section 43's own recommended next step: a
+seed-0 training run on Kaggle GPU, plus the eval adapter
+(`fasterrcnn_multiseed_analysis.py`, mirroring `run_rtdetr_predictions()`)
+needed to compare Faster R-CNN against the coordinate baseline on the
+same matched-IoU protocol as Sections 21/33/40. Deliberately seed 0
+only, not the 5-seed sweep - same one-thing-at-a-time discipline as
+Section 39's RT-DETR smoke test before its own full replication.
+
+**Two real infrastructure bugs found and fixed before a valid run was
+obtained, both worth recording for future Kaggle launches on this
+project:**
+
+1. **`build_coco_dataset.py`'s output baked in this machine's local
+   absolute paths.** Running the conversion locally and shipping the
+   resulting `instances_{train,val}.json` as a static Kaggle dataset
+   asset meant every `file_name` pointed at
+   `/Users/christopherhuang/...`, which does not exist on Kaggle - the
+   exact same class of bug `prepare_yolo_dataset()` already avoids for
+   YOLOv8/RT-DETR by regenerating `train.txt`/`val.txt` fresh on Kaggle
+   each run rather than shipping a pre-built file. **Fix:** `run.py` now
+   runs `build_coco_dataset.py` on Kaggle itself, after the repo copy,
+   before training - not shipped pre-converted.
+2. **Python fully buffers stdout when it isn't attached to a real
+   terminal - which is exactly true of a subprocess whose output Kaggle
+   captures via a pipe.** `print()` calls sat in an ~8KB buffer,
+   invisible in the Kaggle log until it filled or the process exited.
+   Only `tqdm`'s progress bar (which calls `flush()` explicitly) showed
+   live. This fully explains a ~65-minute stretch of apparent silence
+   on an earlier attempt that was first suspected to be a hang -
+   `kaggle kernels logs -f` (a genuinely live log stream, unlike
+   `kernels output`, which only serves a finished version's log) showed
+   zero new lines for 45+ seconds of real-time following, which even
+   *that* observation could not distinguish from "just slow" until this
+   root cause was found. **Fix:** invoke the training script as
+   `python -u train_fasterrcnn.py --train` (unbuffered) in `run.py`. Also
+   added per-N-step progress printing to `train_fasterrcnn.py`'s `train()`
+   itself (step count, running avg step time) so future runs have real
+   visibility without relying on `-u` alone. First real per-step timing
+   this produced: ~0.62s/step steady-state (410 steps/epoch, BATCH=2),
+   confirming the earlier apparent "hang" almost certainly was not one -
+   30 epochs at that rate is consistent with the elapsed time the silent
+   run had already been running.
+
+**Training result (once both bugs were fixed):** 30 epochs completed in
+`fasterrcnn_seed0split`, steady ~255s/epoch (`epoch_time` logged per
+epoch, range 254.4-257.7s, no drift or slowdown), total training
+~127.4 min + ~12.3 min CPU-side `evaluate()` (device hardcoded to CPU in
+`evaluate()`, matching this project's other architectures' local-CPU-
+inference convention for the matched-IoU eval step). Training loss
+converged cleanly and monotonically in aggregate: step-1 loss 7.3665 ->
+epoch-1 avg 0.9471 -> epoch-10 avg ~0.19 -> epoch-30 avg 0.0518, with the
+two LR drops (epoch 18 and 25, per the milestone schedule) each visibly
+tightening the loss further - exactly the shape a correctly-configured
+training run should produce, not a red flag.
+
+**A third real, if minor, infrastructure snag - large-download avoidance,
+not a bug:** `kaggle kernels output` downloads *everything* currently
+under `/kaggle/working`, which included this run's full copied repo
+(the ~900MB `Dataset/` mirror `run.py` copies in at the start of every
+run) - attempting the normal `kernels output` fetch started re-downloading
+thousands of unrelated `.tiff`/`.jpg` files. **Fix, reusable for any
+future large-output Kaggle run on this project:** push a second, tiny
+CPU-only kernel with `kernel_sources: ["<owner>/<training-kernel-slug>"]`
+in its `kernel-metadata.json` (mounts the completed kernel's full output
+read-only under `/kaggle/input`), whose `run.py` just copies the two
+small files actually needed (`best.pt`, `summary.csv`) into its own
+(tiny) `/kaggle/working` - then `kernels output` on *that* extraction
+kernel downloads only ~174MB, not the multi-GB mirror.
+
+**Eval adapter sanity checks (per this session's explicit "don't move to
+5-seed until seed 0 looks sane" instruction) - checked BEFORE reading the
+gap/phi numbers, same discipline as `rtdetr_multiseed_analysis.py`'s
+docstring:** 5634 raw detections across 201 val images (not near-zero),
+all 32 FDI classes represented among predictions (not degenerate), most-
+predicted single class (FDI 31) only 3.5% of all raw detections (not one
+class dominating). None of the failure signatures Section 43's checklist
+was written to catch appeared.
+
+**Seed-0 three-way architecture comparison (n=5491 matched detections,
+identical coordinate-baseline refit and matched-IoU protocol for all
+three):**
+
+| architecture | top1 | gap vs. coord (pp) | 95% CI | phi |
+|---|---|---|---|---|
+| YOLOv8x (Section 21/33) | 0.9410 | 24.82 | - | 0.1633 |
+| RT-DETR-l (Section 39/40) | 0.9501 | 25.73 | [22.93, 28.66] | 0.1719 |
+| Faster R-CNN-v2 (this entry) | 0.9383 | 24.55 | [21.71, 27.45] | 0.1687 |
+
+**Verdict, answering this session's explicit question directly: seed-0
+gap and phi are in the same ballpark as YOLOv8x/RT-DETR-l, nothing looks
+broken.** All three architectures cluster within a 1.18pp band on gap
+(24.55-25.73) and a 0.0086 band on phi (0.1633-0.1719) - tighter than
+the spread already accepted across YOLOv8's own 5 seeds (24.02-25.39pp,
+Section 33). This is, if anything, a stronger data point for Claim B's
+architecture-generality than RT-DETR alone: Faster R-CNN is the
+genuinely two-stage, region-proposal-based architecture Section 42
+flagged as the strongest remaining "is this shortcut-immunity
+architecture-specific" objection, and it converges just as tightly as
+the two single-stage/DETR-style architectures already did.
+
+**Not done in this entry:** the 4-seed extension (seeds 1-4) to match
+this project's 5-seed convention - `build_coco_dataset.py` still
+hardcodes `image_split_seed0.csv`, so extending to other seeds needs the
+same seed-parameterization treatment `train_rtdetr_seed{1,2,3,4}.py`
+gave `train_rtdetr.py` (override `SPLIT_FILE`/`PREPARED_DIR`/`RUN_NAME`
+on the imported base module), not yet written. No `paper/DRAFT.md`
+update yet either - per this session's explicit instruction, do not move
+past a seed-0 sanity check until it was confirmed sane, which this entry
+just did.
+
+## 45. Faster R-CNN 5-seed replication (seeds 1-4 extension) - closes the three-architecture question
+
+**Date:** 2026-09-13. Extends Section 44's seed-0-only Faster R-CNN
+result to the full 5-seed convention already established for YOLOv8x
+(Section 33) and RT-DETR-l (Section 40). `build_coco_dataset.py` and
+`train_fasterrcnn.py` were seed-parameterized (module-level
+`SEED`/`SPLIT_FILE`/`OUT_DIR`/`COCO_DIR`/`RUN_NAME`/`EVAL_RESULTS_DIR`,
+same pattern as `train_rtdetr_seed{1,2,3,4}.py`), and
+`train_fasterrcnn_seed{1,2,3,4}.py` thin wrappers were added. Kernels
+`christopherhuang88/tooth-numbering-fasterrcnn-seed{1,2,3,4}`, all
+`COMPLETE`, all trained/evaluated cleanly (verified via
+`kaggle kernels logs` before download - no traceback in any of the four).
+Outputs pulled via the same tiny CPU-only extraction-kernel pattern
+Section 44 introduced (`kaggle_kernel_fasterrcnn_extract_seed{N}`,
+`kernel_sources` pointing at the training kernel, ~174MB download instead
+of the multi-GB `Dataset/` mirror).
+
+**Known cosmetic bug, corrected manually:** `evaluate()`'s `summary.csv`
+hardcodes `seed=0` in the un-fixed training code seeds 1-4 actually ran
+with (the seed column reflects the code's default, not the seed the run
+was actually launched with). This does not affect the split, the
+weights, or any other column - only the `seed` label in the CSV. Fixed
+by editing the downloaded `summary.csv`'s `seed` column to the correct
+value (1, 2, 3, 4 respectively) before copying into
+`eval_results/fasterrcnn/seed{N}/`. Cross-checked: each seed's `n_test`
+value in its `summary.csv` matches that seed's `image_split_seed{N}.csv`
+test-set size exactly, confirming the weights/split pairing is correct
+regardless of the mislabeled column.
+
+**Eval adapter sanity check, all 4 new seeds** (same non-degeneracy
+checks Section 44 ran at seed 0, now run via
+`fasterrcnn_multiseed_analysis.main(seeds=(0,1,2,3,4))`): all 32 FDI
+classes represented among raw predictions at every seed, no single class
+exceeding 3.8% of raw detections at any seed - none of Section 43's
+checklist failure signatures appeared.
+
+**Per-seed result** (paired against the coordinate-only baseline, same
+matched-IoU protocol and undetected-counts-as-wrong convention as
+Sections 33/40):
+
+| seed | n | Faster R-CNN top-1 | coord top-1 | gap | gap 95% CI (bootstrap) | Faster R-CNN quadrant | coord quadrant | phi |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 5491 | 0.9383 | 0.6928 | +24.5pp | [+21.7, +27.4] | 0.9954 | 0.9661 | 0.1687 |
+| 1 | 5342 | 0.9212 | 0.6937 | +22.7pp | [+19.3, +26.2] | 0.9943 | 0.9627 | 0.2171 |
+| 2 | 5839 | 0.9392 | 0.7025 | +23.7pp | [+20.9, +26.4] | 0.9962 | 0.9681 | 0.1433 |
+| 3 | 5916 | 0.9425 | 0.6990 | +24.4pp | [+21.5, +27.4] | 0.9964 | 0.9620 | 0.1831 |
+| 4 | 4981 | 0.9249 | 0.6864 | +23.9pp | [+20.4, +27.1] | 0.9953 | 0.9677 | 0.1867 |
+
+**5-seed mean +/- 95% CI** (`mean_ci95`, t-distribution, ddof=1,
+Section 33/40's convention):
+
+| metric | mean | 95% CI |
+|---|---|---|
+| gap (pp) | 23.83 | [22.96, 24.71] |
+| phi | 0.1798 | [0.1463, 0.2133] |
+| Faster R-CNN top-1 | 0.9332 | [0.9214, 0.9450] |
+| coordinate-only top-1 | 0.6949 | [0.6872, 0.7025] |
+| Faster R-CNN quadrant accuracy | 0.9955 | [0.9945, 0.9966] |
+| coordinate-only quadrant accuracy | 0.9653 | [0.9618, 0.9688] |
+
+**Three-architecture comparison (Sections 33, 40, this section):**
+
+| architecture | gap mean +/- CI (pp) | phi mean +/- CI |
+|---|---|---|
+| YOLOv8x (Section 33) | 24.77 +/- 0.61 [24.16, 25.38] | 0.184 +/- 0.049 [0.134, 0.233] |
+| RT-DETR-l (Section 40) | 24.99 +/- 0.78 [24.22, 25.77] | 0.1865 +/- 0.0353 [0.1512, 0.2218] |
+| Faster R-CNN (this section) | 23.83 +/- 0.88 [22.96, 24.71] | 0.1798 +/- 0.0335 [0.1463, 0.2133] |
+
+**Reading: Faster R-CNN's gap mean sits about 1pp below both other
+architectures (23.83 vs. 24.77/24.99), with CIs overlapping in both
+comparisons** (Faster R-CNN's upper bound 24.71 overlaps YOLOv8x's lower
+bound 24.16 and sits just below RT-DETR's lower bound 24.22, effectively
+touching) - a plausible small architecture effect (region-proposal,
+two-stage vs. single-stage/DETR-style anchor-free), not a discrepancy or
+a sign of anything broken. phi is functionally identical across all
+three (0.1798-0.1865, all three CIs overlapping heavily). **This closes
+the third-architecture generality question Section 38 raised and Section
+42 scoped**: a genuinely different detector family (two-stage,
+region-proposal-based, not sharing the Ultralytics training/eval
+pipeline the other two do) converges to the same Claim-B behavior -
+large positive gap concentrated in tooth-type accuracy, small positive
+phi, well clear of both a null gap and a high-phi "just inherits the
+coordinate model's mistakes" reading.
+
+**Per-seed error-taxonomy comparison** (`error_taxonomy_multiseed.csv`),
+5-seed mean +/- 95% CI:
+
+| | coordinate-only | Faster R-CNN |
+|---|---|---|
+| mirror-quadrant fraction | 0.0748 +/- 0.0048 | 0.0661 +/- 0.0167 |
+| neighbor fraction | 0.8287 +/- 0.0148 | 0.8986 +/- 0.0213 |
+| other fraction | 0.0965 +/- 0.0147 | 0.0353 +/- 0.0261 |
+
+Same reading as Section 33's YOLOv8 comparison: both models' errors are
+dominated by same-quadrant neighbor confusions at every seed, with
+Faster R-CNN's error mix, like YOLOv8's, more concentrated in the
+neighbor category than the coordinate-only model's - not a qualitatively
+different failure mode.
+
+**Per-seed per-class breakdown** (`per_class_breakdown_multiseed.csv`):
+top-5-share-of-gain mean 25.86% +/- 1.54% (range 24.7-27.9% across the 5
+seeds) - consistent with YOLOv8's 25.0-28.2% band (Section 33) and
+RT-DETR's comparable spread.
+
+**Reversal check, cross-referenced against Section 33's finding:**
+Section 33 found one reversal in YOLOv8x's 5-seed x 32-class breakdown
+(160 combinations) - FDI 38 at seed 1, coord 89.8% vs. YOLOv8 88.3%
+(-1.6pp, net -2 correct of 128 instances). **Correcting a misstatement
+in this section's own planning prompt: that reversal is Section 33's
+(YOLOv8x), not Section 40's (RT-DETR) - Section 40 contains no per-class
+breakdown or reversal analysis at all, so there is no RT-DETR-side
+reversal claim to corroborate.** Checked FDI 38 specifically across all
+5 Faster R-CNN seeds: `delta_fasterrcnn_minus_coord` is positive at
+every seed (+7.4pp, +5.5pp, +3.1pp, +16.9pp, +6.6pp for seeds 0-4
+respectively) - no reversal at FDI 38 in any Faster R-CNN seed. More
+generally, **zero reversals found across all 5 seeds x 32 classes = 160
+Faster R-CNN seed-class combinations** (`delta_fasterrcnn_minus_coord`
+is non-negative in every row of `per_class_breakdown_multiseed.csv`).
+This neither confirms nor contradicts Section 33's single YOLOv8-side
+reversal as a systematic weakness - it remains what Section 33 already
+called it (a single class, single seed, -1.6pp magnitude, well within
+noise for n=128) - but it does mean Faster R-CNN's own 5-seed sweep adds
+no second data point toward "FDI 38 is a genuinely hard class for
+detector-based approaches": at FDI 38, Faster R-CNN comfortably beats
+the coordinate baseline at every seed, including a seed-3 outlier gain
+of +16.9pp.
+
+Full data: `cpu_repro/yolo_training/eval_results/fasterrcnn_multiseed/
+fasterrcnn_multiseed_summary.csv`, `per_class_breakdown_multiseed.csv`,
+`error_taxonomy_multiseed.csv`, `joined_seed{0-4}.csv`.
+
+**Not done in this entry:** `paper/DRAFT.md` integration (updating the
+architecture-comparison table and Claim B language to reflect three
+architectures, mirroring Section 41's fold-in of the RT-DETR result) -
+a separate, explicit follow-up step, not part of this pass.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the
