@@ -3447,37 +3447,100 @@ accuracy gap over the coordinate-only baseline (Sections 33/40/45) shows
 they are not primarily relying on position - if they were, the gap would
 be far smaller. But on the small residual slice where visual evidence is
 genuinely ambiguous (adjacent, morphologically similar teeth) and all
-three real detectors fail anyway (110/5491 = 2.0% of instances), their
-failures are not independent noise: they converge on each other, and
-that convergent failure overwhelmingly lands on the answer a pure
-position-based heuristic would give. This reads as position functioning
-as a secondary, tie-breaking cue under visual ambiguity - consistent
-with, and a specific mechanistic account of, why phi (the aggregate
+three real detectors fail anyway (~2% of instances, consistent across
+seeds - see below), their failures are not independent noise: they
+converge on each other, and that convergent failure overwhelmingly lands
+on the answer a pure position-based heuristic would give, at every one
+of the 5 seeds checked. This reads as position functioning as a
+secondary, tie-breaking cue under visual ambiguity - consistent with,
+and a specific mechanistic account of, why phi (the aggregate
 error-correlation statistic in Sections 33/40/45) is small-but-nonzero
 (0.18-0.19) rather than exactly zero, rather than as independent
 evidence that would raise or lower confidence in the gap/phi findings
-themselves.
+themselves. The 5-seed replication below shows this reading holds
+seed-to-seed, not just as a seed-0 coincidence.
 
-**Scope limits, stated plainly:** n=110 out of 5491 instances (2.0%) -
-this describes a minority failure mode, not typical model behavior.
-Single-seed (seed 0) analysis, not yet replicated across seeds 1-4 the
-way the headline gap/phi numbers are. Exploratory/post-hoc as stated
+**5-seed replication.** Same method, run independently on each seed's
+own `joined_seed{N}.csv` triple (seed 0 reproduces the numbers above
+exactly, confirming the two passes are consistent). Sanity check
+(`true_class`/`coord_pred`/`coord_correct` identical across all three
+architecture tables) passed at all 5 seeds.
+
+| seed | n jointly wrong (triple) | triple-agreement rate | adjacent-tooth share (pairwise, pooled) | n (triple-agreement set) | coord-match rate |
+|---|---|---|---|---|---|
+| 0 | 110 | 97.3% (107/110) | 86.7% (306/353) | 107 | 88.8% (95/107) |
+| 1 | 149 | 98.7% (147/149) | 91.9% (441/480) | 147 | 87.1% (128/147) |
+| 2 | 66 | 98.5% (65/66) | 89.6% (223/249) | 65 | 86.2% (56/65) |
+| 3 | 101 | 98.0% (99/101) | 93.8% (330/352) | 99 | 76.8% (76/99) |
+| 4 | 106 | 91.5% (97/106) | 93.7% (326/348) | 97 | 83.5% (81/97) |
+
+All pairwise same-wrong-class rates and coord-match rates at every seed
+are significant at p<0.0001 against their own 10,000-iteration
+permutation null (same design as the seed-0 table above; per-seed
+pairwise detail omitted here for space, all in the same 96-100% range
+seed 0 showed).
+
+**5-seed mean +/- 95% CI** (`mean_ci95`, t-distribution, ddof=1, Section
+33/40/45's convention):
+
+| metric | mean | 95% CI |
+|---|---|---|
+| triple-agreement rate | 96.8% | [93.1%, 100.5%] |
+| adjacent-tooth share (pairwise, pooled) | 91.1% | [87.4%, 94.8%] |
+| coord-match rate (triple-agreement set) | 84.5% | [78.6%, 90.3%] |
+
+**On the triple-agreement CI's upper bound (100.5%):** this is a
+t-interval artifact, not a claim that agreement can exceed 100%. With
+only 5 seeds and 4 of them clustered at 97.3-98.7%, the sample
+standard deviation is small enough that a t-distribution centered near
+a hard ceiling produces an interval that pokes past it; the correct
+read is the raw range of the 5 point estimates, 91.5-98.7% - every
+seed independently lands well above the permutation null (~6%), and the
+CI's failure to stay under 100% is a small-n statistical technicality,
+not evidence the effect is unbounded or the estimate is unreliable.
+
+**Two per-seed caveats, checked rather than left unexplained:**
+
+- **Seed 2's n=66** for the triple-agreement condition is the smallest
+of the five (vs. 101-149 for the other four), so its 98.5% point
+estimate should be read as noisier than the others despite not being an
+outlier in magnitude - a handful of instances moving into or out of
+"all three wrong" would shift it more than the same handful would shift
+seed 1's n=149.
+- **Seed 3's coord-match rate (76.8%) sits visibly below the other four
+(83-89%)** despite a comparable n (99, in the same range as seeds 0/1/4).
+Checked for a systematic cause before writing this up: the 23
+non-matching instances are not concentrated in one true class (spread
+across ~15 different FDI classes, max 3 instances in any one class) and
+their `label_file` source-prefix distribution (`cate8`/`cate5`/`cate10`
+at 61%/22%/17% of the mismatches) tracks the full sample's own
+distribution (56%/24%/11%) rather than over-representing any single
+source. 16 of the 23 (70%) are still adjacent-tooth to the shared wrong
+class - just one step further from what the coordinate baseline itself
+predicted, not a qualitatively different kind of miss. Nothing
+systematic turned up; this reads as ordinary seed-to-seed variance in
+how far the coordinate baseline's own error drifts on this small
+subset, not a data or pipeline problem.
+
+**Scope limits, stated plainly:** n=66-149 per seed out of ~5000-5900
+joined instances (~1.1-2.8%) - this describes a minority failure mode,
+not typical model behavior, at every seed checked. Now replicated across
+all 5 seeds (previously seed-0-only). Exploratory/post-hoc as stated
 above - no pre-registered threshold exists for "how much agreement would
 be too much," so the honest reading is descriptive (this is what the
-residual failures look like) rather than a pass/fail test of any
-hypothesis.
+residual failures look like, consistently across seeds) rather than a
+pass/fail test of any hypothesis.
 
 Full data and permutation code:
 `cpu_repro/yolo_training/eval_results/{multiseed,fasterrcnn_multiseed,
-rtdetr_multiseed}/joined_seed0.csv` (inputs, already existed),
-cross-architecture join/permutation script (this analysis) - not yet
-checked into the repo as of this entry, run from a scratch location;
-promoting it to a permanent `cpu_repro/` script is a candidate follow-up
-if this section is folded into the paper.
+rtdetr_multiseed}/joined_seed{0,1,2,3,4}.csv` (inputs, already existed),
+cross-architecture join/permutation script (this analysis, now covering
+all 5 seeds) - not yet checked into the repo as of this entry, run from
+a scratch location; promoting it to a permanent `cpu_repro/` script is a
+candidate follow-up if this section is folded into the paper.
 
-**Not done in this entry:** 5-seed replication of this specific
-agreement analysis; `paper/DRAFT.md` integration (a separate, explicit
-follow-up step once this section itself has been reviewed, same
+**Not done in this entry:** `paper/DRAFT.md` integration (a separate,
+explicit follow-up step once this section itself has been reviewed, same
 sequencing discipline Sections 44-45 used before their own Section 41-
 style fold-in).
 
