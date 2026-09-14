@@ -355,6 +355,31 @@ source of truth.
   the third), now converge on the same Claim-B finding. This resolves
   the "is this an Ultralytics-pipeline artifact" objection 4.9 could not
   rule out on its own (Section 45).
+- 4.11 What the phi correlation is capturing mechanistically (Section 46,
+  **not pre-registered** - this analysis emerged post-hoc out of an
+  inconclusive box-targeted Grad-CAM exploration, not from a planned
+  test, and should be weighted as exploratory rather than confirmatory).
+  It characterizes only the small residual slice of instances where all
+  three architecturally distinct detectors (4.5, 4.9, 4.10) fail
+  together - about 1.1-2.8% of instances depending on seed - and does
+  not touch the headline 24-25pp gap, which is untouched by anything in
+  this subsection. On that residual slice, the three detectors'
+  failures are not independent: across all 5 seeds, they converge on
+  the identical wrong FDI class 91.5-98.7% of the time (well above each
+  detector's own random-chance baseline, permutation p<0.0001 at every
+  seed), roughly 91% of those shared wrong answers are adjacent-tooth
+  confusions rather than scattered misclassifications, and the specific
+  wrong class the three detectors converge on matches what the
+  coordinate-only (position-only) baseline itself would have predicted
+  76.8-88.8% of the time (again far above chance, p<0.0001 at every
+  seed) - despite the coordinate-only baseline's own overall accuracy
+  being only ~69-70%. Reading: when visual evidence is genuinely
+  ambiguous (adjacent, morphologically similar teeth) and all three
+  detectors fail anyway, they fail in the position-predicted direction
+  almost 9 times out of 10 - consistent with position acting as a
+  secondary, tie-breaking cue under visual ambiguity, not a primary
+  shortcut, and a specific mechanistic account of why phi is
+  small-but-nonzero rather than exactly zero.
 
 ## 5. Discussion
 
@@ -380,7 +405,14 @@ source of truth.
   effect, not a discrepancy, and not evidence of a qualitatively
   different finding at the third architecture. This is now three data
   points, not an exhaustive architecture sweep, but the earlier "no
-  two-stage detector tested" gap is closed (Section 45).
+  two-stage detector tested" gap is closed (Section 45). The
+  weak-but-real error correlation (phi) noted above is not left as an
+  unexplained residual: a post-hoc, exploratory analysis of the small
+  slice where all three detectors fail together (4.11, Section 46)
+  shows those joint failures converge on each other and on the
+  coordinate-only baseline's own prediction far above chance, across
+  all 5 seeds - a mechanistic account of what phi is capturing, not new
+  evidence bearing on the gap itself.
 - Generalization boundary as a falsifiable hypothesis (Section 11.4):
   state what would need to be true elsewhere (non-panoramic modality, or
   a differently-structured label space) for the finding to transfer.
@@ -486,8 +518,10 @@ source of truth.
   second architecture, third architecture), not on the p-value of any
   single secondary check. Exploratory checks beyond the headline results
   (significance tests, a detectability power check, a geometric-ceiling
-  check, and a supernumerary error-rate follow-up with several
-  sub-analyses) were run and are reported regardless of outcome -
+  check, a supernumerary error-rate follow-up with several
+  sub-analyses, and a post-hoc cross-architecture error-agreement
+  analysis explaining the phi correlation mechanistically - 4.11,
+  Section 46) were run and are reported regardless of outcome -
   `RESULTS.md` is an append-only, dated log of every analysis run,
   including ones that didn't pan out - e.g. a localized-adjacency
   refinement of the supernumerary check (`RESULTS.md` Section 17)
