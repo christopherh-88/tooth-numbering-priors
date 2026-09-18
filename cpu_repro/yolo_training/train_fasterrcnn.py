@@ -117,6 +117,7 @@ WEIGHT_DECAY = 1e-4
 LR_MILESTONES = [18, 25]   # torchvision's 16/22-of-26 schedule, scaled to EPOCHS=30 (see module docstring)
 LR_GAMMA = 0.1
 DEVICE = 0                  # GPU device index for Kaggle; smoke_test_forward() forces "cpu" regardless
+TRAIN_DEVICE = "cuda"        # "cuda" (Kaggle, uses DEVICE as the index) or "mps" (local Apple Silicon)
 
 EVAL_CONF = 0.5              # matches EVAL_CONF in train_yolo.py/train_rtdetr.py
 EVAL_NMS_IOU = 0.7           # matches EVAL_NMS_IOU in train_yolo.py/train_rtdetr.py
@@ -239,7 +240,7 @@ def train():
     function picks up mid-schedule rather than restarting the LR
     schedule from scratch."""
     train_loader, val_loader = get_dataloaders()
-    device = torch.device(f"cuda:{DEVICE}")
+    device = torch.device(f"cuda:{DEVICE}") if TRAIN_DEVICE == "cuda" else torch.device(TRAIN_DEVICE)
     model = get_model().to(device)
 
     params = [p for p in model.parameters() if p.requires_grad]
