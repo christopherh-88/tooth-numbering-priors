@@ -3544,6 +3544,101 @@ explicit follow-up step once this section itself has been reviewed, same
 sequencing discipline Sections 44-45 used before their own Section 41-
 style fold-in).
 
+## 47. Section 46 script promoted to `cpu_repro/`; SHORTKIT-ML author list filled in
+
+**Date:** 2026-09-17.
+
+**Cross-architecture agreement script checked in.** Section 46's analysis
+had been run from a scratch location, not yet a permanent script. Rewrote
+it as `cpu_repro/yolo_training/cross_architecture_agreement.py` (joins
+`{multiseed,fasterrcnn_multiseed,rtdetr_multiseed}/joined_seed{N}.csv` on
+`(label_file, line_idx)`, same sanity checks, same permutation design as
+described in Section 46) and ran it fresh across all 5 seeds. It
+reproduces every number in Section 46 exactly: seed 0's pairwise
+(96.7%/98.3%/97.5%), triple-agreement (97.3%, 107/110), and coord-match
+(88.8%, 95/107) figures, and all 5 seeds' triple-agreement rate, pooled
+adjacent-tooth share, and coord-match rate in the 5-seed table. Output:
+`cpu_repro/yolo_training/eval_results/cross_architecture_agreement_summary.csv`.
+
+**SHORTKIT-ML citation completed** (`paper/DRAFT.md` References,
+flagged incomplete in Section 34). Full author list (Cajas, Marzullo,
+Kapadia, Santos, Ocampo Osorio, Kong, Quarta, Kuo, Patel, Rojas Sillery,
+Celi) verified independently against both the PubMed record
+(pubmed.ncbi.nlm.nih.gov/42094137) and the medRxiv page directly
+(10.64898/2026.04.29.26352053v1) - both agree on order and spelling.
+Title/venue/PMID were already verified in Section 34; this entry closes
+the remaining author-list gap.
+
+**Not done in this entry:** the `requirements.txt` CUDA-wheel ordering
+bug flagged in Section 36 remains unfixed - still blocked on not having
+a Linux machine to verify against, same as when it was first flagged.
+Don't fix it blind; test on Linux first.
+
+## 48. RT-DETR per-class breakdown and reversal check - closing the asymmetry Section 46 noted
+
+**Date:** 2026-09-17. **Script:** `cpu_repro/yolo_training/rtdetr_multiseed_analysis.py`'s
+new `per_class_breakdown()`/`error_taxonomy_breakdown()`/`run_breakdowns()`
+functions, ported line-for-line from `fasterrcnn_multiseed_analysis.py`'s
+same-named functions (`fasterrcnn_*` renamed to `rtdetr_*`) - identical
+method to Sections 27/33 (YOLOv8) and 45 (Faster R-CNN). Reuses the
+existing cached `joined_seed{0-4}.csv` tables (no new inference run).
+
+**Motivation:** of the three architectures, only RT-DETR had no
+per-class breakdown or reversal analysis - Section 46 explicitly flagged
+this ("Section 40 contains no per-class breakdown or reversal analysis
+at all") when correcting a misattributed reversal claim. This entry
+closes that asymmetry so all three architectures have the same
+per-class-level checks.
+
+**A pre-existing inaccuracy this corrects:** Section 45's per-class
+paragraph asserted YOLOv8's top-5-share-of-gain band was "consistent
+with... RT-DETR's comparable spread" - stated as if already known, but
+no such RT-DETR analysis existed yet at that point (confirmed by
+Section 46's later correction, above). That claim was unverified when
+written. It happens to hold up now that the number actually exists (see
+below), but should not have been stated as settled before the data
+existed - flagging this rather than quietly treating Section 45's
+wording as if it had been accurate all along.
+
+**Result, 5-seed per-class breakdown** (`per_class_breakdown_multiseed.csv`
+in `cpu_repro/yolo_training/eval_results/rtdetr_multiseed/`):
+
+| metric | value |
+|---|---|
+| top-5-share-of-gain, per-seed range | 24.4-27.2% |
+| top-5-share-of-gain, 5-seed mean +/- 95% CI | 25.66% +/- 1.35% |
+| reversals (5 seeds x 32 classes = 160 combinations) | 0 |
+
+Consistent with YOLOv8's 25.0-28.2% band (Section 33) and Faster R-CNN's
+24.7-27.9% band (Section 45) - all three architectures concentrate
+roughly a quarter of their total accuracy gain over the coordinate-only
+baseline in the same top-5-classes-worth of instances, now confirmed
+rather than assumed for RT-DETR. Zero reversals matches Faster R-CNN's
+zero (Section 45); YOLOv8 had exactly one, at FDI 38/seed 1 (Section
+33), already characterized there as noise-level (-1.6pp, n=128, both
+models near-ceiling) rather than a systematic weakness.
+
+**Error-taxonomy breakdown** (`error_taxonomy_multiseed.csv`), 5-seed
+mean +/- 95% CI:
+
+| | coordinate-only | RT-DETR-l |
+|---|---|---|
+| mirror-quadrant fraction | 0.0748 +/- 0.0048 | 0.0615 +/- 0.0236 |
+| neighbor fraction | 0.8287 +/- 0.0148 | 0.9186 +/- 0.0151 |
+| other fraction | 0.0965 +/- 0.0147 | 0.0199 +/- 0.0238 |
+
+Same reading as Sections 33 (YOLOv8) and 45 (Faster R-CNN): RT-DETR's
+errors are, if anything, more concentrated in the same-quadrant-neighbor
+category (91.9%) than the coordinate-only model's (82.9%) - not a
+qualitatively different failure mode. All three architectures now show
+the same pattern by the same method.
+
+**Reading:** this is a completeness check, not a new finding - it
+confirms the three-architecture consistency story (Sections 33/45/46)
+holds at the per-class level for the one architecture that hadn't been
+checked at that granularity, and corrects an unverified claim that had
+been stated as if it were.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

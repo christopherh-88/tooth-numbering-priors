@@ -32,9 +32,12 @@ import train_yolo as ty  # noqa: E402 - reuse load_gt_boxes/iou_xyxy/match_boxes
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "coord_baseline"))
 from build_coord_baseline import (  # noqa: E402
+    FDI_CODES,
     FEATURE_COLS,
     TEST_FRACTION,
     grouped_split,
+    is_mirror_quadrant_error,
+    is_neighbor_error,
     load_instances,
     mean_ci95,
     quadrant_of,
@@ -216,6 +219,97 @@ def analyze_seed(seed: int) -> dict:
         "rtdetr_quadrant": rtdetr_quad, "coord_quadrant": coord_quad,
         "phi": phi,
     }
+
+
+def per_class_breakdown(seed: int, merged: pd.DataFrame) -> pd.DataFrame:
+    """Section 27/33/45-style per-FDI-class accuracy breakdown, ported
+    from fasterrcnn_multiseed_analysis.py's per_class_breakdown() with
+    fasterrcnn_* renamed to rtdetr_* - identical logic, applied to this
+    seed's joined table. Closes the gap noted in Section 46: RT-DETR was
+    the only one of the three architectures with no per-class breakdown
+    or reversal analysis (Section 40 has none)."""
+    rows = []
+    for class_id in range(32):
+        sub = merged[merged["true_class"] == class_id]
+        if len(sub) == 0:
+            continue
+        coord_acc = sub["coord_correct"].mean()
+        rtdetr_acc = sub["rtdetr_correct"].mean()
+        rows.append({
+            "seed": seed, "fdi_code": FDI_CODES[class_id], "class_id": class_id,
+            "n_instances": len(sub), "coord_acc": coord_acc, "rtdetr_acc": rtdetr_acc,
+            "delta_rtdetr_minus_coord": rtdetr_acc - coord_acc,
+        })
+    out = pd.DataFrame(rows).sort_values("delta_rtdetr_minus_coord").reset_index(drop=True)
+
+    total_gain = (merged.groupby("true_class")["rtdetr_correct"].sum()
+                  - merged.groupby("true_class")["coord_correct"].sum()).sum()
+    net_gain = (merged.groupby("true_class")["rtdetr_correct"].sum()
+                - merged.groupby("true_class")["coord_correct"].sum())
+    out["net_correct_gain"] = out["class_id"].map(net_gain)
+    out["pct_of_total_gap"] = 100 * out["net_correct_gain"] / total_gain if total_gain else float("nan")
+    return out
+
+
+def error_taxonomy_breakdown(seed: int, merged: pd.DataFrame) -> dict:
+    """Section 22/33/45-style error-type comparison, ported from
+    fasterrcnn_multiseed_analysis.py's error_taxonomy_breakdown() with
+    fasterrcnn_* renamed to rtdetr_* - each model's own wrong
+    predictions run through is_mirror_quadrant_error/is_neighbor_error."""
+    def breakdown(true_col, pred_col, correct_col):
+        wrong = merged[~merged[correct_col].astype(bool) & merged[pred_col].notna()]
+        n_wrong = int((~merged[correct_col].astype(bool)).sum())
+        if len(wrong) == 0:
+            return {"n_wrong": n_wrong, "mirror_frac": float("nan"), "neighbor_frac": float("nan"),
+                    "other_frac": float("nan")}
+        t = wrong[true_col].to_numpy(dtype=int)
+        p = wrong[pred_col].astype(int).to_numpy()
+        mirror = np.array([is_mirror_quadrant_error(ti, pi) for ti, pi in zip(t, p)])
+        neighbor = np.array([is_neighbor_error(ti, pi) for ti, pi in zip(t, p)])
+        other = ~mirror & ~neighbor
+        return {
+            "n_wrong": n_wrong,
+            "mirror_frac": float(mirror.mean()), "mirror_n": int(mirror.sum()),
+            "neighbor_frac": float(neighbor.mean()), "neighbor_n": int(neighbor.sum()),
+            "other_frac": float(other.mean()), "other_n": int(other.sum()),
+        }
+
+    coord_bd = breakdown("true_class", "coord_pred", "coord_correct")
+    rtdetr_bd = breakdown("true_class", "rtdetr_pred", "rtdetr_correct")
+    return {"seed": seed,
+            **{f"coord_{k}": v for k, v in coord_bd.items()},
+            **{f"rtdetr_{k}": v for k, v in rtdetr_bd.items()}}
+
+
+def run_breakdowns(seeds=(0, 1, 2, 3, 4)):
+    """Section 32/33/45's deferred 'free CPU add-ons', ported for
+    RT-DETR - per-seed per-class breakdown (Section 27-style) and
+    error-taxonomy comparison (Section 22-style), across every seed that
+    has a trained checkpoint. Reuses the cached joined tables from
+    analyze_seed()/build_merged() rather than re-running inference."""
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    class_rows, tax_rows = [], []
+    for seed in seeds:
+        _, weights_path = paths_for_seed(seed)
+        if not weights_path.exists():
+            print(f"seed {seed}: SKIPPED - {weights_path} not found yet.")
+            continue
+        print(f"seed {seed}: building per-class and error-taxonomy breakdowns...")
+        merged = build_merged(seed)
+        cb = per_class_breakdown(seed, merged)
+        class_rows.append(cb)
+        tb = error_taxonomy_breakdown(seed, merged)
+        tax_rows.append(tb)
+        n_reversals = int((cb["delta_rtdetr_minus_coord"] < 0).sum())
+        top5_share = cb.sort_values("pct_of_total_gap", ascending=False).head(5)["pct_of_total_gap"].sum()
+        print(f"  reversals={n_reversals}  top5_share_of_gain={top5_share:.1f}%  "
+              f"coord_neighbor_frac={tb['coord_neighbor_frac']:.3f}  "
+              f"rtdetr_neighbor_frac={tb['rtdetr_neighbor_frac']:.3f}")
+
+    if class_rows:
+        pd.concat(class_rows, ignore_index=True).to_csv(OUT_DIR / "per_class_breakdown_multiseed.csv", index=False)
+        pd.DataFrame(tax_rows).to_csv(OUT_DIR / "error_taxonomy_multiseed.csv", index=False)
+        print(f"\nSaved per_class_breakdown_multiseed.csv, error_taxonomy_multiseed.csv to {OUT_DIR}")
 
 
 def main(seeds=(0, 1, 2, 3, 4)):

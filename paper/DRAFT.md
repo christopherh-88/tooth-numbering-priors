@@ -597,8 +597,9 @@ source of truth.
   algorithms for medical imaging research," Scientific Reports 14:29224,
   2024 (DOI: 10.1038/s41598-024-79838-6). Verified via web search
   2026-09-12.
-- [SHORTKIT-ML author list/exact title], "Shortkit-ML: A Unified
-  Multi-Perspective Framework for Detecting Shortcut Learning in Medical
-  Imaging Embeddings," medRxiv, 2026 (PMID: 42094137). Title and venue
-  verified via web search 2026-09-12; author list not yet pulled - fill
-  in from the PMC/medRxiv page before submission.
+- Cajas, Marzullo, Kapadia, Santos, Ocampo Osorio, Kong, Quarta, Kuo,
+  Patel, Rojas Sillery & Celi, "Shortkit-ML: A Unified Multi-Perspective
+  Framework for Detecting Shortcut Learning in Medical Imaging
+  Embeddings," medRxiv, 2026 (PMID: 42094137). Full author list verified
+  independently against both the PubMed and medRxiv pages on 2026-09-17
+  (title and venue were already verified 2026-09-12).
