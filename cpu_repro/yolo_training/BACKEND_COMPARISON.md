@@ -123,6 +123,24 @@ About 1.3% of labeled teeth get no predicted box at the matching IoU threshold, 
 - **Image edge:** teeth within 3% of a border are rarely labeled (37 of 54,722) but are missed often (15 of them, 41%). They contribute only 2% of all misses, so this does not move the headline number.
 - **No single tooth dominates.** The most-missed FDI classes (15, 23, 25, 31, 32, 12, 26, 45) each hold 5-6% of misses at 2-2.4% per class, with no third-molar concentration. The top classes differ between the CUDA and MPS groups, so the class-level ordering is noise.
 
-This analysis covers Faster R-CNN seeds 0-9 only. It has not been run for YOLOv8x or RT-DETR-l, and it does not yet include CUDA seeds 5-14. The YOLOv8x missed-tooth spikes (CUDA seeds 7 and 9 at about 4%, MPS seed 8 at 3.0%) are not explained: they occur on different seeds on the two backends, so they are not simply a hard split.
+This analysis covers Faster R-CNN seeds 0-9 only. It does not yet include CUDA seeds 5-14 for any detector.
 
 The Faster R-CNN detector was not retuned (resolution, anchors, score threshold) so that all seeds share one configuration. Per-tooth rows for the MPS seeds 5-9 come from `per_tooth_predictions_mps.py`, which reruns inference on the saved `best.pt` files and checks its totals against each seed's `summary.csv`.
+
+## Missed teeth: YOLOv8x and RT-DETR-l (MPS seeds 5-9)
+
+`missed_tooth_analysis_yolo_rtdetr.py` runs the same breakdown on YOLOv8x and RT-DETR-l, using per-tooth predictions from `per_tooth_predictions_ultralytics_mps.py` (same rerun-and-verify protocol as the Faster R-CNN script). This only covers the MPS seeds; the CUDA seeds 5-14 outputs are summary-only, so the two CUDA spikes noted below cannot be broken down the same way.
+
+| Detector | Seeds | Missed | Total | Rate |
+|---|---|---|---|---|
+| YOLOv8x | MPS 5-9 | 534 | 27,153 | 1.97% |
+| RT-DETR-l | MPS 5-9 | 247 | 27,153 | 0.91% |
+
+**Per seed, YOLOv8x MPS:** 1.49%, 1.54%, 2.29%, **3.04% (seed 8)**, 1.57%.
+**Per seed, RT-DETR-l MPS:** 0.84%, 0.83%, 1.31%, 0.70%, 0.89%.
+
+The general pattern matches Faster R-CNN's: small boxes drive most misses (YOLO's smallest quarter misses at 3.80% vs 1.35-1.36% for the rest; RT-DETR's at 1.80% vs 0.46-0.91%), edge proximity is a small, rare category, and no single tooth dominates (YOLO's worst class, FDI 23, holds 9.0% of misses at 5.21%; RT-DETR's worst, FDI 45, holds 8.9% at 2.48%).
+
+**YOLOv8x MPS seed 8, the one spike this data can explain:** its own box-size quartiles are 4.71% (small), 2.62% (mid), 2.20% (large) - all three roughly double the pooled MPS rate for that quartile, not just the small one. So seed 8 is not simply "more small teeth"; the whole split is harder for detection. Its top missed classes are canines and premolars (FDI 23, 28, 41, 14, 13, 22 at 5-9% each), not third molars. No further cause (image quality, crowding) was checked.
+
+**Still unexplained:** the two YOLOv8x CUDA spikes, seeds 7 and 9 (about 4% each, from `summary.csv` alone - no per-tooth breakdown exists for the CUDA runs). They occur on different seeds than the MPS spike (seed 8), so this is not one bad split replicated across backends; each backend has its own hard seed(s). A CUDA per-tooth rerun would need the saved Kaggle checkpoints, which were not downloaded (only `summary.csv`).

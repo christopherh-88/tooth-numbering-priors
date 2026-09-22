@@ -7,13 +7,22 @@ answer match what the coordinate-only (position-only) baseline predicts?
 Joins each architecture's per-seed per-instance prediction table
 (`cpu_repro/yolo_training/eval_results/{multiseed,fasterrcnn_multiseed,
 rtdetr_multiseed}/joined_seed{N}.csv`, produced by Sections 33/40/45's own
-evaluation runs) on (label_file, line_idx), restricts to instances where a
-given pair/triple of architectures AND the coordinate-only baseline are all
+evaluation runs for seeds 0-4, and by build_joined_mps_seeds.py for seeds
+5-9) on (label_file, line_idx), restricts to instances where a given
+pair/triple of architectures AND the coordinate-only baseline are all
 simultaneously wrong (excluding null predictions, i.e. missed detections),
 and measures how often they predict the identical wrong class. Significance
 is assessed by permutation: shuffle one architecture's predicted-wrong-class
 labels among the joint-wrong instance set (preserves each architecture's own
 marginal wrong-class frequency, destroys instance-level pairing).
+
+Seeds 0-4 are Kaggle CUDA runs; seeds 5-9 are local MPS runs (see
+BACKEND_COMPARISON.md), each with their own coordinate baseline refit on
+that seed's split (build_joined_mps_seeds.py). Backend and split both differ
+between the two groups, so the per-seed summary reports them separately as
+well as pooled; the pooled numbers describe ten seeds' worth of evidence for
+this analysis's own question (do detectors converge on the same wrong
+answer), not a CUDA/MPS equivalence claim.
 
 Run: python cpu_repro/yolo_training/cross_architecture_agreement.py
 """
@@ -26,7 +35,8 @@ import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EVAL_ROOT = REPO_ROOT / "cpu_repro" / "yolo_training" / "eval_results"
-SEEDS = [0, 1, 2, 3, 4]
+SEEDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+CUDA_SEEDS = {0, 1, 2, 3, 4}
 N_PERM = 10_000
 RNG_SEED = 0
 
@@ -174,6 +184,7 @@ def main():
         n_same_pooled = sum(r["n_same"] for r in pair_results.values())
         per_seed_rows.append({
             "seed": seed,
+            "backend": "CUDA" if seed in CUDA_SEEDS else "MPS",
             "n_joint_triple": triple["n_joint"],
             "triple_rate": triple["rate"],
             "adjacent_share_pooled": n_adj_pooled / n_same_pooled if n_same_pooled else float("nan"),
@@ -182,8 +193,18 @@ def main():
         })
 
     summary = pd.DataFrame(per_seed_rows)
-    print("\n=== 5-seed summary ===")
+    print(f"\n=== {len(SEEDS)}-seed summary ===")
     print(summary.to_string(index=False))
+    for backend in ("CUDA", "MPS"):
+        g = summary[summary["backend"] == backend]
+        if len(g):
+            print(f"\n{backend} seeds {sorted(g['seed'])}: n={len(g)}  "
+                  f"triple_rate mean {g['triple_rate'].mean():.3f} sd {g['triple_rate'].std():.3f}  "
+                  f"coord_match_rate mean {g['coord_match_rate'].mean():.3f} sd {g['coord_match_rate'].std():.3f}")
+    print(f"\nAll {len(summary)} seeds pooled (not a CUDA/MPS equivalence claim - different splits and "
+          f"backends per group, see module docstring): "
+          f"triple_rate mean {summary['triple_rate'].mean():.3f} sd {summary['triple_rate'].std():.3f}  "
+          f"coord_match_rate mean {summary['coord_match_rate'].mean():.3f} sd {summary['coord_match_rate'].std():.3f}")
     out_path = EVAL_ROOT / "cross_architecture_agreement_summary.csv"
     summary.to_csv(out_path, index=False)
     print(f"\nwrote {out_path}")
