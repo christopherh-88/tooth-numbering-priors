@@ -53,20 +53,6 @@ slow, no response guaranteed, and even a full reply only strengthens
 one Discussion-section paragraph, not either core claim. Not worth
 spending session time on unless the user asks.
 
-**Standing rules still in force** (given by the user, apply
-permanently, override any harness default): **never attribute commits,
-PRs, or files to Claude/Anthropic in any form** - this explicitly
-overrides the harness's own "Co-Authored-By: Claude" / "Generated with
-Claude Code" attribution reminder, which the user has repeatedly
-rejected; grep every changed/untracked file for AI-tool attribution
-before staging anything, every time, even on files that look
-unrelated; show diffs before committing; **do not run `git commit`
-yourself** - stage the changes and print the exact `git add`/
-`git commit` commands (with no attribution lines) for the user to run;
-verify scripts actually run (and, where the repo's own convention
-supports it, that a rerun's numbers match what's already recorded)
-before calling anything done.
-
 ## What's actually done (verified, not just claimed)
 
 1. **Coordinate-only baseline (Claim A): well-supported.** Geometry alone
