@@ -1,217 +1,79 @@
-# Repository for UFBA-425 and OralBBNet
+# Do tooth-numbering models read anatomy or position?
 
-This repository contains the implementation related to the pipelines of [UFBA-425](https://figshare.com/articles/dataset/UFBA-425/29827475) dataset and the paper [OralBBNet: Spatially Guided Dental Segmentation of Panoramic X-Rays with Bounding Box Priors](https://arxiv.org/abs/2406.03747).
+Measuring the cost of engineered spatial priors on anomalous dentition.
 
-- UFBA-425 Dataset used in this study are avaiable at [FigShare](https://figshare.com/articles/dataset/UFBA-425/29827475)
+## The question
 
-- 🔥 UFBA-425 Dataset featured in Roboflow100-VL Benchmark for the year of 2025 and referred UFBA-425 as one of the hardest datasets for vision tasks. Find the [paper](https://media.roboflow.com/rf100vl/rf100vl.pdf) here.
+Panoramic-radiograph tooth-numbering models place every tooth in a highly
+regular, near-fixed spatial layout (32 slots, FDI numbering, quadrants
+arranged the same way in almost every image). That regularity is a
+detection-friendly shortcut: a model could in principle number a tooth from
+where its bounding box sits in the image, largely without reading the
+tooth's own anatomy. If so, the model would be expected to fail exactly on
+the clinically interesting cases - supernumerary or ectopically-positioned
+teeth - where position and identity come apart.
 
-## Dataset
+This project measures that directly, in two parts:
 
-- We introduce a set of 425 panoramic X-rays with Human annotated Bounding Boxes and Polygons, the 425 images are a subset of UFBA-UESC Dental Dataset. This dataset can be extensively used for detection and segmentation tasks for Dental Panoramic X-rays. Refer to [Description](./Dataset/Dataset_description.pdf) for understanding the organisation of training and evaluation data. The Distribution of Categories in the dataset are metnioned in the table below.
+- **Claim A - geometry alone predicts identity.** A coordinate-only model
+  (box position/size/aspect ratio, no image content at all) predicts FDI
+  tooth identity at 67-72% top-1 (32-way) vs. a 3.6% majority baseline,
+  replicated across two independent panoramic-radiograph datasets
+  (UFBA-425, DENTEX) with 5-seed confidence intervals and a pre-stated
+  falsification threshold. Well-supported.
+- **Claim B - do real detectors actually use that shortcut?** Trained
+  detectors are compared against the same coordinate-only baseline on
+  identical splits. Across three architecturally distinct detectors
+  (YOLOv8x, RT-DETR-l, Faster R-CNN - CNN single-stage, transformer
+  anchor-free, and CNN two-stage/region-proposal respectively, spanning
+  two independent training pipelines), real detectors substantially
+  outperform the coordinate-only baseline and converge on the same
+  answer: largely no, real detectors do not rely on position as their
+  primary signal - with a weak-but-real residual error correlation as the
+  qualifier (detectors that fail together tend to fail toward the
+  position-predicted answer). See `paper/DRAFT.md` and `RESULTS.md` for
+  the full numbers, caveats, and what would falsify this.
 
+## Where to look
 
-<table style="margin-left:auto;margin-right:auto;">
-  <thead>
-    <tr>
-      <th style="text-align:center;">Category</th>
-      <th style="text-align:center;">32 Teeth</th>
-      <th style="text-align:center;">Restoration</th>
-      <th style="text-align:center;">Dental Appliance</th>
-      <th style="text-align:center;">Images</th>
-      <th style="text-align:center;">Used Images</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align:center;">1</td>
-      <td style="text-align:center;">✓</td>
-      <td style="text-align:center;">✓</td>
-      <td style="text-align:center;">✓</td>
-      <td style="text-align:center;">73</td>
-      <td style="text-align:center;">24</td>
-    </tr>
-    <tr>
-      <td style="text-align:center;">2</td>
-      <td style="text-align:center;">✓</td>
-      <td style="text-align:center;">✓</td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;">220</td>
-      <td style="text-align:center;">72</td>
-    </tr>
-    <tr>
-      <td style="text-align:center;">3</td>
-      <td style="text-align:center;">✓</td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;">45</td>
-      <td style="text-align:center;">15</td>
-    </tr>
-    <tr>
-      <td style="text-align:center;">4</td>
-      <td style="text-align:center;">✓</td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;">140</td>
-      <td style="text-align:center;">32</td>
-    </tr>
-    <tr>
-      <td style="text-align:center;">5</td>
-      <td colspan="3" style="text-align:center;">Images containing dental implant</td>
-      <td style="text-align:center;">120</td>
-      <td style="text-align:center;">37</td>
-    </tr>
-    <tr>
-      <td style="text-align:center;">6</td>
-      <td colspan="3" style="text-align:center;">Images containing more than 32 teeth</td>
-      <td style="text-align:center;">170</td>
-      <td style="text-align:center;">30</td>
-    </tr>
-    <tr>
-      <td style="text-align:center;">7</td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;">✓</td>
-      <td style="text-align:center;">✓</td>
-      <td style="text-align:center;">115</td>
-      <td style="text-align:center;">33</td>
-    </tr>
-    <tr>
-      <td style="text-align:center;">8</td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;">✓</td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;">457</td>
-      <td style="text-align:center;">140</td>
-    </tr>
-    <tr>
-      <td style="text-align:center;">9</td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;">✓</td>
-      <td style="text-align:center;">45</td>
-      <td style="text-align:center;">7</td>
-    </tr>
-    <tr>
-      <td style="text-align:center;">10</td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;">115</td>
-      <td style="text-align:center;">35</td>
-    </tr>
-    <tr>
-      <td style="text-align:center;"><strong>Total</strong></td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;"></td>
-      <td style="text-align:center;"><strong>1500</strong></td>
-      <td style="text-align:center;"><strong>425</strong></td>
-    </tr>
-  </tbody>
-</table>
+This repo is a research log, not a packaged library - the honest, current
+state of the work lives in a few files, not in this README:
 
+- **`RESULTS.md`** - every number produced in this project, with the
+  script and split that produced it. The authoritative source; if a
+  number here ever looks stale, `RESULTS.md` wins.
+- **`HANDOFF.md`** - where things stand right now, what's done, what's
+  next, and standing process rules for this repo (review diffs before
+  committing, grep for AI-tool attribution before staging, etc.).
+- **`paper/DRAFT.md`** - the in-progress MICCAI submission draft and its
+  supporting notes.
+- **`ENVIRONMENT.md`** - environment setup; this project runs two deep
+  learning frameworks at once (TensorFlow for the U-Net segmentation
+  model, PyTorch/Ultralytics for detection) with a real numpy-version
+  conflict between them - read this before installing anything.
+- **`cpu_repro/`** - the actual experiment code: `coord_baseline/` (the
+  coordinate-only model and its README), `yolo_training/` (YOLOv8x,
+  RT-DETR-l and Faster R-CNN training/eval, including
+  `BACKEND_COMPARISON.md` for the Kaggle-CUDA-vs-local-MPS robustness
+  check), `dual_labeled_dataset/`, `boundary_condition/`, `anomaly_scan/`,
+  each with its own README where relevant. `requirements.txt` for this
+  code lives at `cpu_repro/requirements.txt`.
 
-## Results
+## Dataset and upstream attribution
 
-- Teeth Numbering Results 
+This repo is a fork of
+[devichand579/Instance_seg_teeth](https://github.com/devichand579/Instance_seg_teeth)
+and depends directly on that project's dataset and reference pipeline:
+the [UFBA-425](https://figshare.com/articles/dataset/UFBA-425/29827475)
+dataset (425 human-annotated panoramic X-rays, bounding boxes + polygons,
+FDI numbering - a subset of the UFBA-UESC Dental Dataset) and the
+[OralBBNet](https://arxiv.org/abs/2406.03747) paper and its training
+notebooks (`notebooks/`), which this project's own detector runs
+(`cpu_repro/yolo_training/`) build on. See the upstream repository for the
+original project's own results tables, notebooks, and dataset category
+breakdown.
 
-<table>
-  <tr>
-    <th>Model Architecture</th>
-    <th>mAP</th>
-    <th>AP50</th>
-  </tr>
-  <tr>
-    <td>Mask R-CNN</td>
-    <td>70.5</td>
-    <td>97.2</td>
-  </tr>
-  <tr>
-    <td>PANet</td>
-    <td>74.0</td>
-    <td>99.7</td>
-  </tr>
-  <tr>
-    <td>HTC</td>
-    <td>71.1</td>
-    <td>97.3</td>
-  </tr>
-  <tr>
-    <td>ResNeSt</td>
-    <td>72.1</td>
-    <td>96.8</td>
-  </tr>
-  <tr>
-    <td>YOLOv8</td>
-    <td>74.9</td>
-    <td>94.6</td>
-  </tr>
-</table>
-
-- Instance Segmentation Results
-
-<table>
-  <tr>
-    <th>Model Architecture</th>
-    <th>Incisors</th>
-    <th>Canines</th>
-    <th>Premolars</th>
-    <th>Molars</th>
-  </tr>
-  <tr>
-    <td>U-Net</td>
-    <td>73.29</td>
-    <td>69.92</td>
-    <td>67.62</td>
-    <td>64.98</td>
-  </tr>
-  <tr>
-    <td>YOLOv8-seg </td>
-    <td>82.78</td>
-    <td>81.91</td>
-    <td>81.89</td>
-    <td>81.42</td>
-  </tr>
-  <tr>
-    <td>SAM-2 </td>
-    <td>87.12</td>
-    <td>86.21</td>
-    <td>86.19</td>
-    <td>85.69</td>
-  </tr>
-  <tr>
-    <td>OralBBNet</td>
-    <td>89.34</td>
-    <td>88.40</td>
-    <td>88.38</td>
-    <td>87.87</td>
-  </tr>
-</table>
-
-- Refer to the paper for further information on model architectures and datasets used for evaluation.
-
-## Teeth Numbering Heatmaps
-![Teeth Numbering](./imgs/det_res.png)
-
-## Segmentation Masks
-![Segmentation Masks](./imgs/seg_res.png)
-
-
-
-## Code Structure 
-```bash
-
-2ddaatagen.ipynb                   => Notebook for generating labels
-yolov8_train.ipynb                 => Notebook for training YOLOv8
-yolo_test.ipynb                    => Notebook for testing YOLOv8
-unet_training.ipynb                => Notebook for training U-Net
-unet+cv.ipynb                      => Notebook for training U-Net with cross validation
-yolov8+unet_training.ipynb         => Notebook for training OralBBNet
-yolov8+unet+cv.ipynb               => Notebook for training OralBBNet with cross validation
-```
-
-## Cite Us
-If you want to cite the dataset, cite this:
+If you use the dataset, cite:
 ```bibtex
 @article{Budagam2025,
 author = "Devichand Budagam and Azamat Zhanatuly Imanbayev and Iskander Rafailovich Akhmetov and Aleksandr Sinitca and Sergey Antonov and Dmitrii Kaplun",
@@ -222,15 +84,22 @@ url = "https://figshare.com/articles/dataset/UFBA-425/29827475",
 doi = "10.6084/m9.figshare.29827475.v1"
 }
 ```
-if you want to cite the method OralBBNet, cite this:
+
+If you use or reference the OralBBNet method, cite:
 ```bibtex
 @misc{budagam2025oralbbnetspatiallyguideddental,
-      title={OralBBNet: Spatially Guided Dental Segmentation of Panoramic X-Rays with Bounding Box Priors}, 
+      title={OralBBNet: Spatially Guided Dental Segmentation of Panoramic X-Rays with Bounding Box Priors},
       author={Devichand Budagam and Azamat Zhanatuly Imanbayev and Iskander Rafailovich Akhmetov and Aleksandr Sinitca and Sergey Antonov and Dmitrii Kaplun},
-      year={2025},
+      year={2024},
       eprint={2406.03747},
       archivePrefix={arXiv},
       primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2406.03747}, 
+      url={https://arxiv.org/abs/2406.03747},
 }
 ```
+(`year` above reflects the paper's original arXiv posting, 2024-06-06; a
+later revision was posted 2025-07-02 - see `paper/DRAFT.md`'s References
+section for the citation-year note.)
+
+Licensed under Apache 2.0 (`LICENSE`), inherited from the upstream
+project.

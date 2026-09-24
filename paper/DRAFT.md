@@ -569,6 +569,28 @@ source of truth.
 - Hamamci et al., "DENTEX: An Abnormal Tooth Detection with Dental
   Enumeration and Diagnosis Benchmark for Panoramic X-rays," 2023
   (arXiv:2305.19112).
+- Budagam, Imanbayev, Akhmetov, Sinitca, Antonov & Kaplun, "UFBA-425,"
+  2025, FigShare (DOI: 10.6084/m9.figshare.29827475.v1). This is the
+  primary dataset the whole project trains and evaluates on (`Dataset/`,
+  every `cpu_repro/` detector run) and was missing from this list.
+  Title, author list, and the 2025-08-05 posting date verified via web
+  search 2026-09-23; DOI independently confirmed by resolving
+  https://doi.org/10.6084/m9.figshare.29827475.v1, which redirects to
+  the dataset's FigShare page (article 29827475, version 1).
+- Budagam, Imanbayev, Akhmetov, Sinitca, Antonov & Kaplun, "OralBBNet:
+  Spatially Guided Dental Segmentation of Panoramic X-Rays with
+  Bounding Box Priors," arXiv:2406.03747, 2024. UFBA-425's parent
+  paper; this repo is a fork of the paper's own reference
+  implementation (see README.md's fork attribution). Title and author
+  list verified via web search 2026-09-23. **Year flag:** cited here by
+  its first arXiv posting (v1, 2024-06-06), consistent with this
+  section's convention for other arXiv-only entries (DENTEX above, Lin
+  et al. below) - the repo's own README.md bibtex instead lists
+  year=2025, which is when the most recent revision (v3, 2025-07-02)
+  was posted, not the original submission; no conference/journal
+  acceptance was found for either version, so it remains an
+  unpublished preprint either way. Reconcile before finalizing if the
+  submission venue has a rule about which arXiv version year to cite.
 - Zhou, Lu, Zhao et al., "A dual-labeled dataset and fusion model for
   automatic teeth segmentation, numbering, and state assessment on
   panoramic radiographs," BMC Oral Health 24:1201, 2024 (DOI:

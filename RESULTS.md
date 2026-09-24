@@ -3639,6 +3639,202 @@ holds at the per-class level for the one architecture that hadn't been
 checked at that granularity, and corrects an unverified claim that had
 been stated as if it were.
 
+## 49. Detector CUDA-vs-MPS backend robustness check, all three architectures, extended to 10-12 seeds each
+
+**Date:** 2026-09-21/22. **Script:**
+`cpu_repro/yolo_training/detector_backend_comparison.py`. **Writeup:**
+`cpu_repro/yolo_training/BACKEND_COMPARISON.md` (full per-seed tables,
+paired diffs, and caveats - this entry summarizes it, does not replace
+it). **Output:** `eval_results/detector_backend_comparison.csv`.
+
+**What this is.** Section 31's Faster-R-CNN-only Kaggle-CUDA-vs-local-MPS
+comparison (seeds 0-4 CUDA, 5-9 MPS) is extended to all three detector
+architectures (YOLOv8x, RT-DETR-l, Faster R-CNN), and a CUDA-only
+extension to seeds 10-14 is added for additional replication (not paired
+with MPS - MPS was only run for seeds 5-9). **Not yet complete:** CUDA
+seeds 12-14 were not run (blocked on Kaggle's weekly GPU quota, resumed
+only with the user's go-ahead); RT-DETR-l seed 10 was pushed but the
+Kaggle kernel was canceled at its 12h timeout with no output and has not
+been rerun. Both are reported as missing, not silently dropped -
+`detector_backend_comparison.py` prints every expected seed that has no
+result as `MISSING`.
+
+Metric convention throughout (same as Section 31): **all-GT top-1** is
+the headline (a labeled tooth with no matching predicted box counts as
+wrong), with missed-tooth rate and matched-only top-1 as secondary.
+
+**All-GT top-1, mean +/- sd:**
+
+| Detector | CUDA 0-4 | CUDA 5-9 | MPS 5-9 | CUDA 10-14 (n) |
+|---|---|---|---|---|
+| YOLOv8x | 0.9426 +/- 0.0086 | 0.9380 +/- 0.0205 | 0.9423 +/- 0.0062 | 0.9359 +/- 0.0010 (n=2) |
+| RT-DETR-l | 0.9448 +/- 0.0072 | 0.9532 +/- 0.0062 | 0.9527 +/- 0.0075 | 0.9484 (n=1) |
+| Faster R-CNN | 0.9332 +/- 0.0095 | 0.9400 +/- 0.0088 | 0.9377 +/- 0.0106 | 0.9315 +/- 0.0129 (n=2) |
+
+**Paired MPS-minus-CUDA, same split, seeds 5-9 (n=5 each):**
+
+| Detector | Mean diff | Sd of diffs | Per-seed (5,6,7,8,9) |
+|---|---|---|---|
+| YOLOv8x | +0.0042 | 0.0180 | -0.0038, -0.0030, +0.0209, -0.0177, +0.0246 |
+| RT-DETR-l | -0.0005 | 0.0015 | +0.0009, -0.0025, -0.0006, +0.0011, -0.0015 |
+| Faster R-CNN | -0.0023 | 0.0043 | -0.0050, -0.0046, +0.0027, +0.0017, -0.0066 |
+
+**Reading.** RT-DETR-l's backend agreement is tight (every seed within
+0.25pp). Faster R-CNN's is a bit looser (up to 0.7pp, mixed sign).
+YOLOv8x is the loosest (up to 2.5pp swings, both directions) - driven
+entirely by the missed-tooth rate, not by matched-only accuracy, which
+stays in a tight 0.9506-0.9660 band on both backends. For all three, the
+mean backend difference is smaller than the seed-to-seed spread within a
+backend - **no equivalence claim**, since backend is confounded with
+split (no split ran on both, except the deliberately-paired 5-9 set) and
+with software stack (different torch/torchvision/ultralytics
+builds/kernels; on MPS, YOLOv8x used batch 2 and RT-DETR-l batch 4
+against CUDA's batch 10, with ultralytics accumulating to a nominal
+batch of 64 - a disclosed second confound, not varied).
+
+**Missed-tooth spikes, explained where the data allows
+(`cpu_repro/yolo_training/missed_tooth_analysis.py` for Faster R-CNN,
+seeds 0-9; `missed_tooth_analysis_yolo_rtdetr.py` for YOLOv8x/RT-DETR-l,
+MPS seeds 5-9 only - see Section 51 for the per-tooth predictions this
+depends on).** YOLOv8x has three missed-tooth-rate spikes: CUDA seeds 7
+and 9 (3.99%, 3.93% vs. a 1-2% baseline elsewhere) and MPS seed 8
+(3.04%). The two CUDA spikes cannot be broken down further - only
+`summary.csv` was downloaded for the CUDA 5-14 runs, no per-tooth
+predictions - so they remain unexplained beyond "detection recall
+dropped on that split," and they occur on different seeds than the MPS
+spike, so this is not one bad split replicated across backends. **MPS
+seed 8 can be explained:** its own box-size quartiles (4.71%/2.62%/2.20%
+small/mid/large) are all roughly double the pooled MPS rate for that
+quartile, so the whole split is harder for detection on that seed, not
+just its small teeth; its worst-missed classes are canines/premolars
+(FDI 23, 28, 41, 14, 13, 22), not third molars.
+
+**Data-quality note carried forward from earlier sessions:** the Kaggle
+Faster R-CNN CUDA seeds 5-9 `summary.csv` files have `seed=0` in their
+own `seed` column (an older copy of `train_fasterrcnn.py` hard-coded it)
+- `detector_backend_comparison.py` and this entry key results by folder
+name, not that column, and each seed's total labeled-tooth count was
+cross-checked against the MPS run on the same split to confirm the
+folder-name seed is correct.
+
+## 50. Per-tooth head-to-head: each detector vs. the coordinate-only prior, paired bootstrap by FDI class
+
+**Date:** 2026-09-22. **Script:**
+`cpu_repro/yolo_training/per_tooth_head_to_head.py`. **Data:** CUDA
+seeds 0-4 only (`eval_results/{multiseed,rtdetr_multiseed,
+fasterrcnn_multiseed}/joined_seed{0-4}.csv` - seeds 5-14 have no
+coordinate-prior-attached per-tooth table, see Section 51 for why 5-9
+now do for a different analysis). **Output:**
+`eval_results/per_tooth_head_to_head.csv`.
+
+**What this is.** Sections 33/40/45 established the pooled, whole-dataset
+gap between each detector and the coordinate-only prior. This asks the
+same question per FDI tooth class, with a paired bootstrap (2000 draws,
+resampling whole (seed, image) clusters with replacement, RNG seed 0) on
+the detector-minus-prior delta in all-GT top-1 for each of the 32 FDI
+classes, so classes stay comparable to Sections 33/40/45's own
+convention (all-GT, not matched-only).
+
+**Result: all 32 classes, all three detectors, favor the detector.**
+
+| Detector | Pooled detector acc | Pooled prior acc | Gap | Classes where detector wins (CI>0) | Classes where prior wins (CI<0) |
+|---|---|---|---|---|---|
+| YOLOv8x | 0.9430 | 0.6952 | +24.8pp | 32/32 | 0/32 |
+| RT-DETR-l | 0.9451 | 0.6952 | +25.0pp | 32/32 | 0/32 |
+| Faster R-CNN | 0.9337 | 0.6952 | +23.8pp | 32/32 | 0/32 |
+
+Per-class delta range: YOLOv8x +7.2pp to +38.5pp (median +24.7pp);
+RT-DETR-l +8.5pp to +37.2pp (median +25.1pp); Faster R-CNN +7.6pp to
++36.9pp (median +24.8pp). The smallest-gain classes are consistently the
+last molars (FDI 18/28/38/48/46) across all three detectors - the prior
+already scores 82.9-86.7% on these, so there's less headroom - but even
+there the detector's 95% CI stays above zero (smallest: YOLOv8x's FDI 38
+at +7.2pp [+3.5, +10.9]).
+
+**Reading:** this is a finer-grained restatement of Claim B's headline
+gap (Sections 33/40/45), not a new architecture-agreement analysis
+(that's Section 46/51) - no FDI class, for any of the three detectors,
+favors position over the detector's own visual evidence. **Caveat
+carried in the script's own docstring:** the five seeds' test sets can
+share images, so this pools (seed, image) clusters rather than
+independent samples - the CIs are descriptive, not a formal
+hypothesis test.
+
+## 51. Section 46 (cross-architecture error agreement) extended from 5 to 10 seeds; YOLOv8x/RT-DETR-l missed-tooth breakdown added for MPS
+
+**Date:** 2026-09-22. **Scripts:**
+`cpu_repro/yolo_training/per_tooth_predictions_ultralytics_mps.py`
+(reruns inference on the saved MPS `best.pt` checkpoints for YOLOv8x and
+RT-DETR-l, seeds 5-9, verifying each seed's matched/missed/correct
+counts against its training-time `summary.csv` before accepting the
+output - mirrors the existing Faster-R-CNN-only
+`per_tooth_predictions_mps.py`, Section 44); `build_joined_mps_seeds.py`
+(fits a fresh coordinate-only baseline per MPS seed, identical
+HistGradientBoostingClassifier/`grouped_split` recipe to
+`multiseed_analysis.py`'s `build_coord_predictions()`, then joins it
+against each detector's newly-generated MPS per-tooth predictions -
+produces `joined_seed{5-9}.csv` for all three detectors, same schema as
+the existing seed 0-4 tables); `cross_architecture_agreement.py`
+(extended `SEEDS` from `[0..4]` to `[0..9]`, reports CUDA/MPS groups
+separately as well as pooled). **Output:**
+`eval_results/cross_architecture_agreement_summary.csv`,
+`eval_results/{multiseed,fasterrcnn_multiseed,rtdetr_multiseed}/joined_seed{5-9}.csv`,
+`eval_results/{yolo_mps,rtdetr_mps}/seed{5-9}/per_tooth.csv`.
+
+**Verification before use:** all 10 of the new per-tooth reruns (YOLOv8x
+and RT-DETR-l, seeds 5-9) matched their training-time `summary.csv`
+exactly on matched-tooth count, missed-tooth count, and correct-top-1
+count before being accepted - none required a fallback
+`per_tooth.csv.mismatch`. Each MPS seed's coordinate-baseline join was
+checked to preserve every row (inner join count equals the freshly-fit
+baseline's own test-set size).
+
+**Section 46 extension result** (triple agreement = all three detectors
+wrong on the same instance and predicting the identical wrong class;
+coord-match = that shared wrong answer matches the coordinate-only
+prior's own prediction):
+
+| Group | n seeds | Triple-agreement rate | Coord-match rate |
+|---|---|---|---|
+| CUDA seeds 0-4 (original) | 5 | 0.968 +/- 0.030 | 0.845 +/- 0.047 |
+| MPS seeds 5-9 (new) | 5 | 0.974 +/- 0.025 | 0.875 +/- 0.020 |
+| All 10 pooled | 10 | 0.971 +/- 0.026 | 0.860 +/- 0.038 |
+
+Replicates Section 46's finding on five new seeds, a different split,
+and a different training backend: on the residual slice where all three
+architecturally distinct detectors fail together, they converge on the
+identical wrong class roughly 97% of the time, and that shared wrong
+answer matches the position-only prior roughly 86-88% of the time -
+both groups landing within about 1sd of each other. **Not pooled as a
+CUDA/MPS equivalence claim** (backend and split both differ between the
+groups, per Section 49's caveats) - reported separately as the primary
+result, pooled only as a 10-seed summary of this analysis's own
+question.
+
+**YOLOv8x/RT-DETR-l missed-tooth breakdown, MPS seeds 5-9** (new script
+`missed_tooth_analysis_yolo_rtdetr.py`, same size/edge/overlap/per-class
+categories as Section 31's Faster R-CNN version):
+
+| Detector | Missed | Total | Rate |
+|---|---|---|---|
+| YOLOv8x | 534 | 27,153 | 1.97% |
+| RT-DETR-l | 247 | 27,153 | 0.91% |
+
+Same pattern as Faster R-CNN: small boxes drive most misses (YOLOv8x's
+smallest quarter misses at 3.80% vs. 1.35-1.36% for the rest; RT-DETR-l's
+at 1.80% vs. 0.46-0.91%), edge proximity is rare, no single tooth
+dominates. See Section 49 for the MPS-seed-8 spike this unblocked an
+explanation for, and for the two CUDA-side spikes (seeds 7, 9) this
+still cannot explain (no per-tooth data exists for the CUDA 5-14 runs).
+
+**Not done in this entry:** the CUDA-side per-tooth data needed to
+extend Section 46 and the missed-tooth breakdown to seeds 10-14, or to
+explain the two CUDA missed-tooth spikes, does not exist and was not
+generated here - only `summary.csv` was downloaded from those Kaggle
+runs. Generating it would require either downloading each run's saved
+checkpoint from Kaggle (not done for these runs) or rerunning inference
+there.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the
