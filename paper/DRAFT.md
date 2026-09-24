@@ -380,6 +380,47 @@ source of truth.
   secondary, tie-breaking cue under visual ambiguity, not a primary
   shortcut, and a specific mechanistic account of why phi is
   small-but-nonzero rather than exactly zero.
+- 4.12 CUDA-vs-MPS training-backend robustness check (Section 49):
+  extends the earlier single-detector, single-architecture
+  Kaggle-CUDA-vs-local-MPS comparison (Section 31) to all three
+  detector architectures. RT-DETR's backend agreement is tight (every
+  paired seed within 0.25pp); Faster R-CNN a bit looser (up to 0.7pp,
+  mixed sign); YOLOv8 is the loosest (up to 2.5pp swings), but that
+  looseness is driven entirely by the missed-detection rate, not by
+  classification quality on matched detections, which stays in a tight
+  band on both backends. For all three architectures the mean backend
+  difference is smaller than the seed-to-seed spread within a single
+  backend. Not an equivalence claim: backend is confounded with
+  training split (only seeds 5-9 are paired across both backends) and
+  with a disclosed batch-size/software-stack difference that was not
+  varied independently. Read as supporting evidence that the headline
+  gap (4.5, 4.9, 4.10) is not an artifact of one specific
+  hardware/software combination, not as proof the two backends are
+  statistically indistinguishable.
+- 4.13 Per-tooth head-to-head vs. the coordinate-only prior, by FDI
+  class (Section 50): a finer-grained restatement of the headline gap
+  (4.5, 4.9, 4.10) at the level of individual tooth classes rather than
+  pooled across the whole dataset. Paired bootstrap by class, all three
+  detectors, all 32 FDI classes: every single class favors the detector
+  over the geometry-only prior, with no exceptions - all 96
+  detector-class 95% CIs exclude zero. The smallest margins are
+  consistently the last molars (FDI 18/28/38/48/46), where the prior is
+  already comparatively strong (82.9-86.7%), but even there every
+  detector's CI stays above zero (smallest: YOLOv8's FDI 38 at +7.2pp,
+  95% CI [+3.5, +10.9]). Descriptive, not a formal independent-samples
+  test - the five seeds' test sets can share images, so this pools
+  (seed, image) clusters rather than fully independent draws (the
+  analysis script's own documented caveat).
+- 4.14 Cross-architecture error-agreement result (4.11, Section 46)
+  replicated on 5 further seeds under a different training backend
+  (Section 51): the new MPS seeds' triple-agreement and
+  coordinate-match rates (97.4%, 87.5%) land within about 1 standard
+  deviation of the original 5 CUDA seeds (96.8%, 84.5%) - same finding,
+  a different split and a different backend, not pooled as a formal
+  CUDA/MPS equivalence claim for the same reasons given in 4.12. This
+  section also extends the small-box-size-drives-missed-detections
+  pattern already established for Faster R-CNN (Section 31) to YOLOv8
+  and RT-DETR on the new MPS seeds - the same pattern holds for both.
 
 ## 5. Discussion
 
@@ -413,6 +454,20 @@ source of truth.
   coordinate-only baseline's own prediction far above chance, across
   all 5 seeds - a mechanistic account of what phi is capturing, not new
   evidence bearing on the gap itself.
+- Robustness of the architecture-generality result to training backend
+  and finer-grained class analysis (4.12-4.14, Sections 49-51): the
+  same three-architecture convergence discussed above holds under a
+  completely different training backend (Kaggle CUDA T4 vs. a local
+  Apple Silicon MPS run, 4.12) and at the individual FDI-class level
+  rather than only pooled across the dataset (4.13) - no single class,
+  for any of the three detectors, favors the geometry-only prior over
+  the detector's own visual evidence. The cross-architecture
+  error-agreement finding (4.11) itself replicates on 5 further seeds
+  under the different backend (4.14). None of this is evidence for a
+  new claim - it is the same Claim-B finding checked from more angles,
+  addressing a residual "is this specific to how these particular
+  models were trained" objection rather than the core architecture-
+  generality question, which 4.10/Section 45 already closes.
 - Generalization boundary as a falsifiable hypothesis (Section 11.4):
   state what would need to be true elsewhere (non-panoramic modality, or
   a differently-structured label space) for the finding to transfer.
@@ -495,6 +550,20 @@ source of truth.
   different training framework for YOLOv8/RT-DETR specifically, remain
   open extensions but are not required to support the paper's current
   claims.
+- Backend-robustness check (4.12, Section 49) is not a formal
+  equivalence test: training backend (Kaggle CUDA T4 vs. local Apple
+  Silicon MPS) is confounded with both training split (only seeds 5-9
+  are paired across both backends) and a disclosed batch-size/software-
+  stack difference not varied independently - read as supporting
+  evidence that the headline gap isn't a single-environment artifact,
+  not as proof the two backends produce statistically indistinguishable
+  models. Seed coverage beyond the original 5 remains incomplete: CUDA
+  seeds 12-14 and a rerun of RT-DETR's canceled CUDA seed 10 have not
+  been run (blocked on Kaggle's weekly GPU quota), and two YOLOv8
+  missed-detection-rate spikes (CUDA seeds 7 and 9) remain unexplained,
+  since no per-tooth prediction data was retained for those particular
+  runs (only summary statistics were downloaded) - noted here as an
+  open gap, not silently omitted.
 - **Multiplicity / analysis transparency.** This paper makes one
   pre-registered claim pair (Claim A: geometry predicts identity; Claim
   B: does a real detector rely on it) with a single GO/NO-GO decision
