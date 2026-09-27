@@ -219,7 +219,7 @@ def create_correlation_matrices(size_df):
     plt.close()
     print("Saved: tooth_size_correlation_matrix.png")
     
-    return correlation_matrix, rrea_dat
+    return correlation_matrix, area_data
 
 def create_detailed_correlation_analysis(correlation_matrix, area_data):
     """Create detailed correlation analysis plots."""

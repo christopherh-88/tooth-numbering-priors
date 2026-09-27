@@ -248,7 +248,11 @@ again - see "Checkpoint-and-resume" above.
 
 - `train_yolo.py` - the script (prepare data -> train with resume -> evaluate).
 - `prepared/` - generated each run: `train.txt`, `val.txt`, `data.yaml`.
-  Not committed (paths are machine-specific).
+  Not committed (paths are machine-specific). `prepared_coco/` is the
+  Faster R-CNN equivalent. After a fresh clone, `python
+  prepare_all_splits.py` rebuilds both for every seed without training;
+  `missed_tooth_analysis.py`, `build_joined_mps_seeds.py` and
+  `build_joined_cuda_10_14.py` need them.
 - `runs/yolov8_seed0split/weights/{last,best}.pt` - checkpoints. Not
   committed (large binaries).
 - `eval_results/summary.csv`, `confusion_matrix_yolov8_seed0.csv`/`.png` -

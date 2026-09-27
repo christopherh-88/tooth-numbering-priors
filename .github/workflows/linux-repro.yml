@@ -1,0 +1,87 @@
+# Linux x86_64 check of ENVIRONMENT.md's CPU-only setup, plus a rerun of the
+# core analyses against the committed outputs. Run by hand from the Actions
+# tab, or automatically when the install files change.
+name: Linux reproducibility
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - cpu_repro/requirements.txt
+      - ENVIRONMENT.md
+      - .github/workflows/linux-repro.yml
+
+jobs:
+  linux-repro:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Platform
+        run: |
+          uname -a
+          python3 --version
+
+      # The two install commands below are copied from ENVIRONMENT.md.
+      - name: Install (ENVIRONMENT.md, steps 1 and 2)
+        run: |
+          python3 -m venv .venv312
+          source .venv312/bin/activate
+          python -m pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.0 torchvision==0.29.0 -c cpu_repro/requirements.txt
+          pip install -r cpu_repro/requirements.txt
+
+      - name: pip check
+        run: .venv312/bin/pip check
+
+      - name: Imports, versions, no CUDA
+        run: |
+          .venv312/bin/python - <<'EOF'
+          import numpy, tensorflow as tf, torch, torchvision, ultralytics, cv2
+          import statsmodels, openpyxl, imagehash, sklearn, pandas
+          print("numpy", numpy.__version__, "| tensorflow", tf.__version__,
+                "| torch", torch.__version__, "| torchvision", torchvision.__version__,
+                "| ultralytics", ultralytics.__version__, "| cv2", cv2.__version__,
+                "| sklearn", sklearn.__version__, "| pandas", pandas.__version__)
+          assert torch.__version__ == "2.14.0+cpu", torch.__version__
+          assert torchvision.__version__ == "0.29.0+cpu", torchvision.__version__
+          assert not torch.backends.cuda.is_built(), "torch was built with CUDA"
+          assert cv2.__version__ == "4.10.0", cv2.__version__
+          EOF
+          # nvidia-ml-py (an ultralytics dependency) is a pure-Python NVML
+          # binding, not a CUDA library.
+          if .venv312/bin/pip list | grep -i -E "^(nvidia-|cuda-|triton)" | grep -v -i "^nvidia-ml-py "; then
+            echo "CUDA packages found in a CPU-only install"; exit 1
+          fi
+          du -sh .venv312
+
+      - name: Rerun core analyses
+        run: |
+          set -e
+          PY=$PWD/.venv312/bin/python
+          run() { (cd "$(dirname "$1")" && echo "== $1" && $PY "$(basename "$1")" > /dev/null); }
+          # Regenerates the gitignored prepared/ and prepared_coco/ folders.
+          run cpu_repro/yolo_training/prepare_all_splits.py
+          run cpu_repro/coord_baseline/build_coord_baseline.py
+          run cpu_repro/coord_baseline/significance_tests.py
+          run cpu_repro/coord_baseline/dentex/build_coord_baseline_dentex.py
+          run cpu_repro/yolo_training/build_joined_mps_seeds.py
+          run cpu_repro/yolo_training/build_joined_cuda_10_14.py
+          run cpu_repro/yolo_training/detector_backend_comparison.py
+          run cpu_repro/yolo_training/cross_architecture_agreement.py
+          run cpu_repro/yolo_training/missed_tooth_analysis.py
+          run cpu_repro/yolo_training/missed_tooth_analysis_yolo_rtdetr.py
+          run cpu_repro/yolo_training/per_tooth_head_to_head.py
+
+      - name: Committed outputs unchanged
+        run: |
+          # PNGs are listed but not enforced: font rendering differs across
+          # platforms. CSV/JSON outputs must match exactly.
+          git status --porcelain -- '*.png'
+          git diff --stat -- '*.csv' '*.json'
+          git diff --exit-code -- '*.csv' '*.json'

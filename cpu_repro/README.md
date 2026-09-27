@@ -12,13 +12,15 @@ cd cpu_repro
 python3.12 -m venv .venv        # needs Python <=3.12; TensorFlow doesn't support 3.13/3.14 yet
 source .venv/bin/activate
 pip install --upgrade pip
+pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.0 torchvision==0.29.0 -c requirements.txt
 pip install -r requirements.txt
-pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.0 torchvision==0.29.0
 ```
 
-torch is installed separately from the CPU wheel index so you don't
+torch is installed first, from the CPU wheel index, so you don't
 accidentally pull a CUDA build (which is enormous and useless on a CPU-only
-machine).
+machine). The order matters: `requirements.txt` also pins torch, and if it
+went first on Linux it would install PyPI's CUDA build, which the CPU-index
+step would then leave in place. See `../ENVIRONMENT.md`.
 
 ## Run
 

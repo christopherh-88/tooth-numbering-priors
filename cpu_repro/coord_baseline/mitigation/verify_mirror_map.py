@@ -10,8 +10,6 @@ Uses the exact same construction as the notebook fix (copied verbatim,
 not re-derived differently here - a divergent re-implementation would
 defeat the point of a verification script).
 """
-import numpy as np
-
 FDI_CODES = [
     "11", "12", "13", "14", "15", "16", "17", "18",
     "21", "22", "23", "24", "25", "26", "27", "28",

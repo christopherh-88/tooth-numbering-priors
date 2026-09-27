@@ -44,7 +44,7 @@ N_PERM = 10_000
 RNG_SEED = 0
 
 sys.path.insert(0, str(REPO_ROOT / "cpu_repro" / "coord_baseline"))
-from build_coord_baseline import FDI_CODES, is_neighbor_error  # noqa: E402
+from build_coord_baseline import is_neighbor_error  # noqa: E402
 
 ARCHS = {
     "yolo": ("multiseed", "yolo_pred", "yolo_correct"),

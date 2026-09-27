@@ -231,7 +231,7 @@ def main():
     candidates = result_df.head(top_n)
     candidates.to_csv(OUTPUT_DIR / "candidates.csv", index=False)
 
-    print(f"\nTop 20 most anomalous images:")
+    print("\nTop 20 most anomalous images:")
     cols = ["rank", "label_file", "total_tooth_count", "n_duplicate_codes",
             "n_position_violations", "likely_global_framing", "n_missing_codes",
             "anomaly_score", "primary_reason"]

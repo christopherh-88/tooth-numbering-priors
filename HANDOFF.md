@@ -18,10 +18,16 @@ weak-but-real residual error correlation as the qualifier. See
 `RESULTS.md` Sections 33/40/45 (the headline gap per architecture),
 46/51/52 (the error-agreement mechanism, now 14 seeds), 49 (CUDA-vs-MPS
 backend robustness, all three architectures), 50 (per-tooth
-head-to-head vs. the prior, paired bootstrap, seeds 0-4), and 53 (the
+head-to-head vs. the prior, paired bootstrap, seeds 0-4), 53 (the
 YOLOv8x missed-tooth spikes traced to single training runs, with a
-correction to Section 49's seed-8 reading). `paper/DRAFT.md`'s
-Discussion section already states this position.
+correction to Section 49's seed-8 reading) and 54 (the head-to-head
+replicated on MPS seeds 5-9 and CUDA seeds 11-14). `paper/DRAFT.md`
+reflects all of these through Section 54 (4.12-4.14 and Discussion).
+Section 55 fixed the `cpu_repro/requirements.txt` install order;
+Section 56 is a full-repo audit (all 33 repo-local analysis scripts
+rerun byte-identical, code and reference fixes, corrections). Section 57
+adds the paper figures (`paper/figures/`), `prepare_all_splits.py` for
+fresh clones, and a Linux x86_64 GitHub Actions check.
 
 **Git state as of this sync:** the 2026-09-27 work is committed as
 `2adf6bb` (RESULTS.md Sections 52-53, BACKEND_COMPARISON.md updates, the
@@ -29,8 +35,10 @@ Discussion section already states this position.
 `per_tooth_predictions_cuda_10_14.py`, `per_tooth_predictions_yolo_cuda_7_9.py`
 and `build_joined_cuda_10_14.py`, edits to `cross_architecture_agreement.py`
 and both `missed_tooth_analysis*.py` scripts, and new `eval_results/`
-files); this wording fix is a follow-up commit. Run `git status -sb`
-first thing next session to see whether anything is unpushed.
+files), with a HANDOFF wording follow-up in `917dd5c`. Sections 54-55,
+the paper update and the install-order fix came after that; run
+`git status -sb` and `git log -3` first thing next session to see
+whether they are committed and pushed.
 
 **Kaggle: nothing queued.** All 15 CUDA seeds (0-14) are run and
 reported for all three detectors, including the RT-DETR-l seed 10
@@ -53,8 +61,8 @@ spending session time on unless the user asks.
 ## What's actually done (verified, not just claimed)
 
 1. **Coordinate-only baseline (Claim A): well-supported.** Geometry alone
-   predicts FDI tooth identity at 67-72% top-1 (32-way) vs. 3.6% majority
-   baseline, replicated on UFBA-425 and DENTEX, clean negative controls,
+   predicts FDI tooth identity at 67-70% top-1 (32-way) vs. a 3.6-3.8%
+   majority baseline, replicated on UFBA-425 and DENTEX, clean negative controls,
    5-seed CIs, pre-stated falsification threshold. `RESULTS.md`
    Sections 2, 4, 10.
 2. **Novelty check (Task 1, real citation-graph check, not a web search):**
@@ -74,22 +82,24 @@ spending session time on unless the user asks.
    `cpu_repro/coord_baseline/README.md`, committed.
 5. **Flip/label-mismatch bug in the training notebook: found, confirmed,
    fixed, re-verified** (see below) - committed.
-6. **Mitigation experiment: designed, not run.**
+6. **Mitigation experiment: designed, then run** (`RESULTS.md` Sections
+   30-31, clean null). Design in
    `cpu_repro/coord_baseline/mitigation/README.md` - geometry-jitter
    augmentation (primary) or a decorrelation loss (fallback), evaluation
-   protocol, falsification threshold. Blocked on GPU.
+   protocol, falsification threshold.
 7. **Paper draft skeleton:** `paper/DRAFT.md` - abstract, related work
    (real citations: Geirhos 2020, DeGrave et al. 2021, Winkler et al.
    2019, Lin et al. MICCAI 2024, Zhou et al. 2024 BMC Oral Health, DENTEX/
-   HierarchicalDet), methods pointers, results outline with `[PENDING]`
-   markers, discussion, limitations, ethics statement. Committed.
+   HierarchicalDet), methods pointers, results outline, discussion,
+   limitations, ethics statement. Committed; updated through `RESULTS.md`
+   Section 54.
 8. **Statistical testing script:** `cpu_repro/coord_baseline/significance_tests.py`
    - paired permutation tests (real vs. shuffled control; top1 vs.
-   majority baseline), written against the actual CSV columns, **not yet
-   run**. Committed.
-9. **Boundary-condition dataset candidates** (not yet searched for or
-   downloaded - deliberately not started, see sequencing note below),
-   noted in `RESULTS.md` Section 11.5: bitewing/periapical radiographs
+   majority baseline), written against the actual CSV columns, run
+   (`RESULTS.md` Section 12). Committed.
+9. **Boundary-condition dataset candidates**, noted in `RESULTS.md`
+   Section 11.5 (the periapical candidate was later run on DenPAR,
+   Section 25; the other two remain untried): bitewing/periapical radiographs
    (leading candidate - breaks the acquisition-canonicalization
    precondition cleanly), CBCT slices (messier, adds volumetric
    complexity), a differently-structured label space on panoramic
@@ -185,7 +195,7 @@ already in `build_coord_baseline.py`) applied in lockstep with the flip.
 Re-verified: the fix is correct (full before/after evidence and the
 exact diff are in `cpu_repro/coord_baseline/mitigation/README.md`).
 
-**Why this matters for Friday:** Task 2 (error-pattern correlation
+**Why this mattered (as of 2026-09-08; the fix was then committed):** Task 2 (error-pattern correlation
 check, the thing that would close Claim B) depends on training through
 this now-fixed pipeline. Training on the pre-fix version would confound
 any measured shortcut-reliance signal with this labeling artifact - so
@@ -196,7 +206,7 @@ working tree, before the GPU run.
 
 Everything in this subsection was written before Task 2 (detector
 training) happened. It is all done now - see "Where things stand"
-above and `RESULTS.md` Sections 21-53. Left here only so the sequencing
+above and `RESULTS.md` Sections 21-57. Left here only so the sequencing
 reasoning that led to Task 2 isn't lost; don't treat it as pending.
 
 1. ~~GPU training run (Task 2 setup)~~ - done, three architectures
@@ -214,15 +224,18 @@ reasoning that led to Task 2 isn't lost; don't treat it as pending.
 ## Actual next steps (2026-09-27)
 
 1. **`git push`** any unpushed commits once the user says so (commands
-   are printed, not run automatically - see standing rules above).
-2. **Fold Sections 52-53 into `paper/DRAFT.md`** if the paper is being
-   actively drafted. Sections 49-51 are already in (4.12-4.14), and the
-   draft's limitations paragraph already reflects Section 53, but 4.14
-   still describes the 10-seed Section 46 result, not the 14-seed one.
-3. **Optional, not prioritized:** the supernumerary-dataset email (see
-   "Where things stand" above) and the `requirements.txt` CUDA-wheel
-   ordering bug (flagged Section 36, still unfixed, needs a Linux
-   machine to verify against - don't fix blind).
+   are printed for the user to run, not run automatically).
+2. **Optional, not prioritized:** the supernumerary-dataset email (see
+   "Where things stand" above) and a second external-validation dataset.
+   Neither has been started.
+3. **Check the Linux CI run** once pushed: Actions tab, "Linux
+   reproducibility" (or `gh run list --workflow linux-repro.yml -R
+   christopherh-88/tooth-numbering-priors`). Record the outcome in
+   `RESULTS.md` Section 57, which says "Result pending".
+4. **Paper, before submission:** Table 1 (headline numbers); the
+   bracketed "PMC, 2025" note in Related Work (identify the paper or
+   drop it); OralBBNet arXiv-version year per venue rules. Figures are
+   done (`paper/figures/`).
 
 ## Things NOT to re-litigate or redo
 
@@ -255,13 +268,16 @@ reasoning that led to Task 2 isn't lost; don't treat it as pending.
 - Don't redo the per-tooth head-to-head (Section 50), the Section 46
   extension (Sections 51-52, 14 seeds), or the missed-tooth spike
   breakdown (Section 53) - all done and verified against their own
-  summary.csv/joined-table totals. The head-to-head covers seeds 0-4
-  only; extending it is possible for the seeds with per-tooth data but
-  was not requested.
+  summary.csv/joined-table totals. The head-to-head covers every seed
+  with a three-detector joined table: CUDA 0-4, MPS 5-9 and CUDA 11-14
+  (Section 54), reported as separate groups, never pooled.
 - Don't describe the YOLOv8x missed-tooth spikes (CUDA 7 and 9, MPS 8)
   as hard splits. CUDA and MPS runs with the same seed number share a
   split, and the other runs on those splits are unaffected (Section 53).
   Seed 7's split is only mildly harder for every model.
+- Don't reinstall torch/torchvision after `pip install -r
+  cpu_repro/requirements.txt`. They go first, from the CPU wheel index
+  (Section 55, `ENVIRONMENT.md`).
 - Keep `missed_tooth_analysis.py`'s box-area cutoffs on seeds 0-9, or
   BACKEND_COMPARISON.md's seed 0-9 figures stop reproducing.
 - Don't re-add the UFBA-425/OralBBNet citation to `paper/DRAFT.md`'s

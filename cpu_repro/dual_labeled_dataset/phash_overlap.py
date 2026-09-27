@@ -6,11 +6,13 @@ redistributed in this repo (third-party, ~550MB, license "unknown").
 Results as run: findings.md in this directory.
 """
 import os
+from pathlib import Path
+
 from PIL import Image
 import imagehash
 
 DUAL_DIR = "extracted/images1"
-UFBA_DIR = "/Users/christopherhuang/Documents/GitHub/tooth-numbering-priors/Dataset/bb_u_net_dataset/panoramic_x_rays"
+UFBA_DIR = str(Path(__file__).resolve().parents[2] / "Dataset" / "bb_u_net_dataset" / "panoramic_x_rays")
 
 def hash_dir(d):
     out = {}

@@ -336,7 +336,7 @@ def main(seeds=(0, 1, 2, 3, 4)):
     print(f"\nSaved rtdetr_multiseed_summary.csv ({len(rows)} of {len(seeds)} seeds) to {OUT_DIR}")
 
     if len(rows) > 1:
-        print(f"\n5-seed mean +/- 95% CI (mean_ci95, Section 33's convention):")
+        print("\n5-seed mean +/- 95% CI (mean_ci95, Section 33's convention):")
         for col in ["gap_pp", "phi", "rtdetr_top1", "coord_top1", "rtdetr_quadrant"]:
             mean, ci = mean_ci95(out_df[col].to_numpy())
             print(f"  {col:16s} {mean:.4f} +/- {ci:.4f}  [{mean - ci:.4f}, {mean + ci:.4f}]")

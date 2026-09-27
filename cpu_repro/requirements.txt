@@ -1,6 +1,15 @@
 # Pinned, CPU-only, verified working set for macOS arm64 + Python 3.12
 # (also expected to work on Linux x86_64 CPU-only; not tested there).
 #
+# Install torch/torchvision FIRST from PyTorch's CPU wheel index, then this
+# file (see ENVIRONMENT.md):
+#   pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.0 torchvision==0.29.0 -c cpu_repro/requirements.txt
+#   pip install -r cpu_repro/requirements.txt
+# The pins below then match the already-installed CPU builds, so pip keeps
+# them. Installing this file first would pull torch from plain PyPI, which
+# on Linux is the CUDA build, and pip would keep that build afterwards
+# because it already satisfies torch==2.14.0 (RESULTS.md Section 55).
+#
 # Install order matters a little because of a 3-way numpy pin conflict
 # between tensorflow / scipy / ultralytics on Darwin (see README.md).
 # Installing this file top-to-bottom in one `pip install -r` call resolves
@@ -11,12 +20,14 @@
 numpy==1.26.4
 scipy==1.13.1
 tensorflow==2.16.2          # last TF release that cleanly wants numpy<2.0
-torch==2.14.0                # CPU wheel: pip install --index-url https://download.pytorch.org/whl/cpu torch
+torch==2.14.0                # install from the CPU wheel index first - see header
 torchvision==0.29.0
 ultralytics==8.4.143          # repo was pinned to 8.0.28 (2024) - see README for API drift notes
-opencv-python-headless==4.10.0.84   # ultralytics' pip metadata asks for "opencv-python"; the headless
-                                     # build provides the same cv2 module and avoids a Qt/GUI dependency
-                                     # that isn't needed here. `pip check` will warn about this; harmless.
+opencv-python-headless==4.10.0.84
+opencv-python==4.10.0.84             # ultralytics requires opencv-python, so a fresh install gets it
+                                     # alongside the headless build and both provide the same cv2 module.
+                                     # Pinning both to the same version keeps cv2 at 4.10.0 whichever one
+                                     # wins; unpinned, a fresh install loaded cv2 4.11.0 (RESULTS.md Section 55).
 scikit-image==0.26.0
 tifffile==2024.2.12
 imagecodecs==2024.6.1        # tifffile needs this to decode the dataset's LZW-compressed .ome.tiff labels
@@ -25,4 +36,8 @@ matplotlib==3.11.1
 psutil==7.2.2
 scikit-learn==1.9.0
 imageio==2.37.4
-pandas==3.0.5                # used by cpu_repro/coord_baseline/ only
+pandas==3.0.5
+statsmodels==0.15.0          # coord_baseline/dentex/dissociation_mixed_effects.py
+patsy==1.0.3                 # statsmodels' formula backend, pinned with it
+openpyxl==3.1.5              # pandas .xlsx reader, boundary_condition/denpar_periapical/
+ImageHash==4.3.2             # dual_labeled_dataset/phash_overlap.py

@@ -38,7 +38,6 @@ assumed:
 """
 
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -46,7 +45,6 @@ import numpy as np
 import openpyxl
 import pandas as pd
 from PIL import Image
-from scipy import stats
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix

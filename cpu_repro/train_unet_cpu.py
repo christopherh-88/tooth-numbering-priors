@@ -34,7 +34,6 @@ scale this up (more images, more epochs, bigger image size) once you have
 GPU quota again.
 """
 
-import os
 import random
 import re
 import time

@@ -4023,6 +4023,231 @@ own cutoffs, gives 4.71% / 2.62% / 2.20% against the pooled MPS
 3.80% / 1.36% / 1.35%, which is 1.2x, 1.9x and 1.6x. It describes a
 weaker run, not a harder split.
 
+## 54. Per-tooth head-to-head extended to MPS seeds 5-9 and CUDA seeds 11-14
+
+**Date:** 2026-09-27. **Script:**
+`cpu_repro/yolo_training/per_tooth_head_to_head.py`, now run on three
+groups kept separate: CUDA seeds 0-4 (Section 50), MPS seeds 5-9 (joined
+tables from Section 51) and CUDA seeds 11-14 (joined tables from Section
+52; seed 10 has no three-detector table). Method unchanged: all-GT top-1
+per FDI class, detector minus coordinate prior, paired bootstrap over
+(seed, image) clusters, 2000 draws, RNG seed 0 per group. **Output:**
+`eval_results/per_tooth_head_to_head.csv`, which gains a `group` column.
+
+**Verification before use:** the seed 0-4 rows are identical to the
+previously committed output (all 96 rows), so Section 50's numbers are
+unchanged. Each group's pooled detector accuracy and tooth count match
+`detector_backend_comparison.csv` exactly (pooled over teeth).
+
+| Group | Detector | Pooled detector acc | Pooled prior acc | Gap | Classes where detector wins (CI>0) | Classes where prior wins (CI<0) |
+|---|---|---|---|---|---|---|
+| CUDA seeds 0-4 | YOLOv8x | 0.9430 | 0.6952 | +24.8pp | 32/32 | 0/32 |
+| CUDA seeds 0-4 | RT-DETR-l | 0.9451 | 0.6952 | +25.0pp | 32/32 | 0/32 |
+| CUDA seeds 0-4 | Faster R-CNN | 0.9337 | 0.6952 | +23.8pp | 32/32 | 0/32 |
+| MPS seeds 5-9 | YOLOv8x | 0.9425 | 0.6945 | +24.8pp | 32/32 | 0/32 |
+| MPS seeds 5-9 | RT-DETR-l | 0.9528 | 0.6945 | +25.8pp | 32/32 | 0/32 |
+| MPS seeds 5-9 | Faster R-CNN | 0.9378 | 0.6945 | +24.3pp | 32/32 | 0/32 |
+| CUDA seeds 11-14 | YOLOv8x | 0.9427 | 0.6989 | +24.4pp | 32/32 | 0/32 |
+| CUDA seeds 11-14 | RT-DETR-l | 0.9512 | 0.6989 | +25.2pp | 32/32 | 0/32 |
+| CUDA seeds 11-14 | Faster R-CNN | 0.9412 | 0.6989 | +24.2pp | 32/32 | 0/32 |
+
+**Result: Section 50 replicates in both new groups.** Every FDI class
+favors the detector, for all three detectors, with no class favoring the
+prior. Per-class deltas in the new groups run from +4.2pp to +43.1pp
+(medians +23.9pp to +26.3pp). The tightest case is RT-DETR-l, CUDA seeds
+11-14, FDI 38: +4.2pp [+0.7, +7.9], still above zero; next is YOLOv8x,
+MPS seeds 5-9, FDI 48: +5.6pp [+1.8, +9.4].
+
+The smallest gains are again molars, where the prior is already strong
+(79.8-89.3% on the three smallest-gain classes of each new group): third
+molars (FDI 18/28/38/48), first molars (36/46) and the lower-right second
+molar (47). **Correction to Section 50:** it called its smallest-gain
+classes "the last molars (FDI 18/28/38/48/46)". FDI 46 is the lower-right
+first molar, not a last molar, so "molars" is the accurate description
+there too.
+
+The Section 50 caveat still applies within each group: seeds can share
+test images, so the CIs are descriptive, not a formal test. The groups
+are not pooled with each other (different backends and splits).
+
+## 55. `cpu_repro/requirements.txt` install order fixed (the Section 36 CUDA-wheel bug) and OpenCV pinned
+
+**Date:** 2026-09-27. **Files:** `cpu_repro/requirements.txt`,
+`ENVIRONMENT.md`, `cpu_repro/README.md`. No analysis numbers change.
+
+**The bug, re-checked.** Section 36 found that the documented setup
+(`pip install -r cpu_repro/requirements.txt`, then torch/torchvision from
+the CPU wheel index) installs torch from plain PyPI in its first step.
+A Linux dry-run resolution of that first step (`pip install --dry-run
+--ignore-installed --platform manylinux_2_28_x86_64` plus the older
+manylinux tags, `--python-version 3.12 --only-binary=:all: --report`) picks `torch-2.14.0-cp312-cp312-manylinux_2_28_x86_64.whl`
+from PyPI, the ~555 MB CUDA build, whose metadata declares Linux-only
+CUDA dependencies (`cuda-toolkit`, `nvidia-cudnn-cu13`,
+`nvidia-nccl-cu13`, `triton` and others). **Correction to Section 36:**
+it called this "wasteful but not actually broken, since step 2 ... still
+ends in the right state". That is wrong. Step 2's `torch==2.14.0` is
+already satisfied by the installed PyPI build (version `2.14.0`, no local
+label), so pip leaves it in place, whatever index step 2 names. The old
+sequence would end with the CUDA build on Linux, not the CPU one. The
+fresh-venv test below shows the same mechanism directly: step 2 reports
+"Requirement already satisfied: torch==2.14.0" for a torch installed from
+another index. (A CUDA build still runs on a CPU-only machine, so no
+reported number is affected; the cost is the download and disk.)
+
+**Fix:** reverse the order. Step 1 installs torch/torchvision from the CPU
+wheel index with the requirements file as constraints:
+`pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.0 torchvision==0.29.0 -c cpu_repro/requirements.txt`.
+Step 2 is `pip install -r cpu_repro/requirements.txt`, whose torch and
+torchvision pins are then already satisfied. The Linux dry-run of the new
+step 1 resolves `torch-2.14.0+cpu` and `torchvision-0.29.0+cpu` (13
+packages, no CUDA packages), with numpy 1.26.4 and pillow 12.3.0 matching
+the pins. Every torch requirement in the tree (`torchvision`'s
+`torch==2.14.0`, ultralytics' `torch>=1.8.0`/`torchvision>=0.9.0`,
+`ultralytics-thop`'s `torch`) accepts the `+cpu` builds, since PEP 440
+ignores the local label for `==2.14.0`.
+
+**Second problem found while testing: OpenCV.** Ultralytics requires
+`opencv-python`, which `requirements.txt` did not pin (it pinned only
+`opencv-python-headless==4.10.0.84`). A fresh install therefore also got
+`opencv-python` 4.11.0.86, both packages provide `cv2`, and the fresh
+venv loaded **cv2 4.11.0**, not the pinned 4.10.0. The original
+development venv (`.venv312`, built incrementally) has only the headless
+4.10.0 build, which is the one behind every reported number. The file's
+old comment ("`pip check` will warn about this; harmless") described that
+development venv, not a fresh install, where `pip check` was clean
+because `opencv-python` had been pulled in. **Fix:** pin
+`opencv-python==4.10.0.84` as well, so `cv2` is 4.10.0 whichever package
+wins.
+
+**Verification (fresh venv, macOS 14 arm64, Python 3.12.13):** the new
+two-step sequence, run from scratch with the updated file: step 2 reported
+numpy, torch and torchvision as already satisfied (no reinstall);
+`pip check` gave "No broken requirements found."; imports gave
+numpy 1.26.4, TensorFlow 2.16.2, torch 2.14.0, torchvision 0.29.0,
+ultralytics 8.4.143, cv2 4.10.0 and `torch.backends.cuda.is_built()` False. **Not verified:** a real Linux install (no Linux machine or
+Docker here); Linux is covered only by the dry-run resolution above, and
+`ENVIRONMENT.md` says so. The dry-run evaluates environment markers for
+the running macOS system, so it under-reports Linux-only dependencies in
+general; it cannot hide CUDA packages in the new step 1, because the
+`+cpu` wheels' metadata declares none.
+
+## 56. Full-repo audit: reproducibility rerun, code fixes, corrections to earlier sections
+
+**Date:** 2026-09-27. No reported number changes except where a
+correction below says so.
+
+**Reproducibility rerun.** Every analysis script that runs from
+repo-local data (33 scripts: `coord_baseline/` incl. `controls/`,
+`dentex/`, `mitigation/verify_mirror_map.py`; `anomaly_scan/`;
+`boundary_condition/denpar_periapical/`; and the `yolo_training/`
+joined-table builders, backend comparisons, cross-architecture
+agreement, both missed-tooth scripts, `per_tooth_head_to_head.py` and
+`robustness_analysis.py`) was rerun in `.venv312`. All exited cleanly and
+every committed output (CSV, PNG, JSON) came back byte-identical, with
+one exception: `coord_baseline/image_split_seed0.meta.json`'s `source`
+string was written by an older `export_split.py` (`seed=SEEDS[0]`); the
+regenerated file says `seed=0` like seeds 1-14. The split itself is
+unchanged. Not rerun: the training scripts, the inference scripts that
+need gitignored weights (`case_study_yolo_vs_coord.py`,
+`error_correlation_analysis.py`, `mitigation_analysis.py`, the
+`*_multiseed_analysis.py` inference paths, `per_tooth_predictions_*.py`),
+and `dual_labeled_dataset/` (needs the third-party download).
+
+**Code fixes.** pyflakes over every tracked `.py` file:
+- `Dataset/plots/tooth_size_correlation_analysis.py` (upstream) returned
+  the undefined name `rrea_dat`, a NameError whenever the script runs.
+  Fixed to `area_data`, which the caller unpacks.
+- `dual_labeled_dataset/phash_overlap.py` hard-coded an absolute
+  `/Users/...` path to the UFBA-425 images; now resolved from the
+  script's location.
+- Unused imports, unused `y_test` variables and placeholder-free
+  f-strings removed from 14 `cpu_repro/` scripts (no logic change; the
+  rerunnable ones are covered by the rerun above). pyflakes is now clean
+  on all `cpu_repro/` code.
+- `requirements.txt` did not pin `statsmodels` (used by
+  `dissociation_mixed_effects.py`), `openpyxl` (DenPAR `.xlsx` reading)
+  or `ImageHash` (`phash_overlap.py`), so those scripts failed in a fresh
+  install. Pinned at the versions in `.venv312`: statsmodels 0.15.0,
+  patsy 1.0.3, openpyxl 3.1.5, ImageHash 4.3.2. Every pin now matches
+  `.venv312` except `opencv-python` (Section 55). Fresh-venv install of
+  the updated file (macOS 14 arm64, Python 3.12.13): `pip check` clean,
+  all pinned packages import, `torch.backends.cuda.is_built()` False.
+
+**Corrections to earlier sections.**
+- Sections 49 (twice), 51 and 53 cite "Section 31" for a Faster R-CNN
+  CUDA-vs-MPS comparison and its missed-tooth breakdown. Section 31 is
+  the YOLOv8 mitigation experiment. That Faster R-CNN work first
+  appeared in `cpu_repro/yolo_training/BACKEND_COMPARISON.md` (commit
+  `16c69a5`) and is reported in Section 49; read those citations as
+  Section 49 / `BACKEND_COMPARISON.md`.
+- `paper/DRAFT.md`'s abstract paired 95.9% (Section 33's 5-seed
+  matched-detections-only top-1, 0.9585) with the all-GT 69.5% prior and
+  24.8pp gap, so its numbers did not add up (95.9 - 69.5 = 26.4). The
+  all-GT detector figure is 94.3% (0.9426, 5-seed mean of
+  `multiseed_summary.csv`), which is now in the abstract.
+- The paper's 4.11 applied Section 46's seed-0 wording ("almost 9 times
+  out of 10", 88.8%) to all 5 seeds, whose coord-match rates are
+  76.8-88.8% (mean 84.5%). Now "about 85% of the time".
+- README.md and HANDOFF.md still gave Claim A as "67-72% vs. 3.6%",
+  corrected in the paper by Section 36 to 67-70% vs. 3.6-3.8%.
+
+**References** (`paper/DRAFT.md`), checked against PubMed E-utilities
+and the arXiv API: Winkler et al. now carries its authors, JAMA
+Dermatology 155(10):1135-1141 and DOI 10.1001/jamadermatol.2019.1735,
+and the 84.1% -> 45.8% specificity figures match the abstract. DENTEX
+was cited under its v1 title, but the Limitations quotations (Section
+18) are from v2, retitled "DENTEX: Dental Enumeration and Tooth Pathosis
+Detection Benchmark for Panoramic X-ray" (2025-11-13); the entry now
+cites v2 and records both versions. The three DENTEX participant papers
+named in Related Work (DentexSegAndDet, YOLOrtho, DETDet) had no
+reference entries; added with arXiv IDs 2308.14161, 2308.05967 and
+2308.14070. HierarchicalDet gains arXiv:2303.06500.
+
+## 57. Paper figures; fresh-clone data preparation; Linux x86_64 CI check
+
+**Date:** 2026-09-27. No analysis number changes.
+
+**Figures.** `paper/figures/make_figures.py` builds Figs. 1-6 and S1 from
+committed CSVs only (vector PDF with embedded TrueType fonts, plus 600-dpi
+PNG, sized for the 122 mm LNCS text width, Okabe-Ito colours). Error bars
+use `mean_ci95`, the same helper as this log. Every plotted summary value is
+printed by the script and matches its source section: Fig. 1 (Sections 2,
+10, 25), Fig. 2 (4, 13, 19, 20), Fig. 3 (33, 40, 45), Fig. 4 (50), Fig. 5
+(46, 51, 52, with CUDA and MPS means kept separate), Fig. 6 (49, 53), Fig.
+S1 (54). The PDFs are byte-identical across reruns. Draft captions and
+the data file behind each figure are in `paper/figures/README.md`; the
+paper draft's Results outline now cites them. Two things caught while
+building them: the shuffle control permutes box geometry among the teeth
+of each image (`controls/run_controls.py`), not labels, so its figure label
+says so; and automatic tick placement put ticks at 92.5% and 1.5% that a
+0-decimal formatter printed as "92%" and "2%", so Fig. 6 uses explicit
+ticks.
+
+**Fresh-clone gap.** In a copy containing only git-tracked files,
+`missed_tooth_analysis.py`, `build_joined_mps_seeds.py` and
+`build_joined_cuda_10_14.py` failed: they read the gitignored, locally
+generated `prepared/` and `prepared_coco/` folders. New
+`cpu_repro/yolo_training/prepare_all_splits.py` rebuilds both for all 15
+committed splits without training, by calling the existing
+`train_yolo.prepare_yolo_dataset()` and `build_coco_dataset.convert()`.
+Regenerated files are identical to the local ones apart from absolute
+paths (all 45 YOLO `train.txt`/`val.txt`/`data.yaml` files, and the 20
+COCO JSONs for the 10 seeds that had local copies), and with them
+all three scripts reproduce their committed outputs byte-for-byte in the
+tracked-files-only copy. `cpu_repro/yolo_training/README.md` documents it.
+
+**Linux x86_64 check.** No Linux machine or x86 VM is available locally
+(VirtualBox on Apple Silicon runs ARM guests only), so
+`.github/workflows/linux-repro.yml` runs on a GitHub-hosted Ubuntu 24.04
+x86_64 runner: it follows `ENVIRONMENT.md`'s two install commands
+verbatim, requires `pip check` to pass, asserts `torch 2.14.0+cpu`,
+`torchvision 0.29.0+cpu`, `cv2 4.10.0`, no CUDA build and no CUDA
+packages, then runs `prepare_all_splits.py` and ten analysis scripts and
+fails if any committed CSV or JSON changes. It runs on manual dispatch and
+when the install files change. **Result pending:** the workflow has not
+run yet; it needs to be pushed first. Record its outcome here when it
+has.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

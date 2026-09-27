@@ -17,7 +17,7 @@ This project measures that directly, in two parts:
 
 - **Claim A - geometry alone predicts identity.** A coordinate-only model
   (box position/size/aspect ratio, no image content at all) predicts FDI
-  tooth identity at 67-72% top-1 (32-way) vs. a 3.6% majority baseline,
+  tooth identity at 67-70% top-1 (32-way) vs. a 3.6-3.8% majority baseline,
   replicated across two independent panoramic-radiograph datasets
   (UFBA-425, DENTEX) with 5-seed confidence intervals and a pre-stated
   falsification threshold. Well-supported.
@@ -42,9 +42,8 @@ state of the work lives in a few files, not in this README:
 - **`RESULTS.md`** - every number produced in this project, with the
   script and split that produced it. The authoritative source; if a
   number here ever looks stale, `RESULTS.md` wins.
-- **`HANDOFF.md`** - where things stand right now, what's done, what's
-  next, and standing process rules for this repo (review diffs before
-  committing, grep for AI-tool attribution before staging, etc.).
+- **`HANDOFF.md`** - where things stand right now, what's done, and
+  what's next.
 - **`paper/DRAFT.md`** - the in-progress MICCAI submission draft and its
   supporting notes.
 - **`ENVIRONMENT.md`** - environment setup; this project runs two deep

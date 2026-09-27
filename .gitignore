@@ -180,3 +180,6 @@ cython_debug/
 #.idea/
 cpu_repro/boundary_condition/denpar_periapical/RawData/
 cpu_repro/boundary_condition/denpar_periapical/__pycache__/
+
+# macOS Finder metadata
+.DS_Store

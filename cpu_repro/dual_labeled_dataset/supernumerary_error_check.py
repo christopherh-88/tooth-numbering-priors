@@ -41,7 +41,6 @@ from sklearn.ensemble import HistGradientBoostingClassifier
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "coord_baseline"))
 from build_coord_baseline import (
     load_instances, FEATURE_COLS, FDI_CODES, CODE_TO_IDX,
-    quadrant_of, tooth_type_of, is_mirror_quadrant_error, is_neighbor_error,
 )
 
 LABELS_DIR = "extracted/labels"

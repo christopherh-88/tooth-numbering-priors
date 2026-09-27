@@ -34,13 +34,13 @@ tensorflow` (a confusing `AttributeError` deep in a scipy/keras import
 chain, not an "incompatible numpy" message).
 
 The fix is: pin numpy **and** older, numpy-1.x-compatible releases of
-`opencv-python-headless`, `tifffile`, and `imagecodecs` all together in one
+`opencv-python`/`opencv-python-headless`, `tifffile`, and `imagecodecs` all together in one
 `requirements.txt`, so pip's resolver sees every constraint at once instead
 of hitting them one at a time. This is already done in
 `cpu_repro/requirements.txt` - installing that file in one `pip install -r`
 call resolves cleanly. **Verified from a completely fresh venv, one shot,
-no manual fixes, no `pip check` warnings** (aside from one harmless one
-noted below) - see "What was actually tested" below.
+no manual fixes, no `pip check` warnings** - see "What was actually
+tested" below.
 
 ## Setup (verified working sequence)
 
@@ -61,50 +61,66 @@ python3.12 -m venv .venv312
 source .venv312/bin/activate        # Windows: .venv312\Scripts\activate
 python -m pip install --upgrade pip
 
-# 1. Everything except torch, in one shot - order matters less than you'd
-#    think here BECAUSE every version is pinned in this one file; pip's
-#    resolver sees all constraints together. Don't install these packages
-#    one at a time from memory - use this file.
-pip install -r cpu_repro/requirements.txt
+# 1. torch/torchvision FIRST, from PyTorch's own CPU-only wheel index, not
+#    plain PyPI (on Linux, PyPI's torch is the CUDA build: enormous and
+#    pointless on a CPU-only machine). `-c` holds numpy/pillow and the
+#    other dependencies to the same pins as step 2.
+pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.0 torchvision==0.29.0 -c cpu_repro/requirements.txt
 
-# 2. torch/torchvision come from PyTorch's own CPU-only wheel index, not
-#    plain PyPI - installing from PyPI directly risks pulling a CUDA build,
-#    which is enormous and pointless on a CPU-only machine.
-pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.0 torchvision==0.29.0
+# 2. Everything else, in one shot. The torch/torchvision pins in this file
+#    are already satisfied by step 1, so pip keeps the CPU builds. Every
+#    version is pinned in this one file and pip's resolver sees all the
+#    constraints together. Don't install these packages one at a time from
+#    memory - use this file.
+pip install -r cpu_repro/requirements.txt
 ```
 
 Verify it worked:
 
 ```bash
 python -c "
-import numpy, tensorflow as tf, torch, ultralytics
+import numpy, tensorflow as tf, torch, ultralytics, cv2
 print('numpy', numpy.__version__)      # expect 1.26.4
 print('tensorflow', tf.__version__)    # expect 2.16.2
-print('torch', torch.__version__)      # expect 2.14.0
-print('ultralytics', ultralytics.__version__)
+print('torch', torch.__version__)      # expect 2.14.0 (2.14.0+cpu on Linux)
+print('cuda built', torch.backends.cuda.is_built())  # expect False
+print('ultralytics', ultralytics.__version__)        # expect 8.4.143
+print('cv2', cv2.__version__)          # expect 4.10.0
 "
 pip check   # expect: "No broken requirements found." (see note below)
 ```
 
 ## What was actually tested
 
-This exact two-command sequence (`pip install -r requirements.txt` then
-the torch install) was run from a **brand-new venv** on 2026-09-07 -
-not the original messy incremental install used while building this
-project (which hit the numpy conflict live and fixed it step by step; that
-trial-and-error is NOT what's documented here). The clean sequence above
-produced zero dependency-resolver warnings and a clean `pip check`.
-Tested on macOS 14, Apple Silicon (arm64), Python 3.12.13. Should work
-the same way on Linux x86_64 CPU-only; not tested there - if you hit
-something different on Linux, update this file rather than working around
-it silently.
+The two-command sequence above was run from a **brand-new venv** on
+2026-09-27 and produced zero dependency-resolver warnings, a clean
+`pip check`, `torch.backends.cuda.is_built() == False` and cv2 4.10.0.
+Tested on macOS 14, Apple Silicon (arm64), Python 3.12.13. This is not
+the original messy incremental install used while building this project
+(which hit the numpy conflict live and fixed it step by step; that
+trial-and-error is NOT what's documented here).
 
-One `pip check` note that's expected and harmless: Ultralytics' own
-package metadata asks for `opencv-python`, but this project installs
-`opencv-python-headless` instead (same `cv2` module, no GUI/Qt
-dependency pulled in, which isn't needed here). If `pip check` mentions
-this, that's the one known exception - anything else is a real problem,
-not this.
+**Linux x86_64 has not had a real install.** Step 1 was checked there only
+by pip's cross-platform dry-run resolution (`--platform manylinux_2_28_x86_64
+--only-binary=:all:`), which picks `torch-2.14.0+cpu` and
+`torchvision-0.29.0+cpu` with no CUDA packages. If you hit something
+different on Linux, update this file rather than working around it
+silently.
+
+The order was reversed on 2026-09-27 (RESULTS.md Section 55). The earlier
+order (this file first, then torch from the CPU index; tested on
+2026-09-07) pulled torch from plain PyPI in the first step. That is
+harmless on macOS but gets the CUDA build on Linux, and the CPU-index
+step afterwards would not replace it, because the installed torch
+already satisfies `torch==2.14.0`.
+
+One OpenCV note: Ultralytics' package metadata requires `opencv-python`,
+so a fresh install gets it alongside `opencv-python-headless`. Both
+provide the same `cv2` module, so `requirements.txt` pins both to
+4.10.0.84. An older venv built with only the headless package (like the
+original development one) will show `ultralytics 8.4.143 requires
+opencv-python, which is not installed` in `pip check`; that one is
+harmless. Anything else in `pip check` is a real problem.
 
 ## GPU / Kaggle note
 

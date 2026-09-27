@@ -31,10 +31,8 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from train_yolo import (  # noqa: E402
-    base_image_id,
     iou_xyxy,
     load_gt_boxes,
-    xywhn_to_xyxyn,
     MATCH_IOU_THRESHOLD,
     PREPARED_DIR,
     EVAL_CONF,

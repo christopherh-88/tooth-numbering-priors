@@ -42,7 +42,6 @@ def main():
     x_train = train_df[FEATURE_COLS].to_numpy()
     y_train = train_df["class_id"].to_numpy()
     x_test = test_df[FEATURE_COLS].to_numpy()
-    y_test = test_df["class_id"].to_numpy()
 
     clf = HistGradientBoostingClassifier(random_state=0)
     clf.fit(x_train, y_train)

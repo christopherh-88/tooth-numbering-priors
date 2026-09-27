@@ -75,7 +75,6 @@ def main():
     x_train = train_df[FEATURE_COLS].to_numpy()
     y_train = train_df["class_id"].to_numpy()
     x_test = test_df[FEATURE_COLS].to_numpy()
-    y_test = test_df["class_id"].to_numpy()
 
     clf = HistGradientBoostingClassifier(random_state=0)
     clf.fit(x_train, y_train)
@@ -114,7 +113,7 @@ def main():
         {"variant": "excl_flagged", "n_instances": len(clean), "n_images": clean["image_id"].nunique(),
          "top1_acc": clean_top1, "quadrant_acc": clean_quad},
     ]).to_csv(Path(__file__).resolve().parent / "sensitivity_check_section25.csv", index=False)
-    print(f"\nSaved sensitivity_check_section25.csv")
+    print("\nSaved sensitivity_check_section25.csv")
 
 
 if __name__ == "__main__":

@@ -16,7 +16,6 @@ YOLO coordinates), not a re-derived or re-scaled version of it.
 
 No training, no model fitting - purely descriptive statistics.
 """
-import numpy as np
 import pandas as pd
 
 from build_coord_baseline import load_instances, FDI_CODES

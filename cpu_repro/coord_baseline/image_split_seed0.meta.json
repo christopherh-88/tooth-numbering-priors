@@ -5,5 +5,5 @@
   "n_test_images": 85,
   "n_train_instances": 22072,
   "n_test_instances": 5491,
-  "source": "build_coord_baseline.grouped_split(load_instances(), seed=SEEDS[0], TEST_FRACTION)"
+  "source": "build_coord_baseline.grouped_split(load_instances(), seed=0, TEST_FRACTION)"
 }

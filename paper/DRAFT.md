@@ -4,12 +4,13 @@
 `RESULTS.md` (cite the section, don't retype/round further). Anything not
 yet measured is marked `[PENDING - see RESULTS.md Section 11.5]` and must
 not be filled in with an assumed or estimated value - replace only once
-the real script has been run and the number is in `RESULTS.md`. **No
-inline figures or tables exist in this draft yet** - Results/Discussion
-point at `RESULTS.md`'s own tables by section number rather than
-embedding numbered Table/Figure objects; a real submission draft needs
-actual Table 1/Table 2/.../Fig 1 objects assigned and cross-referenced,
-which hasn't been done (reviewed 2026-09-12, RESULTS.md Section 36).
+the real script has been run and the number is in `RESULTS.md`.
+**Figures:** Figs. 1-6 and S1 exist in `paper/figures/` (vector PDF +
+600-dpi PNG, built by `make_figures.py` from committed CSVs; draft
+captions and data sources in `paper/figures/README.md`, RESULTS.md
+Section 57) and are referenced in the Results outline below. **No tables
+exist yet**; a submission draft still needs Table 1 (the headline
+numbers) assigned and cross-referenced.
 
 ## Working title
 
@@ -54,7 +55,8 @@ classification) against a 3.6-3.8% majority-class baseline, with a shuffled-
 geometry negative control collapsing to majority-baseline as expected.
 A real trained detector (YOLOv8, identical split) exceeds the
 coordinate-only ceiling by 24.8 percentage points on average across 5
-independent seeds (95.9% vs. 69.5% top-1, concentrated almost entirely in
+independent seeds (94.3% vs. 69.5% top-1 over all labeled teeth, a
+missed tooth counting as wrong; concentrated almost entirely in
 tooth-type rather than quadrant accuracy) - a pattern inconsistent with
 reliance on the geometric shortcut, though its errors do correlate with
 the coordinate-only model's errors weakly more than chance (phi = 0.18,
@@ -252,8 +254,8 @@ section and pull at write-time so a stale copy can't drift from the
 source of truth.
 
 - 4.1 Coordinate-only baseline recovers FDI identity far above chance
-  (Section 2, Section 10).
-- 4.1a Feature ablation: the signal is asymmetrically position-dependent
+  (Section 2, Section 10; Fig. 1).
+- 4.1a Feature ablation (Fig. 2a): the signal is asymmetrically position-dependent
   - `x_center` dominates (dropping it costs 47pp), `y_center` is real
   but secondary (dropping it costs 17pp, well above any shape feature's
   <0.3pp), shape features are inert (Section 20) - sharpens Claim A from
@@ -261,7 +263,7 @@ source of truth.
   identity prediction," a cleaner mechanistic claim than "x_center
   only." Also motivates the mitigation experiment's choice to jitter
   position, not size/shape.
-- 4.1b Robustness to test-time coordinate noise (Section 19): accuracy
+- 4.1b Robustness to test-time coordinate noise (Section 19; Fig. 2b): accuracy
   degrades smoothly, not as a cliff, and stays well above the majority
   baseline even at noise levels exceeding the natural per-class spread -
   supports reading Section 21/22's result (no shortcut-consistent error
@@ -276,7 +278,7 @@ source of truth.
   not a generalization result; state this distinction clearly so it isn't
   misread as broader evidence than it is.
 - 4.5 A real trained detector does not show shortcut-reliant behavior
-  (Section 21's GO/NO-GO result: PIVOT, YOLOv8 exceeds the
+  (Fig. 3; Section 21's GO/NO-GO result: PIVOT, YOLOv8 exceeds the
   coordinate-only ceiling by 26.3pp at seed 0 under the matched-
   detections-only convention, replicated at 24.8pp mean across 5 seeds
   under the undetected-counts-as-wrong convention used for the paired
@@ -306,7 +308,7 @@ source of truth.
 - 4.7 Boundary-condition dataset result: on DenPAR periapical
   radiographs - where the canonicalized-acquisition-protocol
   precondition breaks while the structured-label-space precondition
-  holds - the coordinate-only shortcut collapses from ~69-70%
+  holds - the coordinate-only shortcut collapses from ~68-70%
   (panoramic) to ~27% top-1, and quadrant accuracy specifically drops
   from near-ceiling (96-98%) to 45.5%, barely above tooth-type accuracy
   on the same data (Section 25). A partial, quantified answer supporting
@@ -314,9 +316,11 @@ source of truth.
   confirmation - stated as such.
 - 4.8 Multi-seed replication: the single-seed fragility concern raised
   across external review answered directly - 5 independent seeds give a
-  top-1 accuracy 95.85% ± 1.01pp and a gap vs. coordinate-only of
-  24.77pp ± 0.61pp (95% CI [24.16, 25.38]), nowhere near the
-  pre-registered 5pp GO/PIVOT threshold on any individual seed
+  top-1 accuracy of 95.85% ± 1.01pp on matched detections (94.26% ±
+  1.06pp over all labeled teeth, the convention the gap uses) and a gap
+  vs. coordinate-only of 24.77pp ± 0.61pp (95% CI [24.16, 25.38]),
+  nowhere near the pre-registered 5pp GO/PIVOT threshold on any
+  individual seed
   (Section 33). The framing decision (4.5, Section 24) is not reopened
   by this replication.
 - 4.9 Second detector architecture (RT-DETR) replicates Claim B's
@@ -356,6 +360,7 @@ source of truth.
   the "is this an Ultralytics-pipeline artifact" objection 4.9 could not
   rule out on its own (Section 45).
 - 4.11 What the phi correlation is capturing mechanistically (Section 46,
+  Fig. 5 for all 14 seeds,
   **not pre-registered** - this analysis emerged post-hoc out of an
   inconclusive box-targeted Grad-CAM exploration, not from a planned
   test, and should be weighted as exploratory rather than confirmatory).
@@ -376,51 +381,62 @@ source of truth.
   being only ~69-70%. Reading: when visual evidence is genuinely
   ambiguous (adjacent, morphologically similar teeth) and all three
   detectors fail anyway, they fail in the position-predicted direction
-  almost 9 times out of 10 - consistent with position acting as a
+  about 85% of the time (5-seed mean 84.5%) - consistent with position acting as a
   secondary, tie-breaking cue under visual ambiguity, not a primary
   shortcut, and a specific mechanistic account of why phi is
   small-but-nonzero rather than exactly zero.
-- 4.12 CUDA-vs-MPS training-backend robustness check (Section 49):
-  extends the earlier single-detector, single-architecture
-  Kaggle-CUDA-vs-local-MPS comparison (Section 31) to all three
-  detector architectures. RT-DETR's backend agreement is tight (every
+- 4.12 CUDA-vs-MPS training-backend robustness check (Section 49,
+  `cpu_repro/yolo_training/BACKEND_COMPARISON.md`; Fig. 6): all three detector
+  architectures trained on Kaggle CUDA and on a local Apple Silicon (MPS)
+  backend. RT-DETR's backend agreement is tight (every
   paired seed within 0.25pp); Faster R-CNN a bit looser (up to 0.7pp,
   mixed sign); YOLOv8 is the loosest (up to 2.5pp swings), but that
   looseness is driven entirely by the missed-detection rate, not by
   classification quality on matched detections, which stays in a tight
-  band on both backends. For all three architectures the mean backend
+  band on both backends. The missed-detection swings come from three
+  single YOLOv8 runs (CUDA seeds 7 and 9, MPS seed 8); the other runs on
+  the same splits are unaffected (Section 53). For all three architectures the mean backend
   difference is smaller than the seed-to-seed spread within a single
-  backend. Not an equivalence claim: backend is confounded with
-  training split (only seeds 5-9 are paired across both backends) and
-  with a disclosed batch-size/software-stack difference that was not
+  backend. Not an equivalence claim: only seeds 5-9 are paired across
+  both backends on identical splits (the group-level comparisons also
+  differ in split), and backend is confounded with a disclosed
+  batch-size/software-stack difference that was not
   varied independently. Read as supporting evidence that the headline
   gap (4.5, 4.9, 4.10) is not an artifact of one specific
   hardware/software combination, not as proof the two backends are
   statistically indistinguishable.
 - 4.13 Per-tooth head-to-head vs. the coordinate-only prior, by FDI
-  class (Section 50): a finer-grained restatement of the headline gap
+  class (Section 50; Fig. 4, and Fig. S1 for all three seed groups): a finer-grained restatement of the headline gap
   (4.5, 4.9, 4.10) at the level of individual tooth classes rather than
   pooled across the whole dataset. Paired bootstrap by class, all three
   detectors, all 32 FDI classes: every single class favors the detector
   over the geometry-only prior, with no exceptions - all 96
-  detector-class 95% CIs exclude zero. The smallest margins are
-  consistently the last molars (FDI 18/28/38/48/46), where the prior is
-  already comparatively strong (82.9-86.7%), but even there every
-  detector's CI stays above zero (smallest: YOLOv8's FDI 38 at +7.2pp,
-  95% CI [+3.5, +10.9]). Descriptive, not a formal independent-samples
-  test - the five seeds' test sets can share images, so this pools
+  detector-class 95% CIs exclude zero on the original 5 CUDA seeds. The
+  smallest margins are molars (third molars FDI 18/28/38/48 and the first
+  molar 46), where the prior is already comparatively strong
+  (82.9-86.7%), but even there every detector's CI stays above zero
+  (smallest: YOLOv8's FDI 38 at +7.2pp, 95% CI [+3.5, +10.9]). The same
+  holds in two further groups analyzed separately, 5 MPS seeds and 4
+  further CUDA seeds (Section 54): all 32 classes favor the detector for
+  all three detectors in both, with molars again the smallest margins.
+  The tightest case is RT-DETR's FDI 38 on the 4 further CUDA seeds, at
+  +4.2pp, 95% CI [+0.7, +7.9]. Descriptive, not a formal independent-samples
+  test - seeds within a group can share test images, so this pools
   (seed, image) clusters rather than fully independent draws (the
   analysis script's own documented caveat).
 - 4.14 Cross-architecture error-agreement result (4.11, Section 46)
-  replicated on 5 further seeds under a different training backend
-  (Section 51): the new MPS seeds' triple-agreement and
+  replicated on 9 further seeds (Sections 51-52). On 5 seeds under a
+  different training backend, the MPS triple-agreement and
   coordinate-match rates (97.4%, 87.5%) land within about 1 standard
   deviation of the original 5 CUDA seeds (96.8%, 84.5%) - same finding,
   a different split and a different backend, not pooled as a formal
-  CUDA/MPS equivalence claim for the same reasons given in 4.12. This
+  CUDA/MPS equivalence claim for the same reasons given in 4.12. On 4
+  further CUDA seeds, triple agreement is 97.0-100% and coordinate match
+  80.6-98.5% per seed, bringing all 9 CUDA seeds to 97.3% and 86.1%. This
   section also extends the small-box-size-drives-missed-detections
-  pattern already established for Faster R-CNN (Section 31) to YOLOv8
-  and RT-DETR on the new MPS seeds - the same pattern holds for both.
+  pattern already established for Faster R-CNN (Section 49) to YOLOv8
+  and RT-DETR on the MPS seeds and the further CUDA seeds - the same
+  pattern holds for all three detectors (Sections 51-52).
 
 ## 5. Discussion
 
@@ -455,15 +471,15 @@ source of truth.
   all 5 seeds - a mechanistic account of what phi is capturing, not new
   evidence bearing on the gap itself.
 - Robustness of the architecture-generality result to training backend
-  and finer-grained class analysis (4.12-4.14, Sections 49-51): the
+  and finer-grained class analysis (4.12-4.14, Sections 49-54): the
   same three-architecture convergence discussed above holds under a
   completely different training backend (Kaggle CUDA T4 vs. a local
   Apple Silicon MPS run, 4.12) and at the individual FDI-class level
   rather than only pooled across the dataset (4.13) - no single class,
   for any of the three detectors, favors the geometry-only prior over
-  the detector's own visual evidence. The cross-architecture
-  error-agreement finding (4.11) itself replicates on 5 further seeds
-  under the different backend (4.14). None of this is evidence for a
+  the detector's own visual evidence, on either backend. The
+  cross-architecture error-agreement finding (4.11) itself replicates on
+  9 further seeds, 5 of them under the different backend (4.14). None of this is evidence for a
   new claim - it is the same Claim-B finding checked from more angles,
   addressing a residual "is this specific to how these particular
   models were trained" objection rather than the core architecture-
@@ -472,7 +488,7 @@ source of truth.
   state what would need to be true elsewhere (non-panoramic modality, or
   a differently-structured label space) for the finding to transfer.
   DenPAR periapical radiographs (Section 25) is the one boundary-condition
-  dataset run so far - the shortcut weakens sharply (69-70% -> ~27%
+  dataset run so far - the shortcut weakens sharply (~68-70% -> ~27%
   top-1, quadrant accuracy collapsing from near-ceiling to 45.5%) but
   does not vanish to chance, a partial result supporting the
   two-precondition hypothesis without fully confirming or falsifying it.
@@ -525,7 +541,9 @@ source of truth.
   materiality-check addition) - one data point supporting the
   two-precondition hypothesis, not a broad generalization sweep.
 - Three real detectors evaluated (YOLOv8, RT-DETR, and Faster R-CNN,
-  5 seeds each - Sections 21/33, 38-40, 42-45), resolving what had been
+  5 seeds each for the headline result - Sections 21/33, 38-40, 42-45;
+  15 CUDA and 5 MPS seeds each for the robustness checks, Sections
+  49-54), resolving what had been
   the paper's single biggest open item and then some. Neither detector
   nor the coordinate-only baseline had its hyperparameters tuned or
   searched within this project (Sections 28, 38) - all three detectors
@@ -552,9 +570,10 @@ source of truth.
   claims.
 - Backend-robustness check (4.12, Section 49) is not a formal
   equivalence test: training backend (Kaggle CUDA T4 vs. local Apple
-  Silicon MPS) is confounded with both training split (only seeds 5-9
-  are paired across both backends) and a disclosed batch-size/software-
-  stack difference not varied independently - read as supporting
+  Silicon MPS) is paired on identical splits only for seeds 5-9 (the
+  group-level comparisons also differ in split) and is confounded with a
+  disclosed batch-size/software-stack difference not varied
+  independently - read as supporting
   evidence that the headline gap isn't a single-environment artifact,
   not as proof the two backends produce statistically indistinguishable
   models. All 15 CUDA seeds (0-14) have now been run for all three
@@ -571,8 +590,9 @@ source of truth.
   rule (`GO_NO_GO.md`), evaluated once against real data (Section 21)
   and then replicated - not re-tested against new thresholds - across 5
   seeds (Section 33) and, again, across two further detector
-  architectures (Sections 40, 45). The ~45 numbered sections in
-  `RESULTS.md` are converging diagnostics for that one claim pair -
+  architectures (Sections 40, 45). The numbered sections in
+  `RESULTS.md` (57 as of 2026-09-27, some of them bookkeeping or audit
+  entries) are converging diagnostics for that one claim pair -
   cross-dataset replication (Sections 2, 10), negative controls
   (Section 4), feature-ablation and noise-robustness checks (Sections
   19, 20), a mitigation experiment (Sections 30/31), a boundary-condition
@@ -624,21 +644,27 @@ source of truth.
 - DeGrave, Janizek & Lee, "AI for radiographic COVID-19 detection selects
   shortcuts over signal," Nature Machine Intelligence 3:610-619, 2021
   (DOI: 10.1038/s42256-021-00338-7). Verified via web search 2026-09-12.
-- Winkler et al., "Association Between Surgical Skin Markings in
-  Dermoscopic Images and Diagnostic Performance of a Deep Learning
-  Convolutional Neural Network for Melanoma Recognition," JAMA
-  Dermatology, 2019 (PMID: 31411641). Verified via web search
-  2026-09-12; title corrected from an earlier "Deep Learning CNN"
-  abbreviation to the paper's actual full title.
+- Winkler, Fink, Toberer et al., "Association Between Surgical Skin
+  Markings in Dermoscopic Images and Diagnostic Performance of a Deep
+  Learning Convolutional Neural Network for Melanoma Recognition," JAMA
+  Dermatology 155(10):1135-1141, 2019 (DOI: 10.1001/jamadermatol.2019.1735;
+  PMID: 31411641). Title verified via web search 2026-09-12; authors,
+  volume, pages, DOI and the 84.1% -> 45.8% specificity figures verified
+  against the PubMed record 2026-09-27.
 - Lin, Weng, Mikolaj et al., "Shortcut Learning in Medical Image
   Segmentation," MICCAI 2024 (LNCS 15008; DOI:
   10.1007/978-3-031-72111-3_59; also arXiv:2403.06748). Title, authors,
   venue and DOI verified via web search 2026-09-12; exact page range
   could not be confirmed (Springer chapter page required login) - use
   DOI, not page numbers, if precision is needed before submission.
-- Hamamci et al., "DENTEX: An Abnormal Tooth Detection with Dental
-  Enumeration and Diagnosis Benchmark for Panoramic X-rays," 2023
-  (arXiv:2305.19112).
+- Hamamci, Er, Durugol et al., "DENTEX: Dental Enumeration and Tooth
+  Pathosis Detection Benchmark for Panoramic X-ray," arXiv:2305.19112v2,
+  2025. Version 1 (2023-05-30, 13 authors) was titled "DENTEX: An
+  Abnormal Tooth Detection with Dental Enumeration and Diagnosis
+  Benchmark for Panoramic X-rays"; v2 (2025-11-13, 43 authors) is the
+  challenge report. The Limitations quotations in Related Work are from
+  v2, Section V-C (`RESULTS.md` Section 18), so cite v2. Title, versions
+  and authors verified against the arXiv API 2026-09-27.
 - Budagam, Imanbayev, Akhmetov, Sinitca, Antonov & Kaplun, "UFBA-425,"
   2025, FigShare (DOI: 10.6084/m9.figshare.29827475.v1). This is the
   primary dataset the whole project trains and evaluates on (`Dataset/`,
@@ -654,13 +680,12 @@ source of truth.
   implementation (see README.md's fork attribution). Title and author
   list verified via web search 2026-09-23. **Year flag:** cited here by
   its first arXiv posting (v1, 2024-06-06), consistent with this
-  section's convention for other arXiv-only entries (DENTEX above, Lin
-  et al. below) - the repo's own README.md bibtex instead lists
-  year=2025, which is when the most recent revision (v3, 2025-07-02)
-  was posted, not the original submission; no conference/journal
-  acceptance was found for either version, so it remains an
-  unpublished preprint either way. Reconcile before finalizing if the
-  submission venue has a rule about which arXiv version year to cite.
+  section's convention for the other arXiv-only entry (DENTEX above).
+  The repo's README.md bibtex also uses year=2024 (its citation key,
+  `budagam2025...`, still carries the year of the most recent revision,
+  v3, 2025-07-02). No conference/journal acceptance was found for any
+  version, so it remains an unpublished preprint. Check the submission
+  venue's rule on which arXiv version year to cite before finalizing.
 - Zhou, Lu, Zhao et al., "A dual-labeled dataset and fusion model for
   automatic teeth segmentation, numbering, and state assessment on
   panoramic radiographs," BMC Oral Health 24:1201, 2024 (DOI:
@@ -683,8 +708,18 @@ source of truth.
   cross-checked against the Zenodo record at 10.5281/zenodo.16645076).
 - Hamamci et al., "Diffusion-Based Hierarchical Multi-Label Object
   Detection to Analyze Panoramic Dental X-rays" (HierarchicalDet),
-  MICCAI 2023 (code/data: github.com/ibrahimethemhamamci/HierarchicalDet).
-  Verified via web search 2026-09-12.
+  MICCAI 2023 (arXiv:2303.06500; code/data:
+  github.com/ibrahimethemhamamci/HierarchicalDet). Verified via web search
+  2026-09-12; title and arXiv ID re-checked against the arXiv API
+  2026-09-27.
+- He, Liu & Wang, "Intergrated [sic] Segmentation and Detection Models
+  for Dentex Challenge 2023," arXiv:2308.14161, 2023 (DentexSegAndDet).
+- Mei, Ma, Shen & Wu, "YOLOrtho - A Unified Framework for Teeth
+  Enumeration and Dental Disease Detection," arXiv:2308.05967, 2023.
+- Choi, Shin & Lyou, "DETDet: Dual Ensemble Teeth Detection,"
+  arXiv:2308.14070, 2023. These three DENTEX participant papers (Related
+  Work, `RESULTS.md` Section 18) verified against the arXiv API
+  2026-09-27.
 - Hill, Koback & Schilling, "The risk of shortcutting in deep learning
   algorithms for medical imaging research," Scientific Reports 14:29224,
   2024 (DOI: 10.1038/s41598-024-79838-6). Verified via web search

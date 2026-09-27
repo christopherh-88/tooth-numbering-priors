@@ -17,7 +17,6 @@ the comparison is apples-to-apples - same instances, same features, same
 generalization boundary (image-level grouping prevents leakage), only
 the classifier changes.
 """
-import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 
@@ -58,7 +57,7 @@ def main():
 
     gbt_acc = 0.692770  # Section 2, seed-0 point value, GBT
     logreg_acc = 0.663814  # Section 2, seed-0 point value, LogReg
-    print(f"\nFor reference (Section 2, seed-0 point values):")
+    print("\nFor reference (Section 2, seed-0 point values):")
     print(f"  logistic regression: {logreg_acc:.4f}")
     print(f"  gradient-boosted tree: {gbt_acc:.4f}")
     print(f"\nBest k-NN top1_acc across k in {K_GRID}: {best_acc:.4f}")
