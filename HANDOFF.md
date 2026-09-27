@@ -23,15 +23,14 @@ YOLOv8x missed-tooth spikes traced to single training runs, with a
 correction to Section 49's seed-8 reading). `paper/DRAFT.md`'s
 Discussion section already states this position.
 
-**Git state as of this sync:** everything through commit `d074fd5` is
-committed and pushed (`main` is level with `origin/main`). The
-2026-09-27 work is **uncommitted, pending the user's review**: RESULTS.md
-Sections 52-53, BACKEND_COMPARISON.md updates, the `paper/DRAFT.md`
-limitations fix, this file, three new scripts
-(`per_tooth_predictions_cuda_10_14.py`, `per_tooth_predictions_yolo_cuda_7_9.py`,
-`build_joined_cuda_10_14.py`), edits to `cross_architecture_agreement.py`
+**Git state as of this sync:** the 2026-09-27 work is committed as
+`2adf6bb` (RESULTS.md Sections 52-53, BACKEND_COMPARISON.md updates, the
+`paper/DRAFT.md` limitations fix, three new scripts
+`per_tooth_predictions_cuda_10_14.py`, `per_tooth_predictions_yolo_cuda_7_9.py`
+and `build_joined_cuda_10_14.py`, edits to `cross_architecture_agreement.py`
 and both `missed_tooth_analysis*.py` scripts, and new `eval_results/`
-files. Run `git status --short` first thing next session.
+files); this wording fix is a follow-up commit. Run `git status -sb`
+first thing next session to see whether anything is unpushed.
 
 **Kaggle: nothing queued.** All 15 CUDA seeds (0-14) are run and
 reported for all three detectors, including the RT-DETR-l seed 10
@@ -214,9 +213,8 @@ reasoning that led to Task 2 isn't lost; don't treat it as pending.
 
 ## Actual next steps (2026-09-27)
 
-1. **Commit the 2026-09-27 work** once the user reviews it (commands
-   are printed at commit time, not run automatically - see standing
-   rules above).
+1. **`git push`** any unpushed commits once the user says so (commands
+   are printed, not run automatically - see standing rules above).
 2. **Fold Sections 52-53 into `paper/DRAFT.md`** if the paper is being
    actively drafted. Sections 49-51 are already in (4.12-4.14), and the
    draft's limitations paragraph already reflects Section 53, but 4.14
