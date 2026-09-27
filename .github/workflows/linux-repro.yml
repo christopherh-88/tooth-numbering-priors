@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -81,7 +81,39 @@ jobs:
       - name: Committed outputs unchanged
         run: |
           # PNGs are listed but not enforced: font rendering differs across
-          # platforms. CSV/JSON outputs must match exactly.
+          # platforms. Logistic-regression outputs are compared with a
+          # tolerance: lbfgs stops at a convergence tolerance, and Linux and
+          # macOS BLAS round differently, so a few borderline teeth can flip
+          # (RESULTS.md Section 57). Everything else must match exactly.
           git status --porcelain -- '*.png'
           git diff --stat -- '*.csv' '*.json'
-          git diff --exit-code -- '*.csv' '*.json'
+          LR_FILES="cpu_repro/coord_baseline/summary.csv cpu_repro/coord_baseline/per_seed_results.csv
+            cpu_repro/coord_baseline/confusion_matrix_logistic_regression_seed0.csv
+            cpu_repro/coord_baseline/dentex/summary.csv cpu_repro/coord_baseline/dentex/per_seed_results.csv
+            cpu_repro/coord_baseline/dentex/confusion_matrix_logistic_regression_seed0.csv"
+          EXCLUDES=$(for f in $LR_FILES; do printf " :(exclude)%s" "$f"; done)
+          git diff --exit-code -- '*.csv' '*.json' $EXCLUDES
+          .venv312/bin/python - $LR_FILES <<'EOF'
+          import io, subprocess, sys
+          import numpy as np
+          import pandas as pd
+          ok = True
+          for f in sys.argv[1:]:
+              old = pd.read_csv(io.StringIO(subprocess.run(["git", "show", f"HEAD:{f}"], capture_output=True, text=True, check=True).stdout))
+              new = pd.read_csv(f)
+              assert list(old.columns) == list(new.columns) and len(old) == len(new), f"{f}: shape changed"
+              if "confusion_matrix" in f:
+                  a, b = old.iloc[:, 1:].to_numpy(), new.iloc[:, 1:].to_numpy()
+                  moved = int(np.abs(a - b).sum()) // 2
+                  good = a.sum() == b.sum() and moved <= 0.005 * a.sum()
+                  print(f"{f}: {moved} of {a.sum()} teeth moved cell")
+              else:
+                  num = old.select_dtypes("number").columns
+                  gbt = old.classifier == "gradient_boosted_tree"
+                  exact = old[gbt].equals(new[gbt])
+                  lr_max = float((old.loc[~gbt, num] - new.loc[~gbt, num]).abs().to_numpy().max())
+                  good = exact and lr_max <= 0.002
+                  print(f"{f}: gradient-boosted tree rows identical={exact}; logistic regression max |diff|={lr_max:.5f}")
+              ok &= bool(good)
+          sys.exit(0 if ok else 1)
+          EOF

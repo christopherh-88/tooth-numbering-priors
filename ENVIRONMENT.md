@@ -100,12 +100,15 @@ the original messy incremental install used while building this project
 (which hit the numpy conflict live and fixed it step by step; that
 trial-and-error is NOT what's documented here).
 
-**Linux x86_64 has not had a real install.** Step 1 was checked there only
-by pip's cross-platform dry-run resolution (`--platform manylinux_2_28_x86_64
---only-binary=:all:`), which picks `torch-2.14.0+cpu` and
-`torchvision-0.29.0+cpu` with no CUDA packages. If you hit something
-different on Linux, update this file rather than working around it
-silently.
+**Linux x86_64 (Ubuntu 24.04, Python 3.12.14)** is tested on every change
+to the install files by `.github/workflows/linux-repro.yml` on a
+GitHub-hosted runner: the same two commands, `pip check`, the versions
+above (`2.14.0+cpu` / `0.29.0+cpu` builds), no CUDA packages, and a rerun
+of the core analyses against the committed outputs. The first run passed
+the install checks; the only output difference was last-digit drift in
+the logistic-regression baseline (RESULTS.md Section 57). If you hit
+something different on Linux, update this file rather than working
+around it silently.
 
 The order was reversed on 2026-09-27 (RESULTS.md Section 55). The earlier
 order (this file first, then torch from the CPU index; tested on

@@ -4244,9 +4244,34 @@ verbatim, requires `pip check` to pass, asserts `torch 2.14.0+cpu`,
 `torchvision 0.29.0+cpu`, `cv2 4.10.0`, no CUDA build and no CUDA
 packages, then runs `prepare_all_splits.py` and ten analysis scripts and
 fails if any committed CSV or JSON changes. It runs on manual dispatch and
-when the install files change. **Result pending:** the workflow has not
-run yet; it needs to be pushed first. Record its outcome here when it
-has.
+when the install files change.
+
+**Linux result (run 36349381179, commit `5a0ecd6`, Ubuntu 24.04 x86_64,
+Python 3.12.14).** The install passes every check: `pip check` clean;
+numpy 1.26.4, tensorflow 2.16.2, torch 2.14.0+cpu, torchvision 0.29.0+cpu,
+ultralytics 8.4.143, cv2 4.10.0, sklearn 1.9.0, pandas 3.0.5; no CUDA
+build and no CUDA packages (venv 3.9 GB). This closes Section 55's open
+item: the reordered `ENVIRONMENT.md` setup works on a real Linux x86_64
+machine. All 11 scripts ran. Every committed CSV and JSON output
+reproduced byte-for-byte except the **logistic-regression** coordinate
+baseline,
+which differs in the last digits: 6 of 5,342 teeth change prediction in
+UFBA-425 seed 1 and 4 of 4,351 in DENTEX seed 0 (its seed-0 confusion
+matrix), moving the 5-seed means from 0.67063 to 0.67040 (UFBA-425) and
+0.61290 to 0.61309 (DENTEX). Reported values (67.1%, 61.3%) are
+unchanged at their stated precision. The gradient-boosted tree (the
+headline coordinate prior) and every detector, per-tooth and agreement
+output are identical. (The four confusion-matrix PNGs also differ, from
+font rendering; PNGs are not compared.) Cause: lbfgs converges in
+90 iterations (of `max_iter=2000`, no warning) but stops at its
+tolerance, and Linux x86_64 and macOS arm64 BLAS round differently, so
+the stopping point differs slightly and a few borderline teeth flip. Not
+a bug; the workflow now checks logistic-regression rows with a tolerance
+(0.002 on any value, at most 0.5% of teeth moving in a confusion matrix)
+and everything else exactly. Tested locally against these exact
+differences (passes) and against a one-digit change in a
+gradient-boosted-tree value and a change to a detector output (both
+fail). The rerun with this check is recorded below when it completes.
 
 ## Adding a new entry
 
