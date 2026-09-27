@@ -4271,7 +4271,11 @@ a bug; the workflow now checks logistic-regression rows with a tolerance
 and everything else exactly. Tested locally against these exact
 differences (passes) and against a one-digit change in a
 gradient-boosted-tree value and a change to a detector output (both
-fail). The rerun with this check is recorded below when it completes.
+fail). Rerun with this check (run 36349755755, commit 49a6311): every
+step passed. Largest logistic-regression differences: 0.00112 in any
+per-seed value (UFBA-425), 0.00033 in a 5-seed summary value; 0 of 5,491
+UFBA-425 and 4 of 4,351 DENTEX seed-0 confusion-matrix teeth moved;
+gradient-boosted-tree rows and all other CSV/JSON outputs identical.
 
 ## Adding a new entry
 

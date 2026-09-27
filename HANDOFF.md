@@ -228,10 +228,10 @@ reasoning that led to Task 2 isn't lost; don't treat it as pending.
 2. **Optional, not prioritized:** the supernumerary-dataset email (see
    "Where things stand" above) and a second external-validation dataset.
    Neither has been started.
-3. **Check the Linux CI run** once pushed: Actions tab, "Linux
-   reproducibility" (or `gh run list --workflow linux-repro.yml -R
-   christopherh-88/tooth-numbering-priors`). Record the outcome in
-   `RESULTS.md` Section 57, which says "Result pending".
+3. **Linux CI: done.** Run 36349755755 (commit 49a6311) passed; recorded
+   in `RESULTS.md` Section 57. It reruns on its own when
+   `cpu_repro/requirements.txt`, `ENVIRONMENT.md` or the workflow changes
+   (Actions tab, "Linux reproducibility").
 4. **Paper, before submission:** Table 1 (headline numbers); the
    bracketed "PMC, 2025" note in Related Work (identify the paper or
    drop it); OralBBNet arXiv-version year per venue rules. Figures are
