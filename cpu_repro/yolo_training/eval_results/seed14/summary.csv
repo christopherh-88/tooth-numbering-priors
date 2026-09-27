@@ -1,0 +1,2 @@
+top1_acc,quadrant_acc,tooth_type_acc,majority_baseline_acc,mirror_quadrant_error_frac,neighbor_error_frac,n_test,seed,classifier,detection_recall,n_unmatched_gt_missed_detections,n_unmatched_pred_spurious_detections
+0.9632183908045977,0.9986590038314176,0.9645593869731801,0.03639846743295019,0.036458333333333336,0.9635416666666666,5220,14,yolov8,0.9795458810283355,109,116

@@ -3835,6 +3835,194 @@ runs. Generating it would require either downloading each run's saved
 checkpoint from Kaggle (not done for these runs) or rerunning inference
 there.
 
+## 52. Section 46 and the missed-tooth breakdown extended to CUDA seeds 10-14
+
+**Date:** 2026-09-27. **Scripts:**
+`cpu_repro/yolo_training/per_tooth_predictions_cuda_10_14.py` (reruns
+inference on the downloaded Kaggle CUDA `best.pt` checkpoints - RT-DETR-l
+seeds 10-14, YOLOv8x and Faster R-CNN seeds 11-14 only, since those two
+architectures' seed-10 checkpoints were never downloaded - verifying each
+seed's matched/missed/correct counts against its training-time
+`summary.csv` before accepting the output, same discipline as the MPS
+version in Section 51); `build_joined_cuda_10_14.py` (fits a fresh
+coordinate-only baseline per CUDA seed 11-14, same
+HistGradientBoostingClassifier/`grouped_split` recipe as
+`build_joined_mps_seeds.py`, joins it against each detector's new
+per-tooth predictions - produces `joined_seed{11-14}.csv` for all three
+detectors; seed 10 excluded from this join, no three-way table possible
+without YOLOv8x/Faster R-CNN checkpoints for it); `cross_architecture_agreement.py`
+(`SEEDS` extended to `[0..9, 11..14]`, `CUDA_SEEDS` extended to include
+11-14); `missed_tooth_analysis.py` and `missed_tooth_analysis_yolo_rtdetr.py`
+(both extended with a CUDA-seed-11-14 report group, reusing each
+architecture's own per_tooth.csv - RT-DETR-l's group also includes seed
+10). **Output:**
+`eval_results/cross_architecture_agreement_summary.csv`,
+`eval_results/{multiseed,fasterrcnn_multiseed,rtdetr_multiseed}/joined_seed{11-14}.csv`,
+`eval_results/{seed{10-14},rtdetr/seed{10-14},fasterrcnn_cuda/seed{11-14}}/per_tooth.csv`,
+`eval_results/missed_tooth_by_class.csv`.
+
+**Verification before use:** checkpoint identity was established first
+(not assumed from Kaggle download filenames, which are all named
+`best.zip`/`best (N).zip` with no seed information) - each of the 13
+downloaded checkpoints was run against every candidate seed's validation
+split until its (top1_acc, n_test, n_missed) reproduced that seed's
+`summary.csv` numbers to within 1e-6; all 13 matched their expected seed
+on the first try. All 13 of the new per-tooth reruns then also matched
+their `summary.csv` matched/missed/correct counts exactly - none required
+a fallback `per_tooth.csv.mismatch`. Each CUDA seed's coordinate-baseline
+join preserved every row (inner join count equals the freshly-fit
+baseline's own test-set size).
+
+**Section 46 extension result** (same triple-agreement / coord-match
+definitions as Sections 46 and 51):
+
+| Group | n seeds | Triple-agreement rate | Coord-match rate |
+|---|---|---|---|
+| CUDA seeds 0-4, 11-14 | 9 | 0.973 +/- 0.024 | 0.861 +/- 0.061 |
+| MPS seeds 5-9 | 5 | 0.974 +/- 0.025 | 0.875 +/- 0.020 |
+| All 14 pooled | 14 | 0.973 +/- 0.023 | 0.866 +/- 0.049 |
+
+Same result as Sections 46 and 51 on four more CUDA seeds (11-14, seed 10
+excluded - no three-way join for it): triple-agreement rate is unchanged
+within noise (0.973 vs. the prior 5-seed CUDA estimate of 0.968), and the
+CUDA/MPS groups continue to land within about 1sd of each other. Still
+reported separately, not pooled as a CUDA/MPS equivalence claim, for the
+same reason as Section 51 (backend and split both differ).
+
+**Missed-tooth breakdown, CUDA seeds 11-14** (RT-DETR-l also includes
+seed 10, the one CUDA seed-10 checkpoint that was downloaded):
+
+| Detector | Seeds | Missed | Total | Rate |
+|---|---|---|---|---|
+| YOLOv8x | 11-14 | 414 | 21,151 | 1.96% |
+| RT-DETR-l | 10-14 | 299 | 26,769 | 1.12% |
+| Faster R-CNN | 11-14 | 283 | 21,151 | 1.34% |
+
+Same pattern as Sections 31 and 51: misses concentrate in the smallest
+box-area quartile for all three detectors (YOLOv8x 3.61% vs. 1.39-1.44%
+elsewhere; RT-DETR-l 2.18% vs. 0.64-1.00%; Faster R-CNN 2.71% vs.
+0.75-1.03%). Quartile cutoffs follow each script's existing convention:
+YOLOv8x and RT-DETR-l use cutoffs from that model's own CUDA seeds listed
+above, and Faster R-CNN uses the seed 0-9 cutoffs, so its seed 0-9
+numbers in BACKEND_COMPARISON.md still reproduce. Edge proximity is rare
+(12-14 near-edge boxes per detector), and no single FDI class dominates
+the misses (the top class holds 7.0-9.4% of misses). YOLOv8x seed 11's
+miss rate (2.58%) is the highest of the four CUDA seeds checked here,
+still short of the CUDA seeds 7 and 9 spikes (~4%) flagged in Section 49;
+those two are broken down in Section 53.
+
+**Not done in this entry:** the YOLOv8x and Faster R-CNN seed-10
+checkpoints and CUDA seeds 5-9 (other than YOLOv8x seeds 7 and 9, see
+Section 53) have no downloaded weights, so no per-tooth data exists for
+them.
+
+## 53. YOLOv8x CUDA seeds 7 and 9 missed-tooth spikes broken down
+
+**Date:** 2026-09-27. **Scripts:**
+`cpu_repro/yolo_training/per_tooth_predictions_yolo_cuda_7_9.py`
+(per-tooth rerun, same protocol and summary.csv verification as Section
+52's script, narrowed to these two seeds);
+`missed_tooth_analysis_yolo_rtdetr.py` (new spike-seed report, which
+produces every number in this entry). **Output:**
+`eval_results/seed{7,9}/per_tooth.csv`.
+
+Section 49 flagged two YOLOv8x CUDA missed-tooth-rate spikes (seeds 7
+and 9, ~4%) that Sections 51 and 52 could not break down because neither
+checkpoint had been downloaded. Both were downloaded from Kaggle and
+identified the same way as Section 52's checkpoints: each file's
+inference output had to reproduce one seed's `summary.csv` (top1_acc,
+n_test, n_missed, to 1e-6) before being assigned to it. The per-tooth
+reruns then reproduced both seeds' matched/missed/correct counts exactly.
+
+**Verification before use:** CUDA and MPS runs with the same seed number
+use the same validation split - checked directly, the per-tooth tables
+for CUDA and MPS YOLOv8x seeds 7 and 9 contain the identical set of
+(image, tooth) pairs. That makes the MPS YOLOv8x run a same-split control
+for each spike.
+
+| Seed | YOLOv8x CUDA missed | YOLOv8x MPS missed (same split) |
+|---|---|---|
+| 7 | 204 / 5,111 (3.99%) | 117 / 5,111 (2.29%) |
+| 9 | 208 / 5,287 (3.93%) | 83 / 5,287 (1.57%) |
+
+The script's seeds 5-9 table (every run's missed-tooth rate from its
+`summary.csv`) extends the control to RT-DETR-l and Faster R-CNN on both
+backends:
+
+| Seed | RT-DETR-l MPS | RT-DETR-l CUDA | Faster R-CNN MPS | Faster R-CNN CUDA | YOLOv8x MPS | YOLOv8x CUDA |
+|---|---|---|---|---|---|---|
+| 5 | 0.84% | 0.77% | 1.18% | 0.86% | 1.49% | 1.17% |
+| 6 | 0.83% | 0.67% | 1.22% | 0.97% | 1.54% | 1.24% |
+| 7 | 1.31% | 1.13% | 1.37% | 1.47% | 2.29% | **3.99%** |
+| 8 | 0.70% | 0.87% | 1.12% | 1.22% | **3.04%** | 1.20% |
+| 9 | 0.89% | 0.66% | 1.17% | 1.02% | 1.57% | **3.93%** |
+
+**Seed 9's spike is specific to the CUDA training run.** Every other run
+on that split is within 0.05 percentage points of its higher rate on
+seeds 5 and 6 (the two seeds with no spike in any run), while the CUDA
+YOLOv8x run is 2.7 points above its own. **Seed 7's spike is partly
+the split.** It is the hardest of seeds 5-9 for all four RT-DETR-l and
+Faster R-CNN runs (1.13-1.47%, vs. 0.66-1.22% on the other four seeds)
+and the second-hardest for YOLOv8x MPS (2.29%). Still, the CUDA YOLOv8x
+run's 3.99% is well above all of them, so most of the spike belongs to
+that run.
+
+Where the CUDA-run misses fall: like every other seed analyzed (Sections
+31, 51, 52), they concentrate in the smallest box-area quartile (seed 7:
+8.24% vs. 2.56% for the other two quartile groups; seed 9: 6.31% vs.
+2.16-3.68%; cutoffs pooled over the two spike seeds). Overlap with
+neighboring teeth is not a consistent driver here: heavy-overlap boxes
+are missed slightly more than the others in seed 7 (4.73% vs.
+3.17-4.26%), but in seed 9 boxes with no overlap are missed most (5.09%
+vs. 3.56-3.95%). Edge proximity plays no role (4 near-edge boxes across
+both seeds, none missed).
+
+**Seed 9 has one class-specific failure on top of that.** FDI 24 (upper-left
+first premolar) is missed 43/165 times (26.1%), 20.7% of that seed's
+misses and about 2.9x the next-highest class in the seed (FDI 35,
+8.9%). The 43 misses fall in 43 different images, so this is not a few
+bad radiographs. Every other run with per-tooth data on that split handles
+the same teeth normally: YOLOv8x MPS misses 7/165 (4.2%), RT-DETR-l MPS
+4/165 (2.4%), Faster R-CNN MPS 4/165 (2.4%). No CUDA RT-DETR-l or Faster
+R-CNN seed-9 checkpoint was downloaded, so those runs can't be checked
+per class. Across all 30 per-tooth tables
+(MPS seeds 5-9 and CUDA seeds 7, 9, 10-14, all available architectures)
+and the CUDA seed 0-4 joined tables, this is the only class with at
+least 30 instances and a miss rate of 20% or more. The next-highest rate
+anywhere is 10.8% (FDI 31, CUDA seed 7), and the CUDA seed 0-4 tables
+never exceed 6.9%. FDI 24 explains only part of seed 9's excess: with it
+excluded, the CUDA run still misses 3.22% (165/5,122), against 1.57%
+for the MPS run overall.
+
+Seed 7 has no comparable single-class failure. Its misses are spread
+across several classes (FDI 31, 41, 15, 42, 14 at 8.4-10.8%), with no
+class above 9.3% of the seed's misses.
+
+**Interpretation, with its limits:** both CUDA spikes are mostly
+run-to-run training variance in YOLOv8x. Seed 7 also sits on a mildly
+harder split. Seed 9's run additionally learned a specific blind spot
+for FDI 24. This does not show whether the CUDA backend makes such runs
+more likely. Each backend has one run per seed, and YOLOv8x spikes
+occurred on both backends (two on CUDA, one on MPS - see the correction
+below), so backend and run-to-run noise cannot be separated. This entry does not explain why
+those particular runs converged worse.
+
+**Correction to Section 49 (MPS seed 8).** Section 49 read YOLOv8x MPS
+seed 8's spike (3.04%) as "the whole split is harder for detection on
+that seed." The seeds 5-9 table above contradicts that. On the identical
+5,262 teeth, the other five runs miss 0.70-1.22%: YOLOv8x CUDA 1.20%,
+RT-DETR-l MPS 0.70% (its lowest of seeds 5-9), RT-DETR-l CUDA 0.87%,
+Faster R-CNN MPS 1.12%, Faster R-CNN CUDA 1.22%. None is more than 0.25
+points above its higher rate on seeds 5 and 6. The MPS YOLOv8x run is
+1.5 points above its own. Seed 8's spike is therefore specific to that
+one MPS YOLOv8x run, like seed 9's on CUDA. Section 49's observation
+that this run's misses are elevated in every box-size quartile still
+stands, but "roughly double the pooled MPS rate" overstates it for the
+smallest quartile. The script's spike quartile table, using the run's
+own cutoffs, gives 4.71% / 2.62% / 2.20% against the pooled MPS
+3.80% / 1.36% / 1.35%, which is 1.2x, 1.9x and 1.6x. It describes a
+weaker run, not a harder split.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

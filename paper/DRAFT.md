@@ -557,13 +557,14 @@ source of truth.
   stack difference not varied independently - read as supporting
   evidence that the headline gap isn't a single-environment artifact,
   not as proof the two backends produce statistically indistinguishable
-  models. Seed coverage beyond the original 5 remains incomplete: CUDA
-  seeds 12-14 and a rerun of RT-DETR's canceled CUDA seed 10 have not
-  been run (blocked on Kaggle's weekly GPU quota), and two YOLOv8
-  missed-detection-rate spikes (CUDA seeds 7 and 9) remain unexplained,
-  since no per-tooth prediction data was retained for those particular
-  runs (only summary statistics were downloaded) - noted here as an
-  open gap, not silently omitted.
+  models. All 15 CUDA seeds (0-14) have now been run for all three
+  detectors. The three YOLOv8 missed-detection-rate spikes (CUDA seeds 7
+  and 9, MPS seed 8) trace to individual training runs rather than to
+  harder splits: the other runs on the same splits are unaffected
+  (Section 53), except that seed 7's split is mildly harder for every
+  model. Why those particular runs converged worse is not explained.
+  With one run per backend per seed, backend and run-to-run variance
+  cannot be separated.
 - **Multiplicity / analysis transparency.** This paper makes one
   pre-registered claim pair (Claim A: geometry predicts identity; Claim
   B: does a real detector rely on it) with a single GO/NO-GO decision

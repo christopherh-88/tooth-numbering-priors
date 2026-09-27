@@ -1,4 +1,6 @@
-"""Which labeled teeth does Faster R-CNN miss? (seeds 0-4 CUDA from joined tables, seeds 5-9 MPS from per_tooth.csv)
+"""Which labeled teeth does Faster R-CNN miss? (seeds 0-4 CUDA from joined tables,
+seeds 5-9 MPS from per_tooth.csv, seeds 11-14 CUDA from per_tooth.csv - seed
+10 excluded, no Faster R-CNN seed-10 checkpoint was downloaded)
 
 A tooth is "missed" when fasterrcnn_pred is empty in joined_seed{N}.csv, i.e. no
 predicted box matched the labeled box at ty.MATCH_IOU_THRESHOLD. Breaks misses
@@ -53,8 +55,17 @@ def rows_cuda(seed):
 
 def rows_mps(seed):
     """Seeds 5-9: per_tooth.csv from per_tooth_predictions_mps.py."""
+    return rows_from_per_tooth(HERE / "eval_results" / "fasterrcnn" / f"seed{seed}" / "per_tooth.csv", seed)
+
+
+def rows_cuda_10_14(seed):
+    """Seeds 11-14: per_tooth.csv from per_tooth_predictions_cuda_10_14.py."""
+    return rows_from_per_tooth(HERE / "eval_results" / "fasterrcnn_cuda" / f"seed{seed}" / "per_tooth.csv", seed)
+
+
+def rows_from_per_tooth(path, seed):
     by_img = defaultdict(list)
-    for r in csv.DictReader(open(HERE / "eval_results" / "fasterrcnn" / f"seed{seed}" / "per_tooth.csv")):
+    for r in csv.DictReader(open(path)):
         by_img[r["image_id"]].append(r)
     rows = []
     for teeth in by_img.values():
@@ -88,7 +99,7 @@ def report(label, rows, q1, q3):
 
     show("By edge proximity (within 3% of a border):",
          [("near edge", [r for r in rows if r["edge"]]), ("interior", [r for r in rows if not r["edge"]])])
-    show("By box area quartile (cutoffs from all 10 seeds):",
+    show("By box area quartile (cutoffs from CUDA seeds 0-4 + MPS seeds 5-9):",
          [("smallest quarter", [r for r in rows if r["area"] <= q1]),
           ("middle half", [r for r in rows if q1 < r["area"] < q3]),
           ("largest quarter", [r for r in rows if r["area"] >= q3])])
@@ -107,10 +118,14 @@ def report(label, rows, q1, q3):
 def main():
     cuda = [r for s in range(5) for r in rows_cuda(s)]
     mps = [r for s in range(5, 10) for r in rows_mps(s)]
+    cuda_10_14 = [r for s in (11, 12, 13, 14) for r in rows_cuda_10_14(s)]
+    # Cutoffs stay on the original 10 seeds so the seed 0-9 numbers in BACKEND_COMPARISON.md reproduce.
     areas = sorted(r["area"] for r in cuda + mps)
     q1, q3 = areas[len(areas) // 4], areas[3 * len(areas) // 4]
     by_cls = {}
-    for label, rows in (("CUDA seeds 0-4", cuda), ("MPS seeds 5-9", mps), ("all 10 seeds (description only)", cuda + mps)):
+    for label, rows in (("CUDA seeds 0-4", cuda), ("MPS seeds 5-9", mps),
+                        ("all 10 seeds (description only)", cuda + mps),
+                        ("CUDA seeds 11-14", cuda_10_14)):
         by_cls[label] = report(label, rows, q1, q3)
 
     dest = HERE / "eval_results" / "missed_tooth_by_class.csv"

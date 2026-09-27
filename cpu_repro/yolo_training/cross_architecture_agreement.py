@@ -16,13 +16,16 @@ is assessed by permutation: shuffle one architecture's predicted-wrong-class
 labels among the joint-wrong instance set (preserves each architecture's own
 marginal wrong-class frequency, destroys instance-level pairing).
 
-Seeds 0-4 are Kaggle CUDA runs; seeds 5-9 are local MPS runs (see
+Seeds 0-4 and 11-14 are Kaggle CUDA runs; seeds 5-9 are local MPS runs (see
 BACKEND_COMPARISON.md), each with their own coordinate baseline refit on
-that seed's split (build_joined_mps_seeds.py). Backend and split both differ
-between the two groups, so the per-seed summary reports them separately as
-well as pooled; the pooled numbers describe ten seeds' worth of evidence for
-this analysis's own question (do detectors converge on the same wrong
-answer), not a CUDA/MPS equivalence claim.
+that seed's split (build_joined_mps_seeds.py for 5-9, build_joined_cuda_10_14.py
+for 11-14). Seed 10 is excluded: only RT-DETR has a downloaded seed-10
+checkpoint, so no three-way join exists for it (see
+build_joined_cuda_10_14.py's docstring). Backend and split both differ
+between the CUDA and MPS groups, so the per-seed summary reports them
+separately as well as pooled; the pooled numbers describe fourteen seeds'
+worth of evidence for this analysis's own question (do detectors converge on
+the same wrong answer), not a CUDA/MPS equivalence claim.
 
 Run: python cpu_repro/yolo_training/cross_architecture_agreement.py
 """
@@ -35,8 +38,8 @@ import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EVAL_ROOT = REPO_ROOT / "cpu_repro" / "yolo_training" / "eval_results"
-SEEDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-CUDA_SEEDS = {0, 1, 2, 3, 4}
+SEEDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14]
+CUDA_SEEDS = {0, 1, 2, 3, 4, 11, 12, 13, 14}
 N_PERM = 10_000
 RNG_SEED = 0
 

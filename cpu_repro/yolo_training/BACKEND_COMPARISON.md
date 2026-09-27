@@ -1,6 +1,6 @@
 # Detector robustness across training backends: Kaggle CUDA vs local Apple Silicon (MPS)
 
-Three detectors (YOLOv8x, RT-DETR-l, Faster R-CNN `fasterrcnn_resnet50_fpn_v2`), 30 epochs each, one fixed configuration per detector, no retuning. Every seed has its own grouped image-level split (340 train / 85 test images). All numbers come from `detector_backend_comparison.py` (`eval_results/detector_backend_comparison.csv`); a seed with no result is printed as MISSING.
+Three detectors (YOLOv8x, RT-DETR-l, Faster R-CNN `fasterrcnn_resnet50_fpn_v2`), 30 epochs each, one fixed configuration per detector, no retuning. Every seed has its own grouped image-level split (340 train / 85 test source images; the Roboflow export has augmented copies of each source image, kept on the same side of the split, so each seed's test set is 189-215 image files for the seeds checked, 5-14). All numbers come from `detector_backend_comparison.py` (`eval_results/detector_backend_comparison.csv`); a seed with no result is printed as MISSING.
 
 Run layout:
 
@@ -9,7 +9,7 @@ Run layout:
 | CUDA seeds 0-4 | 0-4 | Kaggle T4 |
 | CUDA seeds 5-9 | 5-9 | Kaggle T4 |
 | MPS seeds 5-9 | 5-9 | MacBook Air M3 |
-| CUDA seeds 10-14 | 10-14 | Kaggle T4 (only seeds 10-11 done so far) |
+| CUDA seeds 10-14 | 10-14 | Kaggle T4 |
 
 Seeds 5-9 were trained on both backends with identical splits, so that pair is compared seed by seed. The other groups are separate samples on different splits.
 
@@ -22,17 +22,17 @@ Headline metric is all-GT top-1: every labeled tooth is in the denominator, and 
 | YOLOv8x | CUDA seeds 0-4 | 5 | 0.9426 ± 0.0086 | 0.9339-0.9528 | 1.66% | 0.9585 |
 | YOLOv8x | CUDA seeds 5-9 | 5 | 0.9380 ± 0.0205 | 0.9132-0.9547 | 2.31% | 0.9601 |
 | YOLOv8x | MPS seeds 5-9 | 5 | 0.9423 ± 0.0062 | 0.9365-0.9509 | 1.99% | 0.9614 |
-| YOLOv8x | CUDA seeds 10-14 | 2 | 0.9359 ± 0.0010 | 0.9352-0.9366 | 2.23% | 0.9573 |
+| YOLOv8x | CUDA seeds 10-14 | 5 | 0.9412 ± 0.0122 | 0.9296-0.9612 | 1.94% | 0.9598 |
 | RT-DETR-l | CUDA seeds 0-4 | 5 | 0.9448 ± 0.0072 | 0.9345-0.9512 | 1.11% | 0.9554 |
 | RT-DETR-l | CUDA seeds 5-9 | 5 | 0.9532 ± 0.0062 | 0.9461-0.9612 | 0.82% | 0.9611 |
 | RT-DETR-l | MPS seeds 5-9 | 5 | 0.9527 ± 0.0075 | 0.9446-0.9624 | 0.91% | 0.9615 |
-| RT-DETR-l | CUDA seeds 10-14 | 1 | 0.9484 | 0.9484 | 0.98% | 0.9578 |
+| RT-DETR-l | CUDA seeds 10-14 | 5 | 0.9465 ± 0.0163 | 0.9300-0.9696 | 1.11% | 0.9572 |
 | Faster R-CNN | CUDA seeds 0-4 | 5 | 0.9332 ± 0.0095 | 0.9212-0.9425 | 1.36% | 0.9461 |
 | Faster R-CNN | CUDA seeds 5-9 | 5 | 0.9400 ± 0.0088 | 0.9279-0.9519 | 1.11% | 0.9505 |
 | Faster R-CNN | MPS seeds 5-9 | 5 | 0.9377 ± 0.0106 | 0.9213-0.9470 | 1.21% | 0.9492 |
-| Faster R-CNN | CUDA seeds 10-14 | 2 | 0.9315 ± 0.0129 | 0.9224-0.9406 | 1.76% | 0.9481 |
+| Faster R-CNN | CUDA seeds 10-14 | 5 | 0.9371 ± 0.0132 | 0.9224-0.9567 | 1.47% | 0.9511 |
 
-Across all CUDA seeds run so far: YOLOv8x 0.9396 ± 0.0137 (n=12), RT-DETR-l 0.9490 ± 0.0073 (n=11), Faster R-CNN 0.9358 ± 0.0095 (n=12).
+Across all CUDA seeds (0-14): YOLOv8x 0.9406 ± 0.0137 (n=15), RT-DETR-l 0.9482 ± 0.0108 (n=15), Faster R-CNN 0.9368 ± 0.0103 (n=15).
 
 ## Paired comparison on the shared splits (seeds 5-9)
 
@@ -67,7 +67,9 @@ MPS minus CUDA, all-GT top-1, same split per seed:
 | 9 | 0.9132 / 3.93% / 0.9506 | 0.9378 / 1.57% / 0.9527 | +0.0246 |
 | 10 | 0.9366 / 1.89% / 0.9546 | - | - |
 | 11 | 0.9352 / 2.58% / 0.9600 | - | - |
-| 12-14 | not run | - | - |
+| 12 | 0.9296 / 1.58% / 0.9445 | - | - |
+| 13 | 0.9612 / 1.60% / 0.9769 | - | - |
+| 14 | 0.9435 / 2.05% / 0.9632 | - | - |
 
 **RT-DETR-l**
 
@@ -83,9 +85,11 @@ MPS minus CUDA, all-GT top-1, same split per seed:
 | 7 | 0.9489 / 1.13% / 0.9598 | 0.9483 / 1.31% / 0.9609 | -0.0006 |
 | 8 | 0.9612 / 0.87% / 0.9697 | 0.9624 / 0.70% / 0.9692 | +0.0011 |
 | 9 | 0.9461 / 0.66% / 0.9524 | 0.9446 / 0.89% / 0.9531 | -0.0015 |
-| 10 | MISSING: Kaggle run canceled at the 12 h timeout, no output; rerun pending | - | - |
+| 10 | 0.9300 / 1.57% / 0.9448 | - | - |
 | 11 | 0.9484 / 0.98% / 0.9578 | - | - |
-| 12-14 | not run | - | - |
+| 12 | 0.9318 / 1.11% / 0.9423 | - | - |
+| 13 | 0.9696 / 0.91% / 0.9785 | - | - |
+| 14 | 0.9529 / 0.99% / 0.9625 | - | - |
 
 **Faster R-CNN**
 
@@ -103,7 +107,9 @@ MPS minus CUDA, all-GT top-1, same split per seed:
 | 9 | 0.9279 / 1.02% / 0.9375 | 0.9213 / 1.17% / 0.9322 | -0.0066 |
 | 10 | 0.9224 / 2.01% / 0.9413 | - | - |
 | 11 | 0.9406 / 1.50% / 0.9550 | - | - |
-| 12-14 | not run | - | - |
+| 12 | 0.9280 / 1.23% / 0.9396 | - | - |
+| 13 | 0.9567 / 1.06% / 0.9669 | - | - |
+| 14 | 0.9381 / 1.56% / 0.9529 | - | - |
 
 ## What this does not show
 
@@ -111,7 +117,7 @@ MPS minus CUDA, all-GT top-1, same split per seed:
 - **Backend is confounded with software stack and batch size.** The CUDA and MPS runs used different torch/torchvision/ultralytics builds and kernels. On MPS, YOLOv8x ran at batch 2 and RT-DETR-l at batch 4 (ultralytics accumulates to a nominal batch of 64), so batch-norm statistics differ from the CUDA runs. This is a disclosed confound and was not varied.
 - **CUDA seeds 0-4, 5-9 and 10-14 are different splits.** Differences between those groups (for example RT-DETR-l 0.9448 vs 0.9532) are not a backend or time effect; they are different test sets and different seeds.
 - **Groups are not pooled across backends.** The "all CUDA seeds" line pools one backend only.
-- **Incomplete coverage.** CUDA seeds 12-14 have not been run for any detector, and RT-DETR-l seed 10 timed out on Kaggle (12 h) without output. Seeds are reported as they finish, none dropped.
+- **Coverage.** All CUDA seeds 0-14 are now run and reported for all three detectors, none dropped. (RT-DETR-l seed 10 originally timed out on Kaggle at the 12 h ceiling with no output; the rerun completed and its result is included above.)
 - **Seed column label bug.** The Kaggle Faster R-CNN CUDA seeds 5-9 outputs were written by an older script that hard-coded `seed=0` in `summary.csv`. Results here are keyed by folder name, and each total of labeled teeth (`n_test` + missed) matches the MPS run on the same split.
 
 ## Limitation: missed teeth (Faster R-CNN)
@@ -121,26 +127,34 @@ About 1.3% of labeled teeth get no predicted box at the matching IoU threshold, 
 - **Box size is the main driver.** The smallest quarter of boxes miss at 2.9% and account for 57% of all misses, versus 0.64% for the middle half and 0.94% for the largest quarter (CUDA 3.2% / MPS 2.6% for the smallest quarter).
 - **Neighbor overlap does not matter.** Miss rates are 1.1-1.4% whether a tooth's box has no overlap, light overlap or heavy overlap with its nearest labeled neighbor.
 - **Image edge:** teeth within 3% of a border are rarely labeled (37 of 54,722) but are missed often (15 of them, 41%). They contribute only 2% of all misses, so this does not move the headline number.
-- **No single tooth dominates.** The most-missed FDI classes (15, 23, 25, 31, 32, 12, 26, 45) each hold 5-6% of misses at 2-2.4% per class, with no third-molar concentration. The top classes differ between the CUDA and MPS groups, so the class-level ordering is noise.
+- **No single tooth dominates.** The most-missed FDI classes (15, 23, 25, 31, 32, 12, 26, 45) each hold 4.8-5.7% of misses at 1.9-2.4% per class, with no third-molar concentration. The top classes differ between the CUDA and MPS groups, so the class-level ordering is noise.
 
-This analysis covers Faster R-CNN seeds 0-9 only. It does not yet include CUDA seeds 5-14 for any detector.
+The numbers above are Faster R-CNN seeds 0-9. CUDA seeds 11-14 show the same picture: 283/21,151 missed (1.34%), smallest quarter 2.71% vs 0.75-1.03% for the rest, using the same seed 0-9 cutoffs (RESULTS.md Section 52). Faster R-CNN CUDA seeds 5-10 have no per-tooth data, because their checkpoints were not downloaded.
 
 The Faster R-CNN detector was not retuned (resolution, anchors, score threshold) so that all seeds share one configuration. Per-tooth rows for the MPS seeds 5-9 come from `per_tooth_predictions_mps.py`, which reruns inference on the saved `best.pt` files and checks its totals against each seed's `summary.csv`.
 
-## Missed teeth: YOLOv8x and RT-DETR-l (MPS seeds 5-9)
+## Missed teeth: YOLOv8x and RT-DETR-l
 
-`missed_tooth_analysis_yolo_rtdetr.py` runs the same breakdown on YOLOv8x and RT-DETR-l, using per-tooth predictions from `per_tooth_predictions_ultralytics_mps.py` (same rerun-and-verify protocol as the Faster R-CNN script). This only covers the MPS seeds; the CUDA seeds 5-14 outputs are summary-only, so the two CUDA spikes noted below cannot be broken down the same way.
+`missed_tooth_analysis_yolo_rtdetr.py` runs the same breakdown on YOLOv8x and RT-DETR-l. Per-tooth predictions come from `per_tooth_predictions_ultralytics_mps.py` (MPS seeds 5-9), `per_tooth_predictions_cuda_10_14.py` (CUDA RT-DETR-l 10-14, YOLOv8x 11-14) and `per_tooth_predictions_yolo_cuda_7_9.py` (CUDA YOLOv8x 7 and 9). All three use the same rerun-and-verify protocol as the Faster R-CNN script. The CUDA checkpoints were downloaded from Kaggle and matched to seeds by reproducing each seed's `summary.csv`. Other CUDA seeds have no per-tooth data.
 
 | Detector | Seeds | Missed | Total | Rate |
 |---|---|---|---|---|
 | YOLOv8x | MPS 5-9 | 534 | 27,153 | 1.97% |
 | RT-DETR-l | MPS 5-9 | 247 | 27,153 | 0.91% |
+| YOLOv8x | CUDA 11-14 | 414 | 21,151 | 1.96% |
+| RT-DETR-l | CUDA 10-14 | 299 | 26,769 | 1.12% |
 
 **Per seed, YOLOv8x MPS:** 1.49%, 1.54%, 2.29%, **3.04% (seed 8)**, 1.57%.
 **Per seed, RT-DETR-l MPS:** 0.84%, 0.83%, 1.31%, 0.70%, 0.89%.
 
 The general pattern matches Faster R-CNN's: small boxes drive most misses (YOLO's smallest quarter misses at 3.80% vs 1.35-1.36% for the rest; RT-DETR's at 1.80% vs 0.46-0.91%), edge proximity is a small, rare category, and no single tooth dominates (YOLO's worst class, FDI 23, holds 9.0% of misses at 5.21%; RT-DETR's worst, FDI 45, holds 8.9% at 2.48%).
 
-**YOLOv8x MPS seed 8, the one spike this data can explain:** its own box-size quartiles are 4.71% (small), 2.62% (mid), 2.20% (large) - all three roughly double the pooled MPS rate for that quartile, not just the small one. So seed 8 is not simply "more small teeth"; the whole split is harder for detection. Its top missed classes are canines and premolars (FDI 23, 28, 41, 14, 13, 22 at 5-9% each), not third molars. No further cause (image quality, crowding) was checked.
+**The three YOLOv8x spikes (MPS seed 8; CUDA seeds 7 and 9) are mainly single-run effects, not hard splits.** CUDA and MPS runs with the same seed number use the same split, so each spike can be compared against the other runs on identical teeth (RESULTS.md Section 53):
 
-**Still unexplained:** the two YOLOv8x CUDA spikes, seeds 7 and 9 (about 4% each, from `summary.csv` alone - no per-tooth breakdown exists for the CUDA runs). They occur on different seeds than the MPS spike (seed 8), so this is not one bad split replicated across backends; each backend has its own hard seed(s). A CUDA per-tooth rerun would need the saved Kaggle checkpoints, which were not downloaded (only `summary.csv`).
+| Spike | Spiking run | Same split, other YOLOv8x run |
+|---|---|---|
+| Seed 7 | CUDA 3.99% | MPS 2.29% |
+| Seed 8 | MPS 3.04% | CUDA 1.20% |
+| Seed 9 | CUDA 3.93% | MPS 1.57% |
+
+On seeds 8 and 9, all four RT-DETR-l and Faster R-CNN runs are within 0.25 percentage points of their rates on seeds 5 and 6. On seed 8, RT-DETR-l MPS has its lowest rate of any seed (0.70%). Seed 7 is partly the split: it is the hardest of seeds 5-9 for all four of those runs (1.13-1.47%). Even so, the CUDA YOLOv8x run's 3.99% is well above that. Within each spiking run, misses are highest in the smallest box-size quartile, using each run's own cutoffs (seed 7: 8.29%, seed 8: 4.71%, seed 9: 6.35%, vs 3.80% for MPS seeds 5-9 pooled). Seed 9's run also has one class-specific failure: FDI 24 is missed 43/165 times (26.1%), across 43 different images, while the MPS runs miss it 2.4-4.2% on the same split. No other class on any seed exceeds 10.8%. With one run per backend per seed, backend and run-to-run variance cannot be separated, so this does not show whether either backend is more spike-prone. (An earlier version of this section read seed 8 as a harder split; the same-split comparison rules that out.)

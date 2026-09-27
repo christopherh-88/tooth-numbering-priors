@@ -1,4 +1,4 @@
-# Handoff (last synced 2026-09-23)
+# Handoff (last synced 2026-09-27)
 
 Read this first in the next session before doing anything else. It exists
 so nothing has to be re-derived from chat history. **The section below is
@@ -6,7 +6,7 @@ current; the "What's actually done" / "Exact next steps" sections further
 down are the 2026-09-08 snapshot, kept for the early Claim-A groundwork
 detail - don't read them as describing where things stand now.**
 
-## Where things stand (2026-09-23)
+## Where things stand (2026-09-27)
 
 **Target:** MICCAI. Claim B (`RESULTS.md` Section 11.2) is now
 well-supported, not open: three architecturally distinct detectors
@@ -16,33 +16,31 @@ converge on the same answer - real detectors substantially outperform
 the coordinate-only prior and largely do not rely on it, with a
 weak-but-real residual error correlation as the qualifier. See
 `RESULTS.md` Sections 33/40/45 (the headline gap per architecture),
-46/51 (the error-agreement mechanism, now 10 seeds), 49 (CUDA-vs-MPS
-backend robustness, all three architectures), and 50 (per-tooth
-head-to-head vs. the prior, paired bootstrap). `paper/DRAFT.md`'s
+46/51/52 (the error-agreement mechanism, now 14 seeds), 49 (CUDA-vs-MPS
+backend robustness, all three architectures), 50 (per-tooth
+head-to-head vs. the prior, paired bootstrap, seeds 0-4), and 53 (the
+YOLOv8x missed-tooth spikes traced to single training runs, with a
+correction to Section 49's seed-8 reading). `paper/DRAFT.md`'s
 Discussion section already states this position.
 
-**Git state as of this sync:** the backend-comparison/Section-46-
-extension/per-tooth-head-to-head work is committed (commits `65cc970`,
-`16c69a5`, `a2f62e4`, `7f27388`); `16c69a5` is pushed to `origin/main`,
-the other three are local-only pending `git push`. This sync's own
-documentation fixes (this file, `README.md` rewrite, `paper/DRAFT.md`
-References addition for UFBA-425/OralBBNet, `RESULTS.md` Sections
-49-51) are **staged, not committed** as of this sync - run
-`git status --short` and `git --no-pager diff --cached --stat` first
-thing next session to see exactly what's pending review.
+**Git state as of this sync:** everything through commit `d074fd5` is
+committed and pushed (`main` is level with `origin/main`). The
+2026-09-27 work is **uncommitted, pending the user's review**: RESULTS.md
+Sections 52-53, BACKEND_COMPARISON.md updates, the `paper/DRAFT.md`
+limitations fix, this file, three new scripts
+(`per_tooth_predictions_cuda_10_14.py`, `per_tooth_predictions_yolo_cuda_7_9.py`,
+`build_joined_cuda_10_14.py`), edits to `cross_architecture_agreement.py`
+and both `missed_tooth_analysis*.py` scripts, and new `eval_results/`
+files. Run `git status --short` first thing next session.
 
-**Kaggle status: on hold, paused by the user.** Do not push, download,
-or poll Kaggle kernel status until the user explicitly says to resume -
-this includes not re-checking kernel status "just to see," since that
-can itself hit rate limits. Two things are queued for whenever Kaggle
-resumes, in this order: (1) rerun RT-DETR-l seed 10 (the first attempt
-was canceled by Kaggle at its 12h timeout with no output - give the
-rerun a shorter timeout so a repeat hang doesn't burn 12h of the weekly
-GPU quota again); (2) CUDA seeds 12-14 for all three detectors (9
-kernels, blocked on the weekly GPU quota, which was exhausted and
-resets on a schedule Kaggle doesn't publish - check the quota in the
-web UI before pushing). `queue2.sh`-style pushing skips already-pushed
-slugs, so a restart is safe once the user says go.
+**Kaggle: nothing queued.** All 15 CUDA seeds (0-14) are run and
+reported for all three detectors, including the RT-DETR-l seed 10
+rerun. Checkpoints were downloaded by hand for CUDA RT-DETR-l 10-14,
+YOLOv8x 7, 9, 11-14 and Faster R-CNN 11-14; they sit in
+`cpu_repro/yolo_training/runs/{rtdetr,yolov8,fasterrcnn}_cuda_seed{N}/`
+(gitignored). Kaggle Output downloads carry no seed in their filenames;
+each was assigned to a seed only after its inference reproduced that
+seed's `summary.csv`. Other CUDA runs have `summary.csv` only.
 
 **Optional, low-priority, not on the critical path:** the Dual-Labeled
 Dataset supernumerary follow-up (Section 17) is underpowered at n=23
@@ -199,7 +197,7 @@ working tree, before the GPU run.
 
 Everything in this subsection was written before Task 2 (detector
 training) happened. It is all done now - see "Where things stand"
-above and `RESULTS.md` Sections 21-51. Left here only so the sequencing
+above and `RESULTS.md` Sections 21-53. Left here only so the sequencing
 reasoning that led to Task 2 isn't lost; don't treat it as pending.
 
 1. ~~GPU training run (Task 2 setup)~~ - done, three architectures
@@ -214,21 +212,16 @@ reasoning that led to Task 2 isn't lost; don't treat it as pending.
    and a differently-structured label space remain untried, open
    extensions, not required for current claims.
 
-## Actual next steps (2026-09-23)
+## Actual next steps (2026-09-27)
 
-1. **Resume Kaggle only when the user says so** (see "Where things
-   stand" above for the exact queue: RT-DETR-l seed 10 rerun, then CUDA
-   seeds 12-14). Don't poll kernel status in the meantime.
-2. **Fold Sections 49-51 into `paper/DRAFT.md`** if the paper is being
-   actively drafted - the Discussion section's Claim-B framing already
-   matches these results in spirit, but the backend-robustness check
-   (Section 49) and the 10-seed Section 46 extension (Section 51)
-   aren't cited in the draft's own text yet, only in `RESULTS.md`.
-3. **`git push`** the three local-only commits, and this sync's staged
-   documentation fixes once the user reviews and commits them
-   (commands are printed at commit time, not run automatically - see
-   standing rules above).
-4. **Optional, not prioritized:** the supernumerary-dataset email (see
+1. **Commit the 2026-09-27 work** once the user reviews it (commands
+   are printed at commit time, not run automatically - see standing
+   rules above).
+2. **Fold Sections 52-53 into `paper/DRAFT.md`** if the paper is being
+   actively drafted. Sections 49-51 are already in (4.12-4.14), and the
+   draft's limitations paragraph already reflects Section 53, but 4.14
+   still describes the 10-seed Section 46 result, not the 14-seed one.
+3. **Optional, not prioritized:** the supernumerary-dataset email (see
    "Where things stand" above) and the `requirements.txt` CUDA-wheel
    ordering bug (flagged Section 36, still unfixed, needs a Linux
    machine to verify against - don't fix blind).
@@ -258,17 +251,21 @@ reasoning that led to Task 2 isn't lost; don't treat it as pending.
   wording ("asymmetrically position-dependent") was deliberately checked
   and corrected once already; regressing to either simpler phrasing would
   undo that correction (item 18 above / Section 20).
-- Don't re-run the CUDA-vs-MPS backend comparison for seeds already
-  covered (YOLOv8x/RT-DETR-l/Faster R-CNN, seeds 0-11 CUDA, 5-9 MPS) -
-  done, verified, written up (`RESULTS.md` Section 49,
-  `cpu_repro/yolo_training/BACKEND_COMPARISON.md`). Only seeds 10 (RT-
-  DETR-l rerun) and 12-14 remain, and those are Kaggle-blocked, not a
-  local re-run.
-- Don't redo the per-tooth head-to-head (Section 50) or the Section 46
-  ten-seed extension (Section 51) - both done, both verified against
-  their own summary.csv/joined-table totals. Extending either to seeds
-  10-14 needs CUDA per-tooth predictions that don't exist yet (only
-  summary.csv was downloaded from those Kaggle runs).
+- Don't re-run the CUDA-vs-MPS backend comparison - all three
+  detectors, CUDA seeds 0-14 and MPS seeds 5-9, done, verified, written
+  up (`RESULTS.md` Section 49, `cpu_repro/yolo_training/BACKEND_COMPARISON.md`).
+- Don't redo the per-tooth head-to-head (Section 50), the Section 46
+  extension (Sections 51-52, 14 seeds), or the missed-tooth spike
+  breakdown (Section 53) - all done and verified against their own
+  summary.csv/joined-table totals. The head-to-head covers seeds 0-4
+  only; extending it is possible for the seeds with per-tooth data but
+  was not requested.
+- Don't describe the YOLOv8x missed-tooth spikes (CUDA 7 and 9, MPS 8)
+  as hard splits. CUDA and MPS runs with the same seed number share a
+  split, and the other runs on those splits are unaffected (Section 53).
+  Seed 7's split is only mildly harder for every model.
+- Keep `missed_tooth_analysis.py`'s box-area cutoffs on seeds 0-9, or
+  BACKEND_COMPARISON.md's seed 0-9 figures stop reproducing.
 - Don't re-add the UFBA-425/OralBBNet citation to `paper/DRAFT.md`'s
   References - added and independently verified 2026-09-23 (title,
   authors, DOI, and the arXiv-version/year discrepancy are all checked
