@@ -1,62 +1,89 @@
 # Do tooth-numbering models read anatomy or position?
 
-Measuring the cost of engineered spatial priors on anomalous dentition.
+AI models that number teeth on panoramic dental X-rays score well, but a
+panoramic X-ray is taken with the head held in a fixed position, so every
+tooth tends to land in the same part of the image. A model could learn to
+guess a tooth's FDI number from where its box sits instead of from what the
+tooth looks like. If it did, it would fail on the cases that matter
+clinically, such as extra (supernumerary) teeth or teeth that have drifted
+out of place. This repository tests that in two parts.
 
-## The question
+**Claim A: box geometry alone predicts tooth identity.** A gradient-boosted
+tree that sees only each box's center, width, height, area and aspect ratio,
+and no pixels, names the tooth correctly 69.5% of the time on UFBA-425 and
+68.5% on DENTEX (32 classes, 5 random splits), against a majority-class
+baseline of 3.6 to 3.7%. It gets the quadrant right 96.5 to 98.0% of the
+time. Shuffling the boxes among the teeth of each image drops it to chance.
 
-Panoramic-radiograph tooth-numbering models place every tooth in a highly
-regular, near-fixed spatial layout (32 slots, FDI numbering, quadrants
-arranged the same way in almost every image). That regularity is a
-detection-friendly shortcut: a model could in principle number a tooth from
-where its bounding box sits in the image, largely without reading the
-tooth's own anatomy. If so, the model would be expected to fail exactly on
-the clinically interesting cases - supernumerary or ectopically-positioned
-teeth - where position and identity come apart.
-
-This project measures that directly, in two parts:
-
-- **Claim A - geometry alone predicts identity.** A coordinate-only model
-  (box position/size/aspect ratio, no image content at all) predicts FDI
-  tooth identity at 67-70% top-1 (32-way) vs. a 3.6-3.8% majority baseline,
-  replicated across two independent panoramic-radiograph datasets
-  (UFBA-425, DENTEX) with 5-seed confidence intervals and a pre-stated
-  falsification threshold. Well-supported.
-- **Claim B - do real detectors actually use that shortcut?** Trained
-  detectors are compared against the same coordinate-only baseline on
-  identical splits. Across three architecturally distinct detectors
-  (YOLOv8x, RT-DETR-l, Faster R-CNN - CNN single-stage, transformer
-  anchor-free, and CNN two-stage/region-proposal respectively, spanning
-  two independent training pipelines), real detectors substantially
-  outperform the coordinate-only baseline and converge on the same
-  answer: largely no, real detectors do not rely on position as their
-  primary signal - with a weak-but-real residual error correlation as the
-  qualifier (detectors that fail together tend to fail toward the
-  position-predicted answer). See `paper/DRAFT.md` and `RESULTS.md` for
-  the full numbers, caveats, and what would falsify this.
+**Claim B: trained detectors mostly do not rely on that shortcut.** YOLOv8x,
+RT-DETR-l and Faster R-CNN, trained on the same splits, reach 93.3 to 94.5%
+on the same teeth, 24 to 25 percentage points above the geometry-only
+model, and beat it on all 32 tooth classes. Position still shows up in the
+roughly 2% of teeth that every model gets wrong: there the three detectors
+pick the same wrong tooth about 97% of the time, and that tooth matches the
+geometry-only guess 84 to 88% of the time (chance: 4 to 11%). On periapical
+X-rays (DenPAR), which lack the fixed framing, the geometry-only model falls
+to 26.6%.
 
 ## Where to look
 
-This repo is a research log, not a packaged library - the honest, current
-state of the work lives in a few files, not in this README:
+This is a research log, not a packaged library.
 
-- **`RESULTS.md`** - every number produced in this project, with the
-  script and split that produced it. The authoritative source; if a
-  number here ever looks stale, `RESULTS.md` wins.
-- **`HANDOFF.md`** - where things stand right now, what's done, and
-  what's next.
-- **`paper/DRAFT.md`** - the in-progress MICCAI submission draft and its
-  supporting notes.
-- **`ENVIRONMENT.md`** - environment setup; this project runs two deep
-  learning frameworks at once (TensorFlow for the U-Net segmentation
-  model, PyTorch/Ultralytics for detection) with a real numpy-version
-  conflict between them - read this before installing anything.
-- **`cpu_repro/`** - the actual experiment code: `coord_baseline/` (the
-  coordinate-only model and its README), `yolo_training/` (YOLOv8x,
-  RT-DETR-l and Faster R-CNN training/eval, including
-  `BACKEND_COMPARISON.md` for the Kaggle-CUDA-vs-local-MPS robustness
-  check), `dual_labeled_dataset/`, `boundary_condition/`, `anomaly_scan/`,
-  each with its own README where relevant. `requirements.txt` for this
-  code lives at `cpu_repro/requirements.txt`.
+- **`paper/cjsj/`**: the short paper submitted to the Columbia Junior
+  Science Journal, with `paper_numbers.py` (recomputes every number in it
+  from committed results and fails on any mismatch) and
+  `make_cjsj_figures.py` (builds its four figures).
+- **`RESULTS.md`**: every result in the project, in order, with the script
+  and split behind it. If a number anywhere else disagrees, this file wins.
+- **`HANDOFF.md`**: current status and next steps.
+- **`paper/DRAFT.md`** and **`paper/figures/`**: the longer MICCAI draft
+  and its figures.
+- **`ENVIRONMENT.md`**: setup. The project uses TensorFlow (U-Net) and
+  PyTorch/Ultralytics (detectors) in one environment, and the install
+  order matters. Read it before installing anything.
+- **`cpu_repro/`**: the experiment code. `coord_baseline/` is the
+  geometry-only model, its controls and the DENTEX replication;
+  `yolo_training/` trains and evaluates the three detectors and holds their
+  per-seed results; `boundary_condition/` is the DenPAR test;
+  `dual_labeled_dataset/` is the supernumerary-tooth check;
+  `anomaly_scan/` is annotation QA. Most folders have their own README.
+- **`notebooks/`**: the upstream OralBBNet notebooks (see below), with the
+  flip-augmentation bug fixed.
+
+## Quick start
+
+```bash
+# Setup (see ENVIRONMENT.md for why the order matters)
+pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.0 torchvision==0.29.0 -c cpu_repro/requirements.txt
+pip install -r cpu_repro/requirements.txt
+
+# Rebuild the gitignored per-seed data folders, then rerun the main analyses
+python cpu_repro/yolo_training/prepare_all_splits.py
+python cpu_repro/coord_baseline/build_coord_baseline.py
+python cpu_repro/yolo_training/cross_architecture_agreement.py
+
+# Check every number in the CJSJ paper and rebuild its figures
+python paper/cjsj/paper_numbers.py
+python paper/cjsj/make_cjsj_figures.py
+
+# Check the flip augmentation in the U-Net notebooks
+python cpu_repro/coord_baseline/mitigation/verify_flip_augment.py
+```
+
+The detector training scripts in `cpu_repro/yolo_training/` need a GPU and
+were run on Kaggle (Tesla T4) and an Apple M3; their outputs are committed,
+so every analysis above runs on a CPU.
+
+## A training pitfall worth knowing about
+
+FDI numbers encode left and right, so a horizontally flipped X-ray puts
+tooth 11 where tooth 21 belongs. Most augmentation code flips the image
+without swapping the labels, which mislabels left and right teeth on every
+flipped sample. The detectors here train with flipping turned off. The
+upstream U-Net notebooks flipped the image, the per-tooth masks and the
+per-tooth box maps without swapping their tooth channels; all four
+notebooks now swap each channel with its mirror tooth's channel
+(`RESULTS.md` Section 58).
 
 ## Dataset and upstream attribution
 
@@ -65,7 +92,7 @@ This repo is a fork of
 and depends directly on that project's dataset and reference pipeline:
 the [UFBA-425](https://figshare.com/articles/dataset/UFBA-425/29827475)
 dataset (425 human-annotated panoramic X-rays, bounding boxes + polygons,
-FDI numbering - a subset of the UFBA-UESC Dental Dataset) and the
+FDI numbering, a subset of the UFBA-UESC Dental Dataset) and the
 [OralBBNet](https://arxiv.org/abs/2406.03747) paper and its training
 notebooks (`notebooks/`), which this project's own detector runs
 (`cpu_repro/yolo_training/`) build on. See the upstream repository for the
@@ -97,7 +124,7 @@ If you use or reference the OralBBNet method, cite:
 }
 ```
 (`year` above reflects the paper's original arXiv posting, 2024-06-06; a
-later revision was posted 2025-07-02 - see `paper/DRAFT.md`'s References
+later revision was posted 2025-07-02. See `paper/DRAFT.md`'s References
 section for the citation-year note.)
 
 Licensed under Apache 2.0 (`LICENSE`), inherited from the upstream

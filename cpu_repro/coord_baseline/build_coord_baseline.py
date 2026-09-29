@@ -3,7 +3,7 @@ geometry alone, with zero image data?
 
 If accuracy is high, position (where the box sits on the jaw, its size/shape)
 is doing most of the classification work that we'd otherwise credit to the
-image features - i.e. the "hard" part of tooth numbering may just be spatial
+image features, i.e. the "hard" part of tooth numbering may just be spatial
 reasoning that a coordinate-only model already captures.
 
 Data: Dataset/yolo_train_dataset/{train,valid,test}/labels/*.txt (YOLO format:
@@ -276,7 +276,7 @@ def main():
         ax.set_yticklabels(FDI_CODES, fontsize=7)
         ax.set_xlabel("Predicted FDI code")
         ax.set_ylabel("True FDI code")
-        ax.set_title(f"{name} - confusion matrix (seed {CONFUSION_MATRIX_SEED})")
+        ax.set_title(f"{name}: confusion matrix (seed {CONFUSION_MATRIX_SEED})")
         fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
         fig.tight_layout()
         fig.savefig(OUTPUT_DIR / f"confusion_matrix_{name}_seed{CONFUSION_MATRIX_SEED}.png", dpi=150)

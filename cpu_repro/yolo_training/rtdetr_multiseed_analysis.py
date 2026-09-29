@@ -15,7 +15,7 @@ Reports, per seed and pooled across 5 seeds:
 
 Verification-before-use: none needed here in the way multiseed_analysis.py
 verifies against a pre-existing YOLO number, because there is no prior
-RT-DETR result to check against - this script's own seed-0 output is the
+RT-DETR result to check against. This script's own seed-0 output is the
 first RT-DETR result in this project. Read its output with the same
 scrutiny any first result gets, not with an existing-number sanity check.
 """
@@ -28,7 +28,7 @@ import pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import train_yolo as ty  # noqa: E402 - reuse load_gt_boxes/iou_xyxy/match_boxes, not the YOLO class
+import train_yolo as ty  # noqa: E402. Reuse load_gt_boxes/iou_xyxy/match_boxes, not the YOLO class
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "coord_baseline"))
 from build_coord_baseline import (  # noqa: E402
@@ -55,8 +55,8 @@ def paths_for_seed(seed: int):
 
 
 def build_coord_predictions(seed: int) -> pd.DataFrame:
-    """Identical to multiseed_analysis.py's build_coord_predictions() -
-    the coordinate baseline doesn't depend on which detector it's being
+    """Identical to multiseed_analysis.py's build_coord_predictions().
+    The coordinate baseline doesn't depend on which detector it's being
     compared against."""
     df = load_instances()
     df = df.reset_index(drop=True)
@@ -77,7 +77,7 @@ def build_coord_predictions(seed: int) -> pd.DataFrame:
 
     assert result.duplicated(subset=["label_file", "line_idx"]).sum() == 0, (
         f"seed {seed}: label_file+line_idx not unique in the coordinate "
-        f"baseline's own test set - join key assumption broken, do not proceed."
+        f"baseline's own test set. Join key assumption broken, do not proceed."
     )
     return result
 
@@ -88,7 +88,7 @@ def run_rtdetr_predictions(seed: int) -> pd.DataFrame:
     prepared_dir, weights_path = paths_for_seed(seed)
     if not weights_path.exists():
         raise FileNotFoundError(
-            f"seed {seed}: {weights_path} not found - train_rtdetr_seed{seed}.py "
+            f"seed {seed}: {weights_path} not found. train_rtdetr_seed{seed}.py "
             f"(or train_rtdetr.py for seed 0) has not been run / its output not "
             f"downloaded yet."
         )
@@ -130,7 +130,7 @@ def run_rtdetr_predictions(seed: int) -> pd.DataFrame:
         for line_idx, true_cls in enumerate(gt_classes):
             pred_cls = pred_classes[gt_to_pred[line_idx]] if line_idx in gt_to_pred else None
             rows.append({
-                # No "image_id" column here - coord_df already carries one, and
+                # No "image_id" column here. coord_df already carries one, and
                 # the merge below joins on (label_file, line_idx) which
                 # uniquely identifies the row anyway. Including a second
                 # "image_id" here caused a real bug: pandas silently renamed
@@ -224,7 +224,7 @@ def analyze_seed(seed: int) -> dict:
 def per_class_breakdown(seed: int, merged: pd.DataFrame) -> pd.DataFrame:
     """Section 27/33/45-style per-FDI-class accuracy breakdown, ported
     from fasterrcnn_multiseed_analysis.py's per_class_breakdown() with
-    fasterrcnn_* renamed to rtdetr_* - identical logic, applied to this
+    fasterrcnn_* renamed to rtdetr_*. Identical logic, applied to this
     seed's joined table. Closes the gap noted in Section 46: RT-DETR was
     the only one of the three architectures with no per-class breakdown
     or reversal analysis (Section 40 has none)."""
@@ -254,7 +254,7 @@ def per_class_breakdown(seed: int, merged: pd.DataFrame) -> pd.DataFrame:
 def error_taxonomy_breakdown(seed: int, merged: pd.DataFrame) -> dict:
     """Section 22/33/45-style error-type comparison, ported from
     fasterrcnn_multiseed_analysis.py's error_taxonomy_breakdown() with
-    fasterrcnn_* renamed to rtdetr_* - each model's own wrong
+    fasterrcnn_* renamed to rtdetr_*. Each model's own wrong
     predictions run through is_mirror_quadrant_error/is_neighbor_error."""
     def breakdown(true_col, pred_col, correct_col):
         wrong = merged[~merged[correct_col].astype(bool) & merged[pred_col].notna()]
@@ -283,7 +283,7 @@ def error_taxonomy_breakdown(seed: int, merged: pd.DataFrame) -> dict:
 
 def run_breakdowns(seeds=(0, 1, 2, 3, 4)):
     """Section 32/33/45's deferred 'free CPU add-ons', ported for
-    RT-DETR - per-seed per-class breakdown (Section 27-style) and
+    RT-DETR: per-seed per-class breakdown (Section 27-style) and
     error-taxonomy comparison (Section 22-style), across every seed that
     has a trained checkpoint. Reuses the cached joined tables from
     analyze_seed()/build_merged() rather than re-running inference."""
@@ -292,7 +292,7 @@ def run_breakdowns(seeds=(0, 1, 2, 3, 4)):
     for seed in seeds:
         _, weights_path = paths_for_seed(seed)
         if not weights_path.exists():
-            print(f"seed {seed}: SKIPPED - {weights_path} not found yet.")
+            print(f"seed {seed}: SKIPPED, {weights_path} not found yet.")
             continue
         print(f"seed {seed}: building per-class and error-taxonomy breakdowns...")
         merged = build_merged(seed)
@@ -318,7 +318,7 @@ def main(seeds=(0, 1, 2, 3, 4)):
     for seed in seeds:
         _, weights_path = paths_for_seed(seed)
         if not weights_path.exists():
-            print(f"seed {seed}: SKIPPED - {weights_path} not found yet.")
+            print(f"seed {seed}: SKIPPED, {weights_path} not found yet.")
             continue
         print(f"seed {seed}: running coord refit + RT-DETR CPU inference...")
         r = analyze_seed(seed)
@@ -328,7 +328,7 @@ def main(seeds=(0, 1, 2, 3, 4)):
               f"rtdetr_quad={r['rtdetr_quadrant']:.4f}  phi={r['phi']:.4f}")
 
     if not rows:
-        print("\nNo seeds had a trained checkpoint available - nothing to save.")
+        print("\nNo seeds had a trained checkpoint available. Nothing to save.")
         return
 
     out_df = pd.DataFrame(rows)

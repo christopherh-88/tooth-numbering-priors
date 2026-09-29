@@ -2,7 +2,7 @@
 to DENTEX (arXiv 2305.19112, MICCAI 2023 challenge, Hamamci et al.).
 
 DENTEX ships three annotation tiers per image, not one: quadrant-only
-(693 images, no per-tooth FDI code - see NOTE below), quadrant+enumeration
+(693 images, no per-tooth FDI code, see NOTE below), quadrant+enumeration
 (634 images, full FDI code, no diagnosis), and quadrant+enumeration+
 diagnosis (705 train + 50 validation = 755 images, full FDI code AND a
 diagnosis joined on the same box). Only the last two tiers carry a full
@@ -11,7 +11,7 @@ enumeration digit and are structurally excluded (see dentex_findings.md).
 
 NOTE on a real footgun found in DENTEX's own files, not assumed away: the
 quadrant-only tier's own categories list is NOT in id-order (category id 0
-maps to quadrant name '2', not '1' - see dentex_findings.md). The
+maps to quadrant name '2', not '1', see dentex_findings.md). The
 quadrant-enumeration and quadrant-enumeration-disease tiers ARE in aligned
 id order, but this script (via build_table.py) always resolves FDI codes
 through each file's own categories_1/categories_2 id->name lookup rather
@@ -19,11 +19,11 @@ than assuming id+1 anywhere, specifically because of that inconsistency.
 
 CONVENTION: DENTEX's own quadrant-to-image-region layout was verified
 empirically against its own bulk statistics (median/percentile x,y per
-quadrant - see dentex_findings.md) BEFORE reusing UFBA-425's position
+quadrant, see dentex_findings.md) BEFORE reusing UFBA-425's position
 thresholds here. It matches UFBA-425's convention (quadrants 1,4 ->
 image-left; 2,3 -> image-right; 1,2 -> image-upper; 3,4 -> image-lower)
 and has a similar-or-tighter natural spread, so the same buffered
-thresholds are used - this was checked, not assumed.
+thresholds are used, this was checked, not assumed.
 """
 
 from pathlib import Path
@@ -37,7 +37,7 @@ OUTPUT_DIR = HERE / "dentex_results"
 
 FULL_DENTITION_PERMANENT = {f"{q}{p}" for q in "1234" for p in "12345678"}
 
-# Same buffered thresholds as scan_annotations.py (UFBA-425) - verified
+# Same buffered thresholds as scan_annotations.py (UFBA-425), verified
 # defensible for DENTEX's own natural range in dentex_findings.md, not
 # reused blindly.
 X_LEFT_MAX = 0.55
@@ -85,7 +85,7 @@ def scan_image(image_id, group):
         if x_bad or y_bad:
             if x_bad and y_bad:
                 n_both_axis += 1
-                position_notes.append(f"{row['fdi']}: WRONG QUADRANT (both axes) - {x_bad[0]}; {y_bad[0]}")
+                position_notes.append(f"{row['fdi']}: WRONG QUADRANT (both axes): {x_bad[0]}; {y_bad[0]}")
             else:
                 n_single_axis += 1
                 msg, axis, value = x_bad or y_bad

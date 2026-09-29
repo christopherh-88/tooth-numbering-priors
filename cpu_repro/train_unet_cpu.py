@@ -1,7 +1,7 @@
 """CPU-only, tiny-subset reproduction of notebooks/Unet/unet_training.ipynb.
 
 Purpose: prove the environment/data pipeline works end-to-end, NOT to reach
-the README's reported Dice numbers (73.29 for U-Net incisors etc.) - that
+the README's reported Dice numbers (73.29 for U-Net incisors etc.). That
 requires the full 425-image dataset, many more epochs, and (per the
 original notebooks) a GPU.
 
@@ -11,10 +11,10 @@ Differences from the original notebook, and why:
    image) are zero-filled here instead of coming from a trained YOLOv8
    checkpoint. In `get_model()` below (copied verbatim from the notebook),
    the plain U-Net slices `inputs1` (the bbox-prior channels) off the input
-   tensor but NEVER uses it in the forward pass - only `inputs0` (the image)
+   tensor but NEVER uses it in the forward pass. Only `inputs0` (the image)
    feeds the encoder. So for this vanilla U-Net, the bbox channels are inert
    padding. (Contrast with yolov8+unet_training.ipynb, where bbox priors ARE
-   multiplied into the skip connections - that notebook would need real
+   multiplied into the skip connections. That notebook would need real
    YOLO inference first.) Because they're inert here, zero-filling them
    changes nothing about what the model computes, and lets this script skip
    training/running YOLO entirely.
@@ -46,7 +46,7 @@ from tensorflow import keras
 from tensorflow.keras.metrics import Precision, Recall
 
 # --------------------------------------------------------------------------
-# CONFIG - the only section you should need to edit to scale this up later.
+# CONFIG: the only section you should need to edit to scale this up later.
 # --------------------------------------------------------------------------
 SUBSET_SIZE = 24          # number of images to use in total (train+val)
 EPOCHS = 3
@@ -64,7 +64,7 @@ OUTPUT_DIR = Path(__file__).resolve().parent / "outputs"
 # Fixed FDI code -> channel index mapping. This is the *entire* numbering
 # scheme: channel/class index j always means FDI_CHANNELS[j], both here and
 # in the YOLOv8 dataset (Dataset/yolo_train_dataset/data.yaml names list).
-# There is no spatial/geometric assignment anywhere in this repo - see the
+# There is no spatial/geometric assignment anywhere in this repo. See the
 # Task 2 writeup for detail.
 FDI_CHANNELS = [
     "11", "12", "13", "14", "15", "16", "17", "18",
@@ -142,13 +142,13 @@ def build_dataset(image_paths, size):
         masks.append(load_mask(p, size))
     images = np.stack(images).astype(np.float32)   # (N, H, W, 3)
     masks = np.stack(masks).astype(np.float32)      # (N, H, W, 32)
-    bbox_priors = np.zeros_like(masks)               # inert - see docstring
+    bbox_priors = np.zeros_like(masks)               # inert, see docstring
     model_input = np.concatenate([bbox_priors, images], axis=-1)  # (N, H, W, 35)
     return model_input, masks
 
 
 # --------------------------------------------------------------------------
-# Model, loss, metrics - copied from notebooks/Unet/unet_training.ipynb
+# Model, loss, metrics: copied from notebooks/Unet/unet_training.ipynb
 # (get_model / dice_loss_with_l2_regularization / dice_coef) unchanged.
 # --------------------------------------------------------------------------
 DROP_RATE = 0.12
@@ -159,7 +159,7 @@ def get_model(img_size, num_classes):
 
     inputs0 = inputs[:, :, :, 32:]   # image channels (used)
     # inputs1 (bbox-prior channels, inputs[:, :, :, :32]) is intentionally
-    # unused below - this matches the original notebook's plain U-Net,
+    # unused below. This matches the original notebook's plain U-Net,
     # which never references it after slicing.
 
     skip_connections = []

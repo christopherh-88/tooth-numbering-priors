@@ -1,7 +1,7 @@
 # Coordinate-only baseline
 
 **Question:** can FDI tooth class be predicted from bounding-box geometry
-alone (x, y, width, height - no pixels)? If yes, position is carrying most
+alone (x, y, width, height, no pixels)? If yes, position is carrying most
 of the classification decision, and a coordinate-only model is a strong
 sanity-check baseline for any "vision" tooth-numbering model to beat.
 
@@ -44,19 +44,19 @@ secondary, location-blind size signal.
 
 ## Reading the errors
 
-- **Quadrant is almost never the problem** (~96.5% correct) - geometry alone
+- **Quadrant is almost never the problem** (~96.5% correct). Geometry alone
   tells you upper/lower and left/right jaw with near-detector-level
   reliability. Only ~6-7% of mistakes are mirror-quadrant swaps (11 vs 21,
   31 vs 41, etc.), even though those are the pairs closest together near the
   midline.
-- **Tooth type is where it gets hard** (~70-72% correct) - distinguishing
+- **Tooth type is where it gets hard** (~70-72% correct). Distinguishing
   "which of the 8 teeth in this quadrant" from box geometry alone is the
   actual difficulty, not which side of the mouth.
 - **~81-83% of all errors are immediate-neighbor swaps** (e.g. 14 vs 15, 33
-  vs 34) - when the model is wrong, it is almost always off by one tooth
+  vs 34). When the model is wrong, it is almost always off by one tooth
   position along the arch, not confusing unrelated teeth. The five biggest
   single confused pairs in the saved confusion matrix (gradient-boosted
-  tree, seed 0) are 31->41, 31->32, 25->24, 34->35, 41->42 - four of five are
+  tree, seed 0) are 31->41, 31->32, 25->24, 34->35, 41->42. Four of five are
   same-quadrant neighbors, and 31<->41 is the midline mirror pair for the
   lower first premolars, which sit close together and similar in size on
   either side of center.
@@ -67,8 +67,8 @@ secondary, location-blind size signal.
 
 ## Do errors concentrate in particular tooth types?
 
-Yes, but **not the way "premolars/molars are more self-similar" predicts** -
-that hypothesis is about image texture, and this model never sees pixels.
+Yes, but **not the way "premolars/molars are more self-similar" predicts**.
+That hypothesis is about image texture, and this model never sees pixels.
 For a coordinate-only model, what matters is geometric separability, and the
 result is close to the opposite: **molars are the easiest class to place,
 incisors are the hardest.**
@@ -84,15 +84,15 @@ incisors are the hardest.**
 plot in `accuracy_by_tooth_type.png`)
 
 The individual-class breakdown (`accuracy_by_fdi_class.csv`) makes the reason
-plain: the worst nine classes are 31, 41, 32, 34, 24, 14, 33, 44, 22 - lower
+plain: the worst nine classes are 31, 41, 32, 34, 24, 14, 33, 44, 22. Lower
 and upper incisors/first premolars, all crowded around the midline where
 mirror-quadrant boxes sit close together and left/right position is only
-weakly distinguishing. The best nine are 38, 48, 46, 18, 28, 37, 47, 36, 45 -
+weakly distinguishing. The best nine are 38, 48, 46, 18, 28, 37, 47, 36, 45:
 third and second molars, which sit farthest from the midline, are the most
 posterior boxes in the arch, and have the least positional overlap with any
 other tooth. Molars are geometrically the *most* distinctive class by
-position, even though they'd be argued to look most alike as images -
-because this baseline only ever sees geometry, that's the axis that decides
+position, even though they'd be argued to look most alike as images.
+Because this baseline only ever sees geometry, that's the axis that decides
 its errors.
 
 ## Does accuracy vary with how many teeth are in the image?
@@ -114,7 +114,7 @@ plot in `accuracy_by_teeth_count.png`; pooled per-instance predictions with
 `teeth_in_crop` count in `pooled_predictions.csv`)
 
 Accuracy rises monotonically from 43-49% (crops with 1-15 teeth) to 70-73%
-(crops with 29-32 teeth, the bulk of the data at n=18843) - roughly a
+(crops with 29-32 teeth, the bulk of the data at n=18843), roughly a
 0.28-0.30 absolute-accuracy gap between the sparsest and fullest crops.
 Pearson correlation between raw teeth-in-crop count and per-instance
 correctness is weak-but-positive and consistent across both classifiers
@@ -124,7 +124,7 @@ correctness is weak-but-positive and consistent across both classifiers
 The one bin that breaks the monotonic pattern is 33+ teeth (n=372, the
 smallest bin by far): FDI has only 32 valid codes, so "33+ annotated" means
 duplicate or overlapping box annotations in the source labels, not more real
-teeth - treat that bin as a noisy edge case from annotation artifacts, not
+teeth. Treat that bin as a noisy edge case from annotation artifacts, not
 a genuine reversal of the trend.
 
 ## Method notes
@@ -149,7 +149,7 @@ a genuine reversal of the trend.
   standardized first (fit on train only). Gradient-boosted tree:
   `sklearn.ensemble.HistGradientBoostingClassifier` (sklearn's fast
   histogram-based GBM; used instead of the classic `GradientBoostingClassifier`
-  for CPU speed at ~22k training rows x 5 seeds - same family of model).
+  for CPU speed at ~22k training rows x 5 seeds, same family of model).
 - Majority-class baseline is computed per split (most frequent class_id in
   that seed's train fold), matching what "chance" looks like for that fold.
 - 95% CI is a t-interval (df=4) over the 5 seed results, not a bootstrap.
@@ -160,7 +160,7 @@ a genuine reversal of the trend.
 cd /Users/christopherhuang/Documents/GitHub/tooth-numbering-priors
 source .venv312/bin/activate   # or your own env with cpu_repro/requirements.txt installed
 python cpu_repro/coord_baseline/build_coord_baseline.py   # main baseline (~2.5 min)
-python cpu_repro/coord_baseline/error_breakdown.py        # tooth-type / teeth-count breakdown (~11 min - retrains both classifiers across all 5 seeds again)
+python cpu_repro/coord_baseline/error_breakdown.py        # tooth-type / teeth-count breakdown (~11 min, retrains both classifiers across all 5 seeds again)
 ```
 
 Edit `SEEDS`, `TEST_FRACTION`, or `CONFUSION_MATRIX_SEED` at the top of
@@ -170,21 +170,21 @@ from there, so they stay in sync). Edit `TEETH_COUNT_BINS` at the top of
 
 ## Files
 
-- `build_coord_baseline.py` - the main baseline script.
-- `summary.csv` - mean + 95% CI per classifier (top-level results table).
-- `per_seed_results.csv` - all 5x2 individual runs.
-- `confusion_matrix_<classifier>_seed0.csv` / `.png` - 32x32 confusion
+- `build_coord_baseline.py`: the main baseline script.
+- `summary.csv`: mean + 95% CI per classifier (top-level results table).
+- `per_seed_results.csv`: all 5x2 individual runs.
+- `confusion_matrix_<classifier>_seed0.csv` / `.png`: 32x32 confusion
   matrix from the seed-0 split, one per classifier.
-- `error_breakdown.py` - the tooth-type / teeth-count-in-crop follow-up
+- `error_breakdown.py`: the tooth-type / teeth-count-in-crop follow-up
   analysis.
-- `accuracy_by_tooth_type.csv` / `.png` - accuracy grouped into
+- `accuracy_by_tooth_type.csv` / `.png`: accuracy grouped into
   Incisor/Canine/Premolar/Molar.
-- `accuracy_by_fdi_class.csv` - accuracy for each of the 32 individual FDI
+- `accuracy_by_fdi_class.csv`: accuracy for each of the 32 individual FDI
   codes.
-- `accuracy_by_teeth_count.csv` / `.png` - accuracy binned by how many teeth
+- `accuracy_by_teeth_count.csv` / `.png`: accuracy binned by how many teeth
   were annotated in the source crop.
-- `teeth_count_correlation.csv` - Pearson correlation between teeth-in-crop
+- `teeth_count_correlation.csv`: Pearson correlation between teeth-in-crop
   count and per-instance correctness.
-- `pooled_predictions.csv` - every test-set prediction from all 5 seeds x 2
+- `pooled_predictions.csv`: every test-set prediction from all 5 seeds x 2
   classifiers, with `teeth_in_crop` and `label_file` attached, in case you
   want to slice it differently.

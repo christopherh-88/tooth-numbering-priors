@@ -1,27 +1,32 @@
 """Faster R-CNN training run (RESULTS.md Section 42's scoping, third
 detector architecture for Claim B). Written for a Kaggle GPU session,
-same convention as train_yolo.py/train_rtdetr.py - do NOT run the real
+same convention as train_yolo.py/train_rtdetr.py. Do NOT run the real
 30-epoch train() on CPU. smoke_test_forward() (one batch, forward pass
-only) IS meant to run locally on CPU - that's the Section 42 checkpoint
+only) IS meant to run locally on CPU. That's the Section 42 checkpoint
 4 check, and needs no GPU.
 
 Reads cpu_repro/yolo_training/prepared_coco/instances_{train,val}.json
-(build_coco_dataset.py's output - run that first). Does NOT re-derive
-the train/val split - those JSONs already encode the same
+(build_coco_dataset.py's output, run that first). Does NOT re-derive
+the train/val split. Those JSONs already encode the same
 image_split_seed0.csv split every other detector in this project uses.
 
 Model: fasterrcnn_resnet50_fpn_v2, COCO-pretrained backbone, box
 predictor head replaced for this project's 33-class problem (32 FDI
-classes + background at label 0 - see build_coco_dataset.py's docstring
+classes + background at label 0, see build_coco_dataset.py's docstring
 for why the shift is +1, not a free 33rd class).
 
 Fair-comparison protocol (Section 42, not identical hyperparameters to
-YOLOv8x/RT-DETR-l - matching the disclosed "use the framework's own
+YOLOv8x/RT-DETR-l, matching the disclosed "use the framework's own
 default recipe" stance already applied to both of those):
   - Optimizer/LR: SGD lr=0.02 momentum=0.9 weight_decay=1e-4,
-    MultiStepLR gamma=0.1 - torchvision's own detection reference
+    MultiStepLR gamma=0.1: torchvision's own detection reference
     training script defaults (references/detection/train.py), not
-    hand-tuned for this dataset.
+    hand-tuned for this dataset. Note (RESULTS.md Section 58): that script
+    documents lr=0.02 as the value for 8 GPUs x 2 images, a total batch of
+    16. Here it is used with a single batch of 2, so the per-image learning
+    rate is 8x the reference's. Training converged (93.3% top-1, within
+    about 1pp of the other two detectors), and every reported number came
+    from these settings, so they are left unchanged and disclosed instead.
   - LR milestones scaled proportionally to this project's 30-epoch
     budget: torchvision's reference recipe decays at epochs 16/22 of a
     26-epoch run (61.5%/84.6% of the way through); scaled to EPOCHS=30
@@ -30,8 +35,8 @@ default recipe" stance already applied to both of those):
     rather than either using the reference's own 26-epoch total (breaking
     cross-architecture epoch comparability) or its raw milestone numbers
     unscaled (which would decay far too early relative to a 30-epoch
-    budget - a genuine hand-tune, not a default-recipe transplant).
-  - Batch size: 2 - torchvision's own reference default for this model,
+    budget, a genuine hand-tune, not a default-recipe transplant).
+  - Batch size 2: torchvision's own reference default for this model,
     used unmodified (not YOLOv8's BATCH=10, which is a YOLO-specific
     default and not this framework's).
   - Eval-time operating point: box_score_thresh=0.5, box_nms_thresh=0.7,
@@ -41,20 +46,20 @@ default recipe" stance already applied to both of those):
   - Epoch count: EPOCHS=30, matching Sections 21/38. Two-stage detectors
     commonly need more epochs than single-stage/DETR models to converge
     (two forward passes per image: region-proposal + per-region
-    classification) - if the real run's training loss is still dropping
+    classification). If the real run's training loss is still dropping
     steeply at epoch 30, that must be reported as a caveat on the
     cross-architecture comparison, not silently fixed by adding epochs
     after the fact.
 
-Transform pipeline - deliberately excludes horizontal AND vertical flip
+Transform pipeline: deliberately excludes horizontal AND vertical flip
 (Section 42's MIRROR_MAP-risk analysis): FDI tooth numbers encode
 left-right quadrant in their class id (11-18 vs 21-28, 31-38 vs 41-48).
 Mirroring the image without remapping the class id teaches a physically
-wrong tooth-to-position association - the exact bug fixed once already
+wrong tooth-to-position association, the exact bug fixed once already
 in notebooks/yolov8+unet/yolov8+unet_training.ipynb (see HANDOFF.md) and
 avoided in train_yolo.py/train_rtdetr.py via fliplr=0.0. Torchvision has
-no single equivalent flag - augmentation here is whatever transforms are
-explicitly composed - so RandomHorizontalFlip/RandomVerticalFlip are
+no single equivalent flag. Augmentation here is whatever transforms are
+explicitly composed, so RandomHorizontalFlip/RandomVerticalFlip are
 simply never added to TRAIN_TRANSFORMS below, not toggled off via a
 parameter.
 
@@ -62,14 +67,14 @@ Other-transforms audit (per Section 42's "confirm and flag any other
 transform that touches box coordinates" instruction): torchvision's own
 reference training script's default preset for Faster R-CNN
 ("hflip", references/detection/presets.py::DetectionPresetTrain) contains
-exactly RandomHorizontalFlip + a tensor/dtype conversion - no crop, zoom,
+exactly RandomHorizontalFlip + a tensor/dtype conversion, no crop, zoom,
 or photometric transform. The "ssd"/"ssdlite"/"multiscale" preset
 variants (built for SSD-family models, not part of Faster R-CNN's own
 reference command, and NOT used here) add RandomIoUCrop/RandomZoomOut/
 RandomPhotometricDistort/RandomShortestSize; noted for completeness that
 none of those mirror the image, so even if a future edit adopted one, it
 would reposition/rescale a box's coordinates together with the image
-content without swapping which physical side of the image it's on - no
+content without swapping which physical side of the image it's on, no
 class remap would be needed the way flips need one. Only flip-type
 transforms carry the MIRROR_MAP risk.
 """
@@ -95,7 +100,7 @@ from build_coord_baseline import FDI_CODES  # noqa: E402
 # --------------------------------------------------------------------------
 # Seed-parameterized like train_rtdetr.py (SEED=0 here, train_fasterrcnn_seed{1,2,3,4}.py
 # override SEED/COCO_DIR/TRAIN_JSON/VAL_JSON/RUN_NAME/EVAL_RESULTS_DIR before
-# calling train()/evaluate() - same thin-wrapper pattern as train_rtdetr_seed*.py).
+# calling train()/evaluate(), same thin-wrapper pattern as train_rtdetr_seed*.py).
 # Seed 0's COCO_DIR is left unsuffixed (matches build_coco_dataset.py's own
 # seed-0 OUT_DIR) so the already-trained seed-0 run's paths are untouched.
 SEED = 0
@@ -111,7 +116,7 @@ EVAL_RESULTS_DIR = Path(__file__).resolve().parent / "eval_results" / "fasterrcn
 
 EPOCHS = 30
 BATCH = 2                  # torchvision reference default, not YOLO's BATCH=10
-LR = 0.02                  # torchvision reference default
+LR = 0.02                  # torchvision reference default (set there for a total batch of 16; see docstring)
 MOMENTUM = 0.9
 WEIGHT_DECAY = 1e-4
 LR_MILESTONES = [18, 25]   # torchvision's 16/22-of-26 schedule, scaled to EPOCHS=30 (see module docstring)
@@ -125,13 +130,13 @@ EVAL_NMS_IOU = 0.7           # matches EVAL_NMS_IOU in train_yolo.py/train_rtdet
 
 
 def train_transforms():
-    """No RandomHorizontalFlip/RandomVerticalFlip - see module docstring's
+    """No RandomHorizontalFlip/RandomVerticalFlip. See module docstring's
     MIRROR_MAP-risk section for why."""
     return T.Compose([T.ToImage(), T.ToDtype(torch.float32, scale=True)])
 
 
 class CocoTeethDataset(Dataset):
-    """Minimal COCO-format detection dataset - reads build_coco_dataset.py's
+    """Minimal COCO-format detection dataset. Reads build_coco_dataset.py's
     instances_{train,val}.json directly (not torchvision.datasets.CocoDetection,
     to avoid a pycocotools dependency for what's a single small JSON file)."""
 
@@ -186,7 +191,7 @@ def get_model(num_classes: int = NUM_CLASSES) -> torchvision.models.detection.Fa
 def get_dataloaders():
     if not TRAIN_JSON.exists() or not VAL_JSON.exists():
         raise FileNotFoundError(
-            f"{TRAIN_JSON} / {VAL_JSON} not found - run build_coco_dataset.py first."
+            f"{TRAIN_JSON} / {VAL_JSON} not found. Run build_coco_dataset.py first."
         )
     train_ds = CocoTeethDataset(TRAIN_JSON, train_transforms())
     val_ds = CocoTeethDataset(VAL_JSON, train_transforms())
@@ -200,7 +205,7 @@ def get_dataloaders():
 def smoke_test_forward():
     """Section 42 checkpoint 4: run one real batch through the model's
     forward pass (train mode, computing a loss dict) with no shape/dtype/
-    label-range error. Runs on CPU - no GPU needed for a single batch."""
+    label-range error. Runs on CPU, no GPU needed for a single batch."""
     train_loader, _ = get_dataloaders()
     images, targets = next(iter(train_loader))
 
@@ -211,9 +216,9 @@ def smoke_test_forward():
     targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
     assert all(t["labels"].max().item() <= NUM_CLASSES - 1 for t in targets if len(t["labels"])), \
-        "a label exceeds NUM_CLASSES-1 - background-shift invariant broken"
+        "a label exceeds NUM_CLASSES-1: background-shift invariant broken"
     assert all(t["labels"].min().item() >= 1 for t in targets if len(t["labels"])), \
-        "a label is 0 (background) or negative - background-shift invariant broken"
+        "a label is 0 (background) or negative: background-shift invariant broken"
 
     model.train()
     loss_dict = model(images, targets)
@@ -233,7 +238,7 @@ def smoke_test_forward():
 
 
 def train():
-    """NOT for CPU - Kaggle GPU only, same convention as train_yolo.py.
+    """NOT for CPU. Kaggle GPU only, same convention as train_yolo.py.
     Resumable across a killed Kaggle session (Section 39's 12-hour-limit
     concern): last.pt is a full training-state checkpoint (model +
     optimizer + scheduler + epoch), not just weights, so a rerun of this
@@ -265,10 +270,10 @@ def train():
     print(f"Starting training: {n_batches} batches/epoch (BATCH={BATCH}), {EPOCHS} epochs, "
           f"starting at epoch {start_epoch}.")
 
-    # Per-step progress logging - added after a real seed-0 run sat silent
+    # Per-step progress logging, added after a real seed-0 run sat silent
     # for 65+ minutes with zero output (train() previously printed only
     # once per COMPLETED epoch), and `kaggle kernels logs -f` confirmed
-    # live-streaming showed no new lines either - genuinely no way to
+    # live-streaming showed no new lines either, genuinely no way to
     # distinguish "slow" from "stuck" without this. Prints every
     # PROGRESS_EVERY steps with a running avg step time, so a future run's
     # first real number arrives within roughly a minute, not an hour.
@@ -313,13 +318,13 @@ def train():
 
 
 def evaluate(weights_path):
-    """Identical protocol to train_yolo.evaluate()/train_rtdetr.evaluate() -
-    same coord_evaluate() call, same ty.match_boxes() IoU-matching
-    convention (normalized xyxy) - only the model class and the box-
+    """Identical protocol to train_yolo.evaluate()/train_rtdetr.evaluate().
+    Same coord_evaluate() call, same ty.match_boxes() IoU-matching
+    convention (normalized xyxy). Only the model class and the box-
     coordinate conversion (absolute pixel -> normalized xyxy) differ, so
     results are directly comparable to Sections 21/33/40."""
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    import train_yolo as ty  # noqa: E402 - reuse load_gt_boxes/iou_xyxy/match_boxes
+    import train_yolo as ty  # noqa: E402. Reuse load_gt_boxes/iou_xyxy/match_boxes
 
     from sklearn.metrics import confusion_matrix
     import numpy as np
@@ -391,7 +396,7 @@ def evaluate(weights_path):
     pd.DataFrame([metrics]).to_csv(EVAL_RESULTS_DIR / "summary.csv", index=False)
 
     if len(y_true) == 0:
-        print("WARNING: zero matched detections across the whole val split - skipping confusion matrix.")
+        print("WARNING: zero matched detections across the whole val split, skipping confusion matrix.")
     else:
         cm = confusion_matrix(y_true, y_pred, labels=list(range(32)))
         pd.DataFrame(cm, index=FDI_CODES, columns=FDI_CODES).to_csv(
@@ -420,7 +425,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--train", action="store_true",
-                         help="run the real 30-epoch training + evaluate() - Kaggle GPU only. "
+                         help="run the real 30-epoch training + evaluate(). Kaggle GPU only. "
                               "Default (no flag) runs smoke_test_forward() instead, which is "
                               "safe on CPU and does not touch runs/ or eval_results/.")
     args = parser.parse_args()

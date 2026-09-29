@@ -21,8 +21,8 @@ RT-DETR has seeds 10-14; YOLOv8x and Faster R-CNN have 11-14 only (seed 10
 weights were never downloaded for those two).
 
 Writes eval_results/rtdetr/seed{N}/per_tooth.csv, eval_results/seed{N}/per_tooth.csv
-(YOLOv8x - bare "seed" dir is this repo's convention for CUDA YOLO, see
-BACKEND_COMPARISON.md), eval_results/fasterrcnn_cuda/seed{N}/per_tooth.csv -
+(YOLOv8x: bare "seed" dir is this repo's convention for CUDA YOLO, see
+BACKEND_COMPARISON.md), eval_results/fasterrcnn_cuda/seed{N}/per_tooth.csv,
 same columns as the MPS per_tooth.csv files.
 
 Each seed is verified against that seed's existing summary.csv: number of

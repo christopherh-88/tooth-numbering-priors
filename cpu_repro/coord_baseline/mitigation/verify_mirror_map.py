@@ -1,14 +1,16 @@
-"""Full 32-class correctness proof for the MIRROR_MAP fix applied in
-notebooks/yolov8+unet/yolov8+unet_training.ipynb cell 21.
+"""Full 32-class correctness proof for the MIRROR_MAP channel swap used by
+the flip augmentation in the four U-Net notebooks (notebooks/Unet/*.ipynb and
+notebooks/yolov8+unet/*.ipynb). verify_flip_augment.py runs the notebooks'
+actual augment() cells on a real image; this script checks the map itself.
 
 The bug-fix verification run on 2026-09-08 (mitigation/README.md) only
 spot-checked one pair (FDI 11 <-> 21). This proves the property holds
 for all 32 classes, not just that one example, before it's relied on in
 Friday's GPU training run.
 
-Uses the exact same construction as the notebook fix (copied verbatim,
-not re-derived differently here - a divergent re-implementation would
-defeat the point of a verification script).
+Uses the exact same construction as the notebook fix, copied verbatim
+rather than re-derived, because a divergent re-implementation would
+defeat the point of a verification script.
 """
 FDI_CODES = [
     "11", "12", "13", "14", "15", "16", "17", "18",
@@ -41,7 +43,7 @@ def main():
         MIRROR_MAP[MIRROR_MAP[i]] == i for i in range(32)
     )
 
-    # 3. no fixed points - every class has a DIFFERENT mirror partner
+    # 3. no fixed points: every class has a DIFFERENT mirror partner
     checks["no fixed points (MIRROR_MAP[i] != i for all i)"] = all(
         MIRROR_MAP[i] != i for i in range(32)
     )
@@ -57,7 +59,7 @@ def main():
         pair_is_valid(i) for i in range(32)
     )
 
-    # 5. it's a genuine permutation (bijective - no two classes map to the
+    # 5. it's a genuine permutation (bijective, no two classes map to the
     #    same target, which would silently drop a class's box on flip)
     checks["is a bijection (32 distinct targets, none dropped)"] = len(set(MIRROR_MAP)) == 32
 

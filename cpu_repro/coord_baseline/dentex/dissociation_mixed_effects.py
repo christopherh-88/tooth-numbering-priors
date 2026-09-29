@@ -16,9 +16,9 @@ coefficient on is_dissociation is directly a percentage-point difference
 in accuracy, the same unit already used elsewhere in this repo, so the
 numbers are directly comparable without a log-odds conversion. image_id
 and seed are both modeled as random effects (crossed, via a variance
-component for seed) because either source of non-independence - multiple
+component for seed) because either source of non-independence (multiple
 teeth in the same image, and the same image re-tested by differently
-trained models across seeds - would make a naive pooled-instance CI
+trained models across seeds) would make a naive pooled-instance CI
 anti-conservative if left unmodeled. Model 2 tests whether teeth-in-image
 ("crowding") is a confound for the stratum effect; see RESULTS.md Section
 10 for why it was ruled out (not significant, wrong direction, closes

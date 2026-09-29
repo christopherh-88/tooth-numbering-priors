@@ -2,8 +2,8 @@
 
 **Status:** structural draft only. Every number cited below is pulled from
 `RESULTS.md` (cite the section, don't retype/round further). Anything not
-yet measured is marked `[PENDING - see RESULTS.md Section 11.5]` and must
-not be filled in with an assumed or estimated value - replace only once
+yet measured is marked `[PENDING: see RESULTS.md Section 11.5]` and must
+not be filled in with an assumed or estimated value. Replace only once
 the real script has been run and the number is in `RESULTS.md`.
 **Figures:** Figs. 1-6 and S1 exist in `paper/figures/` (vector PDF +
 600-dpi PNG, built by `make_figures.py` from committed CSVs; draft
@@ -17,23 +17,23 @@ numbers) assigned and cross-referenced.
 "Geometry Alone Predicts Tooth Identity: A Diagnostic Baseline for
 Shortcut Risk in FDI Tooth Numbering on Panoramic Radiographs"
 
-(placeholder - Claim B evidence now exists (`RESULTS.md` Sections 21-33)
+(placeholder: Claim B evidence now exists (`RESULTS.md` Sections 21-33)
 and points the other way from what this note originally anticipated: the
 real detector does *not* show shortcut-reliant behavior (it exceeds the
 coordinate-only ceiling by ~25pp, concentrated in tooth-type accuracy,
 and a mitigation experiment removing position/scale jitter produced no
-measurable accuracy change - Sections 30/31). **Update (2026-09-12): a
+measurable accuracy change, Sections 30/31). **Update (2026-09-12): a
 second, architecturally distinct detector (RT-DETR, transformer-based,
 NMS-free) was trained and evaluated the same way across 5 seeds and
-landed within noise of YOLOv8's result (gap +0.22pp, phi +0.0025 -
-`RESULTS.md` Section 40)** - this is no longer a single-detector finding,
+landed within noise of YOLOv8's result (gap +0.22pp, phi +0.0025,
+`RESULTS.md` Section 40)**. This is no longer a single-detector finding,
 it is two independent detector families agreeing. **Update (2026-09-13):
 a third, structurally different detector (Faster R-CNN, a genuine
 two-stage region-proposal architecture, unlike the two single-stage/
 DETR-style models above) was trained and evaluated the same way across
 the same 5 seeds and landed close to the other two (gap 23.83pp vs.
-24.77pp/24.99pp, phi 0.1798 vs. 0.184/0.187, all CIs overlapping -
-`RESULTS.md` Section 45)** - three architecturally distinct detector
+24.77pp/24.99pp, phi 0.1798 vs. 0.184/0.187, all CIs overlapping,
+`RESULTS.md` Section 45)**. Three architecturally distinct detector
 families now agree. This does not justify replacing "Risk" with a stronger positive claim about shortcut exploitation;
 if anything it reinforces the diagnostic-tool framing as the paper's
 actual contribution (`RESULTS.md` Section 24) rather than a "detector X
@@ -45,7 +45,7 @@ Discussion section's framing decision changes.)
 Automated tooth numbering models trained on panoramic radiographs report
 high accuracy, but accuracy alone cannot distinguish genuine appearance
 understanding from reliance on incidental positional structure in the
-data. We introduce a coordinate-only diagnostic baseline - a classifier
+data. We introduce a coordinate-only diagnostic baseline: a classifier
 trained on nothing but bounding-box geometry (center, size, aspect ratio)
 - as a cheap pre-registration-style sanity check that should be run before
 crediting a tooth-numbering model's accuracy to image understanding. On
@@ -57,19 +57,19 @@ A real trained detector (YOLOv8, identical split) exceeds the
 coordinate-only ceiling by 24.8 percentage points on average across 5
 independent seeds (94.3% vs. 69.5% top-1 over all labeled teeth, a
 missed tooth counting as wrong; concentrated almost entirely in
-tooth-type rather than quadrant accuracy) - a pattern inconsistent with
+tooth-type rather than quadrant accuracy), a pattern inconsistent with
 reliance on the geometric shortcut, though its errors do correlate with
 the coordinate-only model's errors weakly more than chance (phi = 0.18,
 5-seed 95% CI [0.13, 0.23]). **Two further, architecturally distinct
 detectors replicate this result within noise: RT-DETR (transformer-based,
 anchor-free, NMS-free; gap 24.99pp, phi 0.187) and Faster R-CNN (a
 genuine two-stage, region-proposal architecture; gap 23.83pp, phi 0.180),
-each evaluated with the identical protocol across the same 5 seeds -
+each evaluated with the identical protocol across the same 5 seeds:
 all three architectures' gap and phi confidence intervals overlap,
 indicating the finding is not specific to one detector architecture or
 detection paradigm.** A geometry-jitter mitigation
-experiment on YOLOv8 alone - training it with position/scale
-augmentation removed, not re-run on the other two architectures -
+experiment on YOLOv8 alone: training it with position/scale
+augmentation removed, not re-run on the other two architectures,
 produced no statistically detectable change in accuracy (paired 95% CI
 on the difference spans zero), giving no evidence that detector had been
 exploiting position as a shortcut to begin with. We release the diagnostic baseline, its negative controls, and
@@ -79,7 +79,7 @@ tooth-numbering research.
 ## 1. Introduction
 
 - Motivate with the shortcut-learning framing from Geirhos et al. (2020,
-  Nature Machine Intelligence) - models can achieve high in-distribution
+  Nature Machine Intelligence): models can achieve high in-distribution
   accuracy by exploiting easy, predictive-but-non-causal features.
 - Ground in real medical-imaging precedent: DeGrave et al. (2021, Nature
   Machine Intelligence) on COVID chest X-ray shortcuts (hospital-specific
@@ -88,13 +88,13 @@ tooth-numbering research.
   84.1% to 45.8%.
 - State the specific question for tooth numbering: FDI numbering is a
   small (32-class), spatially-structured label space applied to a highly
-  canonicalized acquisition protocol (panoramic radiographs) - exactly the
+  canonicalized acquisition protocol (panoramic radiographs), exactly the
   precondition under which a position-based shortcut would be expected to
   work, per the two-precondition hypothesis (Section 11.4,
   `RESULTS.md`).
 - **Define Claim A and Claim B explicitly here, before either term is
   used again** (currently they first appear undefined in Methods/
-  Results and aren't spelled out until Discussion 5.1 - fix this
+  Results and aren't spelled out until Discussion 5.1. Fix this
   ordering when drafting real prose, don't let a reviewer hit "Claim B"
   in Section 3 without a definition). Claim A: geometry alone predicts
   FDI tooth identity far above chance (the coordinate-only baseline's
@@ -103,47 +103,47 @@ tooth-numbering research.
   (the question the YOLOv8 experiment, mitigation, and error-
   correlation analyses are designed to test). The paper's contribution
   is establishing Claim A robustly and testing Claim B rigorously
-  (answer: largely no) - not assuming Claim B follows from Claim A.
+  (answer: largely no), not assuming Claim B follows from Claim A.
 - State the contribution as a **diagnostic tool**, not a claim about any
   specific detector's internals (framing decision, `RESULTS.md`
-  Section 11.1) - avoids overclaiming while the tool itself is the
+  Section 11.1). Avoids overclaiming while the tool itself is the
   contribution.
 
 ## 2. Related work
 
-**Shortcut learning, general.** Geirhos et al. (2020) - the general
+**Shortcut learning, general.** Geirhos et al. (2020): the general
 definition and taxonomy of shortcut learning used throughout this paper.
 
-**Shortcut learning, medical imaging.** DeGrave, Janizek & Lee (2021) -
+**Shortcut learning, medical imaging.** DeGrave, Janizek & Lee (2021):
 COVID-19 chest X-ray models relying on confounders rather than pathology,
 across multiple public datasets, demonstrated with explainable-AI
-techniques. Winkler et al. (2019) - surgical skin markings as a shortcut
+techniques. Winkler et al. (2019): surgical skin markings as a shortcut
 in melanoma classification, with a directly measured specificity collapse.
-Lin et al. (2024, MICCAI) - "Shortcut Learning in Medical Image
+Lin et al. (2024, MICCAI): "Shortcut Learning in Medical Image
 Segmentation": burnt-in clinical annotations and center-crop/zero-padding
 artifacts as segmentation shortcuts, with proposed and evaluated
-mitigations (random cropping, annotation removal) - closest published
+mitigations (random cropping, annotation removal), closest published
 structural comparable to this work. This paper closes the same structural
 gap they identify (measure the shortcut inside a real trained model, then
 evaluate a fix): Sections 21-40 (`RESULTS.md`) do so for tooth
-numbering, with a different qualitative outcome - here the real
+numbering, with a different qualitative outcome: here the real
 detector(s) do not show shortcut-reliant behavior (replicated across
 three architecturally distinct detectors, Sections 40/45), so the "fix"
 (Sections 30/31) is better read as a robustness check than a correction.
 
 **Dental/panoramic radiograph AI and dataset bias.** DENTEX (Hamamci et
-al., 2023, MICCAI challenge) and its HierarchicalDet baseline - the
+al., 2023, MICCAI challenge) and its HierarchicalDet baseline: the
 tooth-numbering benchmark this work's second dataset is drawn from. Zhou,
 Lu, Zhao et al. (2024, BMC Oral Health), "A dual-labeled dataset and
 fusion model for automatic teeth segmentation, numbering, and state
-assessment on panoramic radiographs" - the source of the Dual-Labeled
+assessment on panoramic radiographs": the source of the Dual-Labeled
 Dataset used in this project's Task 3 verification (`RESULTS.md`
 Section 16). Van Nistelrooij et al. (2024, BMC Oral Health), "Combining
 public datasets for automated tooth assessment in panoramic
-radiographs" - a separate paper documenting annotation-quality bias
+radiographs": a separate paper documenting annotation-quality bias
 across combined public dental datasets (a different bias axis than the
 geometric one studied here; corrected 2026-09-12 from an earlier draft
-that misattributed this paper's title to Zhou et al. - citation audit,
+that misattributed this paper's title to Zhou et al., citation audit,
 `RESULTS.md` Section 34). [Add the panoramic-radiograph-quality/
 detection-error correlation paper (PMC, 2025) if it strengthens the
 "multiple known confounds in this exact domain" point in the intro.]
@@ -158,16 +158,16 @@ confusion matrix for the enumeration classes" as future work. A targeted
 literature check (`RESULTS.md` Section 18) confirmed no public
 per-FDI-class confusion matrix exists for any DENTEX-trained detector,
 including the follow-up participant papers (DentexSegAndDet, YOLOrtho,
-DETDet) - only aggregate AP/AR per task is reported anywhere in this
+DETDet): only aggregate AP/AR per task is reported anywhere in this
 line of work. This is cited here as the motivating gap for Task 2, not
 just DENTEX-as-a-dataset.
 
 **Novelty positioning.** A citation-graph check (not a keyword web
-search) of papers citing five seed papers - DENTEX (Hamamci et al.
+search) of papers citing five seed papers: DENTEX (Hamamci et al.
 2023), HierarchicalDet (Hamamci et al. 2023), Hill, Koback & Schilling
-(2024), SHORTKIT-ML (2026), and Lin et al. (2024, cited above) - found
+(2024), SHORTKIT-ML (2026), and Lin et al. (2024, cited above), found
 0 of 132 unique citing papers combining tooth-numbering/FDI-enumeration
-language with shortcut/position-bias language in title or abstract -
+language with shortcut/position-bias language in title or abstract,
 stated here as a genuine checked negative result, not an assumed gap.
 
 ## 3. Methods
@@ -179,7 +179,7 @@ Point to, don't restate, the existing method sections:
   `RESULTS.md` Section 4, `cpu_repro/coord_baseline/controls/`.
 - Cross-dataset replication (DENTEX): `RESULTS.md` Section 10.
 - Falsification threshold (pre-stated, not pre-registered before the
-  first experiment - state this limitation explicitly, don't soften it):
+  first experiment. State this limitation explicitly, don't soften it):
   `RESULTS.md` Section 2 / `cpu_repro/coord_baseline/README.md`.
 - Numbering-convention invariance check (Universal/Palmer):
   `RESULTS.md` Section 11.4.
@@ -187,7 +187,7 @@ Point to, don't restate, the existing method sections:
   Section 21, `cpu_repro/yolo_training/train_yolo.py`. **Define the
   decision rule here before Results uses its outcome label:** a
   pre-registered threshold on the gap between the real detector and the
-  coordinate-only ceiling (`GO_NO_GO.md`) - COMMIT (gap <=5pp, consistent
+  coordinate-only ceiling (`GO_NO_GO.md`): COMMIT (gap <=5pp, consistent
   with shortcut reliance) / PIVOT (gap >=15pp, evidence against reliance)
   / EXTEND (in between, inconclusive), plus a >=90% detection-recall
   guard. The measured 5-seed gap (~24.8pp, Section 33) is a **PIVOT**.
@@ -198,7 +198,7 @@ Point to, don't restate, the existing method sections:
   `cpu_repro/yolo_training/train_rtdetr.py`,
   `train_rtdetr_seed{1,2,3,4}.py`. Same data pipeline, split, and
   evaluation protocol as YOLOv8 (`build_coord_baseline.evaluate()` on
-  matched detections) - only the model class differs - and the same
+  matched detections) (only the model class differs) and the same
   hyperparameter-disclosure stance (Ultralytics' own default RT-DETR
   recipe, not hand-tuned, per Section 28's precedent for YOLOv8).
 - Third detector architecture (Faster R-CNN, a genuine two-stage,
@@ -209,8 +209,8 @@ Point to, don't restate, the existing method sections:
   `cpu_repro/yolo_training/build_coco_dataset.py`,
   `train_fasterrcnn.py`, `train_fasterrcnn_seed{1,2,3,4}.py`. Unlike
   RT-DETR, does not share the Ultralytics training/augmentation/
-  evaluation pipeline with YOLOv8 - a torchvision `fasterrcnn_resnet50_fpn`
-  implementation with its own COCO-format data pipeline - so this
+  evaluation pipeline with YOLOv8: a torchvision `fasterrcnn_resnet50_fpn`
+  implementation with its own COCO-format data pipeline, so this
   replication also addresses the shared-pipeline confound flagged as a
   limitation of the YOLOv8/RT-DETR comparison alone (Section 40).
   Evaluated with the same matched-IoU protocol
@@ -227,7 +227,7 @@ Point to, don't restate, the existing method sections:
   `mitigation_analysis.py`).
 - Boundary-condition dataset method: DenPAR periapical radiographs
   (Rasnayaka et al., *Scientific Data* 12:1615, 2025), chosen as the
-  first real test of the two-precondition hypothesis - `RESULTS.md`
+  first real test of the two-precondition hypothesis: `RESULTS.md`
   Section 25, `cpu_repro/boundary_condition/denpar_periapical/`.
 - Multi-seed replication (Claim B headline numbers, 5 seeds total,
   now for all three detector architectures): `RESULTS.md` Sections 32
@@ -238,18 +238,18 @@ Point to, don't restate, the existing method sections:
   paired-bootstrap-CI methodology, applied to the second and third
   architectures).
 - Statistical testing: paired permutation tests over the 5 seeds,
-  `cpu_repro/coord_baseline/significance_tests.py` (Section 12 -
+  `cpu_repro/coord_baseline/significance_tests.py` (Section 12:
   real vs. shuffled control and vs. majority baseline, both p=0.0625,
   the floor of this test's resolution at n=5 seeds, not a borderline
   result), supplementing the 5-seed mean ± 95% CI reporting already in
   `RESULTS.md` (image-level bootstrap resampling for the YOLO/DenPAR
-  results, `mean_ci95`'s t-interval for cross-seed results - both
+  results, `mean_ci95`'s t-interval for cross-seed results, both
   documented at each point of use).
 
 ## 4. Results
 
 Structure to mirror `RESULTS.md`'s existing numbered sections once the
-paper is actually drafted in full - do not retype numbers here, cite the
+paper is actually drafted in full. Do not retype numbers here, cite the
 section and pull at write-time so a stale copy can't drift from the
 source of truth.
 
@@ -258,23 +258,23 @@ source of truth.
 - 4.1a Feature ablation (Fig. 2a): the signal is asymmetrically position-dependent
   - `x_center` dominates (dropping it costs 47pp), `y_center` is real
   but secondary (dropping it costs 17pp, well above any shape feature's
-  <0.3pp), shape features are inert (Section 20) - sharpens Claim A from
+  <0.3pp), shape features are inert (Section 20). Sharpens Claim A from
   "geometry predicts identity" to "asymmetrically position-dependent
   identity prediction," a cleaner mechanistic claim than "x_center
   only." Also motivates the mitigation experiment's choice to jitter
   position, not size/shape.
 - 4.1b Robustness to test-time coordinate noise (Section 19; Fig. 2b): accuracy
   degrades smoothly, not as a cliff, and stays well above the majority
-  baseline even at noise levels exceeding the natural per-class spread -
+  baseline even at noise levels exceeding the natural per-class spread:
   supports reading Section 21/22's result (no shortcut-consistent error
   pattern from the real detector) as genuine, not an artifact of
   detector localization imprecision washing the signal out.
 - 4.2 Negative controls support that the signal is genuine, not an
   artifact (Section 4).
 - 4.3 Quadrant vs. tooth-type: the non-trivial part of the finding
-  (Section 11.3) - foreground this distinction explicitly, it is the
+  (Section 11.3). Foreground this distinction explicitly, it is the
   paper's sharpest empirical point, not a footnote.
-- 4.4 Numbering-convention invariance (Section 11.4) - a robustness check,
+- 4.4 Numbering-convention invariance (Section 11.4): a robustness check,
   not a generalization result; state this distinction clearly so it isn't
   misread as broader evidence than it is.
 - 4.5 A real trained detector does not show shortcut-reliant behavior
@@ -282,40 +282,40 @@ source of truth.
   coordinate-only ceiling by 26.3pp at seed 0 under the matched-
   detections-only convention, replicated at 24.8pp mean across 5 seeds
   under the undetected-counts-as-wrong convention used for the paired
-  analysis - Section 33; the two numbers differ in denominator, not in
-  finding - do not report them side by side in the paper text without
+  analysis. Section 33; the two numbers differ in denominator, not in
+  finding. Do not report them side by side in the paper text without
   this qualifier, or a reader will read a shrinking effect that isn't
   there). The gap concentrates almost
   entirely in tooth-type accuracy (Sections 21/27), which a
   position-only signal cannot reach per the feature-ablation ceiling
-  (4.1a) - the central piece of evidence against Claim B's "real
+  (4.1a). The central piece of evidence against Claim B's "real
   detectors exploit this" reading. A weak-but-nonzero error correlation
   with the coordinate-only model does exist (phi ranges 0.133-0.235
-  across the 5 seeds, mean 0.184, 95% CI [0.134, 0.233] - Sections
+  across the 5 seeds, mean 0.184, 95% CI [0.134, 0.233], Sections
   26/33; phi moves more across seeds than the gap does, but every seed
   lands in the same "real but modest" range, none near independence or
   strong correlation) and should be reported honestly alongside the
-  gap, not omitted because it complicates a clean "no" - see Section
+  gap, not omitted because it complicates a clean "no". See Section
   24's discussion of how the two facts coexist.
 - 4.6 Mitigation result: training the same detector with the
   geometry-jitter augmentation that (unintentionally) already existed
   in Section 21's run removed (translate=0/scale=0 vs. 0.1/0.5) produces
   no statistically detectable accuracy change (paired bootstrap 95% CI
-  on the top-1 delta spans zero - Section 31). Reported as a clean null,
+  on the top-1 delta spans zero, Section 31). Reported as a clean null,
   not an inconclusive result: further evidence the detector was not
   relying on position as a shortcut, since removing an augmentation that
   would suppress such reliance had nothing to suppress.
 - 4.7 Boundary-condition dataset result: on DenPAR periapical
-  radiographs - where the canonicalized-acquisition-protocol
+  radiographs (where the canonicalized-acquisition-protocol
   precondition breaks while the structured-label-space precondition
-  holds - the coordinate-only shortcut collapses from ~68-70%
+  holds), the coordinate-only shortcut collapses from ~68-70%
   (panoramic) to ~27% top-1, and quadrant accuracy specifically drops
   from near-ceiling (96-98%) to 45.5%, barely above tooth-type accuracy
   on the same data (Section 25). A partial, quantified answer supporting
   the two-precondition hypothesis, not a clean falsification or
-  confirmation - stated as such.
+  confirmation, stated as such.
 - 4.8 Multi-seed replication: the single-seed fragility concern raised
-  across external review answered directly - 5 independent seeds give a
+  across external review answered directly: 5 independent seeds give a
   top-1 accuracy of 95.85% ± 1.01pp on matched detections (94.26% ±
   1.06pp over all labeled teeth, the convention the gap uses) and a gap
   vs. coordinate-only of 24.77pp ± 0.61pp (95% CI [24.16, 25.38]),
@@ -325,48 +325,48 @@ source of truth.
   by this replication.
 - 4.9 Second detector architecture (RT-DETR) replicates Claim B's
   finding within noise: the single-architecture concern raised by 4.5-4.8
-  answered directly - a transformer-based, anchor-free, NMS-free
+  answered directly: a transformer-based, anchor-free, NMS-free
   detector, trained/evaluated with the identical pipeline across the
   same 5 seeds, gives a gap of 24.99pp ± 0.78pp (95% CI [24.22, 25.77])
-  and phi of 0.187 ± 0.035 (95% CI [0.151, 0.222]) - differing from
+  and phi of 0.187 ± 0.035 (95% CI [0.151, 0.222]), differing from
   YOLOv8's 5-seed numbers by only 0.22pp and 0.003 respectively, both
   well inside either architecture's own confidence interval (Section
   40). This is convergence, not merely "also a PIVOT": the two
   architectures are statistically indistinguishable on both the
   headline gap and the secondary error-correlation metric. State this
   as strengthening evidence that the non-reliance finding is not an
-  artifact of YOLOv8 specifically - not as proof it holds for every
+  artifact of YOLOv8 specifically, not as proof it holds for every
   possible detector architecture, since both models here share the
   Ultralytics training/augmentation/evaluation pipeline; 4.10 addresses
   the genuinely different, non-Ultralytics-pipeline architecture this
   section's own limitation flags as untested.
 - 4.10 Third detector architecture (Faster R-CNN) closes the
   architecture-generality question: a genuine two-stage, region-proposal
-  detector - not sharing the Ultralytics pipeline either of the two
+  detector, not sharing the Ultralytics pipeline either of the two
   detectors above use, and evaluated with the identical protocol across
-  the same 5 seeds - gives a gap of 23.83pp ± 0.88pp (95% CI [22.96,
+  the same 5 seeds, gives a gap of 23.83pp ± 0.88pp (95% CI [22.96,
   24.71]) and phi of 0.1798 ± 0.0335 (95% CI [0.1463, 0.2133])
   (`RESULTS.md` Section 45). **Report honestly, not as flat uniformity:**
   the gap mean sits about 1pp below both YOLOv8 (24.77pp) and RT-DETR
-  (24.99pp), though all three 95% CIs overlap - a plausible small
+  (24.99pp), though all three 95% CIs overlap, a plausible small
   architecture effect between two-stage and single-stage/DETR-style
   detection, not a discrepancy. phi is functionally identical across all
   three (0.180-0.187). Three architecturally distinct detector
-  families - CNN-based single-stage/anchor-based (YOLOv8), transformer-
+  families: CNN-based single-stage/anchor-based (YOLOv8), transformer-
   based anchor-free/NMS-free (RT-DETR), and CNN-based two-stage/
-  region-proposal (Faster R-CNN) - spanning two independent training/
+  region-proposal (Faster R-CNN), spanning two independent training/
   evaluation pipelines (Ultralytics for the first two, torchvision for
   the third), now converge on the same Claim-B finding. This resolves
   the "is this an Ultralytics-pipeline artifact" objection 4.9 could not
   rule out on its own (Section 45).
 - 4.11 What the phi correlation is capturing mechanistically (Section 46,
   Fig. 5 for all 14 seeds,
-  **not pre-registered** - this analysis emerged post-hoc out of an
+  **not pre-registered**. This analysis emerged post-hoc out of an
   inconclusive box-targeted Grad-CAM exploration, not from a planned
   test, and should be weighted as exploratory rather than confirmatory).
   It characterizes only the small residual slice of instances where all
   three architecturally distinct detectors (4.5, 4.9, 4.10) fail
-  together - about 1.1-2.8% of instances depending on seed - and does
+  together (about 1.1-2.8% of instances depending on seed) and does
   not touch the headline 24-25pp gap, which is untouched by anything in
   this subsection. On that residual slice, the three detectors'
   failures are not independent: across all 5 seeds, they converge on
@@ -377,11 +377,11 @@ source of truth.
   wrong class the three detectors converge on matches what the
   coordinate-only (position-only) baseline itself would have predicted
   76.8-88.8% of the time (again far above chance, p<0.0001 at every
-  seed) - despite the coordinate-only baseline's own overall accuracy
+  seed), despite the coordinate-only baseline's own overall accuracy
   being only ~69-70%. Reading: when visual evidence is genuinely
   ambiguous (adjacent, morphologically similar teeth) and all three
   detectors fail anyway, they fail in the position-predicted direction
-  about 85% of the time (5-seed mean 84.5%) - consistent with position acting as a
+  about 85% of the time (5-seed mean 84.5%), consistent with position acting as a
   secondary, tie-breaking cue under visual ambiguity, not a primary
   shortcut, and a specific mechanistic account of why phi is
   small-but-nonzero rather than exactly zero.
@@ -410,7 +410,7 @@ source of truth.
   (4.5, 4.9, 4.10) at the level of individual tooth classes rather than
   pooled across the whole dataset. Paired bootstrap by class, all three
   detectors, all 32 FDI classes: every single class favors the detector
-  over the geometry-only prior, with no exceptions - all 96
+  over the geometry-only prior, with no exceptions: all 96
   detector-class 95% CIs exclude zero on the original 5 CUDA seeds. The
   smallest margins are molars (third molars FDI 18/28/38/48 and the first
   molar 46), where the prior is already comparatively strong
@@ -421,44 +421,44 @@ source of truth.
   all three detectors in both, with molars again the smallest margins.
   The tightest case is RT-DETR's FDI 38 on the 4 further CUDA seeds, at
   +4.2pp, 95% CI [+0.7, +7.9]. Descriptive, not a formal independent-samples
-  test - seeds within a group can share test images, so this pools
+  test. Seeds within a group can share test images, so this pools
   (seed, image) clusters rather than fully independent draws (the
   analysis script's own documented caveat).
 - 4.14 Cross-architecture error-agreement result (4.11, Section 46)
   replicated on 9 further seeds (Sections 51-52). On 5 seeds under a
   different training backend, the MPS triple-agreement and
   coordinate-match rates (97.4%, 87.5%) land within about 1 standard
-  deviation of the original 5 CUDA seeds (96.8%, 84.5%) - same finding,
+  deviation of the original 5 CUDA seeds (96.8%, 84.5%): same finding,
   a different split and a different backend, not pooled as a formal
   CUDA/MPS equivalence claim for the same reasons given in 4.12. On 4
   further CUDA seeds, triple agreement is 97.0-100% and coordinate match
   80.6-98.5% per seed, bringing all 9 CUDA seeds to 97.3% and 86.1%. This
   section also extends the small-box-size-drives-missed-detections
   pattern already established for Faster R-CNN (Section 49) to YOLOv8
-  and RT-DETR on the MPS seeds and the further CUDA seeds - the same
+  and RT-DETR on the MPS seeds and the further CUDA seeds: the same
   pattern holds for all three detectors (Sections 51-52).
 
 ## 5. Discussion
 
 - Explicitly separate Claim A (well-supported: geometry alone predicts
-  identity) from Claim B (real detectors exploit this - measured,
+  identity) from Claim B (real detectors exploit this: measured,
   answer is largely no, with a weak-but-real error correlation as the
-  qualifier) per `RESULTS.md` Section 11.2/24 - state plainly which of
+  qualifier) per `RESULTS.md` Section 11.2/24. State plainly which of
   the two the paper is actually claiming, rather than letting the two
   blur together in prose. Claim B's "largely no" answer is now supported
   by **three** architecturally distinct detectors spanning the major
-  detection paradigms - YOLOv8 (CNN-based, single-stage, anchor-based),
+  detection paradigms: YOLOv8 (CNN-based, single-stage, anchor-based),
   RT-DETR (transformer-based, anchor-free, NMS-free), and Faster R-CNN
-  (CNN-based, two-stage, region-proposal) - landing within overlapping
+  (CNN-based, two-stage, region-proposal), landing within overlapping
   confidence intervals of each other on both gap and phi (Sections 40,
-  45) - state this as meaningfully strengthening the claim's
+  45). State this as meaningfully strengthening the claim's
   generalizability, since a reviewer's most natural objection to a
   single-architecture result ("maybe this is just how YOLO behaves") is
   answered directly by a third, structurally different architecture that
   does not even share a training/evaluation pipeline with the other two.
   Report honestly, not as flat uniformity: Faster R-CNN's gap mean sits
   about 1pp below the other two (23.83pp vs. 24.77pp/24.99pp), with CIs
-  overlapping in both comparisons - a plausible small architecture
+  overlapping in both comparisons, a plausible small architecture
   effect, not a discrepancy, and not evidence of a qualitatively
   different finding at the third architecture. This is now three data
   points, not an exhaustive architecture sweep, but the earlier "no
@@ -468,19 +468,19 @@ source of truth.
   slice where all three detectors fail together (4.11, Section 46)
   shows those joint failures converge on each other and on the
   coordinate-only baseline's own prediction far above chance, across
-  all 5 seeds - a mechanistic account of what phi is capturing, not new
+  all 5 seeds. A mechanistic account of what phi is capturing, not new
   evidence bearing on the gap itself.
 - Robustness of the architecture-generality result to training backend
   and finer-grained class analysis (4.12-4.14, Sections 49-54): the
   same three-architecture convergence discussed above holds under a
   completely different training backend (Kaggle CUDA T4 vs. a local
   Apple Silicon MPS run, 4.12) and at the individual FDI-class level
-  rather than only pooled across the dataset (4.13) - no single class,
+  rather than only pooled across the dataset (4.13). No single class,
   for any of the three detectors, favors the geometry-only prior over
   the detector's own visual evidence, on either backend. The
   cross-architecture error-agreement finding (4.11) itself replicates on
   9 further seeds, 5 of them under the different backend (4.14). None of this is evidence for a
-  new claim - it is the same Claim-B finding checked from more angles,
+  new claim. It is the same Claim-B finding checked from more angles,
   addressing a residual "is this specific to how these particular
   models were trained" objection rather than the core architecture-
   generality question, which 4.10/Section 45 already closes.
@@ -488,7 +488,7 @@ source of truth.
   state what would need to be true elsewhere (non-panoramic modality, or
   a differently-structured label space) for the finding to transfer.
   DenPAR periapical radiographs (Section 25) is the one boundary-condition
-  dataset run so far - the shortcut weakens sharply (~68-70% -> ~27%
+  dataset run so far: the shortcut weakens sharply (~68-70% -> ~27%
   top-1, quadrant accuracy collapsing from near-ceiling to 45.5%) but
   does not vanish to chance, a partial result supporting the
   two-precondition hypothesis without fully confirming or falsifying it.
@@ -496,17 +496,17 @@ source of truth.
   remain untried, open extensions for future work, not required to
   support this paper's current claims.
 - Clinical stakes: a coordinate-shortcutting detector would silently
-  mislabel exactly the cases most likely to be clinically flagged -
+  mislabel exactly the cases most likely to be clinically flagged:
   supernumerary or ectopically-positioned teeth, whose position deviates
   from the canonical FDI slot the shortcut relies on. Tie this to the
   UFBA-425 annotation-anomaly scan (Section 5), the Dual-Labeled Dataset
   supernumerary existence-proof (`RESULTS.md` Section 16), and the
   follow-up accuracy comparison (Section 17, run 2026-09-08). **State
   Section 17's result honestly, don't oversell it:** direction matches
-  the hypothesis (accuracy near supernumerary teeth is lower - 29.5% vs.
+  the hypothesis (accuracy near supernumerary teeth is lower: 29.5% vs.
   33.0% per-instance, 28.8% vs. 32.3% per-image) but neither test reaches
   significance (p=0.077 per-instance, p=0.36 per-image, the more
-  appropriate test given image-level clustering) - report this as
+  appropriate test given image-level clustering). Report this as
   suggestive-but-inconclusive in the discussion, explicitly flagging that
   n=23 supernumerary-present images is underpowered, not as confirmed
   evidence. **A follow-up attempt to sharpen this (localized adjacency to
@@ -514,7 +514,7 @@ source of truth.
   significant result that turned out to be a class-composition confound
   (supernumerary teeth cluster anatomically in the anterior maxilla, so
   their "nearest teeth" are disproportionately drawn from classes that
-  are already easy/hard regardless of proximity) - withdrawn, not
+  are already easy/hard regardless of proximity). Withdrawn, not
   reportable as evidence either way. If this section is drafted from
   memory rather than re-reading `RESULTS.md` Section 17, do not
   accidentally resurrect the withdrawn 55.6%-near-accuracy number.**
@@ -522,10 +522,10 @@ source of truth.
   non-significant) whole-image conclusion either. Section 17 does have
   two genuine bonus findings worth using regardless of the supernumerary
   result: (1) Claim A transfers to this third, independent dataset (32.9%
-  vs. 3.76% majority baseline), roughly half the in-domain accuracy -
+  vs. 3.76% majority baseline), roughly half the in-domain accuracy:
   worth citing as further cross-dataset replication of Claim A alongside
   DENTEX (Section 10); (2) images with more visible teeth are easier for
-  the coordinate-only model (r=0.2556, p<0.0001) - plausibly because a
+  the coordinate-only model (r=0.2556, p<0.0001), plausibly because a
   fuller arch looks more like a canonical/complete layout.
 
 ## 6. Limitations
@@ -537,16 +537,16 @@ source of truth.
   dataset with a substantially smaller sample (2505 instances vs.
   27,563/4,872) and its own residual label-quality noise (Arch/Site
   spreadsheet inconsistencies in ~12-35 of 633 used images, checked and
-  found not to materially move the headline numbers - Section 25's
-  materiality-check addition) - one data point supporting the
+  found not to materially move the headline numbers (Section 25's
+  materiality-check addition)). It is one data point supporting the
   two-precondition hypothesis, not a broad generalization sweep.
 - Three real detectors evaluated (YOLOv8, RT-DETR, and Faster R-CNN,
-  5 seeds each for the headline result - Sections 21/33, 38-40, 42-45;
+  5 seeds each for the headline result, Sections 21/33, 38-40, 42-45;
   15 CUDA and 5 MPS seeds each for the robustness checks, Sections
   49-54), resolving what had been
   the paper's single biggest open item and then some. Neither detector
   nor the coordinate-only baseline had its hyperparameters tuned or
-  searched within this project (Sections 28, 38) - all three detectors
+  searched within this project (Sections 28, 38). All three detectors
   used un-searched configurations (values copied from a pre-existing
   notebook for YOLOv8, Ultralytics' own default recipe for RT-DETR, a
   standard torchvision `fasterrcnn_resnet50_fpn` recipe for Faster
@@ -556,7 +556,7 @@ source of truth.
   *relative* claim in either direction (Section 28's disclosure
   decision). **YOLOv8 and RT-DETR share the Ultralytics training/
   augmentation/evaluation pipeline; Faster R-CNN does not** (a
-  torchvision implementation with its own COCO-format data pipeline) -
+  torchvision implementation with its own COCO-format data pipeline):
   this closes what had been the strongest remaining "is this
   architecture-specific, or even just a shared-pipeline artifact"
   objection (Section 45): a structurally different detector family
@@ -564,7 +564,7 @@ source of truth.
   evaluation pipeline, converges to the same finding, with only a small
   (~1pp), CI-overlapping difference in gap magnitude and no meaningful
   difference in phi. This is three data points, not an exhaustive
-  architecture sweep - a fourth or fifth architecture, or a genuinely
+  architecture sweep. A fourth or fifth architecture, or a genuinely
   different training framework for YOLOv8/RT-DETR specifically, remain
   open extensions but are not required to support the paper's current
   claims.
@@ -573,7 +573,7 @@ source of truth.
   Silicon MPS) is paired on identical splits only for seeds 5-9 (the
   group-level comparisons also differ in split) and is confounded with a
   disclosed batch-size/software-stack difference not varied
-  independently - read as supporting
+  independently. Read as supporting
   evidence that the headline gap isn't a single-environment artifact,
   not as proof the two backends produce statistically indistinguishable
   models. All 15 CUDA seeds (0-14) have now been run for all three
@@ -588,16 +588,16 @@ source of truth.
   pre-registered claim pair (Claim A: geometry predicts identity; Claim
   B: does a real detector rely on it) with a single GO/NO-GO decision
   rule (`GO_NO_GO.md`), evaluated once against real data (Section 21)
-  and then replicated - not re-tested against new thresholds - across 5
+  and then replicated (not re-tested against new thresholds) across 5
   seeds (Section 33) and, again, across two further detector
   architectures (Sections 40, 45). The numbered sections in
   `RESULTS.md` (57 as of 2026-09-27, some of them bookkeeping or audit
-  entries) are converging diagnostics for that one claim pair -
+  entries) are converging diagnostics for that one claim pair:
   cross-dataset replication (Sections 2, 10), negative controls
   (Section 4), feature-ablation and noise-robustness checks (Sections
   19, 20), a mitigation experiment (Sections 30/31), a boundary-condition
   test (Section 25), and second- and third-architecture replications
-  (Sections 38-45) - not a battery of independent hypotheses each
+  (Sections 38-45), not a battery of independent hypotheses each
   requiring its own multiple-comparisons correction. State this
   explicitly to pre-empt the reflexive "so many tests, where's the
   Bonferroni correction" objection: a correction would be appropriate
@@ -610,22 +610,22 @@ source of truth.
   (significance tests, a detectability power check, a geometric-ceiling
   check, a supernumerary error-rate follow-up with several
   sub-analyses, and a post-hoc cross-architecture error-agreement
-  analysis explaining the phi correlation mechanistically - 4.11,
-  Section 46) were run and are reported regardless of outcome -
+  analysis explaining the phi correlation mechanistically, 4.11,
+  Section 46) were run and are reported regardless of outcome.
   `RESULTS.md` is an append-only, dated log of every analysis run,
-  including ones that didn't pan out - e.g. a localized-adjacency
+  including ones that didn't pan out, e.g. a localized-adjacency
   refinement of the supernumerary check (`RESULTS.md` Section 17)
   initially looked like a strong, significant result but was identified
   as a class-composition confound and is recorded as withdrawn rather
   than quietly dropped. This is offered as evidence against selective
   reporting, not as a claim that every possible analysis was
-  pre-registered - it wasn't (see the falsification threshold caveat
+  pre-registered. It wasn't (see the falsification threshold caveat
   above).
 
 ## 7. Ethics / data statement
 
 - UFBA-425, DENTEX: publicly released research datasets, already
-  de-identified panoramic radiographs - state license/terms as documented
+  de-identified panoramic radiographs. State license/terms as documented
   by each dataset's own release.
 - Dual-Labeled Dataset (Zhou et al., 2024): note its partial-release
   status (500 of 2,000 stated images) if used in the final paper, and
@@ -633,7 +633,7 @@ source of truth.
   if used to justify treating it as an independent dataset.
 - DenPAR (Rasnayaka et al., 2025): CC BY 4.0, downloaded directly from
   Zenodo with checksum verification against the published record
-  (`RESULTS.md` Section 25) - attribution required per license terms if
+  (`RESULTS.md` Section 25). Attribution required per license terms if
   used in the final paper.
 
 ## References (to finalize)
@@ -655,7 +655,7 @@ source of truth.
   Segmentation," MICCAI 2024 (LNCS 15008; DOI:
   10.1007/978-3-031-72111-3_59; also arXiv:2403.06748). Title, authors,
   venue and DOI verified via web search 2026-09-12; exact page range
-  could not be confirmed (Springer chapter page required login) - use
+  could not be confirmed (Springer chapter page required login). Use
   DOI, not page numbers, if precision is needed before submission.
 - Hamamci, Er, Durugol et al., "DENTEX: Dental Enumeration and Tooth
   Pathosis Detection Benchmark for Panoramic X-ray," arXiv:2305.19112v2,
@@ -693,14 +693,14 @@ source of truth.
   previously carried the title "Combining public datasets for automated
   tooth assessment in panoramic radiographs," which is a real but
   different BMC Oral Health 2024 paper by van Nistelrooij et al.
-  (DOI: 10.1186/s12903-024-04129-5) - title/author mismatch caught by
+  (DOI: 10.1186/s12903-024-04129-5). Title/author mismatch caught by
   citation audit, not the same dataset used in RESULTS.md Section 16.
 - van Nistelrooij, Ghoul, Xi et al., "Combining public datasets for
   automated tooth assessment in panoramic radiographs," BMC Oral
   Health 24:387, 2024 (DOI: 10.1186/s12903-024-04129-5). Added
   2026-09-12 as the correctly-attributed source for the annotation-
   quality-bias point in Related Work (previously mis-cited under
-  "Zhou et al." - see the correction above).
+  "Zhou et al.", see the correction above).
 - Rasnayaka, Leuke Bandara, Jayasundara et al., "DenPAR: Annotated
   Intra-Oral Periapical Radiographs Dataset for Machine Learning,"
   *Scientific Data* 12:1615, 2025 (DOI: 10.1038/s41597-025-05906-9;

@@ -3,7 +3,7 @@ ceiling achievable from geometry alone?
 
 Section 2 reports 69.5% top-1 (GBT) from 6 geometric features. That
 number is only interesting if it's near the best any classifier could do
-given how much real classes' geometric distributions overlap - a weak
+given how much real classes' geometric distributions overlap, a weak
 classifier could leave real headroom unexploited, which would undercut
 the "geometry meaningfully predicts identity" framing (a stronger
 classifier might reveal much more). A k-NN classifier with a large
@@ -13,7 +13,7 @@ class here) without assuming any particular decision-boundary shape the
 way logistic regression (linear) or a fixed-depth GBT do.
 
 Uses the exact same seed-0 grouped train/test split as Section 2/GBT, so
-the comparison is apples-to-apples - same instances, same features, same
+the comparison is apples-to-apples: same instances, same features, same
 generalization boundary (image-level grouping prevents leakage), only
 the classifier changes.
 """

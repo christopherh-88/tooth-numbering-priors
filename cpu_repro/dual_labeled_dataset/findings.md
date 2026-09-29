@@ -1,9 +1,12 @@
-# Dual-Labeled Dataset (Zhou et al., BMC Oral Health 2024) - findings
+# Dual-Labeled Dataset (Zhou et al., BMC Oral Health 2024): findings
 
-**Source:** Kaggle `zwbzwb12341234/a-dual-labeled-dataset` (paper:
-"Combining public datasets for automated tooth assessment in panoramic
-radiographs," BMC Oral Health, 2024). License: "unknown" per the
-dataset's own Kaggle metadata (re-verified live, 2026-09-08) - state this
+**Source:** Kaggle `zwbzwb12341234/a-dual-labeled-dataset` (paper: Zhou
+et al., "A dual-labeled dataset and fusion model for automatic teeth
+segmentation, numbering, and state assessment on panoramic radiographs,"
+BMC Oral Health 24:1201, 2024, doi:10.1186/s12903-024-04984-2; an earlier
+version of this file gave the title of a different paper, see `RESULTS.md`
+Section 34). License: "unknown" per the
+dataset's own Kaggle metadata (re-verified live, 2026-09-08). State this
 plainly in any writeup that cites it, don't assume a permissive license.
 **Downloaded and analyzed:** 2026-09-08.
 
@@ -19,7 +22,7 @@ from memory):
 > remaining data, please contact the author to obtain it
 > (wbzhou23@mails.jlu.edu.cn)."
 
-Only the 500-image tranche was downloaded and is reflected below - this
+Only the 500-image tranche was downloaded and is reflected below. This
 is an admitted partial release, not the full stated dataset.
 
 ## Label 91 (supernumerary) coverage
@@ -32,18 +35,18 @@ is an admitted partial release, not the full stated dataset.
 - 58,269 total annotated shapes/instances across all label files; 33
   distinct label values (32 standard FDI codes + "91").
 - **Label "91": 53 total instances across 49 distinct label files.**
-- **Of those 49 files, only 23 have a paired image in this download** -
+- **Of those 49 files, only 23 have a paired image in this download**:
   those 23 files contain **24 total "91" instances** (one file,
   `4252.json`, has 2). The other 26 files (30 instances) have no image in
   this tranche and are not usable.
 - **Usable supernumerary evidence in this download: 24 instances across
-  23 images** - not "292 across 30" or any other figure not derived from
+  23 images**, not "292 across 30" or any other figure not derived from
   this run; this is the real number this specific 500-image tranche
   supports.
 
 Full per-file breakdown and label-value counts: see the captured run
 output at the bottom of this file (script is reproducible against a
-fresh download - see `inspect_labels.py`'s docstring).
+fresh download, see `inspect_labels.py`'s docstring).
 
 ## Overlap with UFBA-425
 
@@ -68,12 +71,12 @@ annotated supernumerary-tooth instances exist in a public dataset, which
 is relevant substrate for the clinical-stakes argument in `paper/DRAFT.md`
 (a coordinate-shortcutting model would plausibly mislabel exactly these
 anomalous-position cases). **No accuracy comparison has been run on
-them** - nothing here shows the coordinate-only model (or any detector)
-is actually worse on these 24 instances than on typical ones. **Update, 2026-09-08: this follow-up has now been run** - see
+them**. Nothing here shows the coordinate-only model (or any detector)
+is actually worse on these 24 instances than on typical ones. **Update, 2026-09-08: this follow-up has now been run**. See
 `supernumerary_error_check.py` and `RESULTS.md` Section 17. Result:
 direction matches the hypothesis (lower accuracy in supernumerary-present
 images) but is not statistically significant (p=0.36 at the image
-level, the appropriate unit of analysis) - report as suggestive, not
+level, the appropriate unit of analysis). Report as suggestive, not
 confirmed, and note n=23 supernumerary-present images is underpowered.
 
 ## Raw run output (inspect_labels.py, 2026-09-08)

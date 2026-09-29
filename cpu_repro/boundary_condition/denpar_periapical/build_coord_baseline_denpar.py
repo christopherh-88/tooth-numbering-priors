@@ -1,6 +1,6 @@
 """Coordinate-only baseline, replicated on DenPAR (Rasnayaka et al., Scientific
-Data 12:1615, 2025) - a periapical (IOPA) radiograph dataset, CC BY 4.0,
-https://doi.org/10.5281/zenodo.16645076 - as the first real test of the
+Data 12:1615, 2025), a periapical (IOPA) radiograph dataset, CC BY 4.0,
+https://doi.org/10.5281/zenodo.16645076, as the first real test of the
 falsifiable boundary-condition hypothesis in RESULTS.md Section 11.4.
 
 UFBA-425 and DENTEX (Sections 2, 10) are both panoramic radiographs: full
@@ -9,13 +9,13 @@ jaw in one canonically-framed image, satisfying both stated preconditions
 acquisition protocol pinning that slot to a consistent pixel location).
 Periapical radiographs break precondition 2 on purpose: each image shows a
 small, variable subset of teeth (1-8 in this dataset, mean 4.25), framed
-however that region happened to be positioned for that patient/exposure -
-there is no consistent "where quadrant 3 sits in the frame" the way there
+however that region happened to be positioned for that patient/exposure.
+There is no consistent "where quadrant 3 sits in the frame" the way there
 is in a panoramic radiograph. If the coordinate-only shortcut is really
 conditioned on precondition 2 as hypothesized, it should be substantially
 weaker here than the ~69-70% seen on UFBA-425/DENTEX.
 
-IMPORTANT - box-to-FDI-code correspondence is NOT given directly by the
+IMPORTANT: box-to-FDI-code correspondence is NOT given directly by the
 dataset and was independently verified before this script was written, not
 assumed:
   - Each image's annotation JSON (Key Points Annotations/<id>.json) gives a
@@ -32,7 +32,7 @@ assumed:
     for both a "Right" and a "Left" site image. This script applies that
     same rule (sort boxes by x-center ascending, zip with the FDI list as
     given) to every image, and additionally asserts the FDI list itself is
-    strictly ascending per image as an automatic sanity check - a
+    strictly ascending per image as an automatic sanity check. A
     non-ascending list would mean this convention doesn't hold for that
     row, and the image is dropped rather than silently mislabeled.
 """
@@ -79,7 +79,7 @@ FEATURE_COLS = ["x_center", "y_center", "width", "height", "area", "aspect_ratio
 def load_fdi_lists() -> dict:
     """image_id (str, no extension) -> ordered list of FDI code strings, as
     given in the spreadsheet. Rows with unparseable or non-permanent-tooth
-    codes are excluded (11 of 1000 - primary/deciduous-tooth codes in the
+    codes are excluded (11 of 1000, primary/deciduous-tooth codes in the
     51-85 range, or malformed entries), not silently coerced."""
     wb = openpyxl.load_workbook(RAW_DIR / "Characteristics.xlsx")
     ws = wb.worksheets[0]
@@ -99,12 +99,12 @@ def load_fdi_lists() -> dict:
             n_dropped += 1
             continue
         if any(int(codes[i]) >= int(codes[i + 1]) for i in range(len(codes) - 1)):
-            # Not strictly ascending - the verified ordering convention
+            # Not strictly ascending. The verified ordering convention
             # doesn't hold for this row. Drop rather than guess.
             n_dropped += 1
             continue
         out[image_id] = codes
-    print(f"Loaded FDI lists for {len(out)} images ({n_dropped} dropped - "
+    print(f"Loaded FDI lists for {len(out)} images ({n_dropped} dropped: "
           f"primary-tooth codes, malformed entries, or non-ascending order).")
     return out
 
@@ -162,7 +162,7 @@ def load_instances() -> pd.DataFrame:
                 "height": height,
             })
 
-    print(f"{n_count_mismatch} images dropped (bbox count != FDI-list count - "
+    print(f"{n_count_mismatch} images dropped (bbox count != FDI-list count: "
           f"ambiguous correspondence, not guessed at).")
     print(f"{n_missing_files} images dropped (image or annotation file not found).")
 
@@ -175,7 +175,7 @@ def load_instances() -> pd.DataFrame:
 
 def grouped_split(df: pd.DataFrame, seed: int, test_fraction: float):
     # Each DenPAR image is already one independent unit (no augmentation
-    # duplication the way Roboflow-exported UFBA-425 has) - grouping by
+    # duplication the way Roboflow-exported UFBA-425 has). Grouping by
     # image_id is still done for consistency with build_coord_baseline.py's
     # methodology, even though here it is equivalent to a plain instance
     # split at the image level.
@@ -261,7 +261,7 @@ def main():
               f"train_instances={len(train_df)} test_instances={len(test_df)}")
 
     print("\n" + "=" * 88)
-    print("SUMMARY (mean +/- 95% CI over 5 seeds, image-level grouped split) - DenPAR periapical")
+    print("SUMMARY (mean +/- 95% CI over 5 seeds, image-level grouped split), DenPAR periapical")
     print("=" * 88)
     summary_rows = []
     metric_keys = ["top1_acc", "quadrant_acc", "tooth_type_acc",

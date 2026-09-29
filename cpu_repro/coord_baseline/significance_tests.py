@@ -1,7 +1,7 @@
 """Paired significance tests for the coordinate-only baseline results.
 
 STATUS: run 2026-09-08, results in RESULTS.md Section 12. Consumes only
-files that already exist in this directory - no new data collection, no
+files that already exist in this directory, no new data collection, no
 retraining. Run with: python3 significance_tests.py
 
 Two tests, both paired on seed (same 5 seeds, same image-level splits,
@@ -9,10 +9,10 @@ so pairing removes seed-to-seed split variance rather than treating the
 two conditions as independent samples):
 
 1. real vs. shuffled-per-image control (per_seed_results.csv here vs.
-   controls/per_seed_results.csv), per classifier - is the drop from the
+   controls/per_seed_results.csv), per classifier, is the drop from the
    real condition to the shuffled negative control significant, seed by
    seed, rather than just "the CIs don't overlap"?
-2. top1_acc vs. majority_baseline_acc, per classifier - same idea,
+2. top1_acc vs. majority_baseline_acc, per classifier, same idea,
    directly on the headline claim.
 
 Uses a paired permutation test (sign-flip on the seed-level differences,

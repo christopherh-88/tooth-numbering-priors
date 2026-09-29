@@ -3,19 +3,19 @@ what visual signal the real trained detector (YOLOv8, seed-0 split) is
 using, by studying cases where it is correct and the coordinate-only
 baseline (GBT, same split) is wrong.
 
-Exploratory/diagnostic - no pre-registered pass/fail rule applies here,
+Exploratory/diagnostic. No pre-registered pass/fail rule applies here,
 unlike Section 21's GO/NO-GO call. Runs entirely on CPU: the coordinate
 model is refit locally in seconds (deterministic, seed 0, same as
 build_coord_baseline.py's own run), and YOLO inference only needs to run
 once over the ~198 val images using the checkpoint already downloaded
-from the Kaggle run (runs/yolov8_seed0split/weights/best.pt) - no GPU
+from the Kaggle run (runs/yolov8_seed0split/weights/best.pt). No GPU
 needed for this.
 
 Join key: coordinate-only instances (from load_instances(), one row per
 label-file line) and YOLO's ground-truth boxes (from load_gt_boxes(),
 also one row per label-file line, same files) are both parsed by
 splitting each label .txt file's lines in file order and are never
-reordered or filtered before that point - so (label_file, line index) is
+reordered or filtered before that point, so (label_file, line index) is
 a stable, exact join key identifying the same physical tooth annotation
 in both pipelines. This is verified below (see the assertion in
 `build_coord_predictions`) rather than assumed.
@@ -62,8 +62,8 @@ BEST_WEIGHTS = Path(__file__).resolve().parent / "runs" / "yolov8_seed0split" / 
 OUT_DIR = Path(__file__).resolve().parent / "eval_results"
 CROPS_DIR = OUT_DIR / "case_study_crops"
 N_SAMPLE = 18
-CROP_PAD_FRAC = 1.5  # extra context around each box, as a fraction of box size -
-# a tight crop (~0.15) showed only the single tooth with no neighbors, useless
+CROP_PAD_FRAC = 1.5  # extra context around each box, as a fraction of box size.
+# A tight crop (~0.15) showed only the single tooth with no neighbors, useless
 # for judging crowding/adjacent-tooth context; widened after visually checking
 # an initial tight-crop sample
 
@@ -90,10 +90,10 @@ def build_coord_predictions() -> pd.DataFrame:
     result = result.rename(columns={"class_id": "true_class"})
 
     # Sanity check the join key really identifies unique rows before it's
-    # relied on below - a silent duplicate would corrupt the join.
+    # relied on below. A silent duplicate would corrupt the join.
     assert result.duplicated(subset=["label_file", "line_idx"]).sum() == 0, (
         "label_file+line_idx is not unique in the coordinate baseline's own "
-        "test set - join key assumption is wrong, do not proceed."
+        "test set. Join key assumption is wrong, do not proceed."
     )
     return result
 
@@ -108,7 +108,7 @@ def run_yolo_predictions() -> pd.DataFrame:
     val_paths = (PREPARED_DIR / "val.txt").read_text().splitlines()
     if not val_paths:
         raise FileNotFoundError(
-            f"{PREPARED_DIR / 'val.txt'} is empty or missing - run "
+            f"{PREPARED_DIR / 'val.txt'} is empty or missing. Run "
             f"prepare_yolo_dataset() from train_yolo.py first."
         )
 
@@ -218,7 +218,7 @@ def main():
     print(case_set["coord_error_type"].value_counts().to_string())
 
     # Stratified sample across the dominant error-type categories found above,
-    # not uniform random - so the manual review set actually covers whatever
+    # not uniform random, so the manual review set actually covers whatever
     # categories turn out to matter rather than whatever happens to dominate.
     rng = random.Random(0)
     manifest_rows = []

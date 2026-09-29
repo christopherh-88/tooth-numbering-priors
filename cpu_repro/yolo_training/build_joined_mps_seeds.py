@@ -5,22 +5,22 @@ and other seed-0-4 analyses can be extended to seeds 5-9.
 
 Seeds 0-4's tables pair each detector's own prediction with the
 coordinate-only baseline's prediction on the SAME split (build_coord_baseline
-only ever ran seeds 0-4 - see build_coord_baseline.SEEDS). This script trains
+only ever ran seeds 0-4. See build_coord_baseline.SEEDS). This script trains
 a fresh coordinate baseline for seeds 5-9 the same way
 multiseed_analysis.build_coord_predictions() does (identical
 HistGradientBoostingClassifier, identical grouped_split, identical
 FEATURE_COLS), then joins it against each detector's MPS per_tooth.csv
 (from per_tooth_predictions_mps.py / per_tooth_predictions_ultralytics_mps.py)
 on (label_file, line_idx). per_tooth.csv's (image_id, gt_idx) is (label_file
-minus ".txt", line_idx) by construction - both come from the same
-train_yolo.load_gt_boxes() enumeration order - verified by an inner join
+minus ".txt", line_idx) by construction. Both come from the same
+train_yolo.load_gt_boxes() enumeration order. Verified by an inner join
 that must recover every row (assertion below).
 
 Verification-before-use: for seed 0-4-equivalent sanity, this script's coord
 predictions are NOT compared to build_coord_baseline.py's own per_seed_results
-numbers (different classifier - HistGradientBoostingClassifier, matching
+numbers (different classifier: HistGradientBoostingClassifier, matching
 multiseed_analysis.py's convention, not build_coord_baseline.py's
-logistic_regression/gradient_boosted_tree) - so coord_top1 here will differ
+logistic_regression/gradient_boosted_tree), so coord_top1 here will differ
 from BACKEND_COMPARISON.md's baseline numbers and from per_seed_results.csv;
 that is expected, not a bug (see multiseed_analysis.py's own coord_pred,
 which uses the same classifier and is not claimed equivalent to
@@ -67,7 +67,7 @@ def build_coord_predictions(seed: int) -> pd.DataFrame:
     result = result.rename(columns={"class_id": "true_class"})
 
     assert result.duplicated(subset=["label_file", "line_idx"]).sum() == 0, (
-        f"seed {seed}: label_file+line_idx not unique - join key assumption broken."
+        f"seed {seed}: label_file+line_idx not unique: join key assumption broken."
     )
     return result
 
@@ -75,7 +75,7 @@ def build_coord_predictions(seed: int) -> pd.DataFrame:
 def coco_id_to_stem(seed: int) -> dict:
     """Faster R-CNN's per_tooth.csv (per_tooth_predictions_mps.py) keys rows by
     the COCO integer image id, not the filename stem the other two detectors
-    use - map back via prepared_coco/seed{N}/instances_val.json's file_name."""
+    use. Map back via prepared_coco/seed{N}/instances_val.json's file_name."""
     val_json = HERE / "prepared_coco" / f"seed{seed}" / "instances_val.json"
     images = json.load(open(val_json))["images"]
     return {im["id"]: Path(im["file_name"]).stem for im in images}
@@ -86,7 +86,7 @@ def load_detector(arch: str, seed: int) -> pd.DataFrame:
     path = HERE / "eval_results" / eval_subdir / f"seed{seed}" / "per_tooth.csv"
     if not path.exists():
         raise FileNotFoundError(
-            f"{path} not found - run per_tooth_predictions_mps.py (fasterrcnn) or "
+            f"{path} not found. Run per_tooth_predictions_mps.py (fasterrcnn) or "
             f"per_tooth_predictions_ultralytics_mps.py (yolo/rtdetr) for seed {seed} first."
         )
     df = pd.read_csv(path)
@@ -108,7 +108,7 @@ def main():
             det_df = load_detector(arch, seed)
             merged = coord_df.merge(det_df, on=["label_file", "line_idx"], how="inner")
             assert len(merged) == len(coord_df), (
-                f"seed {seed} {arch}: inner join dropped rows ({len(merged)} of {len(coord_df)}) - "
+                f"seed {seed} {arch}: inner join dropped rows ({len(merged)} of {len(coord_df)}): "
                 f"per_tooth.csv and the coord baseline test set disagree on which teeth exist."
             )
             merged[f"{arch}_correct"] = (

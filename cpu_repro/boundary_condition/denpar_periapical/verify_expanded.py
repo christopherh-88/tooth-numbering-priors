@@ -6,10 +6,10 @@ used in Section 25's analysis.
 
 (a) Programmatic check: the spreadsheet's own Arch (Upper/Lower) and Site
 (Right/Left/Anterior) metadata is independently checked against the FDI
-quadrant digit each row's code list implies - FDI quadrant 1/2 = upper,
+quadrant digit each row's code list implies: FDI quadrant 1/2 = upper,
 3/4 = lower; quadrant 1/4 = right side, 2/3 = left side. This catches
 FDI-code data-entry errors in the spreadsheet itself, at 100% coverage
-(not a sample) - a real automated check, not a proxy for the box-order
+(not a sample), a real automated check, not a proxy for the box-order
 verification, which has no analogous full-coverage check available (no
 independent second source gives box-to-tooth identity).
 
@@ -19,7 +19,7 @@ sample (numpy RandomState(1), distinct from the seed used elsewhere in
 this project, and not the same 2 images originally spot-checked) of
 images actually used in Section 25's 633-image analysis set is rendered
 with boxes and their assigned FDI labels drawn directly on the
-radiograph, for visual review and a reported pass rate - not another
+radiograph, for visual review and a reported pass rate, not another
 hand-picked pair.
 """
 
@@ -63,12 +63,12 @@ def programmatic_arch_site_check():
         n_checked += 1
 
         # FDI quadrant digits: 1/2 = upper permanent, 3/4 = lower permanent,
-        # 5/6 = upper primary (deciduous), 7/8 = lower primary - primary-tooth
+        # 5/6 = upper primary (deciduous), 7/8 = lower primary. Primary-tooth
         # quadrants must be included here or every primary-tooth row (which
         # this dataset does contain, per build_coord_baseline_denpar.py's own
         # exclusion count) would be miscounted as an Arch/Site mismatch that
         # isn't real. A first version of this check omitted 5-8 and reported
-        # an inflated failure count - fixed before reporting any number.
+        # an inflated failure count, fixed before reporting any number.
         expected_arch_quads = {"1", "2", "5", "6"} if arch == "Upper" else \
                                {"3", "4", "7", "8"} if arch == "Lower" else None
         if expected_arch_quads is not None and not quadrants.issubset(expected_arch_quads):
@@ -145,7 +145,7 @@ def main():
 
     n_rendered = sum(1 for _, ok, _, _ in rendered if ok)
     print(f"\n{n_rendered}/{len(rendered)} sampled images rendered for visual review "
-          f"(others skipped - box/label count mismatch, same exclusion rule as the main pipeline).")
+          f"(others skipped: box/label count mismatch, same exclusion rule as the main pipeline).")
     print(f"Review images saved to {REVIEW_DIR}")
 
     import csv

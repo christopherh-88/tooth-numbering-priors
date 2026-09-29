@@ -1,10 +1,10 @@
 """Seed 2 runner for Faster R-CNN training (RESULTS.md Section 44's
-5-seed extension) - thin override wrapper, same pattern as
+5-seed extension): thin override wrapper, same pattern as
 train_rtdetr_seed2.py. See train_fasterrcnn.py for the actual pipeline
 and build_coco_dataset.py for the COCO-JSON data prep it now depends on
 for a non-zero seed.
 
-Seed 0 is NOT re-run here or by this file's siblings - Section 44 already
+Seed 0 is NOT re-run here or by this file's siblings. Section 44 already
 trained and evaluated it directly via train_fasterrcnn.py, and its
 prepared_coco/instances_*.json + runs/fasterrcnn_seed0split/best.pt are
 reused unmodified as the seed-0 data point in the 5-seed comparison.

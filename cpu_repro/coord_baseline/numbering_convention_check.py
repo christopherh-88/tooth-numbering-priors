@@ -4,15 +4,15 @@ labels the same 32 physical tooth positions?
 FDI_CODES (build_coord_baseline.py) already IS the canonical partition of
 box geometry into 32 classes, one per physical tooth position. Universal
 and Palmer numbering are both bijective RELABELINGS of that exact same
-32-way partition - same teeth, same quadrant/position structure, different
+32-way partition, same teeth, same quadrant/position structure, different
 symbols. This script (a) builds and verifies those two relabelings are
-clean bijections against FDI, and (b) empirically confirms - rather than
-assumes - how label-agnostic multiclass classifiers (LogReg, GBT) behave
+clean bijections against FDI, and (b) empirically confirms (rather than
+assumes) how label-agnostic multiclass classifiers (LogReg, GBT) behave
 across the three notations, on both UFBA-425 and DENTEX, all 5 seeds.
 
 Because this is a bijective relabeling of the same classes, it does not
 test the generalization-boundary hypothesis in RESULTS.md Section 11.4
-(same label-space structure, same acquisition protocol) - it confirms an
+(same label-space structure, same acquisition protocol). It confirms an
 expected label-invariance, not a new data point on the hypothesis. See
 Section 11.4 for the full interpretation.
 """

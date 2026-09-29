@@ -1,4 +1,4 @@
-"""Per-tooth predictions for YOLOv8x CUDA seeds 7 and 9 - the two seeds
+"""Per-tooth predictions for YOLOv8x CUDA seeds 7 and 9: the two seeds
 flagged in BACKEND_COMPARISON.md and RESULTS.md Section 49 with a
 missed-tooth-rate spike (~4%). Breakdown in RESULTS.md Section 53.
 

@@ -7,17 +7,17 @@ without warning: it needs **two deep learning frameworks at once**, and
 there's a **numpy version conflict** between them that isn't visible until
 you try to install everything together.
 
-## Two frameworks, on purpose - not a mistake
+## Two frameworks, on purpose, not a mistake
 
 This project trains/runs both:
-- **TensorFlow/Keras** - for the U-Net segmentation model
+- **TensorFlow/Keras**: for the U-Net segmentation model
   (`notebooks/Unet/`, `cpu_repro/train_unet_cpu.py`).
-- **PyTorch, via Ultralytics** - for YOLOv8 detection/numbering
+- **PyTorch, via Ultralytics**: for YOLOv8 detection/numbering
   (`notebooks/yolov8/`, `cpu_repro/yolo_training/`).
 
 If you only look at `yolov8_train.ipynb` you'd reasonably assume this is a
 PyTorch project and be confused when `unet_training.ipynb` imports
-`tensorflow`. It's both, in the same environment, at the same time - this
+`tensorflow`. It's both, in the same environment, at the same time. This
 was verified to actually work (see below), not something to "fix" by
 picking one framework.
 
@@ -26,8 +26,8 @@ picking one framework.
 TensorFlow 2.16.2 (the version this project uses) requires `numpy<2.0`.
 Recent releases of `opencv-python`/`opencv-python-headless`, `tifffile`,
 and `imagecodecs` all require `numpy>=2` in their *latest* versions. If you
-install packages one at a time without pinning numpy first - which is the
-natural thing to do - pip will happily install a numpy 2.x release when it
+install packages one at a time without pinning numpy first (which is the
+natural thing to do), pip will happily install a numpy 2.x release when it
 gets to `opencv-python-headless` or `tifffile`, silently breaking
 TensorFlow, and the failure won't show up until the next time you `import
 tensorflow` (a confusing `AttributeError` deep in a scipy/keras import
@@ -37,14 +37,14 @@ The fix is: pin numpy **and** older, numpy-1.x-compatible releases of
 `opencv-python`/`opencv-python-headless`, `tifffile`, and `imagecodecs` all together in one
 `requirements.txt`, so pip's resolver sees every constraint at once instead
 of hitting them one at a time. This is already done in
-`cpu_repro/requirements.txt` - installing that file in one `pip install -r`
+`cpu_repro/requirements.txt`, installing that file in one `pip install -r`
 call resolves cleanly. **Verified from a completely fresh venv, one shot,
-no manual fixes, no `pip check` warnings** - see "What was actually
+no manual fixes, no `pip check` warnings**. See "What was actually
 tested" below.
 
 ## Setup (verified working sequence)
 
-Requires **Python 3.11 or 3.12** - not 3.13 or later. TensorFlow does not
+Requires **Python 3.11 or 3.12**, not 3.13 or later. TensorFlow does not
 yet support Python 3.13+; a newer system Python will fail confusingly deep
 into the TensorFlow install, not with a clear "unsupported Python version"
 message. Check what you have available:
@@ -71,7 +71,7 @@ pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.0 torch
 #    are already satisfied by step 1, so pip keeps the CPU builds. Every
 #    version is pinned in this one file and pip's resolver sees all the
 #    constraints together. Don't install these packages one at a time from
-#    memory - use this file.
+#    memory. Use this file.
 pip install -r cpu_repro/requirements.txt
 ```
 
@@ -129,21 +129,21 @@ harmless. Anything else in `pip check` is a real problem.
 
 Everything above is the CPU-only setup used for local development. The
 YOLOv8 training run in `cpu_repro/yolo_training/` is meant to run on a
-Kaggle GPU session - `torch`/`ultralytics` will use the GPU automatically
+Kaggle GPU session, `torch`/`ultralytics` will use the GPU automatically
 there without any environment changes beyond what Kaggle provides; you do
 not need a different requirements file for that, just don't reinstall the
 CPU-only torch wheel above on a GPU machine (install plain `torch` there,
-or let Kaggle's preinstalled torch stand - check
+or let Kaggle's preinstalled torch stand. Check
 `cpu_repro/yolo_training/README.md` before touching the environment on
 Kaggle, since Kaggle notebooks usually come with torch/CUDA preinstalled
 and reinstalling can be slower and riskier than just using what's there).
 
 ## If you hit a dependency error anyway
 
-Don't hand-fix it package by package - that's exactly how the original
+Don't hand-fix it package by package. That's exactly how the original
 numpy conflict happened during development. Instead: check whether
 `cpu_repro/requirements.txt` is out of date (a newer TensorFlow/Ultralytics
 release may have shifted the numpy compatibility window again), fix the
 pins there, verify with a fresh venv the way this file was verified, and
 update the "What was actually tested" section above with the new date and
-versions - not just silently move on.
+versions, not just silently move on.

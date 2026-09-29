@@ -14,7 +14,7 @@ spike-seed report compares each CUDA spike run against the MPS YOLOv8x run on
 the identical set of teeth.
 
 Reads the per_tooth.csv tables directly (they already carry normalized boxes
-and true/pred class - no label-file lookup needed, unlike
+and true/pred class. No label-file lookup needed, unlike
 missed_tooth_analysis.py's seed 0-4 CUDA path):
 eval_results/{yolo_mps,rtdetr_mps}/seed{5-9}, eval_results/seed{7,9,11-14},
 eval_results/rtdetr/seed{10-14}, and eval_results/fasterrcnn/seed9 (FDI 24

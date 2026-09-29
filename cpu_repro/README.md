@@ -35,7 +35,7 @@ Edit the CONFIG block at the top of `train_unet_cpu.py` to scale up
 
 The dataset is already present in this repo at `Dataset/bb_u_net_dataset/`
 (panoramic X-rays + per-tooth label export tiffs) and
-`Dataset/yolo_train_dataset/` (YOLO-format detection labels) - nothing to
+`Dataset/yolo_train_dataset/` (YOLO-format detection labels), nothing to
 download for this script. If you ever need to re-download UFBA-425 from
 scratch, get it from Figshare (linked in the repo's top-level README.md)
 and match the existing `Dataset/` layout.
@@ -49,6 +49,6 @@ and match the existing `Dataset/` layout.
   to produce combined per-image tiffs (the repo doesn't ship those).
 - `IMG_SIZE` defaults to 256, not 512, for CPU epoch time.
 
-None of this is expected to reproduce the README's reported Dice scores -
-that needs the full 425-image dataset and real YOLO-generated bbox priors
+None of this is expected to reproduce the README's reported Dice scores.
+That needs the full 425-image dataset and real YOLO-generated bbox priors
 (for OralBBNet) or many more epochs (for plain U-Net), on a GPU.

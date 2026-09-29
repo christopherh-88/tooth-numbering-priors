@@ -1,29 +1,39 @@
 # Mitigation experiment design (run, result: clean null)
 
-**Status: run and written up, 2026-09-12 - see `RESULTS.md` Sections 30/31.**
+**Status: run and written up, 2026-09-12. See `RESULTS.md` Sections 30/31.**
 The design below was prepared and executed as planned (geometry-jitter
 augmentation, primary intervention). Result: removing the jitter
 (`translate=0.0/scale=0.0` vs. Section 21's `translate=0.1/scale=0.5`) did
-**not** collapse accuracy - the two runs are statistically indistinguishable
-(paired bootstrap 95% CI on the top-1 delta spans zero) - so the
+**not** collapse accuracy. The two runs are statistically indistinguishable
+(paired bootstrap 95% CI on the top-1 delta spans zero), so the
 "accuracy collapses" branch of this document's original reasoning (see the
 Primary intervention section below, left as originally written for the
 record) did not occur. Read as evidence the detector was not relying on
 the geometric shortcut in the first place, not as an inconclusive or
-failed mitigation attempt - see Section 31 for the full reasoning. The
+failed mitigation attempt. See Section 31 for the full reasoning. The
 rest of this document is left as originally drafted (design-time
 reasoning, MIRROR_MAP bug fix, natural-variance measurement) since it
 remains an accurate record of what was decided and why before the run.
 
+**Update 2026-09-28 (`RESULTS.md` Section 58):** the MIRROR_MAP fix below
+covered only half of the problem. `input_mask`, the U-Net's training target,
+also stores one channel per FDI tooth and was still flipped without a channel
+swap, and three other notebooks had the original, unfixed flip. All four
+notebooks now swap the channels of both arrays, and
+`verify_flip_augment.py` checks this on a real image. The detector results
+were never affected, because the detectors train with flipping turned off.
+The mitigation experiment's other caveat: its zero-jitter run set
+`translate` and `scale` to 0 but left Ultralytics' mosaic augmentation on.
+
 ## Why this is needed
 
 Section 11.2 of `RESULTS.md` draws the line between Claim A (geometry alone
-predicts FDI identity - well-supported) and Claim B (a real detector
-exploits this as a shortcut - untested). Measuring Claim B (the open error-
+predicts FDI identity, well-supported) and Claim B (a real detector
+exploits this as a shortcut, untested). Measuring Claim B (the open error-
 pattern correlation check) tells you whether the problem exists in a real
 model. It does not, by itself, show the problem is fixable. A mitigation
 that is proposed *and* evaluated is what closes the gap to a main-conference
-contribution rather than a diagnostic-only one - this is the structure used
+contribution rather than a diagnostic-only one, this is the structure used
 by the closest published comparable (Lin et al., "Shortcut Learning in
 Medical Image Segmentation," MICCAI 2024): identify the shortcut, propose a
 concrete intervention, re-measure.
@@ -35,7 +45,7 @@ concrete intervention, re-measure.
 During detector training, apply a translation/scale perturbation to each
 training crop or tile that is larger than the acquisition-protocol variance
 naturally present in the dataset (panoramic radiographs are already fairly
-canonicalized - see the two-precondition hypothesis in Section 11.4 - so the
+canonicalized (see the two-precondition hypothesis in Section 11.4), so the
 natural jitter is small). Concretely: randomly translate/rescale the input
 crop window per instance by an amount exceeding the dataset's natural
 positional variance (to be measured empirically from the training split
@@ -49,18 +59,18 @@ Claim B.
 Implementation hook: goes into the training-time augmentation pipeline in
 `notebooks/yolov8+unet/yolov8+unet_training.ipynb` (or the plain YOLOv8
 notebook), as an additional transform applied before/alongside existing
-augmentations - not yet located precisely in the notebook, needs a read-
+augmentations, not yet located precisely in the notebook, needs a read-
 through of the current augmentation block before wiring this in.
 
 **Confirms the right target to perturb:** `RESULTS.md` Section 20 (feature
 ablation, run 2026-09-08) found the coordinate-only signal is
-asymmetrically position-dependent - `x_center` dominates (dropping it
+asymmetrically position-dependent. `x_center` dominates (dropping it
 alone collapses accuracy 0.6949 -> 0.2198), `y_center` is real but
-secondary (dropping it costs 17pp, to 0.5266) - and essentially
+secondary (dropping it costs 17pp, to 0.5266), and essentially
 independent of box size/shape (dropping width/height/area/aspect_ratio
 individually changes accuracy by <0.3pp each, within noise). This
 confirms jittering position (both axes, not just x) is attacking the
-actual signal, not a side channel - a shape-only jitter would have been
+actual signal, not a side channel, a shape-only jitter would have been
 a much weaker intervention, and an x-only jitter would leave a real
 secondary y-axis signal untouched.
 
@@ -69,7 +79,7 @@ secondary y-axis signal untouched.
 Train the detector's classification head jointly with a penalty term that
 discourages its predictions from agreeing with a frozen coordinate-only
 reference classifier (the existing logistic-regression/GBT model from
-Section 2) beyond what accuracy requires - a confound-removal-style loss,
+Section 2) beyond what accuracy requires, a confound-removal-style loss,
 similar in spirit to a gradient-reversal position-predictor. More invasive
 to implement than the augmentation approach; keep as fallback if jitter
 augmentation turns out to not move the needle.
@@ -83,8 +93,8 @@ chosen intervention). For each of the two resulting models:
    Section 2), to check the intervention doesn't just destroy performance.
 2. Fraction of the detector's predictions that agree with the coordinate-
    only baseline's predictions, specifically on the subset where the
-   detector and the coordinate-only model disagree with ground truth -
-   this is the direct measure of shortcut reliance.
+   detector and the coordinate-only model disagree with ground truth.
+   This is the direct measure of shortcut reliance.
 3. Run both models' predictions through the existing
    `is_mirror_quadrant_error` / `is_neighbor_error` taxonomy
    (`build_coord_baseline.py`) and compare the error-type distribution
@@ -96,7 +106,7 @@ chosen intervention). For each of the two resulting models:
 The intervention will be treated as having **failed to demonstrate
 mitigation** if the post-intervention agreement-with-geometry-only-model
 rate (metric 2 above) drops by less than half the drop seen in the
-shuffled-geometry negative control's collapse (Section 4 / `controls/`) -
+shuffled-geometry negative control's collapse (Section 4 / `controls/`),
 i.e., if the intervention barely moves the number relative to how far a
 model *could* be pushed away from the geometry correlation, it should be
 reported as a negative/inconclusive result, not reframed as a partial
@@ -104,13 +114,13 @@ success after the fact.
 
 **As actually run (2026-09-12):** metric 2 exactly as specified here
 (agreement rate with the coordinate-only model, on the disagree-with-
-ground-truth subset) was **not** the metric computed in Section 31 - that
+ground-truth subset) was **not** the metric computed in Section 31. That
 section instead directly compared the two YOLO runs' predictions against
 each other (paired accuracy delta), since there was no accuracy collapse
 to explain in agreement-rate terms. This pre-stated threshold is
 therefore not literally applicable to what happened; flagged here rather
 than silently treated as satisfied or ignored. `RESULTS.md` Section 31 is
-the actual, load-bearing write-up of this experiment's result - this
+the actual, load-bearing write-up of this experiment's result. This
 document's original threshold is left as historical record of the
 pre-registered design.
 
@@ -122,11 +132,11 @@ pre-registered design.
   Albumentations/torchvision. The only existing augmentation is a single
   `augment()` function (cell 21): a 50%-probability `np.fliplr` applied
   identically to the image, the segmentation mask, and `input_bb`. This
-  is the natural hook point for the geometry-jitter intervention - it's
+  is the natural hook point for the geometry-jitter intervention. It's
   the only place per-sample spatial augmentation happens in this
   notebook.
 - **Flip/label-mismatch bug: CONFIRMED, 2026-09-08.** Static read +
-  minimal CPU-only reproduction (no training, no model) - a scratch
+  minimal CPU-only reproduction (no training, no model), a scratch
   verification script, not part of this repo (logic and full run log
   below, so this is reproducible without the original file).
 
@@ -141,19 +151,19 @@ pre-registered design.
   input_bb = np.fliplr(input_bb)
   ```
   (applied to `input_bb` after `resize_img`'s `np.transpose(input_bb,
-  axes=[1, 2, 0])`, i.e. to a `(H, W, C)` array - `np.fliplr` flips axis
+  axes=[1, 2, 0])`, i.e. to a `(H, W, C)` array, `np.fliplr` flips axis
   1, the `W` axis, and leaves axis 2, the channel/class axis, untouched).
   Grepped the full notebook for every reference to `class1` / `class_id`
   / `channel` between cells 13 and 21 inclusive: **no remapping code
   exists anywhere in that span.**
 
   **Reproduction.** Took a real UFBA-425 label file with a matched
-  same-tooth-type, opposite-quadrant pair -
+  same-tooth-type, opposite-quadrant pair:
   `Dataset/yolo_train_dataset/test/labels/cate1-00026_jpg.rf.365e2e2d1d708d69d19a27a09f0b05de.txt`,
   class 0 (FDI 11, `CODE_TO_IDX` convention from `build_coord_baseline.py`)
-  and class 8 (FDI 21) - and reproduced cell 13's `binary_map`
+  and class 8 (FDI 21), and reproduced cell 13's `binary_map`
   construction and cell 21's `fliplr` call verbatim, line-for-line, on a
-  32x640x640 array (no image pixels, no model - box placement and the
+  32x640x640 array (no image pixels, no model, box placement and the
   flip are the entire test). Result:
 
   ```
@@ -174,13 +184,13 @@ pre-registered design.
   channel index 0 the entire time. Channel identity tracks nothing; only
   pixel content moves.
 
-  **Scope.** This is not a messy or random misalignment - it is a fully
+  **Scope.** This is not a messy or random misalignment. It is a fully
   deterministic, systematic swap. Because `MIRROR_QUADRANTS` in
   `build_coord_baseline.py` (`{("1","2"),("2","1"),("3","4"),("4","3")}`)
   already defines the exact anatomical mirror-pairing (upper-left <->
   upper-right, lower-left <-> lower-right, same tooth-type digit), the
   affected classes on any flipped view are precisely the 32 classes
-  paired by that same relation - e.g. every 1x<->2x and 3x<->4x pair,
+  paired by that same relation, e.g. every 1x<->2x and 3x<->4x pair,
   applied symmetrically. **Fraction of training exposure affected: the
   flip's own trigger probability, `np.random.uniform() > 0.5` -> ~50% of
   augmented training views**, on every box in the image simultaneously
@@ -214,20 +224,20 @@ pre-registered design.
   ```
   `FDI_CODES`/`MIRROR_QUADRANTS` are copied verbatim from
   `build_coord_baseline.py` (confirmed identical to this dataset's own
-  `Dataset/yolo_train_dataset/data.yaml` `names:` ordering - same 32
-  codes, same index order - so reusing that class-id assumption here is
+  `Dataset/yolo_train_dataset/data.yaml` `names:` ordering, same 32
+  codes, same index order, so reusing that class-id assumption here is
   justified, not assumed blind). `MIRROR_MAP` is a 32-entry involution;
   spot-checked `MIRROR_MAP[0] == 8` (FDI 11 -> 21) and
   `MIRROR_MAP[8] == 0` (FDI 21 -> 11) in the verification run below.
 
   **Full 32-class correctness proof (not just the one spot-checked pair):
-  `verify_mirror_map.py`, run 2026-09-08 - all 10 checks pass.** Confirms,
+  `verify_mirror_map.py`, run 2026-09-08: all 10 checks pass.** Confirms,
   for every one of the 32 classes, not just FDI 11/21: `MIRROR_MAP` is a
   genuine bijection (no class dropped or duplicated), an involution
   (applying it twice returns the identity), has no fixed points (every
   class maps to a genuinely different partner), and every pair correctly
   preserves the tooth-type digit while swapping to a valid mirror
-  quadrant - and each quadrant block (1, 2, 3, 4) maps entirely into its
+  quadrant, and each quadrant block (1, 2, 3, 4) maps entirely into its
   correct mirror block, not some other mixture. This removes any residual
   doubt from the single-pair spot-check before Friday's GPU run relies on
   it.
@@ -236,7 +246,7 @@ pre-registered design.
   remediation note here said to check
   `flipped_by_channel[0] == pre-flip binary_map[8]` as the post-fix
   invariant. That was imprecise and, on reflection, wrong as literally
-  stated - two independent real teeth (FDI 11 and FDI 21 in this same
+  stated. Two independent real teeth (FDI 11 and FDI 21 in this same
   test image) are not exact pixel-for-pixel mirrors of each other, so
   that exact equality would not hold even with a fully correct fix. The
   invariant that actually must hold, and the one checked below, is:
@@ -262,18 +272,18 @@ pre-registered design.
   class-correct channel, and the old buggy behavior (content staying
   under its original channel) no longer occurs.
 - ~~Measure the dataset's natural positional variance~~ **Done,
-  2026-09-08 - see `RESULTS.md` Section 13.** Mean per-class std is
+  2026-09-08. See `RESULTS.md` Section 13.** Mean per-class std is
   0.0267 (x) / 0.0490 (y), normalized units. Jitter magnitude for this
-  experiment should be at least 0.0535 (x) / 0.0979 (y) - 2x the natural
-  spread - as a starting point.
-- **Task 2 detectability pre-check: done, 2026-09-08 - see `RESULTS.md`
+  experiment should be at least 0.0535 (x) / 0.0979 (y), 2x the natural
+  spread, as a starting point.
+- **Task 2 detectability pre-check: done, 2026-09-08. See `RESULTS.md`
   Section 14.** Confirms Task 2 is statistically well-powered across a
   plausible range of detector accuracies (75-95%), so it's worth running
   as planned rather than redesigning it or worrying it would compare
   noise to noise.
-- Requires GPU (Kaggle or equivalent) - blocked until compute is available.
+- Requires GPU (Kaggle or equivalent), blocked until compute is available.
   Task 2 (error-pattern correlation check) now depends on this fix being
-  in place before any detector is trained on this notebook - training on
+  in place before any detector is trained on this notebook. Training on
   the pre-fix pipeline would confound Claim-B evidence with this labeling
   artifact.
 
@@ -287,7 +297,7 @@ upper-with-upper (1<->2) and lower-with-lower (3<->4), not all four
 quadrants mutually; neighbor-detection correctly requires same quadrant
 (a same-tooth-type error across the midline, e.g. 11 vs. 21, is correctly
 classified as mirror-quadrant, not neighbor, since they're anatomically on
-opposite sides despite adjacent numbering - a deliberate and correct
+opposite sides despite adjacent numbering, a deliberate and correct
 definitional choice, not an edge-case gap); both functions are only ever
 called on the wrong-prediction subset (`y_true[wrong]`), so the undefined
 true_id==pred_id case never actually executes. This taxonomy code can be

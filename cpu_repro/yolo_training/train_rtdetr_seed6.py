@@ -1,5 +1,5 @@
 """Seed 6 runner for RT-DETR training (RESULTS.md Section 38/39's
-scoped replication) - thin override wrapper, same pattern as
+scoped replication): thin override wrapper, same pattern as
 train_yolo_seed6.py. See train_rtdetr.py for the actual pipeline."""
 
 import sys

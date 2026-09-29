@@ -3,7 +3,7 @@ in stratified_analysis.py a real effect, or a tooth-type composition
 artifact?
 
 Motivating fact, checked here first: DENTEX's "Impacted" diagnosis applies
-exclusively to third molars in this dataset (FDI 18/28/38/48) - the impacted
+exclusively to third molars in this dataset (FDI 18/28/38/48), the impacted
 stratum is not a general anomaly sample, it is a third-molar sample. Since
 third molars were already the easiest tooth-type group to place from
 geometry alone (`../README.md`, tooth-type breakdown), any accuracy
@@ -12,14 +12,14 @@ is partly comparing different tooth-type mixes, not just "impacted vs. not."
 
 This script controls for that in two ways, reusing the exact same trained
 models and test-fold predictions as `stratified_analysis.py` (not a new
-experiment - same 5 seeds, same GBT classifier, same splits):
+experiment, same 5 seeds, same GBT classifier, same splits):
 
 1. Restrict all three strata to third-molar instances only (18/28/38/48) and
    compare top-1 accuracy on that matched subset.
 2. Composition-standardize: reweight canonical's per-FDI-code accuracy by
    each stratum's own FDI-code mix, to get "canonical's expected accuracy if
    it had this stratum's tooth-type composition," and compare that to the
-   stratum's actual accuracy - the gap that survives is the part composition
+   stratum's actual accuracy. The gap that survives is the part composition
    does not explain.
 
 Also reports the dissociation stratum with third molars excluded entirely,

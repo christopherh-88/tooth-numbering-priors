@@ -1,5 +1,5 @@
 """Coordinate-only baseline (see ../build_coord_baseline.py), applied to
-DENTEX instead of UFBA-425 - same feature set, same image-level grouped
+DENTEX instead of UFBA-425, same feature set, same image-level grouped
 split, same 5 seeds, same evaluate() function, imported directly (not
 reimplemented) from build_coord_baseline.py so results land in the exact
 same columns as cpu_repro/coord_baseline/per_seed_results.csv and are
@@ -8,18 +8,18 @@ directly comparable.
 Data: cpu_repro/anomaly_scan/dentex_raw/dentex_full_fdi_table.csv, built by
 anomaly_scan/dentex_raw/build_table.py from DENTEX's quadrant_enumeration
 (634 images) and quadrant_enumeration_disease (705 train + 50 validation)
-tiers - the two tiers that carry a full FDI code (see
+tiers, the two tiers that carry a full FDI code (see
 anomaly_scan/dentex_findings.md). 21,806 tooth instances, 1358 images.
 
 DENTEX only covers permanent-dentition quadrants (1-4), so FDI_CODES here
-is the identical 32-code list UFBA-425 uses - imported, not retyped, so a
+is the identical 32-code list UFBA-425 uses, imported, not retyped, so a
 class_id means the same FDI code in both baselines.
 
 Leakage check done before writing this script (see
 ../../CONVENTIONS.md-adjacent verification, logged in dentex/README.md):
 the quadrant_enumeration and quadrant_enumeration_disease tiers were
 hash-compared on a 30-image sample and found to be effectively disjoint
-physical images (0/30 matches) despite overlapping filename indices - safe
+physical images (0/30 matches) despite overlapping filename indices, safe
 to pool and split by image_id as done here.
 """
 
@@ -58,7 +58,7 @@ CODE_TO_IDX = {code: i for i, code in enumerate(FDI_CODES)}
 def load_instances() -> pd.DataFrame:
     df = pd.read_csv(TABLE_PATH, dtype={"quadrant": str, "position": str, "fdi": str})
     df["class_id"] = df["fdi"].map(CODE_TO_IDX)
-    assert df["class_id"].notna().all(), "unmapped FDI code found - DENTEX table has a code outside FDI_CODES"
+    assert df["class_id"].notna().all(), "unmapped FDI code found: DENTEX table has a code outside FDI_CODES"
     df["class_id"] = df["class_id"].astype(int)
     df["label_file"] = df["image_id"]  # one DENTEX image == one atomic annotation unit, no augmentation crops
     df["area"] = df["width"] * df["height"]
@@ -115,7 +115,7 @@ def main():
 
     print()
     print("=" * 88)
-    print("SUMMARY (mean +/- 95% CI over 5 seeds, image-level grouped split) - DENTEX")
+    print("SUMMARY (mean +/- 95% CI over 5 seeds, image-level grouped split), DENTEX")
     print("=" * 88)
 
     summary_rows = []
@@ -150,7 +150,7 @@ def main():
         ax.set_xticklabels(FDI_CODES, rotation=90, fontsize=7)
         ax.set_yticklabels(FDI_CODES, fontsize=7)
         ax.set_xlabel("Predicted FDI code"); ax.set_ylabel("True FDI code")
-        ax.set_title(f"{name} - DENTEX confusion matrix (seed {CONFUSION_MATRIX_SEED})")
+        ax.set_title(f"{name}: DENTEX confusion matrix (seed {CONFUSION_MATRIX_SEED})")
         fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
         fig.tight_layout()
         fig.savefig(OUTPUT_DIR / f"confusion_matrix_{name}_seed{CONFUSION_MATRIX_SEED}.png", dpi=150)

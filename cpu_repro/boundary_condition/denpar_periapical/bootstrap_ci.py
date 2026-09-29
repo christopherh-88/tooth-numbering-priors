@@ -1,7 +1,7 @@
 """Bootstrap CIs for Section 25's headline DenPAR numbers (top-1/quadrant
 accuracy, real and shuffled-label control), resampled at the image level.
 Reuses load_instances()/grouped_split() from build_coord_baseline_denpar.py
-unchanged - refits the seed-0 GBT model once (deterministic, already done
+unchanged. Refits the seed-0 GBT model once (deterministic, already done
 for Section 25) and keeps per-instance identity for resampling, which the
 original script's summary.csv/per_seed_results.csv output did not."""
 

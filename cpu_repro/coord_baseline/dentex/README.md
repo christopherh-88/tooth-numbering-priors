@@ -4,13 +4,13 @@ Same question as `../README.md` (`../build_coord_baseline.py`), asked of a
 second, independent dataset: **does the UFBA-425 coordinate-only result
 replicate on DENTEX?** Same feature set
 (`x_center, y_center, width, height, area, aspect_ratio`), same 5 seeds
-(0-4), same image-level grouped 80/20 split, same `evaluate()` function -
-all imported directly from `build_coord_baseline.py`, not reimplemented -
+(0-4), same image-level grouped 80/20 split, same `evaluate()` function,
+all imported directly from `build_coord_baseline.py`, not reimplemented,
 so every number below lands in the same column as the UFBA-425 table and is
 directly comparable without re-deriving anything.
 
 Data: `cpu_repro/anomaly_scan/dentex_raw/dentex_full_fdi_table.csv` (built
-by `dentex_raw/build_table.py`) - 21,806 tooth instances across 1358
+by `dentex_raw/build_table.py`): 21,806 tooth instances across 1358
 images, pooling DENTEX's `quadrant_enumeration` (634 images) and
 `quadrant_enumeration_disease` (705 train + 50 validation) tiers, the two
 tiers that carry a full FDI code. Convention verified to match UFBA-425
@@ -29,7 +29,7 @@ pooled set by `image_id` carries no cross-tier leakage.
 | majority-class baseline | 0.0363 +/- 0.0019 | 0.0375 +/- 0.0009 |
 
 Two datasets, different institutions, different acquisition protocols,
-different label pipelines - within ~1 point of top-1 accuracy and DENTEX's
+different label pipelines, within ~1 point of top-1 accuracy and DENTEX's
 quadrant accuracy is actually *higher*. This is strong evidence the
 coordinate-identity relationship is a structural property of panoramic
 dental geometry, not an artifact of one dataset's collection or annotation
@@ -47,7 +47,7 @@ process.
 | errors that are immediate-neighbor swaps | 0.8187 +/- 0.0126 | 0.8423 +/- 0.0135 |
 
 Per-seed split sizes (seed 0): 1087 train images / 271 test images, 17,455
-train instances / 4,351 test instances - all 5 seeds land within a few
+train instances / 4,351 test instances. All 5 seeds land within a few
 hundred instances of that.
 
 Full per-seed numbers: `per_seed_results.csv`. Machine-readable summary:
@@ -78,16 +78,16 @@ Same pattern as UFBA-425: shuffling collapses accuracy to essentially the
 majority-class baseline (3.65-4.02% vs. 3.75% baseline), ruling out a
 data-layout artifact as the source of the real result. Position alone
 (x,y) recovers almost all of the full signal (61.7-63.4% vs. 61.3-68.5%
-top-1) - even more of it than on UFBA-425, where position-only trailed the
+top-1). Even more of it than on UFBA-425, where position-only trailed the
 full feature set by a slightly wider margin. Size alone (w,h) gets
 13.4-14.3%, well above the 3.75% majority baseline (~3.6-3.8x chance) but a
-small fraction of the full result - the same secondary, location-blind size
+small fraction of the full result. The same secondary, location-blind size
 signal seen on UFBA-425.
 
 ## Stratified analysis: does accuracy drop on the anomalous strata?
 
 Uses the exact same 5 trained models as the main baseline above (not
-retrained) - per seed, both classifiers are trained once on that seed's
+retrained). Per seed, both classifiers are trained once on that seed's
 train fold, and the resulting test-set predictions are then sliced by
 stratum membership before scoring, so this is a slice of the same result,
 not a new experiment (`stratified_analysis.py`).
@@ -99,11 +99,11 @@ instance in neither stratum):
   one of the 101 images flagged by `scan_dentex.py` for a duplicate FDI
   code and/or a position-vs-quadrant violation (`../../anomaly_scan/
   dentex_findings.md`). 1354 instances total across the full dataset, not
-  just the flagged box itself - flagging is per-image, not per-tooth.
+  just the flagged box itself. Flagging is per-image, not per-tooth.
 - **impacted** (instance-level flag): every test instance whose diagnosis
   is "Impacted" (644 total in the full dataset).
 - The two strata overlap a little (77 instances are both flagged-image and
-  impacted-diagnosis) - reported, not hidden, and each instance still only
+  impacted-diagnosis), reported, not hidden, and each instance still only
   counts once per stratum in its own row.
 
 | stratum | classifier | top-1 acc | quadrant acc | tooth-type acc | pooled n | min seed n |
@@ -116,7 +116,7 @@ instance in neither stratum):
 | impacted | logistic regression | 0.9440 +/- 0.0287 | 0.9889 +/- 0.0105 | 0.9551 +/- 0.0277 | 614 | 109 |
 
 Both strata clear the size thresholds set before running this
-(`MIN_POOLED_N=100`, `MIN_PER_SEED_N=20` per seed) - `too_small` is `False`
+(`MIN_POOLED_N=100`, `MIN_PER_SEED_N=20` per seed). `too_small` is `False`
 for every row (`stratified_summary.csv`). Neither stratum is too small to
 support the comparison below.
 
@@ -128,19 +128,19 @@ support the comparison below.
   expected direction: images flagged for duplicate codes or a
   position-vs-quadrant violation are, almost by definition, images where a
   box's position doesn't cleanly match one true FDI identity, so a
-  coordinate-only model - which has no other information to fall back on -
+  coordinate-only model, which has no other information to fall back on,
   does worse on them. The drop is real but modest (not catastrophic),
   because a flagged *image* still contains mostly well-behaved boxes; only
   a minority of the ~13 teeth in a typical flagged image are the actual
-  anomalous ones. See "Composition check" below - tooth-type composition
+  anomalous ones. See "Composition check" below. Tooth-type composition
   does not explain this drop away, but its size is sensitive to estimation
   method, and the naive **6.3-point** figure above overstates it. The
   best-supported estimate is roughly **3.6 to 3.9 points**, not
-  significant at conventional thresholds - see the full sensitivity chain
+  significant at conventional thresholds. See the full sensitivity chain
   there.
-- **impacted: no - accuracy goes up, but the original "23 points"
+- **impacted: no. Accuracy goes up, but the original "23 points"
   framing overstated why.** See "Composition check" immediately below
-  before reading any impacted-stratum number on its own - the raw
+  before reading any impacted-stratum number on its own. The raw
   comparison mixes a compositional effect with a real one, and needs to be
   read as a third-molar-only result, not a cross-tooth-type one.
 
@@ -151,7 +151,7 @@ including `n_test` per cell).
 ## Composition check: is the impacted-stratum result a tooth-type artifact?
 
 **Read this first: DENTEX's "Impacted" diagnosis label applies exclusively
-to third molars in this dataset - 644/644 impacted-diagnosis instances
+to third molars in this dataset. 644/644 impacted-diagnosis instances
 (100%) carry FDI code 18, 28, 38, or 48.** Anyone treating DENTEX's
 impacted label as a general anomaly category is measuring something
 narrower than they think: it is not "any impacted tooth," it is
@@ -174,7 +174,7 @@ ways, reusing the exact same trained models and test-fold predictions as
 | dissociation | 1,354 | 14.2% |
 | impacted | 644 | **100.0%** |
 
-**Matched subset - third molars only (FDI 18/28/38/48), GBT, pooled over 5 seeds:**
+**Matched subset: third molars only (FDI 18/28/38/48), GBT, pooled over 5 seeds:**
 
 | stratum | n | top-1 acc (third molars only) |
 |---|---|---|
@@ -187,11 +187,11 @@ ways, reusing the exact same trained models and test-fold predictions as
 | stratum | raw gap | composition-controlled residual | non-third-molar-only gap |
 |---|---|---|---|
 | dissociation | -6.1pp (0.6220 vs 0.6827) | **-6.4pp** (0.6220 vs canonical reweighted to 0.6855) | -8.5pp (0.5922 vs 0.6776, third molars excluded entirely) |
-| impacted | +22.9pp (0.9121 vs 0.6827) | **+17.1pp** (0.9121 vs canonical reweighted to 0.7411) | n/a - impacted is 100% third molars, no non-third-molar subset exists |
+| impacted | +22.9pp (0.9121 vs 0.6827) | **+17.1pp** (0.9121 vs canonical reweighted to 0.7411) | n/a: impacted is 100% third molars, no non-third-molar subset exists |
 
 ("Composition-controlled residual" = actual stratum accuracy minus what
 canonical's accuracy *would be* if canonical's per-FDI-code accuracy were
-reweighted to match the stratum's own FDI-code mix - i.e. the part of the
+reweighted to match the stratum's own FDI-code mix, i.e. the part of the
 gap tooth-type mix does not explain. Full numbers: `composition_summary.csv`,
 `composition_matched_subset.csv`, `composition_standardized.csv`.)
 
@@ -201,9 +201,9 @@ gap tooth-type mix does not explain. Full numbers: `composition_summary.csv`,
   estimation-method-sensitive, and the more careful estimate is well under
   half of what was first reported.** Dissociation's third-molar share
   (14.2%) is only mildly higher than canonical's (8.7%), and controlling
-  for it does not shrink the drop - it is slightly larger controlled
+  for it does not shrink the drop. It is slightly larger controlled
   (-6.4pp) than raw (-6.1pp), and excluding third molars entirely widens
-  it further (-8.5pp) - composition is not the explanation. But the
+  it further (-8.5pp), composition is not the explanation. But the
   composition-controlled, naive-pooled, and paired-5-seed-mean numbers all
   share the same limitation: none accounts for image-level clustering.
 
@@ -222,10 +222,10 @@ gap tooth-type mix does not explain. Full numbers: `composition_summary.csv`,
   any one shifts it by at most 1.2pp; 0/70 shift it more than 2pp), but it
   **is** concentrated in a small cluster of large, low-accuracy images:
   the 5 lowest-accuracy dissociation images (2 of which have only 1-2
-  teeth in the entire image - too little to trust as an individual
+  teeth in the entire image, too little to trust as an individual
   accuracy point) are just 7% of the 70 images and 4.3% of instances, but
   account for **~78%** of the gap between the naive estimate and the
-  crossed-model estimate - dropping just those 5 moves the naive number
+  crossed-model estimate. Dropping just those 5 moves the naive number
   from -6.07pp to -4.27pp. Dropping the worst 10 overshoots past zero to
   +1.39pp. Instance-pooling implicitly gives large images more influence
   than image-level weighting does, and a handful of dissociation images
@@ -233,7 +233,7 @@ gap tooth-type mix does not explain. Full numbers: `composition_summary.csv`,
 
   **Treat -3.6pp to -3.9pp (not significant) as the number to cite, not
   -6.32pp/-6.1pp.** Report the full chain if this result is referenced
-  anywhere - a single point estimate without it is not an accurate summary.
+  anywhere. A single point estimate without it is not an accurate summary.
   **Still-untested hypothesis, not a fact:** the dissociation flag is
   image-level, not tooth-level, so even a well-estimated stratum-average
   understates the effect on the specific anomalous teeth within a flagged
@@ -271,14 +271,14 @@ conclusions):**
    less neighbor overlap), making them easier to localize by coordinates
    alone.
 
-Neither hypothesis is checked here - both remain open questions this
+Neither hypothesis is checked here. Both remain open questions this
 dataset alone cannot resolve, and nothing in this analysis distinguishes
 between them.
 
 ## Method notes
 
 - One DENTEX image is one atomic annotation unit (no Roboflow-style
-  augmented-crop duplication like UFBA-425 has) - `label_file` is set to
+  augmented-crop duplication like UFBA-425 has). `label_file` is set to
   `image_id` directly in `load_instances()`, and the grouped split
   operates on that.
 - DENTEX only has permanent-dentition annotations (quadrants 1-4), so it
@@ -305,28 +305,28 @@ python cpu_repro/coord_baseline/dentex/dissociation_loio.py                     
 
 ## Files
 
-- `build_coord_baseline_dentex.py` - main baseline script.
-- `summary.csv` / `per_seed_results.csv` - main baseline results.
-- `confusion_matrix_<classifier>_seed0.csv` / `.png` - 32x32 confusion
+- `build_coord_baseline_dentex.py`: main baseline script.
+- `summary.csv` / `per_seed_results.csv`: main baseline results.
+- `confusion_matrix_<classifier>_seed0.csv` / `.png`: 32x32 confusion
   matrices, seed-0 split.
-- `controls/run_controls_dentex.py` - the four-condition controls script.
+- `controls/run_controls_dentex.py`: the four-condition controls script.
 - `controls/summary.csv` / `controls/per_seed_results.csv` /
-  `controls/controls_comparison.png` - controls results.
-- `stratified_analysis.py` - the dissociation/impacted vs. canonical
+  `controls/controls_comparison.png`: controls results.
+- `stratified_analysis.py`: the dissociation/impacted vs. canonical
   comparison.
-- `stratified_summary.csv` / `stratified_per_seed_results.csv` -
+- `stratified_summary.csv` / `stratified_per_seed_results.csv`:
   stratified results.
-- `composition_check.py` - controls the stratified comparison for
+- `composition_check.py`: controls the stratified comparison for
   tooth-type (third-molar) composition.
 - `composition_summary.csv` / `composition_matched_subset.csv` /
-  `composition_standardized.csv` - composition-check results.
-- `dissociation_mixed_effects.py` - image+seed crossed random-effects
+  `composition_standardized.csv`: composition-check results.
+- `dissociation_mixed_effects.py`: image+seed crossed random-effects
   model for the dissociation-vs-canonical comparison, with and without a
   teeth-count covariate; supersedes the paired-5-seed-mean estimate as the
   reported number (see "Corrected reading" above).
-- `dissociation_mixed_effects_summary.csv` - mixed-effects results.
-- `dissociation_loio.py` - leave-one-image-out sensitivity for the naive
+- `dissociation_mixed_effects_summary.csv`: mixed-effects results.
+- `dissociation_loio.py`: leave-one-image-out sensitivity for the naive
   instance-weighted dissociation estimate, plus per-image accuracy
   breakdown.
-- `dissociation_loio_results.csv` / `dissociation_per_image_accuracy.csv` -
+- `dissociation_loio_results.csv` / `dissociation_per_image_accuracy.csv`:
   LOIO results.

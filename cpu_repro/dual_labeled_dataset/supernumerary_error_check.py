@@ -5,11 +5,11 @@ This is the follow-up flagged in RESULTS.md Section 16 / paper/DRAFT.md
 Section 5's clinical-stakes paragraph: Section 16 established that 24
 real supernumerary instances exist across 23 images (existence-proof),
 but never measured whether the coordinate-only model actually performs
-worse near them. This script closes that gap - or reports honestly that
+worse near them. This script closes that gap, or reports honestly that
 it doesn't, whichever the data shows.
 
 Design: train the coordinate-only GBT on ALL of UFBA-425 (no held-out
-split needed - evaluation happens entirely on the separate Dual-Labeled
+split needed, evaluation happens entirely on the separate Dual-Labeled
 Dataset, so there's no leakage concern the way there would be evaluating
 on UFBA-425 itself). Evaluate on the Dual-Labeled Dataset's own
 standard-FDI-labeled teeth (excluding the "91" instances themselves,
@@ -25,7 +25,7 @@ corrupt this comparison entirely (large "errors" that are just a mirrored
 coordinate system, not a real effect).
 
 Requires the Dual-Labeled Dataset downloaded locally (see
-inspect_labels.py's docstring) - path below must be set to the extracted
+inspect_labels.py's docstring). Path below must be set to the extracted
 labels/ and images1/ directories, not redistributed in this repo.
 """
 import json
@@ -47,7 +47,7 @@ LABELS_DIR = "extracted/labels"
 IMAGES_DIR = "extracted/images1"
 
 # Section 16's 23 usable supernumerary-present image stems (re-derived
-# below from the label files directly, not hardcoded from memory - this
+# below from the label files directly, not hardcoded from memory. This
 # list is printed and should match RESULTS.md Section 16's count of 23).
 
 
@@ -102,7 +102,7 @@ def convention_check(df, label):
     q2_x = df[df["class_id"].isin(q2_ids)]["x_center"].mean()
     print(f"[{label}] mean x_center: quadrant 1 = {q1_x:.4f}, "
           f"quadrant 2 = {q2_x:.4f} -> "
-          f"{'MATCHES UFBA-425 convention (1 < 2)' if q1_x < q2_x else 'MISMATCH - DO NOT PROCEED'}")
+          f"{'MATCHES UFBA-425 convention (1 < 2)' if q1_x < q2_x else 'MISMATCH: DO NOT PROCEED'}")
     return q1_x < q2_x
 
 
@@ -120,7 +120,7 @@ def main():
     dual_ok = convention_check(dual_df, "Dual-Labeled Dataset")
 
     if not (ufba_ok and dual_ok):
-        print("\nABORTING: coordinate convention mismatch detected - "
+        print("\nABORTING: coordinate convention mismatch detected: "
               "proceeding would produce a meaningless comparison.")
         return
 
@@ -156,7 +156,7 @@ def main():
 
     # per-image mean accuracy comparison (accounts for clustering better
     # than the per-instance test above, which treats every tooth as an
-    # independent draw - it isn't, teeth in the same image share an
+    # independent draw: it isn't, teeth in the same image share an
     # image-level accuracy)
     per_image = dual_df.groupby(["image_id", "supernumerary_present"])["correct"].mean().reset_index()
     sn_img = per_image[per_image["supernumerary_present"]]["correct"]

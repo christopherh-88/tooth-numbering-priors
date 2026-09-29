@@ -10,6 +10,8 @@ on:
       - cpu_repro/requirements.txt
       - ENVIRONMENT.md
       - .github/workflows/linux-repro.yml
+      - paper/cjsj/paper_numbers.py
+      - notebooks/**
 
 jobs:
   linux-repro:
@@ -77,6 +79,10 @@ jobs:
           run cpu_repro/yolo_training/missed_tooth_analysis.py
           run cpu_repro/yolo_training/missed_tooth_analysis_yolo_rtdetr.py
           run cpu_repro/yolo_training/per_tooth_head_to_head.py
+          # Flip augmentation in the four U-Net notebooks (RESULTS.md Section 58).
+          run cpu_repro/coord_baseline/mitigation/verify_flip_augment.py
+          # Every number in the CJSJ paper; fails on any mismatch.
+          run paper/cjsj/paper_numbers.py
 
       - name: Committed outputs unchanged
         run: |

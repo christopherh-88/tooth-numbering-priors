@@ -3,7 +3,7 @@ coordinates at test time (train stays clean) and measure how top-1 accuracy
 degrades toward the majority baseline.
 
 Motivation: a real trained detector's predicted boxes are never pixel-perfect
-copies of ground truth - they carry localization error. This curve tells us
+copies of ground truth, they carry localization error. This curve tells us
 how much coordinate noise the shortcut signal can tolerate before it
 disappears, which is the right lens for interpreting Task 2 (comparing a real
 detector's error pattern against this coordinate-only diagnostic) once GPU
@@ -18,7 +18,7 @@ feature vector stays internally consistent. Width/height are clipped to a
 small positive floor to avoid degenerate boxes.
 
 Reuses load_instances/grouped_split/evaluate/FEATURE_COLS/SEEDS/TEST_FRACTION
-from build_coord_baseline.py - only the test-time perturbation is new.
+from build_coord_baseline.py. Only the test-time perturbation is new.
 """
 
 import sys
@@ -46,7 +46,7 @@ from build_coord_baseline import (  # noqa: E402
 OUTPUT_DIR = Path(__file__).resolve().parent
 
 # Grounded in RESULTS.md Section 13's measured natural per-class positional
-# std (x: 0.0267, y: 0.0490) - the grid brackets that scale so we can see
+# std (x: 0.0267, y: 0.0490). The grid brackets that scale so we can see
 # where accuracy sits relative to "noise comparable to natural class spread."
 NOISE_STDS = [0.0, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32]
 

@@ -1,7 +1,7 @@
 """Persist the coordinate baseline's image-level train/test split to a file.
 
 The main baseline (build_coord_baseline.py) computes its grouped split
-on the fly with grouped_split(df, seed, TEST_FRACTION) - reproducible given
+on the fly with grouped_split(df, seed, TEST_FRACTION), reproducible given
 the same code/environment, but not written down anywhere. Any downstream
 consumer that needs the "same split" (e.g. a YOLOv8 training run being
 compared against this baseline) should read a persisted file instead of
@@ -9,14 +9,14 @@ re-deriving the split independently, so there is exactly one source of
 truth and zero risk of silent drift if this code ever changes.
 
 This script calls the coordinate baseline's own load_instances() and
-grouped_split() - unmodified - for a given seed, and writes the resulting
+grouped_split() (unmodified) for a given seed, and writes the resulting
 image_id -> split assignment to image_split_seed<N>.csv. Seed 0 is also
 the seed build_coord_baseline.py uses for its saved confusion matrices
 (CONFUSION_MATRIX_SEED), so it was the first (and, until the multi-seed
 YOLO replication scoped in RESULTS.md Section 32, only) split persisted
 this way.
 
-Usage: `python export_split.py [seed]` - defaults to seed 0 if omitted,
+Usage: `python export_split.py [seed]`. Defaults to seed 0 if omitted,
 for backward compatibility with every existing caller
 (train_yolo.py/train_yolo_zerojitter.py's own SPLIT_FILE default).
 """
@@ -66,7 +66,7 @@ def main():
     if len(sys.argv) > 1:
         seed = int(sys.argv[1])
         if seed not in SEEDS:
-            raise ValueError(f"seed {seed} not in this project's SEEDS={SEEDS} - "
+            raise ValueError(f"seed {seed} not in this project's SEEDS={SEEDS}. "
                               f"every other 5-seed result in this repo uses these same seeds, "
                               f"so an out-of-set seed would not be comparable to them.")
         export_split(seed)

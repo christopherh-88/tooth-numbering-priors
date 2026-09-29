@@ -27,6 +27,11 @@ separately as well as pooled; the pooled numbers describe fourteen seeds'
 worth of evidence for this analysis's own question (do detectors converge on
 the same wrong answer), not a CUDA/MPS equivalence claim.
 
+Outputs: eval_results/cross_architecture_agreement_summary.csv (per-seed
+rates) and eval_results/cross_architecture_agreement_nulls.csv (per-seed
+permutation chance levels and p-values for every comparison, which were
+printed but not saved before RESULTS.md Section 58).
+
 Run: python cpu_repro/yolo_training/cross_architecture_agreement.py
 """
 
@@ -157,6 +162,7 @@ def triple_agreement(df: pd.DataFrame, rng: np.random.RandomState):
 
 def main():
     per_seed_rows = []
+    null_rows = []
     for seed in SEEDS:
         df = load_seed(seed)
         rng = np.random.RandomState(RNG_SEED)
@@ -183,6 +189,13 @@ def main():
             f"null_mean={triple['coord_null_mean']:.1%} p={triple['coord_p']:.4f}"
         )
 
+        for (a, b), res in pair_results.items():
+            null_rows.append({"seed": seed, "comparison": f"{a} vs {b}", "n": res["n_joint"],
+                              "observed_rate": res["rate"], "null_mean": res["null_mean"], "p": res["p"]})
+        null_rows.append({"seed": seed, "comparison": "triple vs coord", "n": triple["n_triple_same"],
+                          "observed_rate": triple["coord_match_rate"], "null_mean": triple["coord_null_mean"],
+                          "p": triple["coord_p"]})
+
         n_adj_pooled = sum(r["n_adjacent"] for r in pair_results.values())
         n_same_pooled = sum(r["n_same"] for r in pair_results.values())
         per_seed_rows.append({
@@ -204,13 +217,21 @@ def main():
             print(f"\n{backend} seeds {sorted(g['seed'])}: n={len(g)}  "
                   f"triple_rate mean {g['triple_rate'].mean():.3f} sd {g['triple_rate'].std():.3f}  "
                   f"coord_match_rate mean {g['coord_match_rate'].mean():.3f} sd {g['coord_match_rate'].std():.3f}")
-    print(f"\nAll {len(summary)} seeds pooled (not a CUDA/MPS equivalence claim - different splits and "
+    print(f"\nAll {len(summary)} seeds pooled (not a CUDA/MPS equivalence claim: different splits and "
           f"backends per group, see module docstring): "
           f"triple_rate mean {summary['triple_rate'].mean():.3f} sd {summary['triple_rate'].std():.3f}  "
           f"coord_match_rate mean {summary['coord_match_rate'].mean():.3f} sd {summary['coord_match_rate'].std():.3f}")
     out_path = EVAL_ROOT / "cross_architecture_agreement_summary.csv"
     summary.to_csv(out_path, index=False)
     print(f"\nwrote {out_path}")
+    nulls = pd.DataFrame(null_rows)
+    for label, rows in (("detector pairs", nulls[nulls["comparison"] != "triple vs coord"]),
+                        ("shared wrong tooth vs. coordinate prediction", nulls[nulls["comparison"] == "triple vs coord"])):
+        print(f"chance level ({label}): {rows['null_mean'].min():.1%} to {rows['null_mean'].max():.1%} "
+              f"across {rows['seed'].nunique()} seeds; largest p = {rows['p'].max():.4f}")
+    null_path = EVAL_ROOT / "cross_architecture_agreement_nulls.csv"
+    nulls.to_csv(null_path, index=False)
+    print(f"wrote {null_path}")
 
 
 if __name__ == "__main__":

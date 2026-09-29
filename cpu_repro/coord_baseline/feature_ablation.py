@@ -3,8 +3,8 @@
 The main baseline (build_coord_baseline.py) uses all six features
 (x_center, y_center, width, height, area, aspect_ratio) together and reports
 one accuracy number. This doesn't say whether the ~69% top-1 accuracy comes
-mainly from *position* (x/y - "where on the jaw is this box"), from *size/
-shape* (width/height/area/aspect_ratio - which could leak identity via
+mainly from *position* (x/y: "where on the jaw is this box"), from *size/
+shape* (width/height/area/aspect_ratio, which could leak identity via
 crowding or systematic annotation-size differences per tooth type), or needs
 all of them jointly. Single-feature and leave-one-out accuracy turns the
 black-box number into an interpretable mechanistic claim for the paper.

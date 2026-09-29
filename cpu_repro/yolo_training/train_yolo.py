@@ -1,6 +1,6 @@
 """YOLOv8 training run, prepared to start the moment GPU quota is back.
 
-Do NOT run this on CPU as a real training run - it's written for a Kaggle
+Do NOT run this on CPU as a real training run. It's written for a Kaggle
 GPU session. Everything needed to start immediately is here: it reads the
 coordinate baseline's persisted image-level split (does not recompute it),
 resumes cleanly across Kaggle's 12-hour session limit, and evaluates with
@@ -8,28 +8,28 @@ the exact same metrics/format as cpu_repro/coord_baseline so the two are
 directly comparable.
 
 Usage on Kaggle (same command whether this is the first run or a resume
-after a session got killed - see get_or_create_model() below):
+after a session got killed, see get_or_create_model() below):
 
     python train_yolo.py
 
 Pipeline, each stage idempotent / safe to rerun:
-  1. prepare_yolo_dataset() - build train.txt/val.txt + data.yaml from the
+  1. prepare_yolo_dataset(): build train.txt/val.txt + data.yaml from the
      persisted split file (../coord_baseline/image_split_seed0.csv).
-  2. get_or_create_model() + train() - resume from the last checkpoint if
+  2. get_or_create_model() + train(): resume from the last checkpoint if
      one exists for RUN_NAME, else start fresh from BASE_WEIGHTS.
-  3. evaluate() - run the trained model on the held-out (val) images,
+  3. evaluate(): run the trained model on the held-out (val) images,
      IoU-match predictions to ground truth, and report per-tooth FDI
      numbering accuracy using build_coord_baseline.evaluate() (the exact
      same function the coordinate baseline uses), so results land in the
      same columns as cpu_repro/coord_baseline/per_seed_results.csv.
 
 Checkpoint/resume: ultralytics writes weights/last.pt after every epoch by
-default. If a Kaggle session is killed (hard VM stop - there's no reliable
+default. If a Kaggle session is killed (hard VM stop, there's no reliable
 way to intercept that in a notebook), the fix is simply: rerun this script.
 get_or_create_model() checks for an existing weights/last.pt under
 PROJECT_DIR/RUN_NAME and, if found, resumes via `model.train(resume=True)`
 (ultralytics reloads the original training args from that run's args.yaml
-automatically - don't re-pass epochs/batch/etc. when resuming, see below).
+automatically. Don't re-pass epochs/batch/etc. when resuming, see below).
 SAVE_PERIOD additionally keeps periodic numbered snapshots as a safety net
 in case last.pt itself is ever corrupted by a mid-write kill.
 """
@@ -45,7 +45,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "coord_baseline"))
 from build_coord_baseline import FDI_CODES, SEEDS  # noqa: E402
 
 # --------------------------------------------------------------------------
-# CONFIG - edit these, nothing else, to change the run.
+# CONFIG: edit these, nothing else, to change the run.
 # --------------------------------------------------------------------------
 REPO_ROOT = Path(__file__).resolve().parents[2]
 YOLO_SOURCE_ROOT = REPO_ROOT / "Dataset" / "yolo_train_dataset"
@@ -56,19 +56,19 @@ YOLO_SOURCE_ROOT = REPO_ROOT / "Dataset" / "yolo_train_dataset"
 # train_yolo_seed1.py etc., RESULTS.md Section 32's multi-seed replication)
 # only has to override this one constant, not re-derive the rest by hand.
 SEED = 0
-assert SEED in SEEDS, f"SEED={SEED} not in this project's SEEDS={SEEDS} - " \
+assert SEED in SEEDS, f"SEED={SEED} not in this project's SEEDS={SEEDS}. " \
     f"every other 5-seed result in this repo uses these same seeds."
 SPLIT_FILE = REPO_ROOT / "cpu_repro" / "coord_baseline" / f"image_split_seed{SEED}.csv"
 
 # Seed 0's directories keep their original (non-suffixed) names for backward
-# compatibility - Sections 21/23/26-32 and their scripts/CSVs already
+# compatibility. Sections 21/23/26-32 and their scripts/CSVs already
 # reference "eval_results/summary.csv" etc. directly, not a seed0/ subpath.
 # Any other seed gets its own seed<N>/ subdirectory instead, so multi-seed
 # runs can never collide with or overwrite seed 0's existing results.
 PREPARED_DIR = Path(__file__).resolve().parent / "prepared" / (f"seed{SEED}" if SEED != 0 else "")
 EVAL_RESULTS_DIR = Path(__file__).resolve().parent / "eval_results" / (f"seed{SEED}" if SEED != 0 else "")
 
-# Training hyperparameters - mirrors notebooks/yolov8/yolov8_train.ipynb's
+# Training hyperparameters: mirrors notebooks/yolov8/yolov8_train.ipynb's
 # CLI call as closely as possible, so this run is comparable to the
 # repo's original YOLOv8 training, just on our fixed comparable split.
 BASE_WEIGHTS = "yolov8x.pt"   # matches the original notebook; use yolov8n.pt for a fast local smoke test
@@ -87,13 +87,13 @@ SINGLE_CLS = False
 SAVE_PERIOD = 5        # extra numbered checkpoint every N epochs, on top of the always-on last.pt/best.pt
 
 # Geometry-jitter augmentation (position/scale perturbation applied per
-# training sample) - previously left as Ultralytics' implicit defaults
+# training sample), previously left as Ultralytics' implicit defaults
 # (translate=0.1, scale=0.5), which was NOT "zero jitter" as the mitigation
 # design in cpu_repro/coord_baseline/mitigation/README.md assumed when it
 # described this run as a future "unjittered" baseline. Section 13 measured
 # the dataset's natural per-class positional spread at std 0.0267 (x) /
 # 0.0490 (y) normalized; the mitigation design's own pre-registered target
-# ("at least 2x natural spread") is 0.0535 (x) / 0.0979 (y) - and the
+# ("at least 2x natural spread") is 0.0535 (x) / 0.0979 (y), and the
 # Ultralytics default translate=0.1 already exceeds the x-target and is
 # comparable to the y-target, with scale=0.5 adding substantial further
 # perturbation on top. This run (default TRANSLATE=0.1, SCALE=0.5,
@@ -113,7 +113,7 @@ AUG_SUFFIX_RE = re.compile(r"_jpg\.rf\.[0-9a-f]+$")
 
 
 def base_image_id(label_stem: str) -> str:
-    """Identical logic to build_coord_baseline.base_image_id - duplicated
+    """Identical logic to build_coord_baseline.base_image_id. Duplicated
     (not imported) only because it's a one-line regex and this module
     should be runnable standalone by copy-pasting to a Kaggle notebook
     without needing coord_baseline importable at the same relative path."""
@@ -124,7 +124,7 @@ def load_split() -> dict:
     if not SPLIT_FILE.exists():
         raise FileNotFoundError(
             f"{SPLIT_FILE} not found. This script reads the coordinate baseline's "
-            f"persisted split - it does not regenerate it. Run "
+            f"persisted split. It does not regenerate it. Run "
             f"cpu_repro/coord_baseline/export_split.py once first."
         )
     split_df = pd.read_csv(SPLIT_FILE)
@@ -178,15 +178,15 @@ def prepare_yolo_dataset():
 
 
 def get_or_create_model():
-    """Return (model, resume) - resume=True if a checkpoint for RUN_NAME
+    """Return (model, resume), resume=True if a checkpoint for RUN_NAME
     already exists, so training continues rather than restarts."""
     from ultralytics import YOLO
 
     last_ckpt = Path(PROJECT_DIR) / RUN_NAME / "weights" / "last.pt"
     if last_ckpt.exists():
-        print(f"Found existing checkpoint at {last_ckpt} - resuming training.")
+        print(f"Found existing checkpoint at {last_ckpt}, resuming training.")
         return YOLO(str(last_ckpt)), True
-    print(f"No existing checkpoint for run '{RUN_NAME}' - starting fresh from {BASE_WEIGHTS}.")
+    print(f"No existing checkpoint for run '{RUN_NAME}', starting fresh from {BASE_WEIGHTS}.")
     return YOLO(BASE_WEIGHTS), False
 
 
@@ -224,7 +224,7 @@ def train(data_yaml):
                          # default fliplr=0.5 mirrors box coordinates but does not
                          # remap the class id, which would reintroduce the same
                          # label-mismatch confound as the MIRROR_MAP bug fixed in
-                         # notebooks/yolov8+unet/yolov8+unet_training.ipynb - see
+                         # notebooks/yolov8+unet/yolov8+unet_training.ipynb. See
                          # HANDOFF.md. Disabled rather than remapped, for now.
         )
     return results
@@ -265,7 +265,7 @@ def match_boxes(gt_boxes, gt_classes, pred_boxes, pred_classes, iou_threshold=MA
     makes the model comparable to the coordinate baseline, which assumes
     box positions are already given. n_unmatched_gt / n_unmatched_pred
     (missed detections / spurious detections) are NOT part of the FDI
-    accuracy numbers below - they're reported separately as detection
+    accuracy numbers below. They're reported separately as detection
     recall/precision context, since the coordinate baseline has no
     equivalent (it's never given a "wrong" box, only a ground-truth one)."""
     gt_boxes = np.asarray(gt_boxes, dtype=float)
@@ -368,7 +368,7 @@ def evaluate(weights_path):
     y_pred = np.array(all_pred, dtype=int)
 
     metrics = coord_evaluate(y_true, y_pred, train_y)
-    metrics["seed"] = SEED  # the split file is generated from this same seed - see export_split.py
+    metrics["seed"] = SEED  # the split file is generated from this same seed. See export_split.py
     metrics["classifier"] = "yolov8"
     metrics["detection_recall"] = (
         (total_gt - total_unmatched_gt) / total_gt if total_gt > 0 else float("nan")
@@ -380,12 +380,12 @@ def evaluate(weights_path):
 
     # summary.csv (the metrics that actually drive the GO_NO_GO comparison) is
     # written above unconditionally. The confusion matrix is diagnostic detail
-    # on top of that - if there were zero matched detections at all (a
+    # on top of that. If there were zero matched detections at all (a
     # pathologically bad run), sklearn's confusion_matrix() raises rather than
     # returning zeros, so guard it here rather than losing summary.csv (and an
     # entire completed training run's results) to a crash at the last step.
     if len(y_true) == 0:
-        print("WARNING: zero matched detections across the whole val split - "
+        print("WARNING: zero matched detections across the whole val split, "
               "skipping confusion matrix. summary.csv above still has "
               "detection_recall/n_unmatched_* to diagnose why.")
     else:
@@ -407,7 +407,7 @@ def evaluate(weights_path):
             ax.set_yticklabels(FDI_CODES, fontsize=7)
             ax.set_xlabel("Predicted FDI code")
             ax.set_ylabel("True FDI code")
-            ax.set_title(f"yolov8 - confusion matrix (matched detections, seed {SEED} split)")
+            ax.set_title(f"yolov8: confusion matrix (matched detections, seed {SEED} split)")
             fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
             fig.tight_layout()
             fig.savefig(EVAL_RESULTS_DIR / f"confusion_matrix_yolov8_seed{SEED}.png", dpi=150)

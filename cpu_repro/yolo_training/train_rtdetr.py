@@ -1,10 +1,10 @@
 """RT-DETR full training run (RESULTS.md Section 38/39's scoped second-
-detector-architecture replication). Seed-parameterized like train_yolo.py -
+detector-architecture replication). Seed-parameterized like train_yolo.py:
 SEED=0 here, train_rtdetr_seed{1,2,3,4}.py override it.
 
 Purpose: replicate Claim B's non-reliance finding (Sections 21/33 for
 YOLOv8) with an architecturally distinct detector (transformer encoder-
-decoder, anchor-free, NMS-free - see Section 38's reasoning), reusing the
+decoder, anchor-free, NMS-free, see Section 38's reasoning), reusing the
 identical data pipeline, split, and evaluation methodology
 (build_coord_baseline.evaluate() on IoU-matched detections) so any
 difference in the resulting gap is attributable to architecture, not to
@@ -16,13 +16,13 @@ using Ultralytics' own default RT-DETR recipe rather than a hand-tuned
 one (Section 38's hyperparameter-disclosure note, carried over from
 Section 28's YOLO precedent). Base weights are rtdetr-l.pt, matching the
 smoke test (Section 39) that measured this variant's real per-epoch cost
-(~86.4s/epoch on a T4, ~1.21x YOLOv8x's 71.3s/epoch) - not rtdetr-x,
+(~86.4s/epoch on a T4, ~1.21x YOLOv8x's 71.3s/epoch), not rtdetr-x,
 which was not measured.
 
-Usage on Kaggle (GPU T4 x2 - the machine_shape kernel-metadata.json
+Usage on Kaggle (GPU T4 x2, the machine_shape kernel-metadata.json
 field / --accelerator NvidiaTeslaT4 push flag reliably attached this in
 Section 39's 4 consecutive attempts, no manual web UI step needed, but
-that fix is flagged "very likely, not yet guaranteed" - confirm it holds
+that fix is flagged "very likely, not yet guaranteed". Confirm it holds
 before assuming a manual step is unnecessary):
 
     python train_rtdetr.py
@@ -35,7 +35,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import train_yolo as base  # noqa: E402 - reuse data prep / matching / eval, not the YOLO class itself
+import train_yolo as base  # noqa: E402. Reuse data prep / matching / eval, not the YOLO class itself
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "coord_baseline"))
 from build_coord_baseline import evaluate as coord_evaluate, SEEDS  # noqa: E402
@@ -46,7 +46,7 @@ assert SEED in SEEDS, f"SEED={SEED} not in this project's SEEDS={SEEDS}"
 SPLIT_FILE = base.REPO_ROOT / "cpu_repro" / "coord_baseline" / f"image_split_seed{SEED}.csv"
 PREPARED_DIR = Path(__file__).resolve().parent / "prepared" / (f"seed{SEED}" if SEED != 0 else "")
 
-BASE_WEIGHTS = "rtdetr-l.pt"   # measured variant (Section 39) - not rtdetr-x, which is unmeasured
+BASE_WEIGHTS = "rtdetr-l.pt"   # measured variant (Section 39), not rtdetr-x, which is unmeasured
 EPOCHS = 30                    # matches train_yolo.py's default for a like-for-like comparison
 BATCH = base.BATCH             # 10
 IMGSZ = base.IMGSZ             # 640
@@ -72,9 +72,9 @@ def get_or_create_model():
 
     last_ckpt = Path(PROJECT_DIR) / RUN_NAME / "weights" / "last.pt"
     if last_ckpt.exists():
-        print(f"Found existing checkpoint at {last_ckpt} - resuming training.")
+        print(f"Found existing checkpoint at {last_ckpt}, resuming training.")
         return RTDETR(str(last_ckpt)), True
-    print(f"No existing checkpoint for run '{RUN_NAME}' - starting fresh from {BASE_WEIGHTS}.")
+    print(f"No existing checkpoint for run '{RUN_NAME}', starting fresh from {BASE_WEIGHTS}.")
     return RTDETR(BASE_WEIGHTS), False
 
 
@@ -92,13 +92,13 @@ def train(data_yaml):
         name=RUN_NAME,
         exist_ok=True,
         val=True,
-        fliplr=0.0,  # FDI class ids encode left/right quadrant - see train_yolo.py's train() for why
+        fliplr=0.0,  # FDI class ids encode left/right quadrant. See train_yolo.py's train() for why
     )
 
 
 def evaluate(weights_path):
-    """Identical protocol to train_yolo.evaluate() - same
-    coord_evaluate() call, same matched-IoU convention - only the model
+    """Identical protocol to train_yolo.evaluate(). Same
+    coord_evaluate() call, same matched-IoU convention. Only the model
     class differs, so results are directly comparable to Sections 21/33."""
     from ultralytics import RTDETR
     from sklearn.metrics import confusion_matrix
@@ -154,7 +154,7 @@ def evaluate(weights_path):
     pd.DataFrame([metrics]).to_csv(EVAL_RESULTS_DIR / "summary.csv", index=False)
 
     if len(y_true) == 0:
-        print("WARNING: zero matched detections across the whole val split - skipping confusion matrix.")
+        print("WARNING: zero matched detections across the whole val split, skipping confusion matrix.")
     else:
         cm = confusion_matrix(y_true, y_pred, labels=list(range(32)))
         pd.DataFrame(cm, index=base.FDI_CODES, columns=base.FDI_CODES).to_csv(

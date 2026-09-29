@@ -7,7 +7,7 @@ architecture, not to a different statistical treatment.
 
 build_coco_dataset.py and train_fasterrcnn.py are now seed-parameterized
 the same way train_rtdetr_seed{1,2,3,4}.py override train_rtdetr.py, via
-train_fasterrcnn_seed{1,2,3,4}.py thin wrappers - this script's own
+train_fasterrcnn_seed{1,2,3,4}.py thin wrappers. This script's own
 paths_for_seed()/main(seeds=...) already generalized to any seed from
 the start, so no changes were needed here for the 5-seed run.
 
@@ -20,10 +20,10 @@ Reports, per seed:
 
 Verification-before-use: read this seed-0 output with the same
 scrutiny any first result gets (rtdetr_multiseed_analysis.py's own
-docstring note) - there being no prior Faster R-CNN number to sanity-
+docstring note). There being no prior Faster R-CNN number to sanity-
 check against. Explicitly checked here: raw prediction diversity (not
 every box classified as one FDI number) and detection recall (not
-near-zero detections) before trusting the gap/phi numbers at all - see
+near-zero detections) before trusting the gap/phi numbers at all. See
 main()'s printed diagnostics, which are read BEFORE the gap/phi line by
 design.
 """
@@ -36,8 +36,8 @@ import pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import train_yolo as ty  # noqa: E402 - reuse load_gt_boxes/iou_xyxy, not the YOLO class
-import train_fasterrcnn as tf  # noqa: E402 - reuse get_model()
+import train_yolo as ty  # noqa: E402. Reuse load_gt_boxes/iou_xyxy, not the YOLO class
+import train_fasterrcnn as tf  # noqa: E402. Reuse get_model()
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "coord_baseline"))
 from build_coord_baseline import (  # noqa: E402
@@ -63,7 +63,7 @@ def paths_for_seed(seed: int):
 
 def build_coord_predictions(seed: int) -> pd.DataFrame:
     """Identical to multiseed_analysis.py/rtdetr_multiseed_analysis.py's
-    build_coord_predictions() - the coordinate baseline doesn't depend on
+    build_coord_predictions(). The coordinate baseline doesn't depend on
     which detector it's being compared against."""
     df = load_instances()
     df = df.reset_index(drop=True)
@@ -84,24 +84,24 @@ def build_coord_predictions(seed: int) -> pd.DataFrame:
 
     assert result.duplicated(subset=["label_file", "line_idx"]).sum() == 0, (
         f"seed {seed}: label_file+line_idx not unique in the coordinate "
-        f"baseline's own test set - join key assumption broken, do not proceed."
+        f"baseline's own test set. Join key assumption broken, do not proceed."
     )
     return result
 
 
 def run_fasterrcnn_predictions(seed: int) -> pd.DataFrame:
-    """Mirrors run_rtdetr_predictions()'s structure exactly - same
+    """Mirrors run_rtdetr_predictions()'s structure exactly. Same
     ty.load_gt_boxes()/ty.iou_xyxy()-based greedy matching, same
     (label_file, line_idx) join key, no "image_id" column here for the
     identical reason documented in rtdetr_multiseed_analysis.py (pandas
     silently renaming both to image_id_x/image_id_y instead of erroring
-    was a real bug there - not reintroducing it here)."""
+    was a real bug there, not reintroducing it here)."""
     import torch
 
     prepared_dir, weights_path = paths_for_seed(seed)
     if not weights_path.exists():
         raise FileNotFoundError(
-            f"seed {seed}: {weights_path} not found - train_fasterrcnn.py's "
+            f"seed {seed}: {weights_path} not found. train_fasterrcnn.py's "
             f"train() has not been run / its output not downloaded yet."
         )
     val_paths = (prepared_dir / "val.txt").read_text().splitlines()
@@ -170,7 +170,7 @@ def run_fasterrcnn_predictions(seed: int) -> pd.DataFrame:
 
     print(f"  raw diagnostics: {n_raw_detections} total raw detections across "
           f"{len(val_paths)} val images, {len(raw_pred_class_counts)} distinct "
-          f"FDI classes predicted (out of 32) - degenerate would be near-0 "
+          f"FDI classes predicted (out of 32). Degenerate would be near-0 "
           f"detections or 1 distinct class dominating almost all of them.")
     if raw_pred_class_counts:
         top_class, top_count = max(raw_pred_class_counts.items(), key=lambda kv: kv[1])
@@ -260,7 +260,7 @@ def analyze_seed(seed: int) -> dict:
 def per_class_breakdown(seed: int, merged: pd.DataFrame) -> pd.DataFrame:
     """Section 27/33-style per-FDI-class accuracy breakdown, ported from
     multiseed_analysis.py's per_class_breakdown() with yolo_* renamed to
-    fasterrcnn_* - identical logic, applied to this seed's joined table."""
+    fasterrcnn_*. Identical logic, applied to this seed's joined table."""
     rows = []
     for class_id in range(32):
         sub = merged[merged["true_class"] == class_id]
@@ -287,7 +287,7 @@ def per_class_breakdown(seed: int, merged: pd.DataFrame) -> pd.DataFrame:
 def error_taxonomy_breakdown(seed: int, merged: pd.DataFrame) -> dict:
     """Section 22/33-style error-type comparison, ported from
     multiseed_analysis.py's error_taxonomy_breakdown() with yolo_*
-    renamed to fasterrcnn_* - each model's own wrong predictions run
+    renamed to fasterrcnn_*. Each model's own wrong predictions run
     through is_mirror_quadrant_error/is_neighbor_error."""
     def breakdown(true_col, pred_col, correct_col):
         wrong = merged[~merged[correct_col].astype(bool) & merged[pred_col].notna()]
@@ -316,7 +316,7 @@ def error_taxonomy_breakdown(seed: int, merged: pd.DataFrame) -> dict:
 
 def run_breakdowns(seeds=(0, 1, 2, 3, 4)):
     """Section 32/33's deferred 'free CPU add-ons', ported for Faster
-    R-CNN - per-seed per-class breakdown (Section 27-style) and
+    R-CNN: per-seed per-class breakdown (Section 27-style) and
     error-taxonomy comparison (Section 22-style), across every seed that
     has a trained checkpoint. Reuses the cached joined tables from
     analyze_seed()/build_merged() rather than re-running inference."""
@@ -325,7 +325,7 @@ def run_breakdowns(seeds=(0, 1, 2, 3, 4)):
     for seed in seeds:
         _, weights_path = paths_for_seed(seed)
         if not weights_path.exists():
-            print(f"seed {seed}: SKIPPED - {weights_path} not found yet.")
+            print(f"seed {seed}: SKIPPED, {weights_path} not found yet.")
             continue
         print(f"seed {seed}: building per-class and error-taxonomy breakdowns...")
         merged = build_merged(seed)
@@ -344,7 +344,7 @@ def run_breakdowns(seeds=(0, 1, 2, 3, 4)):
         pd.DataFrame(tax_rows).to_csv(OUT_DIR / "error_taxonomy_multiseed.csv", index=False)
         print(f"\nSaved per_class_breakdown_multiseed.csv, error_taxonomy_multiseed.csv to {OUT_DIR}")
     else:
-        print("\nNo seeds had a trained checkpoint available - nothing to save.")
+        print("\nNo seeds had a trained checkpoint available. Nothing to save.")
 
 
 def main(seeds=(0,)):
@@ -353,7 +353,7 @@ def main(seeds=(0,)):
     for seed in seeds:
         _, weights_path = paths_for_seed(seed)
         if not weights_path.exists():
-            print(f"seed {seed}: SKIPPED - {weights_path} not found yet.")
+            print(f"seed {seed}: SKIPPED, {weights_path} not found yet.")
             continue
         print(f"seed {seed}: running coord refit + Faster R-CNN CPU inference...")
         r = analyze_seed(seed)
@@ -363,7 +363,7 @@ def main(seeds=(0,)):
               f"fasterrcnn_quad={r['fasterrcnn_quadrant']:.4f}  phi={r['phi']:.4f}")
 
     if not rows:
-        print("\nNo seeds had a trained checkpoint available - nothing to save.")
+        print("\nNo seeds had a trained checkpoint available. Nothing to save.")
         return
 
     out_df = pd.DataFrame(rows)

@@ -4,12 +4,12 @@ run BEFORE spending GPU time training a real detector.
 Question: given how few "wrong" predictions a real, reasonably-accurate
 detector will actually produce on this test set, is there enough
 statistical power to detect a meaningful difference between the real
-detector's error-type distribution and the coordinate-only model's -
+detector's error-type distribution and the coordinate-only model's,
 or would Task 2 be comparing noise to noise?
 
 Comparison used (matches mitigation/README.md's evaluation protocol,
 metric 3): neighbor-error-fraction (the dominant error type for the
-coordinate-only model - 0.8079 logreg / 0.8287 GBT, RESULTS.md Section 2)
+coordinate-only model: 0.8079 logreg / 0.8287 GBT, RESULTS.md Section 2)
 vs. whatever fraction the real detector's wrong predictions turn out to
 be neighbor errors. This is treated as a one-sample proportion test
 against p0 = the coordinate-only model's neighbor-error-fraction, since
@@ -17,7 +17,7 @@ that reference value is estimated on a much larger sample (n=5491, wrong
 subset ~1800) than any plausible detector-error subsample, so its own
 sampling error is comparatively negligible.
 
-Detector accuracy is NOT YET KNOWN (no detector trained yet) - this
+Detector accuracy is NOT YET KNOWN (no detector trained yet). This
 sweeps a plausible range (75-95%) rather than assuming a specific number,
 since the point is to check whether the test is well-powered across
 realistic scenarios, not to predict the actual result.
@@ -62,13 +62,13 @@ def main():
     print("different cues than geometry would be expected to produce a")
     print("much larger gap than that (its errors would plausibly look far")
     print("less neighbor-dominated), so Task 2 is well-powered across the")
-    print("full plausible accuracy range - not an underpowered comparison")
+    print("full plausible accuracy range, not an underpowered comparison")
     print("that risks reading noise as a null result.")
     print("\nCaveat: this assumes a normal approximation to the binomial")
     print("and treats P0 as a fixed population value (reasonable given")
     print("its much larger source sample). It does not model any")
     print("clustering by image (multiple teeth per image are not")
-    print("independent draws) - a more careful analysis would use a")
+    print("independent draws). A more careful analysis would use a")
     print("clustered/robust variance estimate once real detector output")
     print("exists, the same way Section 10's image+seed random-effects")
     print("model corrected an overstated paired-seed estimate there.")

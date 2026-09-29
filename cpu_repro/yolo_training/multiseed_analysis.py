@@ -1,18 +1,18 @@
 """Multi-seed replication of Sections 21/22/26 (RESULTS.md Section 32's
 scoped plan). Seed-parameterized generalization of
 case_study_yolo_vs_coord.py's build_coord_predictions()/run_yolo_predictions()
-and error_correlation_analysis.py's phi/2x2 analysis - same logic, no
+and error_correlation_analysis.py's phi/2x2 analysis, same logic, no
 hardcoded seed-0 paths, so it can be run once per seed as each seed's YOLO
 checkpoint becomes available (seed 0 already does; seeds 1-4 depend on the
 corresponding train_yolo_seed<N>.py Kaggle runs actually finishing).
 
 Verification-before-use: `main(seeds=[0])` reproduces Section 21's top-1
 (0.9558) and Section 26's phi (0.163) from the already-existing seed-0
-checkpoint/predictions before this script is trusted for seeds 1-4 - see
+checkpoint/predictions before this script is trusted for seeds 1-4. See
 the assertion in `main()`. Not run for seeds 1-4 until their checkpoints
 exist; this file itself makes no claim about their results.
 
-Section 25 (DenPAR) is not included here - already 5-seed, no YOLO
+Section 25 (DenPAR) is not included here. Already 5-seed, no YOLO
 dependency, nothing to generalize (Section 32).
 """
 
@@ -69,7 +69,7 @@ def build_coord_predictions(seed: int) -> pd.DataFrame:
 
     assert result.duplicated(subset=["label_file", "line_idx"]).sum() == 0, (
         f"seed {seed}: label_file+line_idx not unique in the coordinate "
-        f"baseline's own test set - join key assumption broken, do not proceed."
+        f"baseline's own test set. Join key assumption broken, do not proceed."
     )
     return result
 
@@ -80,7 +80,7 @@ def run_yolo_predictions(seed: int) -> pd.DataFrame:
     prepared_dir, weights_path = paths_for_seed(seed)
     if not weights_path.exists():
         raise FileNotFoundError(
-            f"seed {seed}: {weights_path} not found - train_yolo_seed{seed}.py "
+            f"seed {seed}: {weights_path} not found. train_yolo_seed{seed}.py "
             f"(or train_yolo.py for seed 0) has not been run / its output not "
             f"downloaded yet."
         )
@@ -135,7 +135,7 @@ def phi_coefficient(a, b) -> float:
 
 
 def build_merged(seed: int, use_cache: bool = True) -> pd.DataFrame:
-    """Cached per-seed joined table (coord + YOLO predictions) - CPU YOLO
+    """Cached per-seed joined table (coord + YOLO predictions). CPU YOLO
     inference over ~200 val images takes real wall-clock time, so re-runs
     of downstream analysis (breakdown/taxonomy scripts) read the cached
     joined CSV instead of re-inferring from scratch."""
@@ -189,7 +189,7 @@ def analyze_seed(seed: int) -> dict:
 
 def per_class_breakdown(seed: int, merged: pd.DataFrame) -> pd.DataFrame:
     """Section 27-style per-FDI-class accuracy breakdown, generalized to
-    an arbitrary seed - identical logic to robustness_analysis.py's
+    an arbitrary seed. Identical logic to robustness_analysis.py's
     task1_per_class_breakdown(), applied to this seed's own joined table
     instead of the seed-0-only error_correlation_joined.csv."""
     rows = []
@@ -217,7 +217,7 @@ def per_class_breakdown(seed: int, merged: pd.DataFrame) -> pd.DataFrame:
 
 def error_taxonomy_breakdown(seed: int, merged: pd.DataFrame) -> dict:
     """Section 22-style error-type comparison, generalized to an arbitrary
-    seed - each model's own wrong predictions (not a joined subset,
+    seed. Each model's own wrong predictions (not a joined subset,
     matching Section 22's own convention of computing this per-model on
     that model's full evaluation output) run through
     is_mirror_quadrant_error/is_neighbor_error."""
@@ -247,7 +247,7 @@ def error_taxonomy_breakdown(seed: int, merged: pd.DataFrame) -> dict:
 
 
 def run_breakdowns(seeds=(0, 1, 2, 3, 4)):
-    """Section 32's deferred 'free CPU add-ons' - per-seed per-class
+    """Section 32's deferred 'free CPU add-ons': per-seed per-class
     breakdown (Section 27-style) and error-taxonomy comparison (Section
     22-style), across every seed that has a trained checkpoint. Reuses
     the cached joined tables from analyze_seed()/build_merged() rather
@@ -257,7 +257,7 @@ def run_breakdowns(seeds=(0, 1, 2, 3, 4)):
     for seed in seeds:
         _, weights_path = paths_for_seed(seed)
         if not weights_path.exists():
-            print(f"seed {seed}: SKIPPED - {weights_path} not found yet.")
+            print(f"seed {seed}: SKIPPED, {weights_path} not found yet.")
             continue
         print(f"seed {seed}: building per-class and error-taxonomy breakdowns...")
         merged = build_merged(seed)
@@ -276,7 +276,7 @@ def run_breakdowns(seeds=(0, 1, 2, 3, 4)):
         pd.DataFrame(tax_rows).to_csv(OUT_DIR / "error_taxonomy_multiseed.csv", index=False)
         print(f"\nSaved per_class_breakdown_multiseed.csv, error_taxonomy_multiseed.csv to {OUT_DIR}")
     else:
-        print("\nNo seeds had a trained checkpoint available - nothing to save.")
+        print("\nNo seeds had a trained checkpoint available. Nothing to save.")
 
 
 def main(seeds=(0, 1, 2, 3, 4), verify_only_seed0=True):
@@ -285,7 +285,7 @@ def main(seeds=(0, 1, 2, 3, 4), verify_only_seed0=True):
     for seed in seeds:
         _, weights_path = paths_for_seed(seed)
         if not weights_path.exists():
-            print(f"seed {seed}: SKIPPED - {weights_path} not found yet.")
+            print(f"seed {seed}: SKIPPED, {weights_path} not found yet.")
             continue
         print(f"seed {seed}: running coord refit + YOLO CPU inference...")
         r = analyze_seed(seed)
@@ -300,11 +300,11 @@ def main(seeds=(0, 1, 2, 3, 4), verify_only_seed0=True):
         assert abs(r0["yolo_top1"] - 0.9410) < 0.005, (
             f"seed-0 yolo_top1 {r0['yolo_top1']:.4f} does not match the "
             f"~0.9410 figure from Section 31's paired analysis (same "
-            f"undetected-counts-as-wrong convention) - do not trust this "
+            f"undetected-counts-as-wrong convention). Do not trust this "
             f"script for seeds 1-4 until this is resolved."
         )
         assert abs(r0["phi"] - 0.163) < 0.01, (
-            f"seed-0 phi {r0['phi']:.4f} does not match Section 26's 0.163 - "
+            f"seed-0 phi {r0['phi']:.4f} does not match Section 26's 0.163. "
             f"do not trust this script for seeds 1-4 until this is resolved."
         )
         print("\nVerification against Section 21/26/31's published seed-0 numbers: PASS.")
@@ -314,7 +314,7 @@ def main(seeds=(0, 1, 2, 3, 4), verify_only_seed0=True):
         out_df.to_csv(OUT_DIR / "multiseed_summary.csv", index=False)
         print(f"\nSaved multiseed_summary.csv ({len(rows)} of {len(seeds)} seeds) to {OUT_DIR}")
     else:
-        print("\nNo seeds had a trained checkpoint available - nothing to save.")
+        print("\nNo seeds had a trained checkpoint available. Nothing to save.")
 
 
 if __name__ == "__main__":

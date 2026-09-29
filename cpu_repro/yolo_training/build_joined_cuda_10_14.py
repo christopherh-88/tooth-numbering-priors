@@ -7,14 +7,14 @@ Counterpart of build_joined_mps_seeds.py for the CUDA seeds 10-14 batch. Seed
 10 is excluded here: only RT-DETR has a downloaded seed-10 checkpoint (YOLOv8x
 and Faster R-CNN seed-10 weights were never pulled from Kaggle), so seed 10
 has no per_tooth.csv for two of the three architectures and cannot form a
-three-way join - see per_tooth_predictions_cuda_10_14.py's docstring.
+three-way join. See per_tooth_predictions_cuda_10_14.py's docstring.
 
 Same recipe as build_joined_mps_seeds.py: train a fresh coordinate baseline
 per seed (identical HistGradientBoostingClassifier / grouped_split /
 FEATURE_COLS to multiseed_analysis.build_coord_predictions()), then join it
 against each detector's per_tooth.csv
 (eval_results/{rtdetr,fasterrcnn_cuda}/seed{N}/per_tooth.csv,
-eval_results/seed{N}/per_tooth.csv for YOLOv8x - this repo's bare-"seed" dir
+eval_results/seed{N}/per_tooth.csv for YOLOv8x. This repo's bare-"seed" dir
 is the CUDA YOLOv8x convention) on (label_file, line_idx).
 
 Writes eval_results/{multiseed,fasterrcnn_multiseed,rtdetr_multiseed}/joined_seed{11..14}.csv
@@ -58,14 +58,14 @@ def build_coord_predictions(seed: int) -> pd.DataFrame:
     result = result.rename(columns={"class_id": "true_class"})
 
     assert result.duplicated(subset=["label_file", "line_idx"]).sum() == 0, (
-        f"seed {seed}: label_file+line_idx not unique - join key assumption broken."
+        f"seed {seed}: label_file+line_idx not unique: join key assumption broken."
     )
     return result
 
 
 def coco_id_to_stem(seed: int) -> dict:
     """Faster R-CNN's per_tooth.csv keys rows by the COCO integer image id, not
-    the filename stem the other two detectors use - map back via
+    the filename stem the other two detectors use. Map back via
     prepared_coco/seed{N}/instances_val.json's file_name."""
     val_json = HERE / "prepared_coco" / f"seed{seed}" / "instances_val.json"
     images = json.load(open(val_json))["images"]
@@ -77,7 +77,7 @@ def load_detector(arch: str, seed: int) -> pd.DataFrame:
     path = (HERE / "eval_results" / eval_subdir / f"seed{seed}" / "per_tooth.csv" if eval_subdir
             else HERE / "eval_results" / f"seed{seed}" / "per_tooth.csv")
     if not path.exists():
-        raise FileNotFoundError(f"{path} not found - run per_tooth_predictions_cuda_10_14.py for seed {seed} first.")
+        raise FileNotFoundError(f"{path} not found. Run per_tooth_predictions_cuda_10_14.py for seed {seed} first.")
     df = pd.read_csv(path)
     if arch == "fasterrcnn":
         id_map = coco_id_to_stem(seed)
@@ -97,7 +97,7 @@ def main():
             det_df = load_detector(arch, seed)
             merged = coord_df.merge(det_df, on=["label_file", "line_idx"], how="inner")
             assert len(merged) == len(coord_df), (
-                f"seed {seed} {arch}: inner join dropped rows ({len(merged)} of {len(coord_df)}) - "
+                f"seed {seed} {arch}: inner join dropped rows ({len(merged)} of {len(coord_df)}): "
                 f"per_tooth.csv and the coord baseline test set disagree on which teeth exist."
             )
             merged[f"{arch}_correct"] = (

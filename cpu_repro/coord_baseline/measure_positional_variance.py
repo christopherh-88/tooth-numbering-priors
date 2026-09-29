@@ -2,7 +2,7 @@
 
 Purpose: the mitigation experiment (mitigation/README.md) needs a
 geometry-jitter magnitude that is deliberately LARGER than the positional
-variance already naturally present in the data - otherwise the jitter
+variance already naturally present in the data, otherwise the jitter
 augmentation wouldn't meaningfully perturb anything the model doesn't
 already see. This script measures that natural variance directly instead
 of guessing a jitter size.
@@ -14,7 +14,7 @@ signal. Reuses the same instance loader as build_coord_baseline.py so
 this is measured on the identical data/convention (normalized [0,1]
 YOLO coordinates), not a re-derived or re-scaled version of it.
 
-No training, no model fitting - purely descriptive statistics.
+No training, no model fitting. Purely descriptive statistics.
 """
 import pandas as pd
 
@@ -63,7 +63,7 @@ def main():
           f"{2 * stats_df['x_std'].mean():.4f} in x and "
           f"{2 * stats_df['y_std'].mean():.4f} in y (2x mean per-class std) "
           "to deliberately exceed natural variance rather than mimic it. "
-          "This is a starting point, not a tuned value - revisit once the "
+          "This is a starting point, not a tuned value. Revisit once the "
           "mitigation experiment is actually run.")
 
 

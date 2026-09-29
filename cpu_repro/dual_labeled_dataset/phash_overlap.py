@@ -1,7 +1,7 @@
 """Perceptual-hash + filename overlap check: does the Dual-Labeled
 Dataset's downloaded subset share any images with UFBA-425 (relevant
 since the underlying paper draws partly on UFBA-UESC)? See
-inspect_labels.py's docstring for how to obtain the data - not
+inspect_labels.py's docstring for how to obtain the data, not
 redistributed in this repo (third-party, ~550MB, license "unknown").
 Results as run: findings.md in this directory.
 """

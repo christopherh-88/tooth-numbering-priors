@@ -1,5 +1,5 @@
 """Which labeled teeth does Faster R-CNN miss? (seeds 0-4 CUDA from joined tables,
-seeds 5-9 MPS from per_tooth.csv, seeds 11-14 CUDA from per_tooth.csv - seed
+seeds 5-9 MPS from per_tooth.csv, seeds 11-14 CUDA from per_tooth.csv. Seed
 10 excluded, no Faster R-CNN seed-10 checkpoint was downloaded)
 
 A tooth is "missed" when fasterrcnn_pred is empty in joined_seed{N}.csv, i.e. no
@@ -130,7 +130,7 @@ def main():
 
     dest = HERE / "eval_results" / "missed_tooth_by_class.csv"
     with open(dest, "w", newline="") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n")
         w.writerow(["group", "fdi", "n", "missed", "miss_rate"])
         for label, groups in by_cls.items():
             for c in sorted(groups):

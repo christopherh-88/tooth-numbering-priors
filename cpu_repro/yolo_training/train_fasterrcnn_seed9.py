@@ -1,11 +1,11 @@
-"""Seed 9 runner for Faster R-CNN training - extends the 5-seed
+"""Seed 9 runner for Faster R-CNN training: extends the 5-seed
 replication (RESULTS.md Section 45) with one additional seed, run
 locally on this machine's Apple Silicon GPU (MPS) rather than Kaggle,
 since Kaggle GPU access was unavailable when this was scoped. Same
 thin-wrapper pattern as train_fasterrcnn_seed1.py, plus TRAIN_DEVICE
 overridden to "mps".
 
-Not part of the pre-registered 5-seed replication (Sections 32/45) -
+Not part of the pre-registered 5-seed replication (Sections 32/45):
 seeds 0-4 are that fixed, already-analyzed set. This is an extra,
 sixth data point requested afterward to further tighten the CIs, using
 a different hardware backend than every prior training run in this
@@ -13,7 +13,7 @@ project (Kaggle CUDA). That's a real difference worth disclosing
 alongside whatever result comes out of this, not silently folded in as
 if it were seed 9 of the original set.
 
-Pause/resume: kill and rerun this script freely - train_fasterrcnn.py's
+Pause/resume: kill and rerun this script freely. train_fasterrcnn.py's
 train() reloads model/optimizer/scheduler/epoch state from
 runs/fasterrcnn_seed9split/last.pt if it exists, so nothing is lost
 beyond whatever epoch was in progress at kill time.

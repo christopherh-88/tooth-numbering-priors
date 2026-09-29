@@ -1,6 +1,6 @@
 """Same controls as ../../controls/run_controls.py, applied to DENTEX. Same
 four conditions, same 5 seeds, same image-level grouped split, same two
-classifiers, same evaluate() function - all imported, not reimplemented.
+classifiers, same evaluate() function, all imported, not reimplemented.
 """
 
 import sys
@@ -126,7 +126,7 @@ def main():
     summary_df.to_csv(OUTPUT_DIR / "summary.csv", index=False)
 
     print("\n" + "=" * 100)
-    print("SUMMARY (mean +/- 95% CI over 5 seeds) - DENTEX controls")
+    print("SUMMARY (mean +/- 95% CI over 5 seeds), DENTEX controls")
     print("=" * 100)
     for condition in CONDITIONS:
         print(f"\n{condition}")

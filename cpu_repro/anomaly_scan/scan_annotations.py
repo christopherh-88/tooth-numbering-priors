@@ -7,7 +7,7 @@ This is a data-quality screen, not a clinical read. It flags candidates for
 a human to look at; it does not diagnose anything about the patient.
 
 Unit of analysis: one row per YOLO label FILE (each .txt file is one
-detector-visible image - including each Roboflow-augmented crop of a source
+detector-visible image, including each Roboflow-augmented crop of a source
 X-ray as its own entry, since that's what a model actually sees and what
 "total tooth count in this image" naturally means here). See README.md for
 why we did not collapse augmented copies of the same source X-ray into one
@@ -15,16 +15,16 @@ row.
 
 Checks
 ------
-1. Total tooth count - how many boxes are annotated in this image.
-2. Duplicate FDI codes - the same class_id (FDI code) annotated more than
+1. Total tooth count: how many boxes are annotated in this image.
+2. Duplicate FDI codes: the same class_id (FDI code) annotated more than
    once in one image. Two teeth cannot share one FDI number.
-3. Missing FDI codes - codes absent from the image, relative to the full
+3. Missing FDI codes: codes absent from the image, relative to the full
    32-code adult dentition. This is expected/common in this dataset (many
-   UFBA-425 categories are explicitly partial dentition, implants, etc. -
+   UFBA-425 categories are explicitly partial dentition, implants, etc.,
    see the repo's top-level README) so it is reported for every image but
    weighted lightly in the anomaly score; it's context, not on its own
    evidence of a labeling error.
-4. Position-vs-code inconsistency - does a box's (x, y) sit in the image
+4. Position-vs-code inconsistency: does a box's (x, y) sit in the image
    region its FDI code implies? FDI quadrant convention, in *radiographic*
    (mirrored) image coordinates, confirmed empirically from the dataset's
    own bulk statistics (see module docstring below and
@@ -36,13 +36,13 @@ Checks
    A box is flagged if it sits clearly on the wrong side (x) and/or wrong
    level (y) for its code's quadrant, using thresholds set with a buffer
    past the dataset's own 5th/95th-percentile natural range per quadrant
-   (see CONFIG) - so ordinary anatomical variation near the midline or
+   (see CONFIG), so ordinary anatomical variation near the midline or
    occlusal plane is not flagged, only boxes that land solidly in the
    opposite region.
 
 Anomaly score
 -------------
-A simple, documented, additive score per image (see WEIGHTS below) -
+A simple, documented, additive score per image (see WEIGHTS below):
 duplicates and position contradictions dominate the ranking; missing-code
 count and total-count extremes contribute lightly. This is a heuristic for
 sorting candidates for review, not a statistical test.
@@ -76,7 +76,7 @@ EXPECTED_X_SIDE = {"1": "left", "2": "right", "3": "right", "4": "left"}
 EXPECTED_Y_LEVEL = {"1": "upper", "2": "upper", "3": "lower", "4": "lower"}
 
 # Anomaly-score weights. Duplicates and full quadrant contradictions (wrong
-# on BOTH axes - the clearest anatomically-impossible case) dominate;
+# on BOTH axes, the clearest anatomically-impossible case) dominate;
 # single-axis position anomalies are weighted less since they're closer to
 # the natural-variation boundary; missing-code count and count extremes are
 # informational nudges, not primary drivers, because partial dentition is
@@ -129,7 +129,7 @@ def scan_image(label_file, group):
             code = FDI_CODES[row["class_id"]]
             if x_bad and y_bad:
                 n_both_axis += 1
-                position_notes.append(f"{code}: WRONG QUADRANT (both axes) - {x_bad[0]}; {y_bad[0]}")
+                position_notes.append(f"{code}: WRONG QUADRANT (both axes): {x_bad[0]}; {y_bad[0]}")
             else:
                 n_single_axis += 1
                 bad = x_bad or y_bad

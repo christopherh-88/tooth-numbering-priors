@@ -87,7 +87,7 @@ def main():
             allrows += report(model, group, seeds)
     dest = EVAL / "per_tooth_head_to_head.csv"
     with open(dest, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=list(allrows[0]))
+        w = csv.DictWriter(f, fieldnames=list(allrows[0]), lineterminator="\n")
         w.writeheader()
         w.writerows(allrows)
     print(f"Saved {dest}")

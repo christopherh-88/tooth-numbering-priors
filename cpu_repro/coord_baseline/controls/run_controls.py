@@ -6,7 +6,7 @@ classifiers:
 
 1. full (real)               - x_center, y_center, width, height, area,
                                 aspect_ratio, as in the main baseline.
-2. full (shuffled per image) - the same six features, but for each image
+2. full (shuffled per image): the same six features, but for each image
                                 (each YOLO label file) the feature ROWS are
                                 randomly permuted among that image's teeth
                                 before the class labels are attached. This
@@ -26,8 +26,8 @@ classifiers:
                                 positional information at all.
 
 Train/test membership (which images are in the held-out fold) is identical
-across all four conditions for a given seed - only the feature values differ
-- so the four accuracy numbers are a fair side-by-side comparison.
+across all four conditions for a given seed, only the feature values differ,
+so the four accuracy numbers are a fair side-by-side comparison.
 """
 
 import sys
@@ -70,7 +70,7 @@ def shuffle_features_within_image(df: pd.DataFrame, seed: int) -> pd.DataFrame:
     """Return a copy of df where, within each label_file (= one image's set
     of annotated teeth), the FEATURE_COLS values are randomly permuted
     across rows. class_id, image_id, label_file stay attached to their
-    original row - only the box geometry describing each row is scrambled."""
+    original row. Only the box geometry describing each row is scrambled."""
     rng = np.random.RandomState(seed)
     shuffled = df.copy()
     feature_matrix = df[FEATURE_COLS].to_numpy()

@@ -6,7 +6,7 @@ For each of the 70 dissociation images with at least one pooled test
 instance across the 5 seeds, recompute the instance-weighted estimate with
 that image's instances excluded, to check whether the naive estimate is
 driven by a small number of outlier images (it is not, individually) or by
-a small cluster of large, low-accuracy images considered together (it is -
+a small cluster of large, low-accuracy images considered together (it is:
 see RESULTS.md Section 10 for the interpretation).
 """
 import sys

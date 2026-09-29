@@ -1,13 +1,13 @@
 """Do YOLO and the coordinate-only baseline fail on the *same* samples,
 not just at similar rates? Sections 21/22 compare error rates and error
 taxonomy but never joined the two models' predictions into one per-sample
-table. Exploratory/diagnostic - no GO/NO-GO rule applies here.
+table. Exploratory/diagnostic. No GO/NO-GO rule applies here.
 
 Reuses case_study_yolo_vs_coord.py's build_coord_predictions() and
 run_yolo_predictions() unchanged (same deterministic seed-0 refit + CPU
-inference on the existing best.pt checkpoint - no new training or GPU run),
+inference on the existing best.pt checkpoint, no new training or GPU run),
 but does NOT filter down to one quadrant of the 2x2 table the way the case
-study did - this script keeps the full joined set.
+study did. This script keeps the full joined set.
 """
 
 import sys
@@ -29,7 +29,7 @@ OUT_DIR = Path(__file__).resolve().parent / "eval_results"
 
 
 def phi_coefficient(a: np.ndarray, b: np.ndarray) -> float:
-    """Pearson correlation applied to two binary (0/1) vectors - the
+    """Pearson correlation applied to two binary (0/1) vectors, the
     standard association measure for a 2x2 table of binary outcomes.
     Chosen over Cohen's kappa: kappa is built for inter-rater agreement
     on nominal categories and corrects for chance *agreement* (which
@@ -53,7 +53,7 @@ def main():
     n_total = len(merged)
     print(f"Joined on (label_file, line_idx): {n_total} instances.")
 
-    # Undetected ground-truth boxes (yolo_pred is NaN - YOLO never found this
+    # Undetected ground-truth boxes (yolo_pred is NaN: YOLO never found this
     # tooth at all) count as YOLO-wrong, not dropped: the coordinate-only
     # baseline is always given a box to classify, so treating a missed
     # detection as anything other than "YOLO failed on this instance" would
@@ -103,11 +103,11 @@ def main():
         ]
         return pd.Series(types).value_counts()
 
-    print("\nBoth-wrong subset - coordinate model's own error-type breakdown:")
+    print("\nBoth-wrong subset: coordinate model's own error-type breakdown:")
     coord_tax = taxonomy_breakdown(both_wrong, "coord_pred")
     print(coord_tax.to_string())
 
-    print("\nBoth-wrong subset - YOLO's own error-type breakdown:")
+    print("\nBoth-wrong subset: YOLO's own error-type breakdown:")
     yolo_tax = taxonomy_breakdown(both_wrong[both_wrong["yolo_pred"].notna()], "yolo_pred")
     print(yolo_tax.to_string())
 

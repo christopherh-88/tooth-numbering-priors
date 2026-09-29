@@ -8,9 +8,9 @@ accuracy numbers below are a fair side-by-side comparison.
 | condition | what it tests |
 |---|---|
 | full (real) | the main baseline: `x_center, y_center, width, height, area, aspect_ratio`, unchanged |
-| full (shuffled per image) | same 6 features, but within each image the feature rows are randomly permuted across that image's teeth before the split - same boxes, wrong owners. Negative control: if the real result reflects a genuine geometry-identity relationship rather than a data-layout artifact, this should collapse to the majority-class baseline |
-| position only (x,y) | drops width/height/area/aspect entirely - how much signal is in *where* the box is, alone |
-| size only (w,h) | drops x/y entirely - how much signal is in *how big/what shape* the box is, alone, with zero positional information |
+| full (shuffled per image) | same 6 features, but within each image the feature rows are randomly permuted across that image's teeth before the split. Same boxes, wrong owners. Negative control: if the real result reflects a genuine geometry-identity relationship rather than a data-layout artifact, this should collapse to the majority-class baseline |
+| position only (x,y) | drops width/height/area/aspect entirely. How much signal is in *where* the box is, alone |
+| size only (w,h) | drops x/y entirely. How much signal is in *how big/what shape* the box is, alone, with zero positional information |
 
 ## Results (mean +/- 95% CI over 5 seeds)
 
@@ -42,10 +42,10 @@ conditions x 5 seeds x 2 classifiers = 40 individual runs). Plot:
   that the main baseline's 67-69% accuracy is some kind of leakage or
   data-layout artifact (e.g. label files always listing teeth in a fixed
   left-to-right order that a classifier could exploit independent of true
-  geometry) - once the true correspondence between a box and its tooth is
+  geometry). Once the true correspondence between a box and its tooth is
   broken, all the signal is gone. Interesting secondary detail: shuffling
   does NOT destroy quadrant/type accuracy down to chance-for-8-or-4-classes
-  levels (24-25% quadrant, 13-14% type) - that's because shuffling happens
+  levels (24-25% quadrant, 13-14% type). That's because shuffling happens
   *within* an image, and most images contain roughly similar numbers of
   teeth per quadrant/type, so even a random within-image box still lands in
   a plausible region reasonably often. This is expected residual structure
@@ -58,7 +58,7 @@ conditions x 5 seeds x 2 classifiers = 40 individual runs). Plot:
 - **Size alone (w, h) is far weaker but not useless**: 14.7-15.7% top-1,
   well above the 3.6% majority baseline (roughly 4x chance) but nowhere near
   position's 62-64%. Quadrant accuracy craters to ~35% under size-only,
-  which makes sense - box width/height carries no left/right information at
+  which makes sense. Box width/height carries no left/right information at
   all, since tooth shape is roughly mirror-symmetric across the midline.
   Tooth-type accuracy under size-only (36.5-38.1%) is actually within
   shouting distance of what position-only achieves for type (64.7-66.7% is
@@ -77,15 +77,15 @@ conditions x 5 seeds x 2 classifiers = 40 individual runs). Plot:
 - Shuffling is done once per seed, over the **whole** dataset (train and
   test together) before the grouped split is applied by row index, so both
   the shuffled-train and shuffled-test folds have the geometry-identity
-  link broken - this is a clean ablation of the signal itself, not a
+  link broken. This is a clean ablation of the signal itself, not a
   robustness-to-noise check.
 - "Per image" = per YOLO label file (each `.txt` file is one image's/crop's
-  full set of annotated teeth) - the natural atomic unit in this dataset.
+  full set of annotated teeth), the natural atomic unit in this dataset.
   Images with fewer than 2 annotated teeth are left unshuffled (nothing to
   permute).
 - Train/test membership (which images fall in the held-out fold) is
-  identical across all four conditions for a given seed - the split only
-  depends on `image_id`, never on the feature values - so differences
+  identical across all four conditions for a given seed. The split only
+  depends on `image_id`, never on the feature values, so differences
   between conditions are purely about which features the classifier saw.
 - Same two classifiers as the main baseline: `LogisticRegression` (features
   standardized, fit on train only) and `HistGradientBoostingClassifier`.
@@ -105,8 +105,8 @@ from there to stay in sync with the main baseline).
 
 ## Files
 
-- `run_controls.py` - the script.
-- `summary.csv` - mean + 95% CI per condition x classifier (the table above).
-- `per_seed_results.csv` - all 40 individual runs.
-- `controls_comparison.png` - bar chart of top-1 accuracy across the four
+- `run_controls.py`: the script.
+- `summary.csv`: mean + 95% CI per condition x classifier (the table above).
+- `per_seed_results.csv`: all 40 individual runs.
+- `controls_comparison.png`: bar chart of top-1 accuracy across the four
   conditions, both classifiers, with the majority-class baseline marked.

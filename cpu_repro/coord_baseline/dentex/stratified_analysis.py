@@ -3,23 +3,23 @@
 Two strata, evaluated separately against a canonical remainder, using the
 exact same trained models and evaluate() function as
 build_coord_baseline_dentex.py (same 5 seeds, same image-level grouped
-split - these are NOT new models, they are the same per-seed classifiers,
+split. These are NOT new models, they are the same per-seed classifiers,
 sliced by which stratum a test instance falls into):
 
-1. "dissociation" - all test-fold instances belonging to one of the 101
+1. "dissociation": all test-fold instances belonging to one of the 101
    images flagged by scan_dentex.py (duplicate FDI code and/or a
-   position-vs-quadrant violation - see anomaly_scan/dentex_findings.md).
+   position-vs-quadrant violation, see anomaly_scan/dentex_findings.md).
    This is an IMAGE-level flag: every tooth in a flagged image is in this
    stratum, not just the specific anomalous box.
-2. "impacted" - all test-fold instances whose diagnosis is "Impacted"
+2. "impacted": all test-fold instances whose diagnosis is "Impacted"
    (644 total in the full dataset, before splitting). This is an
    INSTANCE-level flag.
 
 "canonical" is every other test-fold instance (not in a flagged image, not
-impacted-diagnosed) - the reference point both strata are compared against.
+impacted-diagnosed): the reference point both strata are compared against.
 
 These two strata overlap a little (an impacted tooth can also live in a
-flagged image) - reported, not hidden.
+flagged image), reported, not hidden.
 
 Because both strata are a small slice of 1358 images, and each seed's test
 fold is itself only ~20% of the data, per-seed stratum sample sizes can be

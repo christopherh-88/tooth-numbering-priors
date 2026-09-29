@@ -1,10 +1,10 @@
-"""RT-DETR 1-epoch smoke test - RESULTS.md Section 38's scoped next step.
+"""RT-DETR 1-epoch smoke test: RESULTS.md Section 38's scoped next step.
 
 Purpose: get a REAL per-epoch timing for RT-DETR on this exact dataset/
 hardware (replacing Section 38's estimated 1.5-3x-YOLOv8x guess with a
 measurement) and confirm the Ultralytics YOLO->RTDETR pipeline swap works
 end to end, before sizing/launching a full 5-seed replication. This is
-NOT meant to produce a trustworthy accuracy number - 1 epoch on a
+NOT meant to produce a trustworthy accuracy number. 1 epoch on a
 detector this size will not have converged. Only the timing and "did it
 run without crashing" outcomes matter here.
 
@@ -16,14 +16,14 @@ fetch.
 
 Reuses train_yolo.py's data prep, box-matching, and evaluation logic
 unchanged (same seed-0 split, same IoU-matching protocol, same
-coord_evaluate() call) - only the model class (RTDETR instead of YOLO)
+coord_evaluate() call). Only the model class (RTDETR instead of YOLO)
 and epoch count differ. This is deliberate: reusing the identical
 evaluation methodology is what makes an eventual RT-DETR-vs-YOLOv8
 comparison meaningful rather than confounded by a different eval
 protocol (see Section 38's reasoning for why RT-DETR was chosen over a
 from-scratch Faster R-CNN pipeline).
 
-Usage on Kaggle (GPU T4 x2, selected manually in the web UI first - the
+Usage on Kaggle (GPU T4 x2, selected manually in the web UI first, since the
 API's enable_gpu flag has repeatedly and unreliably assigned a P100
 instead, see Sections 21/31/33):
 
@@ -38,14 +38,14 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import train_yolo as base  # noqa: E402 - reuse data prep / matching / eval, not the YOLO class itself
+import train_yolo as base  # noqa: E402. Reuse data prep / matching / eval, not the YOLO class itself
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "coord_baseline"))
 from build_coord_baseline import evaluate as coord_evaluate  # noqa: E402
 
 # --------------------------------------------------------------------------
-BASE_WEIGHTS = "rtdetr-l.pt"   # smaller of the two RT-DETR variants Ultralytics ships - fastest smoke test
-EPOCHS = 1                     # smoke test only - see module docstring, not a real training run
+BASE_WEIGHTS = "rtdetr-l.pt"   # smaller of the two RT-DETR variants Ultralytics ships, fastest smoke test
+EPOCHS = 1                     # smoke test only, see module docstring, not a real training run
 BATCH = base.BATCH             # 10, same as train_yolo.py, for a like-for-like per-epoch timing comparison
 IMGSZ = base.IMGSZ             # 640
 DEVICE = base.DEVICE           # 0 on Kaggle GPU
@@ -59,7 +59,7 @@ def print_environment_info():
     """Section 37's disclosed gap: GPU-side package versions were never
     captured. Print them here so this run's own Kaggle log has them,
     rather than requiring a retroactive kernel-output fetch (which was
-    rate-limited and abandoned - see Section 37)."""
+    rate-limited and abandoned, see Section 37)."""
     import torch
     import ultralytics
 
@@ -161,7 +161,7 @@ def evaluate_smoketest(weights_path):
     pd.DataFrame([metrics]).to_csv(EVAL_RESULTS_DIR / "summary.csv", index=False)
 
     print("\n" + "=" * 70)
-    print("RT-DETR 1-EPOCH SMOKE TEST evaluation (NOT a converged result - timing/pipeline check only)")
+    print("RT-DETR 1-EPOCH SMOKE TEST evaluation (NOT a converged result, timing/pipeline check only)")
     print("=" * 70)
     for key in ["top1_acc", "quadrant_acc", "detection_recall"]:
         print(f"  {key:32s} {metrics.get(key)}")
@@ -175,7 +175,7 @@ def main():
     results = train_smoketest(data_yaml)
 
     # Ultralytics logs per-epoch and total training time in results.speed / the
-    # trainer's own printed summary - also read train time directly from the
+    # trainer's own printed summary. Also read train time directly from the
     # run's own results.csv if present, so Section 38's cost estimate can be
     # replaced with a real number without depending on stdout scraping alone.
     speed = getattr(results, "speed", None)

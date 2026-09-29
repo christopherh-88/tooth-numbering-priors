@@ -7,7 +7,7 @@ train_yolo.py; differs from the CUDA runner only in:
     a 16 GB Mac, 607 s/step in a smoke test; batch 2 uses ~4.8 GB at ~1 s/step).
     Ultralytics accumulates gradients to a nominal batch of 64, so the
     optimizer update size is nearly unchanged, but batch-norm statistics
-    differ - a second disclosed difference besides the backend.
+    differ, a second disclosed difference besides the backend.
   - separate run/eval directories (yolov8_mps_seed7split,
     eval_results/yolo_mps/seed7) so it never overwrites CUDA results.
 

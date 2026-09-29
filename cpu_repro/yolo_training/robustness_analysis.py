@@ -1,4 +1,4 @@
-"""CPU-only robustness analyses on already-saved predictions - no new
+"""CPU-only robustness analyses on already-saved predictions. No new
 training or GPU use. Covers three of the six review-driven checks:
 
 1. Per-FDI-class breakdown of the YOLO vs. coordinate-baseline gap
@@ -10,7 +10,7 @@ training or GPU use. Covers three of the six review-driven checks:
    correlation between multiple teeth in the same radiograph.
 
 Reads cpu_repro/yolo_training/eval_results/error_correlation_joined.csv
-(already computed, Section 26) - does not re-run any model.
+(already computed, Section 26). Does not re-run any model.
 """
 
 import sys

@@ -5,7 +5,7 @@ override wrapper around train_rtdetr.py; differs from the CUDA runner only in:
   - BATCH = 4 instead of 10 (RT-DETR-l at batch 4 uses ~5.5 GB on MPS in a
     smoke test; batch 10 would need ~14 GB on a 16 GB Mac). Ultralytics
     accumulates gradients to a nominal batch of 64, so the optimizer update
-    size is nearly unchanged, but batch-norm statistics differ - a second
+    size is nearly unchanged, but batch-norm statistics differ, a second
     disclosed difference besides the backend.
   - separate run/eval directories (rtdetr_mps_seed5split,
     eval_results/rtdetr_mps/seed5) so it never overwrites CUDA results.

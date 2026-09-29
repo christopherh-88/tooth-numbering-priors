@@ -9,7 +9,7 @@
 
 Reuses load_instances/grouped_split/FDI_CODES/FEATURE_COLS from
 build_coord_baseline.py so the leakage-safe grouped split and feature
-definitions stay identical to the main baseline - only the reporting is new.
+definitions stay identical to the main baseline. Only the reporting is new.
 """
 
 import sys

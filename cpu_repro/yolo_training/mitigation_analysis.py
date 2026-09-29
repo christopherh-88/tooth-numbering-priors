@@ -9,7 +9,7 @@ Reuses case_study_yolo_vs_coord.py's load_gt_boxes()/iou_xyxy() and a
 parameterized version of its run_yolo_predictions() (only change: takes a
 weights path instead of a hardcoded module constant) to run CPU inference
 with both checkpoints over the identical seed-0 val split, then joins on
-(label_file, line_idx) - the same exact-identity join key used by
+(label_file, line_idx). The same exact-identity join key used by
 Section 23/26's YOLO-vs-coordinate comparisons.
 """
 

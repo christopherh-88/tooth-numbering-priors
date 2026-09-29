@@ -2,20 +2,20 @@
 (RESULTS.md Section 42). Produces instances_train.json / instances_val.json
 under cpu_repro/yolo_training/prepared_coco/, reusing the exact same
 image_split_seed0.csv split (via base_image_id(), copied identically from
-train_yolo.py - see its own comment on why it's duplicated rather than
+train_yolo.py. See its own comment on why it's duplicated rather than
 imported) that every other detector run in this project uses, so Faster
 R-CNN is trained/evaluated on the same held-out images as YOLOv8x and
 RT-DETR-l, not a re-derived split that could silently leak.
 
 Two lossy-conversion risks handled explicitly here, per Section 42:
   1. Background-label shift: torchvision's FasterRCNN reserves class 0
-     for an implicit background - this project's FDI classes are 0-31
+     for an implicit background, this project's FDI classes are 0-31
      (background-free), so every category_id here is written as
      class_id + 1 (COCO categories 1-32), with a positive assertion that
      no annotation is ever written with category_id 0.
   2. Per-image (width, height) is read from the actual file via
      PIL.Image.size, not assumed to be 640x640 from the Roboflow
-     README's stated preprocessing - that note describes what Roboflow
+     README's stated preprocessing. That note describes what Roboflow
      did before export, not a verified guarantee of every file on disk.
 
 Usage:
@@ -39,7 +39,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 YOLO_SOURCE_ROOT = REPO_ROOT / "Dataset" / "yolo_train_dataset"
 
 # Seed-parameterized the same way train_rtdetr.py's SEED/SPLIT_FILE/PREPARED_DIR
-# are - SEED=0 here, train_fasterrcnn_seed{1,2,3,4}.py override these three
+# are: SEED=0 here, train_fasterrcnn_seed{1,2,3,4}.py override these three
 # module attributes before calling convert()/verify(), same thin-wrapper
 # pattern as train_rtdetr_seed{1,2,3,4}.py. Seed 0's OUT_DIR is deliberately
 # left as the pre-existing unsuffixed prepared_coco/ (matching PREPARED_DIR's
@@ -53,8 +53,8 @@ AUG_SUFFIX_RE = re.compile(r"_jpg\.rf\.[0-9a-f]+$")
 
 
 def base_image_id(label_stem: str) -> str:
-    """Identical to train_yolo.py's base_image_id() / build_coord_baseline's
-    - duplicated for the same standalone-runnability reason train_yolo.py
+    """Identical to train_yolo.py's base_image_id() / build_coord_baseline's,
+    duplicated for the same standalone-runnability reason train_yolo.py
     gives, not re-derived differently."""
     return AUG_SUFFIX_RE.sub("", label_stem)
 
@@ -63,7 +63,7 @@ def load_split() -> dict:
     if not SPLIT_FILE.exists():
         raise FileNotFoundError(
             f"{SPLIT_FILE} not found. This script reads the coordinate baseline's "
-            f"persisted split - it does not regenerate it. Run "
+            f"persisted split. It does not regenerate it. Run "
             f"cpu_repro/coord_baseline/export_split.py once first."
         )
     import pandas as pd
@@ -73,7 +73,7 @@ def load_split() -> dict:
 
 def parse_yolo_label(label_path: Path):
     """Returns a list of (class_id, cx, cy, w, h), all normalized [0,1],
-    directly from the txt file. Empty file -> empty list (valid - some
+    directly from the txt file. Empty file -> empty list (valid, since some
     images may have zero annotated teeth)."""
     boxes = []
     text = label_path.read_text().strip()
@@ -108,7 +108,7 @@ def build_split(split_name: str, label_files, split_map: dict) -> dict:
         raw_split = split_map.get(bid)
         if raw_split is None:
             continue
-        # image_split_seed0.csv uses "train"/"test" labels, not "train"/"val" -
+        # image_split_seed0.csv uses "train"/"test" labels, not "train"/"val".
         # train_yolo.py's prepare_yolo_dataset() treats anything not "train" as
         # its val set (line: `(train_paths if split == "train" else val_paths)`).
         # Mirrored exactly here so this script's "val" split is the identical
@@ -182,12 +182,12 @@ def verify(n_checks: int = 5):
     """Round-trip check: re-read instances_train.json, recompute the
     original normalized YOLO cx/cy/w/h from each COCO bbox + the image's
     recorded width/height, and compare against the source label file's
-    actual line for the same image - not a self-consistency check against
+    actual line for the same image, not a self-consistency check against
     the conversion script's own math, but against the untouched source
     file on disk."""
     train_path = OUT_DIR / "instances_train.json"
     if not train_path.exists():
-        raise FileNotFoundError(f"{train_path} not found - run convert() first.")
+        raise FileNotFoundError(f"{train_path} not found. Run convert() first.")
 
     coco = json.loads(train_path.read_text())
     images_by_id = {im["id"]: im for im in coco["images"]}
@@ -231,7 +231,7 @@ def verify(n_checks: int = 5):
 
     if failures:
         raise AssertionError(f"{len(failures)}/{checked} spot-checked boxes did NOT "
-                              f"round-trip back to a source YOLO-txt line - DO NOT "
+                              f"round-trip back to a source YOLO-txt line. DO NOT "
                               f"trust this conversion on the full dataset.")
     print(f"\nAll {checked} spot-checked boxes round-tripped exactly to their source "
           f"YOLO-txt line (within 1e-6). category_id never 0 in either split's "

@@ -1,7 +1,7 @@
 """Inspect the Dual-Labeled Dataset (Zhou et al., BMC Oral Health 2024,
 Kaggle: zwbzwb12341234/a-dual-labeled-dataset) for label-91 (supernumerary
 tooth) coverage. Not run against a copy of the data checked into this
-repo - the dataset is third-party (license "unknown" per its own Kaggle
+repo. The dataset is third-party (license "unknown" per its own Kaggle
 metadata) and ~550MB, so it isn't redistributed here.
 
 To reproduce: `kaggle datasets download zwbzwb12341234/a-dual-labeled-dataset`,

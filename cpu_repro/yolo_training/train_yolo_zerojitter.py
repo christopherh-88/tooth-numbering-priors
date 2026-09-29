@@ -4,14 +4,14 @@ See train_yolo.py's TRANSLATE/SCALE comment block for why this script
 exists: Section 21's run (train_yolo.py, unmodified) used Ultralytics'
 default translate=0.1/scale=0.5, which already exceeds or matches the
 mitigation design's own pre-registered "2x natural positional spread"
-jitter target (cpu_repro/coord_baseline/mitigation/README.md) - so it is
+jitter target (cpu_repro/coord_baseline/mitigation/README.md), so it is
 correctly read as the *jittered* condition, not a jitter-free baseline.
 This script is the actual near-zero-jitter counterpart: everything else
 (epochs, batch, imgsz, dropout, fliplr fix, split, evaluation protocol)
 is identical to train_yolo.py, so TRANSLATE/SCALE is the only intended
 difference between the two runs' results.
 
-Not a copy-paste-diverged fork of the pipeline logic - imports every
+Not a copy-paste-diverged fork of the pipeline logic: imports every
 function from train_yolo.py unchanged except train(), which is
 reimplemented here only to swap in TRANSLATE=0/SCALE=0 and a distinct
 RUN_NAME/output directory so this run can never overwrite Section 21's
@@ -31,7 +31,7 @@ from train_yolo import (  # noqa: F401
     evaluate as base_evaluate,
 )
 
-# Override just the two augmentation knobs and the run identity - everything
+# Override just the two augmentation knobs and the run identity. Everything
 # else (EPOCHS, BATCH, IMGSZ, DEVICE, DROPOUT, CLOSE_MOSAIC, COS_LR,
 # WARMUP_EPOCHS, LRF, SINGLE_CLS, SAVE_PERIOD, BASE_WEIGHTS, the fliplr=0.0
 # fix) is read from train_yolo directly so the two runs differ only in
@@ -62,11 +62,11 @@ def train(data_yaml):
             warmup_epochs=base.WARMUP_EPOCHS,
             lrf=base.LRF,
             single_cls=base.SINGLE_CLS,
-            translate=base.TRANSLATE,   # 0.0 - the only intended difference from train_yolo.py
-            scale=base.SCALE,           # 0.0 - the only intended difference from train_yolo.py
+            translate=base.TRANSLATE,   # 0.0: the only intended difference from train_yolo.py
+            scale=base.SCALE,           # 0.0: the only intended difference from train_yolo.py
             save_period=base.SAVE_PERIOD,
             val=True,
-            fliplr=0.0,  # same fix as train_yolo.py - see that file's comment
+            fliplr=0.0,  # same fix as train_yolo.py. See that file's comment
         )
     return results
 

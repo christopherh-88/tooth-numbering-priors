@@ -20,9 +20,9 @@
 numpy==1.26.4
 scipy==1.13.1
 tensorflow==2.16.2          # last TF release that cleanly wants numpy<2.0
-torch==2.14.0                # install from the CPU wheel index first - see header
+torch==2.14.0                # install from the CPU wheel index first, see header
 torchvision==0.29.0
-ultralytics==8.4.143          # repo was pinned to 8.0.28 (2024) - see README for API drift notes
+ultralytics==8.4.143          # repo was pinned to 8.0.28 (2024), see README for API drift notes
 opencv-python-headless==4.10.0.84
 opencv-python==4.10.0.84             # ultralytics requires opencv-python, so a fresh install gets it
                                      # alongside the headless build and both provide the same cv2 module.

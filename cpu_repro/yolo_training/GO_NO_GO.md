@@ -9,7 +9,7 @@ fact, not the other way around.
 
 Let:
 - **C** = coordinate-only top-1 numbering accuracy, gradient-boosted tree,
-  **seed-0 split specifically** (not the 5-seed aggregate - see note below):
+  **seed-0 split specifically** (not the 5-seed aggregate, see note below):
   **C = 69.28%** (`cpu_repro/coord_baseline/per_seed_results.csv`, seed=0,
   classifier=gradient_boosted_tree, top1_acc=0.6928).
 - **Y** = YOLOv8 top-1 numbering accuracy on matched detections, same
@@ -48,7 +48,7 @@ digits, not a large jump).
 leaves 100% - 69.28% = 30.7 points of headroom above it; a 15-point gap
 closes roughly half of that remaining headroom. That's a qualitatively
 different regime from "vision adds a modest correction on top of
-geometry" - it means real image-derived signal (tooth shape, texture,
+geometry". It means real image-derived signal (tooth shape, texture,
 local anatomy, adjacent-tooth context) is doing substantial work that
 position alone does not capture, which weakens the "numbering is primarily
 a geometric problem" framing this project is built around.
@@ -56,14 +56,14 @@ a geometric problem" framing this project is built around.
 The 5-15 point middle band is deliberately wide: it's the range where the
 result is real but its *size* is ambiguous enough that a single dataset
 shouldn't be trusted to generalize. UFBA-425 has a notably consistent
-single-protocol imaging setup (see `cpu_repro/anomaly_scan/` - the
+single-protocol imaging setup (see `cpu_repro/anomaly_scan/`, the
 FDI-to-region mapping is consistent enough across the whole dataset that a
 geometry-only classifier gets 69%+ accuracy on it); a moderate gap could be
 a genuine property of tooth numbering, or an artifact of this dataset's
 unusual positional regularity. EXTEND resolves that ambiguity with data
 rather than a guess.
 
-These are recommendations, not final - confirm or adjust the two numbers
+These are recommendations, not final. Confirm or adjust the two numbers
 before this file is committed.
 
 ## 2. Detection-recall guard
@@ -72,7 +72,7 @@ Matched-only comparison flatters Y: unmatched ground-truth boxes (teeth
 YOLO never found) are excluded from the accuracy calculation entirely, so
 a model that only detects the "easy" teeth (e.g. large, well-separated
 molars) and misses crowded/ambiguous ones (e.g. incisors, which the
-coordinate baseline's own controls already showed are the hardest region -
+coordinate baseline's own controls already showed are the hardest region,
 `cpu_repro/coord_baseline/README.md`) could post an inflated Y computed
 over a biased, shrunken sample.
 
@@ -90,7 +90,7 @@ in Section 1 if this triggers.
 90% was chosen because a competently trained detector on a curated,
 single-protocol dataset like UFBA-425 should find the large majority of
 annotated teeth even before classification is considered; recall much below
-that would mean detection - not numbering - is the actual bottleneck, a
+that would mean detection (not numbering) is the actual bottleneck, a
 different problem than the one this comparison is designed to answer.
 
 ## 3. What each outcome means and what happens next
@@ -98,8 +98,8 @@ different problem than the one this comparison is designed to answer.
 **COMMIT.** The trained detector adds only a modest correction on top of
 what raw box geometry already predicts, on this dataset's own comparable
 split. This is strong supporting evidence for the project's central
-premise - that FDI tooth numbering is substantially a positional/geometric
-problem rather than a visual-recognition one - and justifies spending the
+premise: that FDI tooth numbering is substantially a positional/geometric
+problem rather than a visual-recognition one, and justifies spending the
 MICCAI 2027 effort on formalizing and improving explicit positional priors
 (e.g. a geometry-aware post-processor, or a joint geometry+vision
 architecture) rather than on chasing marginal detector accuracy gains.
@@ -128,8 +128,8 @@ between the COMMIT and PIVOT narratives above.
 ## 4. This file is frozen
 
 Once committed, the numbers in Section 1 and Section 2 do not change in
-place. Any revision - including narrowing a threshold after seeing that it
-would flip the outcome - requires a **new, dated entry appended below this
+place. Any revision (including narrowing a threshold after seeing that it
+would flip the outcome) requires a **new, dated entry appended below this
 line**, stating what changed and why. Both the original and the revised
 version must be reported together in any writeup that cites this decision;
 a threshold is not allowed to quietly become whatever the observed result
@@ -142,13 +142,13 @@ needed it to be.
 ## 5. This rule applies to top-1 accuracy only, not quadrant/tooth-type
 
 The coordinate baseline's own results show quadrant accuracy (96.5%) and
-tooth-type accuracy (72.0%) diverge sharply - quadrant is already near
+tooth-type accuracy (72.0%) diverge sharply. Quadrant is already near
 ceiling, tooth-type is where nearly all the remaining error lives
 (`cpu_repro/coord_baseline/README.md`). Applying the *same* percentage-point
 thresholds to all three metrics would be structurally unsound: quadrant
 accuracy has at most ~3.5 points of headroom left above the coordinate
 baseline (100% - 96.5%), so it can **never** produce a 15-point gap
-regardless of how much better the vision model is - the PIVOT threshold
+regardless of how much better the vision model is. The PIVOT threshold
 would be unreachable on that metric by construction, not because vision
 didn't help.
 
