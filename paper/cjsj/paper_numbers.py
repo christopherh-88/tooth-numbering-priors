@@ -152,7 +152,7 @@ def main():
          f"{p1(tax.coord_mirror_frac)}, {p1(tax.coord_neighbor_frac)}", "7.5, 84.2")
     man = pd.read_csv(YT / "case_study_crops" / "manifest.csv")
     fig = man[man.crop_file.str.startswith("case_07_")].iloc[0]
-    show("Fig. 3 case", f"{Path(fig.source_image).name.split('_jpg')[0]} true {fig.true_fdi} "
+    show("Fig. 1b case", f"{Path(fig.source_image).name.split('_jpg')[0]} true {fig.true_fdi} "
          f"YOLOv8x {fig.yolo_pred_fdi} position-only {fig.coord_pred_fdi}",
          "cate8-00390 true 11 YOLOv8x 11 position-only 21")
 
