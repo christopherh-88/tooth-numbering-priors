@@ -1,0 +1,6 @@
+detector,fold,n_xrays,n_teeth,det_top1,coord_top1,missed_pct,matched_only_top1,gap_pp,guard_failed
+yolov8x,0,85,2267,95.3683,81.1204,1.4116,96.7338,14.2479,False
+yolov8x,1,85,2327,94.6283,75.3760,2.0198,96.5789,19.2523,False
+yolov8x,2,86,2361,95.6374,77.3401,1.3977,96.9931,18.2973,False
+yolov8x,3,85,2356,95.2462,80.6452,1.1036,96.3090,14.6010,False
+yolov8x,4,84,2291,93.5836,77.4771,1.9206,95.4161,16.1065,False

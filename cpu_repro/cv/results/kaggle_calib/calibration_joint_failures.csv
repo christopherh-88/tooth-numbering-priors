@@ -1,0 +1,4 @@
+detector,n_joint,n_correct,conf_mean_joint,conf_mean_correct,conf_median_joint,auroc,auroc_lo,auroc_hi,rule
+yolov8x,151,11010,0.858,0.882,0.885,0.544,0.485,0.603,2
+rtdetr_l,151,10886,0.813,0.845,0.842,0.593,0.530,0.658,2
+fasterrcnn,151,10743,0.951,0.977,0.986,0.645,0.586,0.705,2

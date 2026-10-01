@@ -1,0 +1,11 @@
+detector,comparison,metric,point,ci_lo,ci_hi
+yolov8x,position_only,det_top1,94.8974,94.0579,95.6868
+yolov8x,position_only,coord_top1,78.3830,76.7657,79.8904
+yolov8x,position_only,gap_pp,16.5144,15.1371,17.8763
+yolov8x,position_only,missed_pct,1.5687,1.2545,1.9020
+yolov8x,position_only,misnumbered_pct,3.5339,2.8919,4.2432
+yolov8x,position_only,matched_only_top1,96.4098,95.6930,97.0644
+yolov8x,position_only,gap_matched_only_pp,17.6620,16.2995,19.0584
+yolov8x,position_only,kappa,0.1491,0.1204,0.1780
+yolov8x,position_only,kappa_max,0.3263,0.2858,0.3683
+yolov8x,position_only,phi,0.2018,0.1699,0.2338

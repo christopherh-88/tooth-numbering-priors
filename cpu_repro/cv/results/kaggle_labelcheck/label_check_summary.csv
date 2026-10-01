@@ -1,0 +1,2 @@
+detectors,n_teeth,n_joint_same_wrong,n_joint_with_roboflow_label,r_J_pct,n_J_roboflow_equals_mask,n_J_roboflow_other,n_control,n_control_with_roboflow_label,r_C_pct,rule,xrays_ok,xrays_skipped,n_joint_after_excluding,position_match_pct_after_excluding,cleanlab_flag_pct_J,cleanlab_flag_pct_C
+yolov8x rtdetr_l fasterrcnn,11602,151,150,10.6667,134,0,10315,10222,0.3913,3,419,6,135,93.3333,95.3642,15.5308

@@ -1,0 +1,90 @@
+"""Write the two Phase 3 batch 1 kernels (cpu_repro/cv/PHASE3_RULES.md).
+
+    python cpu_repro/cv/kaggle/make_phase3_kernels.py --out <dir>
+
+tooth-numbering-cv-shift-s0 (T4): shift_test.py on all three detectors'
+fold models. tooth-numbering-cv-calib-s0 (CPU): calib_sweep.py.
+tooth-numbering-cv-matchorder-s0 (CPU): the sweep under both matcher
+orders (PHASE3_RULES.md note). Each kernel
+embeds the scripts it runs (written to disk at start, so the code that ran
+is visible in the kernel itself), reads the training and scoring kernels'
+outputs as kernel sources, and checks out only the data files it needs
+from GitHub at commit 6ea25a5.
+"""
+import argparse
+import json
+from pathlib import Path
+
+USER = "christopherhuang88"
+COMMIT = "6ea25a58cb0a99b402cbb24898c10641fcb679a9"
+REPO_URL = "https://github.com/christopherh-88/tooth-numbering-priors.git"
+HERE = Path(__file__).resolve().parents[1]
+TRAIN_KERNELS = [f"{USER}/tooth-numbering-cv-{d}-s0" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")]
+
+HEADER = '''import shutil, subprocess, sys
+from pathlib import Path
+
+FILES = {files!r}
+for name, text in FILES.items():
+    Path(name).write_text(text)
+sys.path.insert(0, ".")
+REPO = Path("/kaggle/working/repo")
+subprocess.run(["git", "clone", "--quiet", "--no-checkout", "{repo_url}", str(REPO)], check=True)
+subprocess.run(["git", "-C", str(REPO), "checkout", "--quiet", "{commit}", "--", *{paths!r}], check=True)
+'''
+
+SHIFT_BODY = '''subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "ultralytics==8.4.143"], check=True)
+import shift_test
+sys.argv = ["shift_test.py", "--repo", str(REPO), "--models", "/kaggle/input", "--out", "/kaggle/working/shift"]
+shift_test.main()
+shutil.rmtree(REPO)
+'''
+
+CALIB_BODY = '''import calib_sweep
+per_tooth = sorted(Path("/kaggle/input").rglob("per_tooth_predictions.csv"))
+assert len(per_tooth) == 1, per_tooth
+args = ["calib_sweep.py", "--per-tooth", str(per_tooth[0]), "--repo", str(REPO), "--out", "/kaggle/working/calib"]
+for det in ["yolov8x", "rtdetr_l", "fasterrcnn"]:
+    found = sorted(p for p in Path("/kaggle/input").rglob(f"{det}_cvseed0") if p.is_dir())
+    assert len(found) == 1, (det, found)
+    args += ["--det", f"{det}={found[0]}"]
+sys.argv = args
+calib_sweep.main()
+shutil.rmtree(REPO)
+'''
+
+
+MATCH_BODY = CALIB_BODY.replace('"/kaggle/working/calib"]', '"/kaggle/working/match_order", "--match-order-only"]')
+
+
+def write(out, name, files, paths, body, gpu, sources):
+    d = out / name
+    d.mkdir(parents=True, exist_ok=True)
+    code = HEADER.format(files={f: (HERE / f).read_text() for f in files}, repo_url=REPO_URL,
+                         commit=COMMIT, paths=paths) + body
+    (d / f"{name}.py").write_text(code)
+    meta = {"id": f"{USER}/{name}", "title": name, "code_file": f"{name}.py", "language": "python",
+            "kernel_type": "script", "is_private": True, "enable_gpu": gpu, "enable_tpu": False,
+            "enable_internet": True, "dataset_sources": [], "kernel_sources": sources,
+            "competition_sources": [], "model_sources": []}
+    if gpu:
+        meta["machine_shape"] = "NvidiaTeslaT4"
+    (d / "kernel-metadata.json").write_text(json.dumps(meta, indent=2))
+    print("wrote", d)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", type=Path, required=True)
+    a = ap.parse_args()
+    csvs = ["cpu_repro/cv/boxes.csv", "cpu_repro/cv/folds.csv"]
+    write(a.out, "tooth-numbering-cv-shift-s0", ["shift_test.py"],
+          csvs + ["Dataset/bb_u_net_dataset/panoramic_x_rays"], SHIFT_BODY, True, TRAIN_KERNELS)
+    write(a.out, "tooth-numbering-cv-calib-s0", ["score_cv.py", "calib_sweep.py"], csvs, CALIB_BODY,
+          False, TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-score-s0"])
+    write(a.out, "tooth-numbering-cv-matchorder-s0", ["score_cv.py", "calib_sweep.py"], csvs, MATCH_BODY,
+          False, TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-score-s0"])
+
+
+if __name__ == "__main__":
+    main()

@@ -4493,6 +4493,360 @@ Open question, not checked here: whether DENTEX (position-only 68.5%)
 contains any cropped or augmented copies, and if not, why its figure sits
 below UFBA-425's uncropped 76 to 77%.
 
+## 60. Grouped 5-fold CV on uncropped UFBA-425: the gap is 14 to 16 pp; the tie-breaker pattern replicates
+
+**Date:** 2026-10-01. **Rules:** `cpu_repro/cv/PHASE2_CV_RULES.md`, frozen and
+approved before any kernel was pushed. **Code:** `cpu_repro/cv/prepare_uncropped_cv.py`
+(boxes and folds), `train_cv.py` (training, run on Kaggle T4 at commit
+6ea25a5 through kernels from `kaggle/make_kernels.py`), `score_cv.py`
+(scoring, run in the CPU kernel `tooth-numbering-cv-score-s0`, which read
+the three training kernels' outputs on Kaggle). **Output:**
+`cpu_repro/cv/results/kaggle_score/{cv_fold_summary,cv_pooled_summary,cv_joint_failures}.csv`
+(copied from that kernel's output). The per-tooth file
+(`per_tooth_predictions.csv`, 11,602 rows) is still only on Kaggle.
+**GPU environment:** torch 2.10.0+cu128, torchvision 0.25.0+cu128,
+ultralytics 8.4.143 (printed by the kernels).
+
+**Setup.** All 425 X-rays, uncropped (`Dataset/bb_u_net_dataset`), 11,602
+teeth, boxes from the FDI masks; no Roboflow copies. 5 folds balanced by
+category (84 to 86 test X-rays each), each X-ray tested once; 52 training
+X-rays per fold held out to pick the epoch by validation fitness, the test
+fold never used for selection. Faster R-CNN learning rate 0.0025 (scaled to
+batch 2). Position-only: same 6 features and classifier, fit per fold on
+the same mask boxes.
+
+**Checks.** On the YOLOv8x detections, `score_cv.py`'s matcher gives the
+same top-1 as `yolo_training/train_yolo.py`'s `match_boxes` (94.90% both).
+Position-only with boxes shuffled within each X-ray: 2.9%, against a 3.6%
+majority baseline. The YOLOv8x detector numbers from the Kaggle scoring run
+match a local scoring run exactly; the position-only model differs by up
+to 0.7 pp per fold between the two machines (pooled 78.50% on Kaggle vs.
+78.38% locally), most likely from different scikit-learn versions. The
+Kaggle run is the one reported, since it scored all three detectors
+together.
+
+### Primary result (pooled over 425 X-rays, 95% CIs by X-ray bootstrap)
+
+| Detector | Top-1 | Position-only | Gap (pp) | Rule |
+|---|---|---|---|---|
+| YOLOv8x | 94.9 | 78.5 | **16.4 [15.0, 17.8]** | 1 (lower bound >= 15) |
+| RT-DETR-l | 93.8 | 78.5 | **15.3 [14.0, 16.7]** | 2 (5 to 15) |
+| Faster R-CNN | 92.6 | 78.5 | **14.1 [12.7, 15.5]** | 2 (5 to 15) |
+
+Per fold, gaps range from 11.2 (Faster R-CNN, fold 3) to 18.8 pp (YOLOv8x,
+fold 1); position-only ranges from 75.8% to 81.3% across folds.
+
+**Graded.**
+- Claim B holds on clean data: every detector beats position by 14 to 16
+  pp, all lower bounds far above 5. But by the frozen rule, the paper can
+  no longer say every detector cleared the pre-set 15 pp threshold; two of
+  three lower bounds fall under it. The wording becomes the measured gaps
+  and CIs.
+- Consistency check: **triggered.** Each CV gap is more than 3 pp below
+  the Section 59 uncropped-originals estimate (19.7, 19.9, 18.5; differences
+  3.3, 4.6, 4.4 pp). Comparing accuracies as the rule requires: detectors
+  are lower than on the old uncropped test X-rays (94.9, 93.8, 92.6 vs. 96.4,
+  96.6, 95.3), consistent with training on 288 X-rays without copies, and
+  position-only is higher (78.5 vs. 76.8), consistent with it now training
+  on uncropped boxes. Both move the gap down; neither points to a broken run.
+- Broken-run guard: no fold failed (matched-only 92.5 to 97.0%, missed 0.4
+  to 2.0% per fold).
+
+### Secondary (same rules as Section 59)
+
+- **Missed vs. misnumbered:** missed 1.6 / 0.8 / 0.9%, misnumbered 3.5 /
+  5.4 / 6.5% (YOLOv8x / RT-DETR-l / Faster R-CNN). The gap on matched teeth
+  is 0.6 to 1.2 pp larger than on all teeth. Rule B1 holds.
+- **Kappa vs. position-only:** 0.14 [0.12, 0.17], 0.16 [0.13, 0.19],
+  0.16 [0.13, 0.19]; phi 0.19 to 0.20. Rule C1 holds. Between detectors,
+  kappa 0.48 to 0.55.
+- **Joint failures:** 152 teeth (1.3%) that all three detectors and the
+  position-only model got wrong, none missed. The three detectors chose
+  the same wrong tooth on 151 (99.3%, rule: >= 80%), and that tooth was the
+  position-only guess on 140 of 151 (92.7%), against a permutation mean of
+  3.8% and 95th percentile of 6.6% (p < 0.0001). 92.7% named a neighbor of
+  the labeled tooth. **The mechanism rule is met.**
+
+**Audit note on the joint failures.** These rates are higher than in the
+old runs (97% and 84 to 88%), and a label error would produce exactly
+this pattern: if a mask is labeled 14 but the tooth is 15, every model,
+position-only included, answers 15, and the tooth appears as a shared,
+position-matching "error" between neighbors. Before the tie-breaker
+reading goes into a paper, these 152 teeth need the label-error check
+(cleanlab and a dentist's review).
+
+**Reading.** On uncropped X-rays with no test-set epoch selection, the
+detectors beat a position-only model by about 14 to 16 pp, not 24 to 25.
+The drop has at least two sources measured here: cropped Roboflow copies
+weakening position in the old test sets (Section 59), and the change in
+training data for both models (above); this entry does not split the drop
+between them. Position alone names the tooth about 78% of the time on
+uncropped panoramic X-rays.
+
+## 61. Label-error check on the CV joint failures: about 1 in 9 is a label disagreement; the mechanism holds without them
+
+**Date:** 2026-10-01. **Rules:** `cpu_repro/cv/LABEL_CHECK_RULES.md`, frozen
+and approved before running. **Code:** `cpu_repro/cv/label_check.py`, run in
+the CPU kernel `tooth-numbering-cv-labelcheck-s0` on the Section 60
+`per_tooth_predictions.csv`. **Output:**
+`cpu_repro/cv/results/kaggle_labelcheck/{label_check_summary,label_check_teeth}.csv`
+(copied from that kernel's output; the teeth table reproduces every count
+in the summary).
+
+**Setup.** J = the 151 joint failures where all three detectors gave the
+same wrong answer (the rules file says 152; one of the 152 had the
+detectors disagree, so it has no shared answer to compare and is left
+out). C = the 10,315 teeth all three detectors got right. Roboflow labels
+were mapped back to the uncropped frame on 419 of 425 X-rays; 6 were
+skipped for a poor coordinate fit. 150 of 151 J teeth and 10,222 of
+10,315 C teeth got a Roboflow label.
+
+### Check A: Roboflow labels vs. mask labels
+
+| Group | n with Roboflow label | Roboflow sides with the models | Roboflow differs from mask |
+|---|---|---|---|
+| J (joint failures) | 150 | **16 (10.7%)** | 16 (10.7%) |
+| C (control) | 10,222 | n/a | **40 (0.39%)** |
+
+On the other 134 J teeth the Roboflow label equals the mask label; no J
+tooth has a third label. Wilson 95% intervals, treating teeth as
+independent: r_J 6.7 to 16.6%, r_C 0.29 to 0.53%. r_J is about 27 times
+r_C.
+
+**Graded: rule 3** (r_J below 50% and above 2 x r_C = 0.78%). As the rule
+requires, both versions:
+
+| Joint-failure statistic | All 151 | Without the 16 |
+|---|---|---|
+| n | 151 | 135 |
+| Shared answer = position-only guess | 92.7% (140) | 93.3% (126) |
+
+Removing the teeth where the second annotation file sides with the models
+does not weaken the mechanism result.
+
+### Check B: cleanlab (secondary, circular)
+
+cleanlab on the position-only model's out-of-fold probabilities flags
+95.4% of J (144 of 151) and 15.5% of C. This is the expected result of the
+circularity named in the rules: J is defined by the position-only model
+being wrong, so a filter built on that model's probabilities flags nearly
+all of it. No claim rests on it, and the paper should not cite it as
+evidence for or against label errors.
+
+**Audit.** The counts implied by the percentages are whole numbers (16 of
+150, 40 of 10,222, 126 of 135, 144 of 151). The 0.39% control disagreement
+rate is a floor on how often the two files disagree on a tooth anyone
+would call easy, which is the comparison the rule asks for. Limit from the
+rules: both label files may come from the same annotators, so the 134
+agreements do not show those labels are right.
+
+**Audit: the joint failures cluster by X-ray.** The 151 teeth come from
+68 X-rays, and 10 X-rays hold 67 of them (up to 10 teeth on one X-ray,
+cate6-00009). These look like whole runs of teeth numbered one position
+off, as when a tooth is missing or an extra one is counted: on cate8-00447
+every tooth from 31 to 34 and 41 to 45 is off by one in the same direction.
+The 16 label disagreements also cluster (8 X-rays; two hold 8 of them).
+Two consequences:
+- The tooth-level rates treat clustered teeth as independent. With the
+  X-ray as the unit, the position-match rate is 92.7% with a 95% CI of
+  87.3 to 97.2% (10,000 resamples of the 68 X-rays, seed 0); the mean of
+  per-X-ray rates is 93.6%; without the 10 heaviest X-rays it is 78 of 84
+  (92.9%). The result does not rest on a few X-rays, but the effective
+  sample is closer to 68 than 151, and the paper should say so.
+- A run of shifted numbers is what a counting error by the annotator would
+  produce, and Check A cannot see it if both label files share the error.
+  The dentist sheet should show these X-rays whole (or the full arch), not
+  only a crop around one tooth, so the reviewer can count.
+
+**Reading.** Some joint failures are label disagreements: at least 16 of
+151, far above the background rate. They do not drive the tie-breaker
+result; on the remaining 135 the shared wrong answer is still the
+position-only guess 93% of the time. The dentist review (Check C) is the
+remaining test and decides whether the claim survives in the paper. The
+blinded sheet is not built yet.
+
+## 62. Confidence on joint failures and sensitivity to the scoring cutoffs
+
+**Date:** 2026-10-01. **Rules:** `cpu_repro/cv/PHASE3_RULES.md` items 2 and
+3, frozen and approved before running. **Code:** `cpu_repro/cv/calib_sweep.py`,
+run in the CPU kernel `tooth-numbering-cv-calib-s0` on the Section 60
+outputs. **Output:** `cpu_repro/cv/results/kaggle_calib/{calibration_joint_failures,cutoff_sweep}.csv`,
+rebuilt from the kernel log (the sweep from its full-precision printed
+rows, the calibration table from its 3-decimal printout), not downloaded.
+**Check:** the 0.5 / 0.5 row of the sweep reproduces Section 60 to 4
+decimals for all three detectors, and n_correct (11,010 / 10,886 / 10,743)
+matches the Section 60 top-1 rates.
+
+### Item 2: are joint failures made with low confidence?
+
+| Detector | Mean conf, joint failures (n = 151) | Mean conf, correct | AUROC [95% CI by X-ray] | Rule |
+|---|---|---|---|---|
+| YOLOv8x | 0.858 (median 0.885) | 0.882 | 0.54 [0.49, 0.60] | 2 |
+| RT-DETR-l | 0.813 (median 0.842) | 0.845 | 0.59 [0.53, 0.66] | 2 |
+| Faster R-CNN | 0.951 (median 0.986) | 0.977 | 0.65 [0.59, 0.71] | 2 |
+
+**Graded: rule 2 for all three.** The detectors are about as confident
+on the teeth they number wrong together with position as on the teeth they
+number right. YOLOv8x's interval includes 0.5. A confidence threshold would
+not catch these errors; this motivates the look-alike-neighbor review rule
+(roadmap item 11) rather than a confidence cutoff. Caveat from Section 61:
+some of these 151 may be label errors, where a confident answer would be
+correct.
+
+### Item 3: does the gap depend on the cutoffs?
+
+Gap (detector top-1 minus position-only 78.50%, pp; missed teeth count as
+wrong):
+
+| Conf | IoU | YOLOv8x | RT-DETR-l | Faster R-CNN |
+|---|---|---|---|---|
+| 0.25 | 0.3 | 16.8 | **-0.7** | 13.2 |
+| 0.25 | 0.5 | 16.6 | **-0.8** | 13.0 |
+| 0.25 | 0.7 | 13.8 | **-2.9** | 9.8 |
+| 0.50 | 0.3 | 16.6 | 15.5 | 14.2 |
+| 0.50 | 0.5 | 16.4 | 15.3 | 14.1 |
+| 0.50 | 0.7 | 13.6 | 12.7 | 10.7 |
+| 0.75 | 0.3 | 13.1 | 12.2 | 13.4 |
+| 0.75 | 0.5 | 13.0 | 12.1 | 13.2 |
+| 0.75 | 0.7 | 10.6 | 9.8 | 9.8 |
+
+**Graded: the 2 pp rule fails; the range is reported.** Largest change:
+RT-DETR-l at confidence 0.25, IoU 0.7 (-18.2 pp from Section 60).
+
+**Audit of the RT-DETR-l rows at confidence 0.25.** Accuracy falls from
+93.8% to 77.7% while the missed rate falls (0.43%), so these teeth are
+matched to a box of the wrong class, not lost. The matcher in `score_cv.py`
+pairs each tooth with the box of highest IoU and ignores confidence. RT-DETR
+has no NMS and emits several near-identical boxes per tooth with different
+classes; at a 0.25 cutoff a low-confidence wrong-class box that overlaps
+slightly better wins the match. That is a property of the scorer, not of
+the detector's answer. This is a likely explanation, not yet verified: it
+needs a rescore with confidence-first matching on Kaggle (proposed below,
+not run). The rule is applied as written: the RT-DETR-l 0.25 rows stay in
+the table.
+
+**Reading, excluding nothing.** At the pre-set confidence 0.5, the gap
+moves less than 0.2 pp between IoU 0.3 and 0.5 and drops 2.7 to 3.4 pp at
+IoU 0.7. At confidence 0.75 it drops 1 to 3.4 pp. Every drop in the
+confidence >= 0.5 rows goes with a rise in missed teeth (up to 9.1% at 0.75
+/ 0.7), which count as wrong, so the stricter cutoffs mostly measure
+localization, not numbering. Over confidence >= 0.5 the gaps range from
+9.8 to 16.6 pp; every one is positive and far from zero. The paper reports
+the headline at 0.5 / 0.5 and this range, and names IoU 0.7 and confidence
+0.75 as the cutoffs that move it.
+
+**Proposed follow-up (needs approval, about 10 minutes of Kaggle CPU).**
+Rescore all 9 cutoffs with confidence-first matching (pairs sorted by
+detector confidence, then IoU), alongside the IoU-first result. Decision
+rule: if the RT-DETR-l 0.25 rows rise to within 2 pp of their
+confidence-0.5 value, the drop is a matcher artifact and the paper says
+so; if the 0.5 / 0.5 gap for any detector changes by more than 0.5 pp,
+Section 60 is reported under both matchers.
+
+## 63. Shift test: moving the whole image barely changes the detectors' answers
+
+Date 2026-10-01. Script `cpu_repro/cv/shift_test.py`, Kaggle kernel
+`tooth-numbering-cv-shift-s0` (T4, inference only, the Section 60 fold
+models, seed 0). Rule: `cpu_repro/cv/PHASE3_RULES.md` item 1, frozen
+before the run. Output: `cpu_repro/cv/results/kaggle_shift/shift_summary.csv`
+(rebuilt from the kernel log). Matching is IoU-first, as in Section 60.
+
+**Checks.** The unshifted top-1 matches Section 60 to four decimals for
+all three detectors (94.8974, 93.8287, 92.5961). The detectors score 92 to
+95% against the shifted labeled boxes, which can only happen if their boxes
+moved with the image, so the shift was applied to the pixels and not only
+to the labels.
+
+| Detector | Shift | Teeth | Top-1 change, pp (95% CI) | Teeth changed | Follow rate | Chance p95 |
+|---|---|---|---|---|---|---|
+| YOLOv8x | dx -10% | 11,578 | -0.03 (-0.17 to 0.11) | 38 | 23.7% | 13.2% |
+| YOLOv8x | dx +10% | 11,570 | +0.05 (-0.09 to 0.18) | 40 | 17.5% | 12.5% |
+| RT-DETR-l | dx -10% | 11,578 | +0.04 (-0.20 to 0.28) | 204 | 11.8% | 5.9% |
+| RT-DETR-l | dx +10% | 11,570 | +0.08 (-0.17 to 0.33) | 193 | 13.5% | 5.7% |
+| Faster R-CNN | dx -10% | 11,578 | -0.23 (-0.60 to 0.14) | 496 | 15.3% | 4.8% |
+| Faster R-CNN | dx +10% | 11,570 | -0.35 (-0.74 to 0.03) | 516 | 14.7% | 5.0% |
+
+The position-only model on the same shifted boxes falls from 78.5% to 8.6%
+(dx -10%) and 6.8% (dx +10%). The +-5% horizontal and vertical shifts
+(in the CSV) look the same: every detector change is within 0.4 pp.
+
+**Graded: rule 3 for all three detectors.** The accuracy part of rule 1
+holds with room to spare (every drop under 0.4 pp), but the follow rate is
+above its chance 95th percentile for every detector, so rule 1 is not met
+as written. Rule 2 is far from met. No causal claim either way.
+
+**Reading.** A 10% shift moves each tooth about two tooth-widths and wipes
+out the position-only model, yet the detectors give the same answer for
+over 95% of teeth (Faster R-CNN changes 4.5%, RT-DETR-l 1.7%, YOLOv8x
+0.3%). Absolute position in the frame is not what they number from. Among
+the few teeth that do change, the new answer agrees with the position-only
+prediction 12 to 24% of the time, two to three times chance. That is a
+small effect: at most about 80 teeth out of 11,570 (Faster R-CNN, dx +10%),
+and 7 to 9 for YOLOv8x. The tie-breaker reading from Sections 46 to 60 is best
+stated as relative position (neighbors and arch order), not where the tooth
+sits in the image.
+
+**Limits.** Black fill adds a new border, which is itself a cue. The
+follow rate counts a change to the position-only answer even when that
+answer is correct; at dx +-10% the position-only model is right for under
+9% of teeth, so this matters little there, but it inflates the vertical
+shift rows (position-only still 76% right). For RT-DETR-l some changes
+may be the IoU-first matcher switching between duplicate boxes (Section
+64), not a real change in the detector's answer. This tests reliance at
+test time, not what was learned in training.
+
+## 64. Matcher order: the RT-DETR-l drop at confidence 0.25 is a scoring artifact
+
+Date 2026-10-01. Script `cpu_repro/cv/calib_sweep.py --match-order-only`
+(sets `score_cv.MATCH_ORDER`), Kaggle kernel
+`tooth-numbering-cv-matchorder-s0` (CPU, reads the Section 60 raw
+detections). Rule: dated note at the end of `cpu_repro/cv/PHASE3_RULES.md`,
+written and approved before the run. Output:
+`cpu_repro/cv/results/kaggle_match_order/cutoff_sweep_match_order.csv`
+(54 rows, rebuilt from the kernel log). The IoU-first half reproduces
+Section 62 exactly.
+
+Confidence-first matching sorts tooth-box pairs by detector confidence,
+then IoU, which is the order COCO evaluation uses. Gap in pp (detector
+top-1 minus position-only 78.5%):
+
+| Conf | IoU | YOLOv8x conf-first | YOLOv8x IoU-first | RT-DETR-l conf-first | RT-DETR-l IoU-first | Faster R-CNN conf-first | Faster R-CNN IoU-first |
+|---|---|---|---|---|---|---|---|
+| 0.25 | 0.3 | 17.1 | 16.8 | 17.0 | -0.7 | 14.6 | 13.2 |
+| 0.25 | 0.5 | 17.0 | 16.6 | 16.8 | -0.8 | 14.5 | 13.0 |
+| 0.25 | 0.7 | 14.1 | 13.8 | 14.0 | -2.9 | 11.0 | 9.8 |
+| 0.5 | 0.3 | 16.7 | 16.6 | 16.8 | 15.5 | 14.4 | 14.2 |
+| 0.5 | 0.5 | 16.5 | 16.4 | 16.7 | 15.3 | 14.3 | 14.1 |
+| 0.5 | 0.7 | 13.7 | 13.6 | 13.9 | 12.7 | 10.9 | 10.7 |
+| 0.75 | 0.3 | 13.1 | 13.1 | 12.2 | 12.2 | 13.2 | 13.4 |
+| 0.75 | 0.5 | 13.0 | 13.0 | 12.1 | 12.1 | 13.1 | 13.2 |
+| 0.75 | 0.7 | 10.6 | 10.6 | 9.8 | 9.8 | 9.7 | 9.8 |
+
+**Graded, part 1: matcher artifact.** Under confidence-first matching the
+RT-DETR-l confidence-0.25 rows sit 0.14 to 0.16 pp from their
+confidence-0.5 values (rule: within 2 pp). The -0.7 to -2.9 pp gaps in
+Section 62 came from the scorer, not the detector, and the paper says so.
+
+**Graded, part 2: Section 60 is reported under both matchers.** The 0.5 /
+0.5 gap changes by 0.09 pp (YOLOv8x), 1.33 pp (RT-DETR-l) and 0.22 pp
+(Faster R-CNN). RT-DETR-l is over the 0.5 pp line: its top-1 goes from
+93.8% to 95.2% and its gap from 15.3 to 16.7 pp, which puts it level with
+YOLOv8x (95.0%, 16.5 pp) instead of behind it. The headline range across
+detectors becomes 14.3 to 16.7 pp (conf-first) against 14.1 to 16.4 pp
+(IoU-first).
+
+**What this leaves.** At confidence 0.75 the two matchers agree to within
+0.2 pp, and under either matcher the gap drops 2 to 6 pp at confidence 0.75
+or IoU 0.7, so the Section 62 finding that strict cutoffs move the gap
+through missed teeth stands. With confidence-first matching, every gap at
+confidence 0.25 or 0.5 lies between 10.9 and 17.1 pp.
+
+**Not yet redone under confidence-first matching:** the joint-failure set
+(151 teeth, Sections 60 to 62), the calibration AUROCs (Section 62) and the
+shift test (Section 63) all used IoU-first matching. YOLOv8x and Faster
+R-CNN barely move, but RT-DETR-l does, so the joint-failure set may change
+by a few teeth. A rerun is cheap (CPU) and is proposed, not run.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the
