@@ -13,6 +13,7 @@ tooth-numbering-cv-batch3-s0 (CPU): batch3.py (PHASE3_BATCH3_RULES.md).
 tooth-numbering-cv-dentist-s0 (CPU): dentist_sheet.py (LABEL_CHECK_RULES.md check C).
 tooth-numbering-cv-seed1-score (CPU): seed 0 and seed 1 scored with YOLOv8x and
 RT-DETR-l, confidence-first (PHASE3_BATCH2_RULES.md item 3).
+tooth-numbering-cv-gapcheck-s0 (CPU): gap_check.py (PHASE3_BATCH3_RULES.md note).
 Each kernel
 embeds the scripts it runs (written to disk at start, so the code that ran
 is visible in the kernel itself), reads the training and scoring kernels'
@@ -164,6 +165,15 @@ shutil.rmtree(REPO)
 '''
 
 
+GAP_BODY = '''import gap_check
+per_tooth = sorted(Path("/kaggle/input").rglob("per_tooth_predictions.csv"))
+assert len(per_tooth) == 1, per_tooth
+sys.argv = ["gap_check.py", "--per-tooth", str(per_tooth[0]), "--out", "/kaggle/working/gap_check"]
+gap_check.main()
+shutil.rmtree(REPO)
+'''
+
+
 def write(out, name, files, paths, body, gpu, sources):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
@@ -199,6 +209,8 @@ def main():
           TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-confmatch-s0"])
     seed1_sources = [f"{USER}/tooth-numbering-cv-{d}-s{s}" for d in ("yolov8x", "rtdetr-l") for s in (0, 1)]
     write(a.out, "tooth-numbering-cv-seed1-score", ["score_cv.py"], csvs, SEED1_BODY, False, seed1_sources)
+    write(a.out, "tooth-numbering-cv-gapcheck-s0", ["gap_check.py"], csvs, GAP_BODY, False,
+          [f"{USER}/tooth-numbering-cv-confmatch-s0"])
     write(a.out, "tooth-numbering-cv-dentist-s0", ["dentist_sheet.py"], ["Dataset/bb_u_net_dataset/panoramic_x_rays"],
           DENTIST_BODY, False, [f"{USER}/tooth-numbering-cv-confmatch-s0"])
     write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,

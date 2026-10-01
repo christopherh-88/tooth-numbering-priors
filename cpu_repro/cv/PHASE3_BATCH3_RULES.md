@@ -82,3 +82,29 @@ the paper may call a difference and what it must call a tie.
 - D: the seed comparison treats the two splits as independent, which
   overstates its standard error (both seeds test the same X-rays), so the
   minimum detectable seed difference is conservative.
+
+## Note 2026-10-01: missing-neighbor check (approved by the user before running)
+
+Added after RESULTS.md Section 68. Script `gap_check.py`, Kaggle CPU
+kernel `tooth-numbering-cv-gapcheck-s0`, on the confidence-first per-tooth
+file (Section 65).
+
+**Definition.** Teeth in each arch are ordered as they appear left to
+right in the image (18 ... 11, 21 ... 28; 48 ... 41, 31 ... 38, as in
+`batch3.ORDER`). A tooth has a missing neighbor if a position next to it
+in that order exists and has no labeled tooth in that X-ray. Groups: J =
+the 161 joint same-wrong teeth; C = all teeth that all three detectors
+number correctly.
+
+**Rule.** r_J and r_C = share of each group with a missing neighbor;
+95% CIs by X-ray bootstrap (10,000 draws).
+1. r_J >= 2 x r_C and the CI of r_J - r_C excludes 0: joint failures
+   cluster next to gaps (the "tooth sits where its neighbor usually is"
+   reading).
+2. r_J < 1.25 x r_C: they do not.
+3. Otherwise: report as measured.
+
+Reported with no rule: the share of J whose shared wrong answer is an FDI
+number with no labeled tooth in that X-ray; the same rates with
+third-molar gaps ignored; and the rate for teeth the position-only model
+gets wrong but all three detectors get right.

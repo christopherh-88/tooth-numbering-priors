@@ -5095,6 +5095,60 @@ interventions here do not show the detectors using position to produce
 it. The tooth-level check that would separate the two readings (are joint
 failures next to a gap or in a crowded arch?) is not yet run.
 
+## 69. Joint failures sit next to missing teeth, and the shared wrong answer is usually the missing tooth's number
+
+Date 2026-10-01. Script `cpu_repro/cv/gap_check.py`, Kaggle kernel
+`tooth-numbering-cv-gapcheck-s0` (CPU), on the confidence-first per-tooth
+file (Section 65). Rule: note "missing-neighbor check" in
+`cpu_repro/cv/PHASE3_BATCH3_RULES.md`, approved and frozen before the run.
+Tables: `cpu_repro/cv/results/kaggle_gapcheck/` (from the kernel log, 3
+decimals). A tooth has a missing neighbor when a position next to it in
+the arch, read left to right in the image, has no labeled tooth in that
+X-ray.
+
+| Group | Teeth | With a missing neighbor (95% CI) |
+|---|---|---|
+| Joint failures (J) | 161 | 44.7% (36.8 to 54.4) |
+| All three detectors correct (C) | 10,479 | 8.5% (7.5 to 9.6) |
+| Of C, position-only wrong | 1,947 | 10.5% |
+
+Difference 36.2 pp (28.3 to 45.9); ratio 5.3 (4.2 to 6.6). Ignoring
+third-molar gaps: 39.8% against 7.0%, ratio 5.7 (4.5 to 7.2).
+
+**Graded: rule 1.** Joint failures sit next to a gap more than five times
+as often as correctly numbered teeth.
+
+**The wrong answer names the missing tooth.** Of the 72 joint failures
+next to a gap, 67 (93%) get the number of a tooth that has no label in
+that X-ray: the detectors and the position-only model all number the
+tooth as if it had moved into the empty slot. That is 67 of all 161
+joint failures (41.6%). For the 89 joint failures with no missing
+neighbor the shared wrong answer is always a tooth that is present, so
+two teeth in the X-ray end up with the same number.
+
+**Position alone is not the cause.** Teeth the position-only model gets
+wrong but all three detectors get right have a missing neighbor 10.5% of
+the time, close to the 8.5% for all correct teeth. So gaps are not where
+position fails in general; they are where position and the detectors
+fail together.
+
+**Reading, with Sections 63 to 68.** The shared errors are best described
+as a gap-filling failure: next to a missing tooth, a tooth that has
+drifted toward the gap, or that looks like the missing one, gets the
+missing tooth's number from every model. The detectors do not need
+absolute position to do this (Sections 63, 67) and keep the answer when
+the far context is masked (Section 68). This is a concrete, checkable
+failure mode for the paper, and it gives the review rule that Section 66
+could not find inside the detector: check numbering next to every gap in
+the arch. In this data that would cover 44.7% of joint failures while
+reviewing the teeth next to gaps (about 9% of all teeth; the exact share
+of all teeth was not computed in this run).
+
+Not tested: whether the 89 joint failures without a gap share another
+pattern (crowding, rotated or impacted teeth, or the 10% label disputes of
+Section 65). The dentist sheet (161 joint failures, built from the same
+set) can answer part of that.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

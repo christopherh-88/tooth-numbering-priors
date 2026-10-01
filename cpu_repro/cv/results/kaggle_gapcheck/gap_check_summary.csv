@@ -1,0 +1,3 @@
+gaps,n_J,r_J_pct,r_J_lo,r_J_hi,n_C,r_C_pct,r_C_lo,r_C_hi,diff_pp,diff_lo,diff_hi,ratio,ratio_lo,ratio_hi,n_C_coord_wrong,r_C_coord_wrong_pct,rule,J_wrong_answer_is_absent_tooth_pct,J_wrong_answer_is_absent_tooth_n
+all gaps,161,44.72,36.757,54.386,10479,8.493,7.486,9.555,36.227,28.339,45.867,5.265,4.247,6.581,1947,10.529,1,41.615,67
+third-molar gaps ignored,161,39.752,31.818,49.092,10479,6.966,6.068,7.905,32.785,24.959,42.088,5.706,4.487,7.248,1947,9.296,,,
