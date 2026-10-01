@@ -1,0 +1,2 @@
+n_teeth,n_joint,joint_pct_of_teeth,n_same_wrong,same_wrong_pct,n_position_match,position_match_pct,null_mean_pct,null_p95_pct,perm_p,neighbor_pct
+11602.00,162.00,1.40,161.00,99.38,147.00,91.30,4.10,6.83,0.00,94.41

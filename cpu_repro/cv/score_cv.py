@@ -60,13 +60,15 @@ def iou(a, b):
     return inter / (area(a)[:, None] + area(b)[None, :] - inter)
 
 
-def match(teeth, dets):
-    """Per labeled tooth: matched predicted class (NaN if missed) and its confidence."""
+def match(teeth, dets, return_index=False):
+    """Per labeled tooth: matched predicted class (NaN if missed) and its confidence
+    (and, with return_index, the matched row label in dets, -1 if missed)."""
     pred = np.full(len(teeth), np.nan)
     conf = np.full(len(teeth), np.nan)
+    index = np.full(len(teeth), -1, dtype=object)
     dets = dets[dets["conf"] >= CONF]
     if len(dets) == 0:
-        return pred, conf
+        return (pred, conf, index) if return_index else (pred, conf)
     g = teeth[["x_center", "y_center", "width", "height"]].to_numpy()
     g = np.stack([g[:, 0] - g[:, 2] / 2, g[:, 1] - g[:, 3] / 2,
                   g[:, 0] + g[:, 2] / 2, g[:, 1] + g[:, 3] / 2], 1)
@@ -82,13 +84,20 @@ def match(teeth, dets):
         used_d.add(j)
         pred[i] = dets["class_id"].iloc[j]
         conf[i] = dets["conf"].iloc[j]
-    return pred, conf
+        index[i] = dets.index[j]
+    return (pred, conf, index) if return_index else (pred, conf)
 
 
 def add_detector(teeth, name, run_dir):
     dets = pd.concat([pd.read_csv(p) for p in sorted(Path(run_dir).glob("fold*/test_detections.csv"))])
     n_folds = len(list(Path(run_dir).glob("fold*/test_detections.csv")))
     assert n_folds == 5, (name, n_folds)
+    add_detections(teeth, name, dets)
+
+
+def add_detections(teeth, name, dets):
+    """Match one detector's detections (image_id, class_id, conf, x1..y2) to the
+    labeled teeth and add the {name}_pred/_conf/_correct/_missed columns."""
     unknown = set(dets["image_id"]) - set(teeth["image_id"])
     assert not unknown, (name, sorted(unknown)[:5])
     by_img = dict(tuple(dets.groupby("image_id")))

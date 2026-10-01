@@ -4847,6 +4847,51 @@ shift test (Section 63) all used IoU-first matching. YOLOv8x and Faster
 R-CNN barely move, but RT-DETR-l does, so the joint-failure set may change
 by a few teeth. A rerun is cheap (CPU) and is proposed, not run.
 
+## 65. Section 60 to 62 redone with confidence-first matching: same conclusions, 161 joint failures
+
+Date 2026-10-01. Kernel `tooth-numbering-cv-confmatch-s0` (CPU): `score_cv.py
+--match-order conf`, then `calib_sweep.calibration` and `label_check.py` on
+the new per-tooth file, from the same saved detections as Section 60.
+Rule: dated note "confidence-first rescore" in `cpu_repro/cv/PHASE3_RULES.md`,
+approved before the run. Tables in `cpu_repro/cv/results/kaggle_confmatch/`,
+rebuilt from the kernel log (2 to 3 decimals, as printed).
+
+**Graded: the paper uses the confidence-first numbers.** The joint
+same-wrong set changed by 42 teeth (16 only under IoU-first, 26 only under
+confidence-first; 151 becomes 161), over the 5-tooth limit. The other two
+parts held: every AUROC moved by less than 0.02 (0.544 to 0.527, 0.593 to
+0.596, 0.645 to 0.661) and the label-error share by 0.7 pp (10.7% to
+10.0%). Every conclusion drawn from these numbers is unchanged.
+
+| | IoU-first (Sections 60 to 62) | Confidence-first |
+|---|---|---|
+| YOLOv8x top-1 / gap | 94.90% / 16.4 pp | 94.98% / 16.5 pp (15.1 to 17.9) |
+| RT-DETR-l top-1 / gap | 93.83% / 15.3 pp | 95.16% / 16.7 pp (15.3 to 18.1) |
+| Faster R-CNN top-1 / gap | 92.60% / 14.1 pp | 92.82% / 14.3 pp (13.0 to 15.7) |
+| Joint same-wrong teeth | 151 | 161 |
+| Shared wrong answer = position-only answer | 140 (92.7%) | 147 (91.3%); chance p95 6.8% |
+| Shared wrong answer is a neighbor | 92.7% | 94.4% |
+| Confidence AUROC, joint vs correct | 0.544 / 0.593 / 0.645 | 0.527 / 0.596 / 0.661 (all rule 2) |
+| Label-error share r_J (rule 3) | 10.7% | 10.0% (16 of 160) |
+| Position match after removing those | 93.3% of 135 | 91.7% of 145 |
+
+No fold trips the guard under either matcher. With confidence-first matching
+RT-DETR-l has the lowest missed rate (0.78%) and the highest top-1, level
+with YOLOv8x; the batch 3 power analysis will say whether any ranking of the three
+can be claimed.
+
+**Why 42 teeth moved.** A joint failure needs all three detectors wrong
+with the same answer. RT-DETR-l's answer changed on about 1.3% of teeth
+(Section 64), and any change on a joint-failure tooth, or on a tooth where
+the other two were already wrong together, moves it in or out of the set.
+YOLOv8x and Faster R-CNN changed little. The set is a property of the
+scorer as well as the detectors, which is one more reason the paper gives
+rates with CIs, not lists of teeth.
+
+**Carried forward.** Everything after this section (shift test v2,
+context masking, batch 3) uses the confidence-first set. The blinded dentist sheet should be drawn from the
+161, not the 151.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

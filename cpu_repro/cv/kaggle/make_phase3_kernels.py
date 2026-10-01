@@ -9,6 +9,7 @@ orders (PHASE3_RULES.md note). tooth-numbering-cv-confmatch-s0 (CPU):
 Section 60 scoring, calibration and label check redone with confidence-first
 matching (RESULTS.md Section 64). tooth-numbering-cv-shiftctx-s0 (T4):
 shift test v2 and context masking (PHASE3_BATCH2_RULES.md items 1 and 2).
+tooth-numbering-cv-batch3-s0 (CPU): batch3.py (PHASE3_BATCH3_RULES.md).
 Each kernel
 embeds the scripts it runs (written to disk at start, so the code that ran
 is visible in the kernel itself), reads the training and scoring kernels'
@@ -116,6 +117,21 @@ shutil.rmtree(REPO)
 '''
 
 
+BATCH3_BODY = '''import batch3
+args = ["batch3.py", "--repo", str(REPO)]
+for det in ["yolov8x", "rtdetr_l", "fasterrcnn"]:
+    found = sorted(p for p in Path("/kaggle/input").rglob(f"{det}_cvseed0") if p.is_dir())
+    assert len(found) == 1, (det, found)
+    args += ["--det", f"{det}={found[0]}"]
+sys.argv = args + ["--out", "/kaggle/working/batch3_smoke", "--images", "20"]
+batch3.main()
+print("smoke run done; full run follows", flush=True)
+sys.argv = args + ["--out", "/kaggle/working/batch3"]
+batch3.main()
+shutil.rmtree(REPO)
+'''
+
+
 def write(out, name, files, paths, body, gpu, sources):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
@@ -149,6 +165,8 @@ def main():
     write(a.out, "tooth-numbering-cv-shiftctx-s0", ["shift_test.py", "context_test.py"],
           csvs + ["Dataset/bb_u_net_dataset/panoramic_x_rays"], SHIFTCTX_BODY, True,
           TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-confmatch-s0"])
+    write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,
+          TRAIN_KERNELS)
 
 
 if __name__ == "__main__":
