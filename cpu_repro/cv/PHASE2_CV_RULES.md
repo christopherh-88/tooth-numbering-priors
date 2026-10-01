@@ -1,7 +1,8 @@
-# Phase 2 CV: decision rules (DRAFT, not yet frozen)
+# Phase 2 CV: decision rules (frozen 2026-10-01)
 
 Written 2026-10-01, before any CV training run and before the position-only
-model is fit on these folds. Once the user approves it, this file is frozen:
+model is fit on these folds, and approved by the user the same day before
+any kernel was pushed (code at commit 6ea25a5). This file is frozen:
 results are graded against it, and any later change is added as a dated
 note at the end, not an edit above.
 
