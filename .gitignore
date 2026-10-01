@@ -183,3 +183,8 @@ cpu_repro/boundary_condition/denpar_periapical/__pycache__/
 
 # macOS Finder metadata
 .DS_Store
+
+# Phase 2 CV prep and run artifacts (regenerated per machine; results are
+# copied to cpu_repro/cv/results/ once scored)
+cpu_repro/cv/prepared/
+cpu_repro/cv/runs/
