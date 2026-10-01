@@ -209,3 +209,32 @@ New findings that could support the mechanism sentence:
   mechanism sentence should read as position relative to the neighboring
   teeth, not position in the frame. Shift test v2 and context masking
   (running) will sharpen this.
+
+## 8. Mechanism wording after the interventions (added 2026-10-01)
+
+Sections 67 to 69 of RESULTS.md change what the mechanism sentence can
+claim. Not applied to the docx.
+
+Current (abstract, section 1 above):
+> ... it points to one mechanism: the detectors identify teeth by
+> appearance and use typical position only to break ties between neighbors
+> that look alike.
+
+The interventions do not show the detectors using position: shifting the
+image barely changes their answers, and masking the far context leaves
+the shared wrong answers in place. What they show instead is where the
+shared errors happen. Suggested replacement:
+
+> ... it points to one failure mode: the shared errors cluster next to
+> missing teeth (45% of them, against 9% of correctly numbered teeth), and
+> there every model, with or without image pixels, gives the tooth the
+> number of the missing one.
+
+Suggested addition to "two implications" (section 5 above), replacing
+"look first at confusions between neighboring teeth":
+
+> ... check the numbering of every tooth next to a gap in the arch, where
+> the shared errors concentrate.
+
+Both use numbers from the uncropped cross-validation (section 7), so they
+only fit if the paper moves to that set.
