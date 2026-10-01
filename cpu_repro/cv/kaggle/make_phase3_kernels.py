@@ -10,6 +10,7 @@ Section 60 scoring, calibration and label check redone with confidence-first
 matching (RESULTS.md Section 64). tooth-numbering-cv-shiftctx-s0 (T4):
 shift test v2 and context masking (PHASE3_BATCH2_RULES.md items 1 and 2).
 tooth-numbering-cv-batch3-s0 (CPU): batch3.py (PHASE3_BATCH3_RULES.md).
+tooth-numbering-cv-dentist-s0 (CPU): dentist_sheet.py (LABEL_CHECK_RULES.md check C).
 Each kernel
 embeds the scripts it runs (written to disk at start, so the code that ran
 is visible in the kernel itself), reads the training and scoring kernels'
@@ -132,6 +133,16 @@ shutil.rmtree(REPO)
 '''
 
 
+DENTIST_BODY = '''import dentist_sheet
+per_tooth = sorted(Path("/kaggle/input").rglob("per_tooth_predictions.csv"))
+assert len(per_tooth) == 1, per_tooth
+sys.argv = ["dentist_sheet.py", "--per-tooth", str(per_tooth[0]),
+            "--images", str(REPO / "Dataset/bb_u_net_dataset/panoramic_x_rays"), "--out", "/kaggle/working/dentist"]
+dentist_sheet.main()
+shutil.rmtree(REPO)
+'''
+
+
 def write(out, name, files, paths, body, gpu, sources):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
@@ -165,6 +176,8 @@ def main():
     write(a.out, "tooth-numbering-cv-shiftctx-s0", ["shift_test.py", "context_test.py"],
           csvs + ["Dataset/bb_u_net_dataset/panoramic_x_rays"], SHIFTCTX_BODY, True,
           TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-confmatch-s0"])
+    write(a.out, "tooth-numbering-cv-dentist-s0", ["dentist_sheet.py"], ["Dataset/bb_u_net_dataset/panoramic_x_rays"],
+          DENTIST_BODY, False, [f"{USER}/tooth-numbering-cv-confmatch-s0"])
     write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,
           TRAIN_KERNELS)
 
