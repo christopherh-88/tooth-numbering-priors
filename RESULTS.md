@@ -4375,6 +4375,124 @@ digits and a last-digit float difference in two phi values, the same
 platform effect described in Section 57 (this run used Linux x86_64 with
 Python 3.11).
 
+## 59. Phase 2 batch 1: CIs by source X-ray, missed vs. misnumbered, error-consistency kappa; the gap on uncropped originals
+
+**Date:** 2026-10-01. **Rules:** `cpu_repro/yolo_training/PHASE2_BATCH1_RULES.md`,
+written and approved before running. **Script:**
+`cpu_repro/yolo_training/image_level_reanalysis.py` (reads the saved
+`joined_seed{N}.csv` files and `mitigation_paired_joined.csv`; no training,
+no existing file changed). **Output:** `eval_results/phase2_gap_by_xray.csv`,
+`phase2_missed_vs_misnumbered.csv`, `phase2_error_consistency.csv`,
+`phase2_augmentation_by_xray.csv`, `phase2_originals_vs_cropped.csv`.
+Seeds 0-9 and 11-14; 10,000 bootstrap draws of source X-rays.
+
+**The unit.** Each seed's test set is 85 source X-rays but about 200 image
+files: the Roboflow export (`Dataset/yolo_train_dataset/README.roboflow.txt`)
+made 3 copies of each X-ray in its own train split by randomly cropping 0
+to 20% of the image and adjusting brightness, and kept its valid/test
+X-rays as single uncropped originals. At seed 0, 58 test X-rays have 3
+copies and 27 have one. All copies of a test X-ray are in test, so the
+source X-ray is the independent unit.
+
+Checks built into the script, all passing: the YOLOv8x all-copies gap
+reproduces `multiseed_summary.csv` to 1e-9 for seeds 0-4; phi reproduces
+the saved phi for the same seeds; the old augmentation CI reproduces
+`mitigation_bootstrap_ci.csv` to 1e-12; all three detectors' joined files
+have the same teeth and the same position-only predictions.
+
+### A. Gap CIs by source X-ray
+
+Lowest per-seed 95% lower bound across 42 runs (3 detectors x 14 seeds):
+**19.3 pp** with all copies and **16.6 pp** with one copy per X-ray.
+
+Mean gap, seeds 0-4 (pp):
+
+| Detector | All copies (paper) | One copy per X-ray |
+|---|---|---|
+| YOLOv8x | 24.8 | 23.7 |
+| RT-DETR-l | 25.0 | 23.9 |
+| Faster R-CNN | 23.8 | 22.7 |
+
+Augmentation test (Section 31, zero-jitter minus jittered YOLOv8x, seed 0):
+
+| Resampling unit | Delta (pp) | 95% CI |
+|---|---|---|
+| Image files (saved, 2,000 draws) | -0.18 | -0.74 to +0.34 |
+| Source X-rays, all copies | -0.18 | -1.01 to +0.62 |
+| Source X-rays, one copy | +0.04 | -0.71 to +0.81 |
+
+**Graded against the rules.**
+- A1: every lower bound clears 15 pp in both variants. "Every run cleared
+  the pre-set threshold" stands.
+- A4: **triggered.** The one-copy mean for Faster R-CNN, 22.7, does not
+  round into 24 to 25. By the rule, the headline uses the one-copy numbers
+  (about 23 to 24 pp) and says why. Not yet applied to any paper text;
+  see the audit below, which bears on the same number.
+- A5: the X-ray-level CI still contains 0. The null result stands; the
+  paper should quote -1.0 to +0.6 instead of -0.74 to +0.34.
+
+### B. Missed vs. misnumbered (seeds 0-4 means)
+
+| Detector | Missed | Misnumbered | Matched-only top-1 | Gap, all teeth | Gap, matched teeth |
+|---|---|---|---|---|---|
+| YOLOv8x | 1.7% | 4.1% | 95.9% | 24.8 | 25.9 |
+| RT-DETR-l | 1.1% | 4.4% | 95.5% | 25.0 | 25.7 |
+| Faster R-CNN | 1.4% | 5.3% | 94.6% | 23.8 | 24.8 |
+
+Largest difference between the two gaps in any seed 0-4 run: 1.55 pp, with
+the matched-only gap always larger. **Rule B1 holds:** misses do not drive
+the headline, and the all-teeth gap is the conservative one. Replication
+groups agree (differences 0.65 to 1.51 pp).
+
+### C. Error-consistency kappa (Geirhos et al., 2020)
+
+Detector vs. position-only, seeds 0-4: kappa 0.08 to 0.16 per run (group
+means 0.12 for all three detectors), against kappa_max 0.21 to 0.33 given
+the accuracy difference; phi 0.13 to 0.24 as before. **No kappa CI
+includes 0 in any of the 42 runs.** **Rule C1 holds:** kappa confirms the
+small but nonzero link, and can be reported next to phi.
+
+Detector vs. detector (descriptive): kappa 0.61 to 0.67 (means over
+seeds), against kappa_max 0.88 to 0.93. The detectors' errors line up with
+each other about five times more than with the position-only model's.
+
+### Exploratory audit (not in the frozen rules): uncropped originals vs. cropped copies
+
+Run after A4 triggered, to see why the one-copy gap is lower. Weighting
+each X-ray once by averaging its copies gives the same numbers as the
+first-copy rule (22.7, 24.0, 23.7), so the choice of copy is not the
+cause. The difference is between kinds of X-ray:
+
+| Seeds 0-4 means | X-rays per seed | Position-only top-1 | Gap YOLOv8x | Gap RT-DETR-l | Gap Faster R-CNN |
+|---|---|---|---|---|---|
+| Uncropped originals | 25 | 76.8% | 19.7 | 19.9 | 18.5 |
+| Cropped copies | 60 | 68.4% | 25.5 | 25.7 | 24.6 |
+
+The same split holds in both replication groups (originals: position-only
+76.3% and 75.8%, gaps 18.0 to 20.5 pp). Detectors lose about 1 to 3 points
+on cropped copies; the position-only model loses about 8. Random cropping
+moves teeth in the frame, which weakens the position cue far more than it
+weakens the detectors.
+
+On originals alone, no lower bound falls below 5 pp (lowest 9.5 pp), but
+32 of 42 runs have a lower bound under 15 pp, with only 25 to 29 X-rays
+per seed.
+
+**Reading.** The 24 to 25 pp headline and the "about 69%" position-only
+figure are both measured on a test set where about 70% of the X-rays (and
+about 87% of the image files, 174 of 201 at seed 0) are randomly cropped
+copies. On uncropped panoramic X-rays, position alone
+reaches about 76 to 77% and the detectors lead by about 18 to 20 pp. The
+direction of every claim is unchanged (detectors still beat position on
+every subset), but the size of the headline depends on this, and the
+cropped copies are an augmentation, not clinical images. This is also a
+small natural version of the planned Phase 3 shift/crop intervention.
+**Decision on paper wording is left to the user.**
+
+Open question, not checked here: whether DENTEX (position-only 68.5%)
+contains any cropped or augmented copies, and if not, why its figure sits
+below UFBA-425's uncropped 76 to 77%.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

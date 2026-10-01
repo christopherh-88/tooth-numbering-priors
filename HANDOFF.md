@@ -31,6 +31,14 @@ is fixed (Section 55). The YOLOv8x seed 7/9 missed-tooth spikes are traced
 to single training runs (Section 53). Open: which README lines were
 dropped in the `5a0ecd6` rewrite (ask the user before restoring any).
 
+**Phase 2 batch 1 done (`RESULTS.md` Section 59, 2026-10-01).** CIs by
+source X-ray, missed vs. misnumbered, and kappa all support the existing
+claims. But an audit found that about 70% of each seed's test X-rays are
+Roboflow copies randomly cropped 0 to 20%. On uncropped originals,
+position-only reaches about 77% and the gap is about 18 to 20 pp, not 24
+to 25. **How the headline is worded is waiting on the user**; nothing in
+`paper/cjsj/REVISIONS.md` has been changed for it yet.
+
 **Next target: MICCAI 2027** (deadline assumed about Feb 2027). The plan
 was written up in a chat outside this repo (`claude/tooth-numbering-roadmap.md`
 and `claude/cjsj-revisions-from-hyunjun.md` were referenced but never
