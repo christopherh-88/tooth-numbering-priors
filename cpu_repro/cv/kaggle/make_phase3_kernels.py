@@ -174,6 +174,19 @@ shutil.rmtree(REPO)
 '''
 
 
+GAPINT_BODY = '''subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "ultralytics==8.4.143"], check=True)
+import gap_intervention
+per_tooth = sorted(Path("/kaggle/input").rglob("per_tooth_predictions.csv"))
+assert len(per_tooth) == 1, per_tooth
+args = ["gap_intervention.py", "--repo", str(REPO), "--models", "/kaggle/input", "--per-tooth", str(per_tooth[0])]
+sys.argv = args + ["--out", "/kaggle/working/gap_intervention_smoke", "--images", "10"]
+gap_intervention.main()
+sys.argv = args + ["--out", "/kaggle/working/gap_intervention"]
+gap_intervention.main()
+shutil.rmtree(REPO)
+'''
+
+
 def write(out, name, files, paths, body, gpu, sources):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
@@ -213,6 +226,9 @@ def main():
           [f"{USER}/tooth-numbering-cv-confmatch-s0"])
     write(a.out, "tooth-numbering-cv-dentist-s0", ["dentist_sheet.py"], ["Dataset/bb_u_net_dataset/panoramic_x_rays"],
           DENTIST_BODY, False, [f"{USER}/tooth-numbering-cv-confmatch-s0"])
+    write(a.out, "tooth-numbering-cv-gapint-s0", ["shift_test.py", "gap_check.py", "gap_intervention.py"],
+          csvs + ["Dataset/bb_u_net_dataset/panoramic_x_rays", "Dataset/bb_u_net_dataset/labels"], GAPINT_BODY, True,
+          TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-confmatch-s0"])
     write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,
           TRAIN_KERNELS)
 
