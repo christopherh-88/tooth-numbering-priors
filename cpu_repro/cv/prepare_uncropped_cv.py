@@ -12,7 +12,7 @@ Outputs (small, committed):
   cpu_repro/cv/boxes.csv   one row per tooth: image_id, category, fdi,
                            class_id (FDI_CODES index), normalized
                            x_center, y_center, width, height
-  cpu_repro/cv/folds.csv   one row per X-ray: image_id, category, n_teeth,
+  cpu_repro/cv/folds.csv   (folds_seed<s>.csv for --split-seed s) one row per X-ray: image_id, category, n_teeth,
                            fold (0-4, the X-ray's test fold), and
                            inner_val_fold{0..4} (True if the X-ray is in the
                            validation set used for epoch selection when that
@@ -74,6 +74,30 @@ def stratified_folds(ids, cats, n, rng):
     return fold
 
 
+def assign_folds(boxes, seed):
+    """Test fold and inner validation sets per X-ray, from boxes.csv alone."""
+    ids = sorted(boxes["image_id"].unique())
+    cats = [i.split("-")[0] for i in ids]
+    rng = np.random.default_rng(seed)
+    test_fold = stratified_folds(ids, cats, N_FOLDS, rng)
+    folds = pd.DataFrame({"image_id": ids, "category": cats})
+    folds["n_teeth"] = folds["image_id"].map(boxes.groupby("image_id").size())
+    folds["fold"] = folds["image_id"].map(test_fold)
+    for f in range(N_FOLDS):
+        train = folds[folds["fold"] != f]
+        val = set()
+        for c, grp in train.groupby("category"):
+            members = sorted(grp["image_id"])
+            rng.shuffle(members)
+            val.update(members[:int(round(len(members) * VAL_FRACTION))])
+        folds[f"inner_val_fold{f}"] = folds["image_id"].isin(val)
+    return folds
+
+
+def folds_path(seed):
+    return OUT / ("folds.csv" if seed == SPLIT_SEED else f"folds_seed{seed}.csv")
+
+
 def build():
     boxes = mask_boxes()
     n_empty = int(boxes["empty"].sum())
@@ -96,25 +120,11 @@ def build():
                    "x_center", "y_center", "width", "height"]]
     boxes = boxes.sort_values(["image_id", "class_id"]).reset_index(drop=True)
 
-    ids = sorted(boxes["image_id"].unique())
-    cats = [i.split("-")[0] for i in ids]
-    rng = np.random.default_rng(SPLIT_SEED)
-    test_fold = stratified_folds(ids, cats, N_FOLDS, rng)
-    folds = pd.DataFrame({"image_id": ids, "category": cats})
-    folds["n_teeth"] = folds["image_id"].map(boxes.groupby("image_id").size())
-    folds["fold"] = folds["image_id"].map(test_fold)
-    for f in range(N_FOLDS):
-        train = folds[folds["fold"] != f]
-        val = set()
-        for c, grp in train.groupby("category"):
-            members = sorted(grp["image_id"])
-            rng.shuffle(members)
-            val.update(members[:int(round(len(members) * VAL_FRACTION))])
-        folds[f"inner_val_fold{f}"] = folds["image_id"].isin(val)
+    folds = assign_folds(boxes, SPLIT_SEED)
 
     boxes.to_csv(OUT / "boxes.csv", index=False, float_format="%.6f")
     folds.to_csv(OUT / "folds.csv", index=False)
-    print(f"{len(images)} X-rays on disk; {len(ids)} with at least one tooth mask; "
+    print(f"{len(images)} X-rays on disk; {len(folds)} with at least one tooth mask; "
           f"no masks: {no_masks}; empty masks skipped: {n_empty}")
     print(f"{len(boxes)} teeth")
     print(folds.groupby("fold").agg(xrays=("image_id", "size"), teeth=("n_teeth", "sum")))
@@ -152,7 +162,14 @@ def write_yolo(out_dir: Path, boxes, folds):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--write-yolo", type=Path, default=None)
+    ap.add_argument("--split-seed", type=int, default=None,
+                    help="only write folds_seed<s>.csv from the committed boxes.csv (no masks read)")
     args = ap.parse_args()
+    if args.split_seed is not None:
+        f = assign_folds(pd.read_csv(OUT / "boxes.csv"), args.split_seed)
+        f.to_csv(folds_path(args.split_seed), index=False)
+        print(f.groupby("fold").agg(xrays=("image_id", "size"), teeth=("n_teeth", "sum")))
+        raise SystemExit
     b, f = build()
     if args.write_yolo:
         write_yolo(args.write_yolo, b, f)

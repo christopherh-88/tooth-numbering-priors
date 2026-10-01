@@ -5,7 +5,11 @@
 tooth-numbering-cv-shift-s0 (T4): shift_test.py on all three detectors'
 fold models. tooth-numbering-cv-calib-s0 (CPU): calib_sweep.py.
 tooth-numbering-cv-matchorder-s0 (CPU): the sweep under both matcher
-orders (PHASE3_RULES.md note). Each kernel
+orders (PHASE3_RULES.md note). tooth-numbering-cv-confmatch-s0 (CPU):
+Section 60 scoring, calibration and label check redone with confidence-first
+matching (RESULTS.md Section 64). tooth-numbering-cv-shiftctx-s0 (T4):
+shift test v2 and context masking (PHASE3_BATCH2_RULES.md items 1 and 2).
+Each kernel
 embeds the scripts it runs (written to disk at start, so the code that ran
 is visible in the kernel itself), reads the training and scoring kernels'
 outputs as kernel sources, and checks out only the data files it needs
@@ -57,6 +61,61 @@ shutil.rmtree(REPO)
 MATCH_BODY = CALIB_BODY.replace('"/kaggle/working/calib"]', '"/kaggle/working/match_order", "--match-order-only"]')
 
 
+CONFMATCH_BODY = '''subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "cleanlab"], check=True)
+import numpy as np, pandas as pd
+import calib_sweep, label_check, score_cv
+OUT = Path("/kaggle/working/confmatch")
+old = sorted(Path("/kaggle/input").rglob("per_tooth_predictions.csv"))
+assert len(old) == 1, old
+args = ["score_cv.py", "--out", str(OUT / "score"), "--match-order", "conf",
+        "--boxes", str(REPO / "cpu_repro/cv/boxes.csv"), "--folds", str(REPO / "cpu_repro/cv/folds.csv")]
+for det in ["yolov8x", "rtdetr_l", "fasterrcnn"]:
+    found = sorted(p for p in Path("/kaggle/input").rglob(f"{det}_cvseed0") if p.is_dir())
+    assert len(found) == 1, (det, found)
+    args += ["--det", f"{det}={found[0]}"]
+sys.argv = args
+score_cv.main()
+new = OUT / "score" / "per_tooth_predictions.csv"
+
+cal = calib_sweep.calibration(pd.read_csv(new), np.random.default_rng(0))
+cal.to_csv(OUT / "calibration_joint_failures.csv", index=False, float_format="%.4f")
+print(cal.round(3).to_string(index=False), flush=True)
+
+sys.argv = ["label_check.py", "--per-tooth", str(new), "--out", str(OUT / "label_check"),
+            "--roboflow", str(REPO / "Dataset/yolo_train_dataset")]
+label_check.main()
+
+def joint_set(path):
+    t = pd.read_csv(path)
+    j = t["coord_pred"] != t["class_id"]
+    for d in calib_sweep.DETS:
+        j &= (t[f"{d}_pred"] != t["class_id"]) & t[f"{d}_pred"].notna()
+    p = np.stack([t[f"{d}_pred"].to_numpy() for d in calib_sweep.DETS])
+    j &= (p == p[0]).all(0)
+    return set(zip(t.loc[j, "image_id"], t.loc[j, "fdi"]))
+a, b = joint_set(old[0]), joint_set(new)
+print(f"joint same-wrong: IoU-first {len(a)}, conf-first {len(b)}, only IoU-first {len(a - b)}, "
+      f"only conf-first {len(b - a)}, symmetric difference {len(a ^ b)}")
+pd.DataFrame([dict(image_id=i, fdi=f, in_iou_first=(i, f) in a, in_conf_first=(i, f) in b)
+              for i, f in sorted(a ^ b)]).to_csv(OUT / "joint_set_diff.csv", index=False)
+shutil.rmtree(REPO)
+'''
+
+
+SHIFTCTX_BODY = '''subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "ultralytics==8.4.143"], check=True)
+import context_test, shift_test
+per_tooth = sorted(Path("/kaggle/input").rglob("per_tooth_predictions.csv"))
+assert len(per_tooth) == 1, per_tooth
+sys.argv = ["shift_test.py", "--repo", str(REPO), "--models", "/kaggle/input", "--out", "/kaggle/working/shift_v2",
+            "--match-order", "conf", "--save-raw"]
+shift_test.main()
+sys.argv = ["context_test.py", "--repo", str(REPO), "--models", "/kaggle/input", "--per-tooth", str(per_tooth[0]),
+            "--out", "/kaggle/working/context"]
+context_test.main()
+shutil.rmtree(REPO)
+'''
+
+
 def write(out, name, files, paths, body, gpu, sources):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
@@ -84,6 +143,12 @@ def main():
           False, TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-score-s0"])
     write(a.out, "tooth-numbering-cv-matchorder-s0", ["score_cv.py", "calib_sweep.py"], csvs, MATCH_BODY,
           False, TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-score-s0"])
+    write(a.out, "tooth-numbering-cv-confmatch-s0", ["score_cv.py", "calib_sweep.py", "label_check.py"],
+          csvs + ["Dataset/yolo_train_dataset"], CONFMATCH_BODY, False,
+          TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-score-s0"])
+    write(a.out, "tooth-numbering-cv-shiftctx-s0", ["shift_test.py", "context_test.py"],
+          csvs + ["Dataset/bb_u_net_dataset/panoramic_x_rays"], SHIFTCTX_BODY, True,
+          TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-confmatch-s0"])
 
 
 if __name__ == "__main__":

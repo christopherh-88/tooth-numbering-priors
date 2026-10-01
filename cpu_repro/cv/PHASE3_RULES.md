@@ -98,3 +98,20 @@ sorted by detector confidence, then IoU), next to the IoU-first result.
   confidence-0.5 value, the drop is a matcher artifact and the paper says so.
 - If the 0.5 / 0.5 gap of any detector changes by more than 0.5 pp,
   Section 60 is reported under both matchers.
+
+## Note 2026-10-01 (after the matcher-order check): confidence-first rescore
+
+Added after RESULTS.md Section 64, approved by the user before running.
+Kernel `tooth-numbering-cv-confmatch-s0` (CPU) redoes the Section 60
+scoring, the joint-failure set, the calibration (item 2) and the label
+check (LABEL_CHECK_RULES.md) with confidence-first matching, from the same
+saved detections. The shift test is not included: it kept only matched
+answers, not raw boxes, so redoing it needs GPU inference.
+
+**Rule.**
+- If the joint same-wrong set changes by 5 teeth or fewer (symmetric
+  difference with the 151), every detector's AUROC moves by less than
+  0.02, and the label-error share r_J moves by less than 2 pp, Sections 61
+  and 62 stand and a note says so.
+- Otherwise a new section reports the confidence-first numbers next to the
+  old ones, and the paper uses the confidence-first numbers.

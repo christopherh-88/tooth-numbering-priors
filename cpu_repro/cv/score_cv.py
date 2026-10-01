@@ -1,7 +1,7 @@
 """Score the Phase 2 CV runs (cpu_repro/cv/PHASE2_CV_RULES.md, frozen 2026-10-01).
 
     python cpu_repro/cv/score_cv.py --det yolov8x=<dir> [--det rtdetr_l=<dir> --det fasterrcnn=<dir>] \
-        --out <dir> [--boxes cpu_repro/cv/boxes.csv --folds cpu_repro/cv/folds.csv]
+        --out <dir> [--boxes cpu_repro/cv/boxes.csv --folds cpu_repro/cv/folds.csv] [--match-order conf]
 
 Each <dir> holds fold{0..4}/test_detections.csv from train_cv.py. Uses only
 numpy, pandas and scikit-learn, so it runs unchanged in a Kaggle CPU kernel.
@@ -19,7 +19,8 @@ numpy, pandas and scikit-learn, so it runs unchanged in a Kaggle CPU kernel.
    permutation null, defined as in yolo_training/cross_architecture_agreement.py.
 
 Outputs in --out: per_tooth_predictions.csv, cv_fold_summary.csv,
-cv_pooled_summary.csv, cv_joint_failures.csv (when all three detectors are given).
+cv_pooled_summary.csv, cv_joint_failures.csv (when two or more detectors are given; all of them
+must be wrong, unmissed and agree).
 """
 import argparse
 from pathlib import Path
@@ -168,7 +169,7 @@ def summarize(teeth, dets, rng):
 
 def joint_failures(teeth, dets, rng):
     """Same definitions as yolo_training/cross_architecture_agreement.py's
-    triple_agreement: all three detectors and the position-only model wrong,
+    triple_agreement: every given detector and the position-only model wrong,
     no detector missed the tooth."""
     jf = teeth[~teeth["coord_correct"]]
     for d in dets:
@@ -200,8 +201,11 @@ def main():
     ap.add_argument("--boxes", type=Path, default=here / "boxes.csv")
     ap.add_argument("--folds", type=Path, default=here / "folds.csv")
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--match-order", choices=["iou", "conf"], default="iou")
     a = ap.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
+    global MATCH_ORDER
+    MATCH_ORDER = a.match_order
     rng = np.random.default_rng(0)
 
     teeth = position_only(pd.read_csv(a.boxes), pd.read_csv(a.folds))
@@ -222,8 +226,8 @@ def main():
     pd.set_option("display.width", 200)
     print(folds.round(2).to_string(index=False))
     print(pooled[pooled["comparison"] == "position_only"].round(2).to_string(index=False))
-    if len(dets) == 3:
-        jf = joint_failures(teeth, dets, rng)
+    if len(dets) >= 2:
+        jf = joint_failures(teeth, dets, rng).assign(detectors=" ".join(dets))
         jf.to_csv(a.out / "cv_joint_failures.csv", index=False, float_format="%.4f")
         print(jf.round(2).T.to_string())
 

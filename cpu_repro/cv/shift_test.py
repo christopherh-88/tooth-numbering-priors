@@ -5,7 +5,8 @@ of height), fills the uncovered strip with black, moves the labeled boxes
 with it, and runs each detector's model from the fold that tests that
 X-ray. Runs in a Kaggle GPU kernel (see kaggle/make_phase3_kernels.py):
 
-    python shift_test.py --repo <repo checkout> --models <dir with *_cvseed0/> --out <dir>
+    python shift_test.py --repo <repo checkout> --models <dir with *_cvseed0/> --out <dir> \
+        [--match-order conf --save-raw]   # PHASE3_BATCH2_RULES.md item 1
 
 Writes shift_per_tooth.csv (one row per tooth, detector and condition) and
 shift_summary.csv (per detector and condition: accuracy change with a
@@ -22,7 +23,9 @@ CONDITIONS = [(0.0, 0.0), (-0.10, 0.0), (-0.05, 0.0), (0.05, 0.0), (0.10, 0.0), 
 CONF, MATCH_IOU, NMS_IOU, IMGSZ = 0.5, 0.5, 0.7, 640
 FEATURES = ["x_center", "y_center", "width", "height", "area", "aspect_ratio"]
 N_BOOT = N_PERM = 10_000
-SECTION60_TOP1 = {"yolov8x": 94.8974, "rtdetr_l": 93.8287, "fasterrcnn": 92.5961}
+MATCH_ORDER = "iou"  # "conf" for PHASE3_BATCH2_RULES.md item 1
+SECTION60_TOP1 = {"iou": {"yolov8x": 94.8974, "rtdetr_l": 93.8287, "fasterrcnn": 92.5961},
+                  "conf": {"yolov8x": 94.9836, "rtdetr_l": 95.1560, "fasterrcnn": 92.8202}}  # Section 64
 
 
 def add_shape(df):
@@ -47,15 +50,17 @@ def iou(a, b):
 
 
 def match(gt_xyxy, det_cls, det_conf, det_xyxy):
-    """Greedy one-to-one IoU matching, class-agnostic, as score_cv.match."""
+    """Greedy one-to-one matching, class-agnostic, as score_cv.match (IoU-first
+    or confidence-first by MATCH_ORDER)."""
     pred = np.full(len(gt_xyxy), np.nan)
     keep = det_conf >= CONF
-    det_cls, det_xyxy = det_cls[keep], det_xyxy[keep]
+    det_cls, det_conf, det_xyxy = det_cls[keep], det_conf[keep], det_xyxy[keep]
     if len(det_cls) == 0 or len(gt_xyxy) == 0:
         return pred
     m = iou(gt_xyxy, det_xyxy)
+    key = (lambda i, j: (m[i, j],)) if MATCH_ORDER == "iou" else (lambda i, j: (det_conf[j], m[i, j]))
     used_g, used_d = set(), set()
-    for _, i, j in sorted(((m[i, j], i, j) for i, j in zip(*np.nonzero(m >= MATCH_IOU))), reverse=True):
+    for *_, i, j in sorted((key(i, j) + (i, j) for i, j in zip(*np.nonzero(m >= MATCH_IOU))), reverse=True):
         if i in used_g or j in used_d:
             continue
         used_g.add(i)
@@ -110,7 +115,12 @@ def main():
     ap.add_argument("--repo", type=Path, required=True)
     ap.add_argument("--models", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--match-order", choices=["iou", "conf"], default="iou")
+    ap.add_argument("--save-raw", action="store_true", help="also write shift_raw_detections.csv")
     a = ap.parse_args()
+    global MATCH_ORDER
+    MATCH_ORDER = a.match_order
+    expected = SECTION60_TOP1[MATCH_ORDER]
     a.out.mkdir(parents=True, exist_ok=True)
     rng = np.random.default_rng(0)
 
@@ -122,7 +132,7 @@ def main():
         for f in range(5)}
     img_dir = a.repo / "Dataset/bb_u_net_dataset/panoramic_x_rays"
 
-    rows = []
+    rows, raw = [], []
     for det in ("yolov8x", "rtdetr_l", "fasterrcnn"):
         run = next(a.models.rglob(f"{det}_cvseed0"))
         for f in range(5):
@@ -137,7 +147,10 @@ def main():
                                      s.x_center + s.width / 2, s.y_center + s.height / 2], 1)
                     inside = ((xyxy >= 0) & (xyxy <= 1)).all(1)
                     s, xyxy = s[inside], xyxy[inside]
-                    pred = match(xyxy, *model(shift_image(img, dx_px, dy_px)))
+                    out = model(shift_image(img, dx_px, dy_px))
+                    pred = match(xyxy, *out)
+                    if a.save_raw:
+                        raw += [(det, dx, dy, image_id, int(c), float(p), *map(float, b)) for c, p, b in zip(*out)]
                     coord_pred = coord[f].predict(add_shape(s)[FEATURES]) if len(s) else []
                     rows += [dict(detector=det, dx=dx, dy=dy, image_id=image_id, fold=f, fdi=r.fdi,
                                   class_id=r.class_id, det_pred=p, coord_pred=c)
@@ -145,12 +158,15 @@ def main():
             print(det, "fold", f, "done", flush=True)
     t = pd.DataFrame(rows)
     t.to_csv(a.out / "shift_per_tooth.csv", index=False)
+    if a.save_raw:
+        pd.DataFrame(raw, columns=["detector", "dx", "dy", "image_id", "class_id", "conf", "x1", "y1", "x2", "y2"]
+                     ).to_csv(a.out / "shift_raw_detections.csv", index=False, float_format="%.5f")
 
     summary = []
     for det, d in t.groupby("detector"):
         base = d[(d.dx == 0) & (d.dy == 0)].set_index(["image_id", "fdi"])
         top1_0 = 100 * (base["det_pred"] == base["class_id"]).mean()
-        print(f"{det}: unshifted top-1 {top1_0:.4f} (Section 60: {SECTION60_TOP1[det]:.4f})", flush=True)
+        print(f"{det}: unshifted top-1 {top1_0:.4f} (Section 60, {MATCH_ORDER}-first: {expected[det]:.4f})", flush=True)
         for (dx, dy), c in d.groupby(["dx", "dy"]):
             if dx == 0 and dy == 0:
                 continue
@@ -163,6 +179,11 @@ def main():
             follow = float((ch["det_pred"] == ch["coord_pred"]).mean()) if len(ch) else np.nan
             null = np.array([np.mean(ch["det_pred"].to_numpy() == rng.permutation(ch["coord_pred"].to_numpy()))
                              for _ in range(N_PERM)]) if len(ch) else np.array([np.nan])
+            # Restricted: only changed teeth whose position-only answer is wrong.
+            cw = ch[ch["coord_pred"] != ch["class_id"]]
+            follow_w = float((cw["det_pred"] == cw["coord_pred"]).mean()) if len(cw) else np.nan
+            null_w = np.array([np.mean(cw["det_pred"].to_numpy() == rng.permutation(cw["coord_pred"].to_numpy()))
+                               for _ in range(N_PERM)]) if len(cw) else np.array([np.nan])
             summary.append(dict(
                 detector=det, dx=dx, dy=dy, n_teeth=len(j), n_xrays=j["image_id"].nunique(),
                 top1_unshifted=100 * j["ok0"].mean(), top1_shifted=100 * j["ok1"].mean(),
@@ -171,7 +192,10 @@ def main():
                 n_changed=len(ch), follow_pct=100 * follow, follow_null_mean_pct=100 * np.nanmean(null),
                 follow_null_p95_pct=100 * np.nanpercentile(null, 95),
                 follow_p=float(np.mean(null >= follow)) if len(ch) else np.nan,
-                unshifted_full_top1=top1_0, section60_top1=SECTION60_TOP1[det]))
+                n_changed_pos_wrong=len(cw), follow_pos_wrong_pct=100 * follow_w,
+                follow_pos_wrong_null_p95_pct=100 * np.nanpercentile(null_w, 95),
+                follow_pos_wrong_p=float(np.mean(null_w >= follow_w)) if len(cw) else np.nan,
+                match_order=MATCH_ORDER, unshifted_full_top1=top1_0, section60_top1=expected[det]))
     pd.DataFrame(summary).to_csv(a.out / "shift_summary.csv", index=False, float_format="%.4f")
     print(pd.DataFrame(summary).round(2).to_string(index=False))
 

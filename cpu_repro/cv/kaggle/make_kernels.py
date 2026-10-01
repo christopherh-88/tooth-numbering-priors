@@ -1,6 +1,6 @@
 """Write one Kaggle kernel per detector for the Phase 2 CV runs.
 
-    python cpu_repro/cv/kaggle/make_kernels.py --commit <git sha> --out <dir> [--folds 0 1 2 3 4]
+    python cpu_repro/cv/kaggle/make_kernels.py --commit <git sha> --out <dir> [--folds 0 1 2 3 4] [--cv-seed 1]
 
 Each kernel clones this repo from GitHub at the given commit (code and the
 uncropped X-rays and masks, which git tracks in Dataset/bb_u_net_dataset),
@@ -17,7 +17,7 @@ REPO_URL = "https://github.com/christopherh-88/tooth-numbering-priors.git"
 ULTRALYTICS = "ultralytics==8.4.143"  # same version as cpu_repro/requirements.txt
 WATCHDOG_SECONDS = 11 * 3600
 
-SCRIPT = '''"""Phase 2 CV kernel: {detector}, folds {folds}, repo commit {commit}."""
+SCRIPT = '''"""Phase 2 CV kernel: {detector}, CV seed {cv_seed}, folds {folds}, repo commit {commit}."""
 import shutil, subprocess, sys, time
 from pathlib import Path
 
@@ -55,7 +55,7 @@ print("versions: torch", torch.__version__, "torchvision", torchvision.__version
 t0 = time.time()
 cmd = [sys.executable, str(REPO / "cpu_repro/cv/train_cv.py"), "--detector", DETECTOR,
        "--out-root", str(OUT), "--work", "/kaggle/working/prepared", "--device", "0",
-       "--folds", *map(str, FOLDS)]
+       "--folds", *map(str, FOLDS), "--cv-seed", "{cv_seed}"]
 try:
     sh(cmd, cwd=str(REPO), timeout={watchdog})
     status = "finished"
@@ -85,13 +85,14 @@ def main():
     ap.add_argument("--detectors", nargs="+", default=["yolov8x", "rtdetr_l", "fasterrcnn"])
     ap.add_argument("--folds", type=int, nargs="+", default=[0, 1, 2, 3, 4])
     ap.add_argument("--suffix", default="")
+    ap.add_argument("--cv-seed", type=int, default=0)
     a = ap.parse_args()
     for det in a.detectors:
-        name = f"tooth-numbering-cv-{det.replace('_', '-')}-s0{a.suffix}"
+        name = f"tooth-numbering-cv-{det.replace('_', '-')}-s{a.cv_seed}{a.suffix}"
         d = a.out / name
         d.mkdir(parents=True, exist_ok=True)
         (d / f"{name}.py").write_text(SCRIPT.format(
-            detector=det, folds=a.folds, commit=a.commit, ultralytics=ULTRALYTICS,
+            detector=det, folds=a.folds, commit=a.commit, cv_seed=a.cv_seed, ultralytics=ULTRALYTICS,
             repo_url=REPO_URL, watchdog=WATCHDOG_SECONDS))
         (d / "kernel-metadata.json").write_text(json.dumps({
             "id": f"{USER}/{name}", "title": name, "code_file": f"{name}.py",

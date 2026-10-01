@@ -53,10 +53,8 @@ def fold_lists(work: Path, fold: int):
 
 
 def prepare(work: Path, cv_seed: int):
-    if cv_seed != prep.SPLIT_SEED:
-        raise SystemExit("only CV seed 0 is prepared so far (cpu_repro/cv/folds.csv)")
     boxes = pd.read_csv(HERE / "boxes.csv")
-    folds = pd.read_csv(HERE / "folds.csv")
+    folds = pd.read_csv(prep.folds_path(cv_seed))  # folds.csv for seed 0, folds_seed<s>.csv otherwise
     prep.write_yolo(work, boxes, folds)
 
 
