@@ -4892,6 +4892,92 @@ rates with CIs, not lists of teeth.
 context masking, batch 3) uses the confidence-first set. The blinded dentist sheet should be drawn from the
 161, not the 151.
 
+## 66. Batch 3: realistic position-only gap, an arch-order fix, a review flag, and power
+
+Date 2026-10-01. Script `cpu_repro/cv/batch3.py`, Kaggle kernel
+`tooth-numbering-cv-batch3-s0` (CPU; a 20-X-ray smoke pass, then the full
+run). Rules: `cpu_repro/cv/PHASE3_BATCH3_RULES.md`, approved and frozen
+before the run, with clarifications written at freezing. Seed 0 raw
+detections, confidence-first matching, joint set of 161 (Section 65).
+Tables in `cpu_repro/cv/results/kaggle_batch3/`, rebuilt from the kernel log
+(3 decimals, as printed).
+
+### A. Position-only model on predicted boxes: rule 1, the gap stands
+
+| Detector | Matched teeth | Position-only, labeled box | Position-only, predicted box | Change, pp (95% CI) | Gap on predicted boxes |
+|---|---|---|---|---|---|
+| YOLOv8x | 11,420 | 78.8% | 80.0% | +1.2 (0.5 to 1.9) | 16.2 pp |
+| RT-DETR-l | 11,512 | 78.6% | 80.2% | +1.6 (0.9 to 2.3) | 15.6 pp |
+| Faster R-CNN | 11,492 | 78.6% | 79.0% | +0.5 (-0.2 to 1.2) | 14.5 pp |
+
+All three changes are within 2 pp, so the Section 65 gaps stand as stated.
+Fed the detector's own box, the position-only model is slightly better,
+not worse. A likely reason, not tested: the labeled boxes come from the
+full extent of each tooth mask, roots included, and vary more than the
+boxes the detectors draw. Either way, giving the position-only model
+labeled boxes did not flatter it, and the realistic gap (14.5 to 16.2 pp)
+is close to the reported one (14.3 to 16.7 pp).
+
+### B. Tooth-order post-processor: rule 2 for all three
+
+| Detector | Top-1 before | After order constraint | Change, pp (95% CI) | Joint failures, this detector post-processed |
+|---|---|---|---|---|
+| YOLOv8x | 94.98% | 94.87% | -0.11 (-0.36 to 0.13) | 161 to 153 (-5.0%) |
+| RT-DETR-l | 95.16% | 94.70% | -0.46 (-0.97 to 0.02) | 161 to 151 (-6.2%) |
+| Faster R-CNN | 92.82% | 92.89% | +0.07 (-0.68 to 0.75) | 161 to 157 (-2.5%) |
+
+All three post-processed together: 161 to 158. Collapsing duplicate boxes
+alone changes top-1 by under 0.04 pp, so these numbers are the order
+constraint's own effect.
+
+Every change in top-1 is under 0.5 pp, and joint failures fall by 2.5 to
+6%, far from the 30% in rule 1. Forcing each arch into strict left-to-right
+order barely changes the answers: the detectors' output already follows arch
+order almost everywhere, so the shared errors are not out-of-order
+labels. They fit a run of neighboring teeth all labeled one position off,
+which an order constraint cannot detect. (This reading follows rule 2;
+counting such runs directly was not part of the run.) RT-DETR-l comes
+closest to a loss (-0.46 pp, CI just touching 0).
+
+### C. Risk-coverage and the look-alike flag: rule 2 for all three
+
+| Detector | AURC (95% CI) | Teeth flagged by look-alike rule | Joint failures caught: look-alike / confidence at the same count | Ratio |
+|---|---|---|---|---|
+| YOLOv8x | 0.024 (0.019 to 0.031) | 331 (2.9%) | 11 / 13 of 161 | 0.85 |
+| RT-DETR-l | 0.021 (0.015 to 0.027) | 10,683 (92.1%) | 152 / 155 | 0.98 |
+| Faster R-CNN | 0.018 (0.014 to 0.024) | 2,469 (21.3%) | 53 / 66 | 0.80 |
+
+The look-alike flag never reaches 1.5 times the confidence threshold; it
+does slightly worse for all three. For RT-DETR-l it is useless as defined:
+RT-DETR-l emits an adjacent-class box at confidence 0.1 or more for 92% of
+teeth, so the flag fires almost everywhere. For YOLOv8x it catches more
+misnumbered teeth overall than confidence does (109 against 84 of 400) but
+not more joint failures.
+
+What this adds to Section 65: flagging the 2.9% least confident YOLOv8x
+teeth catches 13 of the 161 joint failures (8%). Neither the detectors'
+confidence nor their second choices point at these teeth. A review rule
+for them would have to come from outside the detector, for example a
+dentist checking the count and order of the whole arch.
+
+### D. Power
+
+Standard errors from the X-ray bootstrap; minimum detectable difference
+(MDE) at 80% power, two-sided alpha 0.05.
+
+| Comparison | Observed, pp (95% CI) | MDE, pp |
+|---|---|---|
+| RT-DETR-l minus YOLOv8x | +0.17 (-0.17 to 0.53) | 0.50 |
+| Faster R-CNN minus YOLOv8x | -2.16 (-2.68 to -1.66) | 0.72 |
+| Faster R-CNN minus RT-DETR-l | -2.34 (-2.87 to -1.83) | 0.75 |
+| Seed 0 vs seed 1, YOLOv8x / RT-DETR-l / Faster R-CNN | (pending) | 1.65 / 1.54 / 1.91 |
+
+The paper may say Faster R-CNN numbers teeth about 2 pp worse than the
+other two, and must call YOLOv8x and RT-DETR-l a tie. A seed 1 result that
+differs from seed 0 by less than about 1.5 pp cannot be told apart from
+seed 0; the seed MDEs treat the two splits as independent, which
+overstates them (both splits test the same X-rays).
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

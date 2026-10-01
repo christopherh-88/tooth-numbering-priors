@@ -1,0 +1,7 @@
+comparison,observed_pp,se_pp,mde_pp,ci_lo,ci_hi
+yolov8x: seed 0 vs seed 1 (independent-split approximation),,0.588,1.649,,
+rtdetr_l: seed 0 vs seed 1 (independent-split approximation),,0.548,1.536,,
+fasterrcnn: seed 0 vs seed 1 (independent-split approximation),,0.682,1.911,,
+rtdetr_l minus yolov8x (paired by X-ray),0.172,0.178,0.498,-0.167,0.534
+fasterrcnn minus yolov8x (paired by X-ray),-2.163,0.255,0.716,-2.675,-1.660
+fasterrcnn minus rtdetr_l (paired by X-ray),-2.336,0.266,0.746,-2.869,-1.827

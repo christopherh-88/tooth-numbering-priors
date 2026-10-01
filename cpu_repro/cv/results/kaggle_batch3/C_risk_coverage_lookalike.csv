@@ -1,0 +1,4 @@
+detector,aurc,aurc_lo,aurc_hi,n_flagged,flagged_pct,n_joint,joint_caught_lookalike,joint_caught_conf,ratio,misnumbered_caught_lookalike,misnumbered_caught_conf,n_misnumbered,rule
+yolov8x,0.024,0.019,0.031,331,2.853,161,11,13,0.846,109,84,400,2
+rtdetr_l,0.021,0.015,0.027,10683,92.079,161,152,155,0.981,452,461,472,2
+fasterrcnn,0.018,0.014,0.024,2469,21.281,161,53,66,0.803,474,539,723,2

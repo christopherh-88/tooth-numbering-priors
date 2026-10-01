@@ -172,3 +172,40 @@ After a Zenodo-archived release exists:
 > (archived version: doi:10.5281/zenodo.XXXXXXX).
 
 Blocked until the Zenodo setup is done.
+
+## 7. Numbers that Phases 2 and 3 change (added 2026-10-01)
+
+Sections 1 to 6 above use only numbers already in the submitted paper.
+Phases 2 and 3 (RESULTS.md Sections 59 to 65) changed some of them. Which
+set the CJSJ version reports is the author's call; these are the
+replacements if it moves to the uncropped cross-validation results. Not
+applied to the docx.
+
+| Claim in the paper | Submitted | Uncropped 5-fold CV, confidence-first matching (Sections 60, 64, 65) |
+|---|---|---|
+| Detector minus position-only gap | 24 to 25 pp | 14.3 to 16.7 pp (CIs 13.0 to 18.1) |
+| Position-only top-1 | about 69% | 78.5% (76.9 to 80.0) |
+| Detector top-1 | 93 to 95% | 92.8 to 95.2% |
+| Teeth every model got wrong | about 2% | 1.4% (161 of 11,602) |
+| Same wrong tooth across the three detectors | 97% | 99.4% |
+| Shared wrong answer = position-only answer | 84 to 88% | 91.3% (chance p95 6.8%) |
+| Shared wrong answer is a neighbor | nearly all | 94.4% |
+
+Why the gap shrank: most test images in the submitted split are
+Roboflow's randomly cropped copies (Section 59). Cropping moves teeth
+within the frame, which costs the position-only model about 8 pp (68.4% on
+cropped copies against 76.8% on uncropped originals) while the detectors
+barely change, so it inflates the gap. The uncropped CV uses only the
+original X-rays.
+
+New findings that could support the mechanism sentence:
+- Detectors are confidently wrong on these teeth (AUROC 0.53 to 0.66,
+  Section 65), so a confidence threshold would not catch them.
+- About 10% of the shared errors are teeth whose label is disputed by a
+  second annotation (Section 61, 65); the position match holds without them
+  (91.7%).
+- Shifting the whole image 10% sideways barely changes the detectors'
+  answers (under 0.4 pp, Section 63), so "typical position" in the
+  mechanism sentence should read as position relative to the neighboring
+  teeth, not position in the frame. Shift test v2 and context masking
+  (running) will sharpen this.

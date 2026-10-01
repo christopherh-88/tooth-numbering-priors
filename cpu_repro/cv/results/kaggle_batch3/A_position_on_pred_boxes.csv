@@ -1,0 +1,4 @@
+detector,n_matched,coord_on_label_box_matched_top1,coord_on_pred_box_matched_top1,change_pp,change_lo,change_hi,coord_on_pred_box_all_teeth_top1,coord_on_label_box_all_teeth_top1,gap_on_pred_box_pp,gap_on_label_box_pp,rule
+yolov8x,11420,78.827,80.026,1.2,0.519,1.891,78.771,78.495,16.213,16.489,1
+rtdetr_l,11512,78.596,80.195,1.598,0.949,2.265,79.572,78.495,15.584,16.661,1
+fasterrcnn,11492,78.576,79.046,0.47,-0.213,1.151,78.297,78.495,14.523,14.325,1
