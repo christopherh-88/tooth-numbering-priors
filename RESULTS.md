@@ -4978,6 +4978,123 @@ differs from seed 0 by less than about 1.5 pp cannot be told apart from
 seed 0; the seed MDEs treat the two splits as independent, which
 overstates them (both splits test the same X-rays).
 
+## 67. Shift test v2 (confidence-first, restricted follow rate): rule 3 again
+
+Date 2026-10-01. `shift_test.py --match-order conf --save-raw`, Kaggle kernel
+`tooth-numbering-cv-shiftctx-s0` (T4, seed 0 fold models). Rule:
+`cpu_repro/cv/PHASE3_BATCH2_RULES.md` item 1, frozen before the run. Table:
+`cpu_repro/cv/results/kaggle_shift_v2/shift_summary.csv` (from the kernel
+log, 2 decimals). Raw detections for every condition are in the kernel
+output (`shift_raw_detections.csv`), not copied to the repo.
+
+**Check.** Unshifted top-1 equals the confidence-first Section 60 values
+to four decimals (94.9836, 95.1560, 92.8202).
+
+Follow rate restricted to changed teeth whose position-only answer is wrong:
+
+| Detector | Shift | Top-1 change, pp (95% CI) | Changed teeth, position-only wrong | Follow rate | Chance p95 |
+|---|---|---|---|---|---|
+| YOLOv8x | dx -10% | +0.03 (-0.09 to 0.15) | 19 (under 20: not graded) | 21.1% | 15.8% |
+| YOLOv8x | dx +10% | +0.03 (-0.10 to 0.15) | 23 | 17.4% | 13.0% |
+| RT-DETR-l | dx -10% | -0.10 (-0.27 to 0.06) | 59 | 18.6% | 8.5% |
+| RT-DETR-l | dx +10% | -0.02 (-0.18 to 0.15) | 67 | 9.0% | 7.5% |
+| Faster R-CNN | dx -10% | -0.11 (-0.48 to 0.26) | 401 | 12.5% | 5.0% |
+| Faster R-CNN | dx +10% | -0.26 (-0.63 to 0.11) | 409 | 14.9% | 5.1% |
+
+**Graded: rule 3 for all three**, as in Section 63. Accuracy moves by under
+0.3 pp, well inside rule 1, but every graded follow rate is above its
+chance 95th percentile, so rule 1 is not met; rule 2 is far away. With
+confidence-first matching far fewer teeth change for RT-DETR-l (70 against
+about 200 in Section 63), which confirms that most of its Section 63
+changes were the matcher switching between duplicate boxes.
+
+**Reading.** Unchanged from Section 63. A shift of two tooth-widths, which
+leaves the position-only model right on under 9% of teeth, changes the
+detectors' answer on 0.2% (YOLOv8x), 0.6% (RT-DETR-l) and 3.8% (Faster R-CNN)
+of teeth. On the few that change, the new answer leans toward the
+position-only answer more than chance: about 4 YOLOv8x teeth, 6 to 11
+RT-DETR-l teeth and 50 to 61 Faster R-CNN teeth per shift. Absolute
+position in the frame has a small, real pull on a few teeth and no effect
+on accuracy.
+
+## 68. Context masking: two detectors lose a quarter of their accuracy without neighbors; the shared wrong answers survive
+
+Date 2026-10-01. `context_test.py`, same kernel as Section 67. Rule:
+`cpu_repro/cv/PHASE3_BATCH2_RULES.md` item 2, frozen before the run.
+Sample: the 161 confidence-first joint failures (Section 65) and 1,000
+control teeth (all three detectors correct, seed 0). Everything outside the
+tooth's box widened by k box widths each side and k box heights above and
+below is blacked out. Table: `cpu_repro/cv/results/kaggle_context/context_summary.csv`
+(from the kernel log, 2 decimals).
+
+**Control teeth** (all correct on the full image, so the change equals the
+masked top-1 minus 100):
+
+| Detector | k | Top-1 (missed = wrong) | Change, pp (95% CI) | Missed | Top-1 among detected |
+|---|---|---|---|---|---|
+| YOLOv8x | 0.5 | 59.4% | -40.6 (-43.8 to -37.4) | 37.2% | 94.6% |
+| YOLOv8x | 1 | 90.4% | -9.6 (-11.7 to -7.7) | 7.2% | 97.4% |
+| YOLOv8x | 2 | 99.2% | -0.8 (-1.4 to -0.3) | 0.4% | 99.6% |
+| RT-DETR-l | 0.5 | 35.7% | -64.3 (-67.3 to -61.4) | 51.5% | 73.6% |
+| RT-DETR-l | 1 | 74.1% | -25.9 (-29.0 to -22.9) | 17.0% | 89.3% |
+| RT-DETR-l | 2 | 95.6% | -4.4 (-5.9 to -3.1) | 1.6% | 97.2% |
+| Faster R-CNN | 0.5 | 43.0% | -57.0 (-60.1 to -53.9) | 27.0% | 58.9% |
+| Faster R-CNN | 1 | 74.0% | -26.0 (-28.8 to -23.2) | 8.8% | 81.1% |
+| Faster R-CNN | 2 | 93.9% | -6.1 (-7.8 to -4.5) | 0.7% | 94.6% |
+
+**Graded at k = 1:** Faster R-CNN rule 1 (-26.0 pp), RT-DETR-l rule 1
+(-25.9 pp), YOLOv8x rule 3 (-9.6 pp). For Faster R-CNN and RT-DETR-l the
+relative-position reading is supported: without the teeth beyond the
+immediate neighbors they lose about a quarter of their accuracy.
+
+**Audit of the drop.** The rule counts a missed tooth as wrong, as the
+paper does, and masking makes many teeth undetectable: a lone tooth in a
+black frame looks nothing like training data. Among teeth still detected,
+the drop at k = 1 is smaller: YOLOv8x 2.6 pp, RT-DETR-l 10.7 pp, Faster
+R-CNN 18.9 pp. So the ordering holds (Faster R-CNN leans on context most,
+YOLOv8x least) but part of each headline drop is detection, not numbering.
+For YOLOv8x the numbering itself barely depends on context: 94.6% of the
+teeth it still finds at k = 0.5 get the right number. Whether this reflects
+YOLOv8x's mosaic augmentation (which trains on scrambled context) is not
+tested here.
+
+**Joint failures** (161 teeth; no rule):
+
+| Detector | k | Still the shared wrong answer | Now correct | Other wrong | Missed |
+|---|---|---|---|---|---|
+| YOLOv8x | 0.5 | 51.6% | 6.2% | 2.5% | 39.8% |
+| YOLOv8x | 1 | 87.6% | 5.6% | 0.6% | 6.2% |
+| YOLOv8x | 2 | 96.3% | 1.2% | 0.6% | 1.9% |
+| RT-DETR-l | 0.5 | 42.2% | 5.0% | 8.7% | 44.1% |
+| RT-DETR-l | 1 | 67.7% | 7.5% | 3.7% | 21.1% |
+| RT-DETR-l | 2 | 90.1% | 6.2% | 0.0% | 3.7% |
+| Faster R-CNN | 0.5 | 38.5% | 17.4% | 16.1% | 28.0% |
+| Faster R-CNN | 1 | 63.4% | 13.0% | 9.3% | 14.3% |
+| Faster R-CNN | 2 | 91.9% | 5.0% | 2.5% | 0.6% |
+
+Removing context rarely fixes a joint failure. Among teeth still detected
+at k = 1, the shared wrong answer stays for 93% (YOLOv8x), 86% (RT-DETR-l)
+and 74% (Faster R-CNN); the correct answer appears for 6 to 15%. Even at
+k = 0.5, with only half of each neighbor visible, 53 to 86% of detected
+joint failures keep the shared wrong answer.
+
+**What Sections 63 to 68 together say about the mechanism.** This is a
+reading across sections, not a graded result. The detectors' answers
+barely depend on absolute position (Sections 63, 67). Two of the three
+depend substantially on the surrounding teeth for correct teeth (this
+section). But the shared wrong answers persist without that context and
+without any shift: the detectors give the wrong number from the tooth and
+its immediate surroundings, and the position-only model gives the same
+wrong number from the box (91%, Section 65). That fits teeth that both
+look like and sit where their neighbor usually is (for example after a
+missing tooth or drift), more than detectors falling back on typical
+position to break a tie. The paper's "position as a tie-breaker" sentence
+should be weakened to what is shown: detector and position-only errors
+coincide on the same teeth with the same wrong answer, and the
+interventions here do not show the detectors using position to produce
+it. The tooth-level check that would separate the two readings (are joint
+failures next to a gap or in a crowded arch?) is not yet run.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

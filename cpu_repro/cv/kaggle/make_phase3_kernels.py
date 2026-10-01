@@ -11,6 +11,8 @@ matching (RESULTS.md Section 64). tooth-numbering-cv-shiftctx-s0 (T4):
 shift test v2 and context masking (PHASE3_BATCH2_RULES.md items 1 and 2).
 tooth-numbering-cv-batch3-s0 (CPU): batch3.py (PHASE3_BATCH3_RULES.md).
 tooth-numbering-cv-dentist-s0 (CPU): dentist_sheet.py (LABEL_CHECK_RULES.md check C).
+tooth-numbering-cv-seed1-score (CPU): seed 0 and seed 1 scored with YOLOv8x and
+RT-DETR-l, confidence-first (PHASE3_BATCH2_RULES.md item 3).
 Each kernel
 embeds the scripts it runs (written to disk at start, so the code that ran
 is visible in the kernel itself), reads the training and scoring kernels'
@@ -143,6 +145,25 @@ shutil.rmtree(REPO)
 '''
 
 
+SEED1_BODY = '''import score_cv
+subprocess.run(["git", "-C", str(REPO), "fetch", "--quiet", "origin", "f12fa7bb0f34828ec967261d263ef1a985f5fa47"], check=True)
+subprocess.run(["git", "-C", str(REPO), "checkout", "--quiet", "f12fa7bb0f34828ec967261d263ef1a985f5fa47", "--",
+                "cpu_repro/cv/folds_seed1.csv"], check=True)
+folds = {0: REPO / "cpu_repro/cv/folds.csv", 1: REPO / "cpu_repro/cv/folds_seed1.csv"}
+for seed in (0, 1):
+    args = ["score_cv.py", "--out", f"/kaggle/working/seed{seed}_2det", "--match-order", "conf",
+            "--boxes", str(REPO / "cpu_repro/cv/boxes.csv"), "--folds", str(folds[seed])]
+    for det in ["yolov8x", "rtdetr_l"]:
+        found = sorted(p for p in Path("/kaggle/input").rglob(f"{det}_cvseed{seed}") if p.is_dir())
+        assert len(found) == 1, (det, seed, found)
+        args += ["--det", f"{det}={found[0]}"]
+    print(f"===== seed {seed}", flush=True)
+    sys.argv = args
+    score_cv.main()
+shutil.rmtree(REPO)
+'''
+
+
 def write(out, name, files, paths, body, gpu, sources):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
@@ -176,6 +197,8 @@ def main():
     write(a.out, "tooth-numbering-cv-shiftctx-s0", ["shift_test.py", "context_test.py"],
           csvs + ["Dataset/bb_u_net_dataset/panoramic_x_rays"], SHIFTCTX_BODY, True,
           TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-confmatch-s0"])
+    seed1_sources = [f"{USER}/tooth-numbering-cv-{d}-s{s}" for d in ("yolov8x", "rtdetr-l") for s in (0, 1)]
+    write(a.out, "tooth-numbering-cv-seed1-score", ["score_cv.py"], csvs, SEED1_BODY, False, seed1_sources)
     write(a.out, "tooth-numbering-cv-dentist-s0", ["dentist_sheet.py"], ["Dataset/bb_u_net_dataset/panoramic_x_rays"],
           DENTIST_BODY, False, [f"{USER}/tooth-numbering-cv-confmatch-s0"])
     write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,
