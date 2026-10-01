@@ -3659,6 +3659,14 @@ been rerun. Both are reported as missing, not silently dropped.
 `detector_backend_comparison.py` prints every expected seed that has no
 result as `MISSING`.
 
+**Update (2026-10-01):** both gaps above are closed. CUDA seeds 12-14
+were run for all three detectors and the RT-DETR-l seed 10 rerun
+completed; `detector_backend_comparison.py`, rerun on 2026-10-01, prints
+results for CUDA seeds 10-14 for every detector and no `MISSING` line,
+and its CSV output is unchanged. See `BACKEND_COMPARISON.md` and
+Section 52. Seed 10 still has no three-detector join (Section 52), since
+only its RT-DETR-l checkpoint was downloaded.
+
 Metric convention throughout (same as Section 31): **all-GT top-1** is
 the headline (a labeled tooth with no matching predicted box counts as
 wrong), with missed-tooth rate and matched-only top-1 as secondary.

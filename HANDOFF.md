@@ -1,12 +1,54 @@
-# Handoff (last synced 2026-09-28)
+# Handoff (last synced 2026-10-01)
 
 Read this first in the next session before doing anything else. It exists
-so nothing has to be re-derived from chat history. **The section below is
-current; the "What's actually done" / "Exact next steps" sections further
+so nothing has to be re-derived from chat history. **The two sections below
+are current; the "What's actually done" / "Exact next steps" sections further
 down are the 2026-09-08 snapshot, kept for the early Claim-A groundwork
 detail. Don't read them as describing where things stand now.**
 
-## Where things stand (2026-09-28)
+## Where things stand (2026-10-01)
+
+**Git:** everything through `eb8ed20` (CJSJ figures) is committed and
+pushed; `main` matches `origin/main`. The 2026-09-28 work below is in
+`e26eec1`, not uncommitted as that entry says.
+
+**CJSJ:** the submission files (`HuangChristopher_paper.docx`, `.pdf`,
+`HuangChristopher_figures.pptx`, `HuangChristopher_form.pdf`) are dated
+2026-09-30 and kept in `~/Downloads`, outside the repo.
+`paper/cjsj/REVISIONS.md` lists planned text edits for a revision
+(abstract and conclusion lead with the tie-breaker mechanism, a "two
+implications" paragraph, the 24 to 25 pp gap as the one repeated number,
+the joint-failure result moved earlier). They are notes only; the docx is
+unchanged. `paper_numbers.py` passes (rerun 2026-10-01 in `.venv312`; the
+system `python3` has no pandas). The Zenodo DOI for the repo link is on
+hold by the user's choice.
+
+**Housekeeping checked 2026-10-01:** RT-DETR-l seed 10 rerun and CUDA
+seeds 12-14 are done for all three detectors (`RESULTS.md` Section 49
+update note); seed 10 still has no three-detector join because only its
+RT-DETR-l checkpoint was downloaded. The `requirements.txt` CUDA-wheel bug
+is fixed (Section 55). The YOLOv8x seed 7/9 missed-tooth spikes are traced
+to single training runs (Section 53). Open: which README lines were
+dropped in the `5a0ecd6` rewrite (ask the user before restoring any).
+
+**Next target: MICCAI 2027** (deadline assumed about Feb 2027). The plan
+was written up in a chat outside this repo (`claude/tooth-numbering-roadmap.md`
+and `claude/cjsj-revisions-from-hyunjun.md` were referenced but never
+saved here). Phase 2 items as the user listed them: grouped 5-fold CV
+by source image with a validation split inside each fold (replacing
+best-epoch-on-test selection); Faster R-CNN learning rate scaled for batch
+size 2; bootstrap by image; power analysis before any new supernumerary
+test; missed vs. misnumbered reported separately; cleanlab on joint
+failures plus a sample for a dentist to re-check; detectors trained on
+DENTEX and a two-way cross-dataset gap table; position-only model rebuilt
+from detector-predicted boxes; IoU/confidence sweeps, calibration on joint
+failures, Geirhos kappa next to phi. Then Phase 3 (shift/crop/pad
+intervention and retraining YOLOv8x without zero-padding position cues)
+and Phase 4 (MICCAI packaging). Write each experiment's decision rule and
+show it to the user before running; ask before any long Kaggle run or
+anything that overwrites results.
+
+## Where things stood (2026-09-28)
 
 **New this session (`RESULTS.md` Section 58):** a CJSJ version of the paper
 (`paper/cjsj/`, due 2026-09-30) with `paper_numbers.py`, which recomputes
@@ -247,7 +289,7 @@ reasoning that led to Task 2 isn't lost; don't treat it as pending.
 
 ## Actual next steps (2026-09-28)
 
-0. **CJSJ submission, due 2026-09-30:** upload `HuangChristopher_paper.docx`,
+0. **CJSJ submission, due 2026-09-30 (files dated 2026-09-30; see the 2026-10-01 entry at the top):** upload `HuangChristopher_paper.docx`,
    `HuangChristopher_figures.pptx` and the signed Permission to Publish form
    (`HuangChristopher_form.pdf`, needs a PI/mentor/teacher signature)
    through the CJSJ portal. Rerun `python paper/cjsj/paper_numbers.py` if
