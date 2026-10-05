@@ -1,0 +1,7 @@
+seed,metric,n,point,lo,hi,seed1_inside_seed0_ci
+0,gap_pp_yolov8x,,16.4885,15.0893,17.8623,True
+0,gap_pp_rtdetr_l,,16.6609,15.2586,18.0572,True
+0,position_match_pct,191.0000,90.0524,84.4444,94.8389,True
+1,gap_pp_yolov8x,,15.7559,14.4022,17.1022,True
+1,gap_pp_rtdetr_l,,15.8938,14.5292,17.2796,True
+1,position_match_pct,195.0000,90.7692,85.6353,95.2381,True

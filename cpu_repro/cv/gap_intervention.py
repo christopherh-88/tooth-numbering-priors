@@ -139,7 +139,7 @@ def main():
                 g = t[t["image_id"] == image_id].reset_index(drop=True)
                 img = cv2.imread(str(img_dir / f"{image_id}.jpg"))
                 gt = np.stack([g.x_center - g.width / 2, g.y_center - g.height / 2,
-                               g.x_center + g.width / 2, g.y_center + g.height / 2], 1).to_numpy()
+                               g.x_center + g.width / 2, g.y_center + g.height / 2], 1)
                 row_of = {fdi: i for i, fdi in enumerate(g["fdi"])}
                 intact = st.match(gt, *model(img))
                 masks = {fdi: load_mask(mask_path[f"{image_id}_{fdi}"], img.shape[:2])

@@ -5149,6 +5149,45 @@ pattern (crowding, rotated or impacted teeth, or the 10% label disputes of
 Section 65). The dentist sheet (161 joint failures, built from the same
 set) can answer part of that.
 
+## 70. CV seed 1: the gap and the shared-error pattern replicate on a new split
+
+Date 2026-10-05. Rule: `PHASE3_BATCH2_RULES.md` item 3, frozen before
+training. Split: `folds_seed1.csv` (`prepare_uncropped_cv.py --split-seed
+1`; 20.9% of X-rays share a test fold with seed 0). YOLOv8x and RT-DETR-l
+retrained on Kaggle T4s (kernels `tooth-numbering-cv-{yolov8x,rtdetr-l}-s1`,
+same settings as seed 0). Both seeds scored in one kernel
+(`tooth-numbering-cv-seed1-score`, `score_cv.py --match-order conf`, two
+detectors). Position-match CI from `seed1_grade.py` (X-ray bootstrap,
+10,000 draws, seed 0), since `score_cv.py` prints only the point.
+Results: `cpu_repro/cv/results/kaggle_seed1/` (`seed1_grade.csv`).
+
+Check first: the seed 0 two-detector gaps (16.49 and 16.66 pp) are the
+Section 65 values, so the rescoring matches.
+
+| | seed 0 (95% CI) | seed 1 (95% CI) | seed 1 inside seed 0 CI |
+|---|---|---|---|
+| Gap, YOLOv8x (pp) | 16.49 (15.09 to 17.86) | 15.76 (14.40 to 17.10) | yes |
+| Gap, RT-DETR-l (pp) | 16.66 (15.26 to 18.06) | 15.89 (14.53 to 17.28) | yes |
+| Joint same-wrong teeth | 191 | 195 | |
+| Position match (%) | 90.05 (84.44 to 94.84) | 90.77 (85.64 to 95.24) | yes |
+| Permutation null mean / p95 (%) | 4.04 / 6.28 | 4.00 / 6.15 | |
+
+**Graded: replication**, for both detectors. The paper keeps the seed 0
+numbers as the headline and reports seed 1 as a replication.
+
+Detail. Both gaps are about 0.75 pp smaller on seed 1. That comes from
+both sides: the position-only model is 0.56 pp better (79.06 vs 78.50)
+and the detectors are 0.16 to 0.20 pp worse (94.82 vs 94.98, 94.96 vs
+95.16). The shift is about the size of the seed MDE in Section 66 D
+(1.5 to 1.9 pp), so it is not a detectable change. Seed 1 fold 2 is the
+weakest fold of either seed (92.26 and 92.67 detector top-1). Of the
+seed 1 same-wrong teeth, 92.8% get the number one place away in the same
+quadrant (94.8% on seed 0).
+
+Limits. One extra seed, two detectors. Seed 1 changes the split and the
+training randomness together, so the two cannot be told apart. Faster
+R-CNN was not retrained (about 4.5 GPU-hours).
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

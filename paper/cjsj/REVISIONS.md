@@ -238,3 +238,16 @@ Suggested addition to "two implications" (section 5 above), replacing
 
 Both use numbers from the uncropped cross-validation (section 7), so they
 only fit if the paper moves to that set.
+
+## 9. Second split (added 2026-10-05)
+
+RESULTS.md Section 70. A new five-fold split (seed 1) with YOLOv8x and
+RT-DETR-l retrained gives gaps of 15.8 and 15.9 pp (seed 0: 16.5 and
+16.7) and the same 91% position match for the shared errors (seed 0:
+90%), all inside the seed 0 confidence intervals. Suggested sentence for
+the limitations or methods paragraph, if the paper moves to the uncropped
+set:
+
+> On a second random split, with YOLOv8x and RT-DETR-l retrained, both
+> gaps and the position match of the shared errors fell inside the first
+> split's 95% confidence intervals.

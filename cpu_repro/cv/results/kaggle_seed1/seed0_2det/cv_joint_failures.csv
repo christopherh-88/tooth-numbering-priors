@@ -1,0 +1,2 @@
+n_teeth,n_joint,joint_pct_of_teeth,n_same_wrong,same_wrong_pct,n_position_match,position_match_pct,null_mean_pct,null_p95_pct,perm_p,neighbor_pct,detectors
+11602,193,1.6635,191,98.9637,172,90.0524,4.0404,6.2827,0.0000,94.7644,yolov8x rtdetr_l
