@@ -5188,6 +5188,82 @@ Limits. One extra seed, two detectors. Seed 1 changes the split and the
 training randomness together, so the two cannot be told apart. Faster
 R-CNN was not retrained (about 4.5 GPU-hours).
 
+## 71. Gap intervention: an empty slot makes each detector fill it sometimes, but almost never all three together
+
+Date 2026-10-05. Rule: `cpu_repro/cv/GAP_INTERVENTION_RULES.md`, frozen
+2026-10-01 before the run. Script `gap_intervention.py`, Kaggle T4 kernel
+`tooth-numbering-cv-gapint-s0` (version 2; version 1 stopped on a bug in
+the smoke test before any results). Seed 0 fold models, confidence-first.
+Up to 3 targets per X-ray, drawn with seed 0: 1,248 targets in 419
+X-rays, the same targets for all three detectors. Each target erased by
+inpainting its mask (dilated 3 px, OpenCV Telea, radius 5). Results:
+`cpu_repro/cv/results/kaggle_gap_intervention/gap_intervention/`.
+
+Visual check of the saved examples: the erased slot reads as a smeared
+empty space, not a black box. Where the tooth carried an orthodontic
+bracket, the bracket is outside the mask and smears into a bright blob.
+The sham is a faint patch in bone.
+
+g is the share of neighbors (numbered right on the intact image) that
+get the erased tooth's number. N2 is the same for teeth two places away;
+sham is g under the sham inpaint. 95% CIs by X-ray bootstrap.
+
+| | YOLOv8x | RT-DETR-l | Faster R-CNN |
+|---|---|---|---|
+| Neighbors scored | 2,394 | 2,392 | 2,310 |
+| g (%) | 1.96 (1.45 to 2.53) | 4.39 (3.57 to 5.25) | 5.71 (4.74 to 6.73) |
+| N2 (%) | 0.00 | 0.00 | 0.05 |
+| Sham (%) | 0.00 | 0.17 | 0.22 |
+| g minus sham, CI low | 1.45 | 3.39 | 4.51 |
+| Neighbor missed after removal (%) | 4.55 | 5.27 | 5.24 |
+| Neighbor still correct (%) | 92.52 | 88.67 | 83.94 |
+| **Rule** | **3** | **3** | **1** |
+
+**Graded:** Faster R-CNN rule 1 (gap filling is causal for it). YOLOv8x
+and RT-DETR-l rule 3: g is clearly above both controls (every CI excludes
+0) but under the 5% bar, so they are reported as measured. No detector is
+rule 2: an empty slot alone is enough to make every detector sometimes
+give a neighbor the missing tooth's number.
+
+**Follow-ups, not in the frozen rule** (`gap_intervention_overlap.py`,
+on the 2,260 neighbors all three detectors number right on the intact
+image):
+
+| Detectors filling the same neighbor | observed | expected if independent |
+|---|---|---|
+| YOLOv8x and RT-DETR-l | 12 | 1.7 |
+| YOLOv8x and Faster R-CNN | 6 | 2.4 |
+| RT-DETR-l and Faster R-CNN | 18 | 5.1 |
+| All three | 4 (0.18%) | 0.09 |
+
+- The detectors fill the same neighbor more often than chance (2.5 to 7
+  times for pairs), but all three together only 4 times in 2,260. In the
+  real data, 72 joint failures sit next to a gap (Section 69), all three
+  detectors and the position-only model agreeing.
+- The fill rate does not depend much on tooth type (YOLOv8x 1.3 to 2.2%,
+  RT-DETR-l 3.1 to 6.5%, Faster R-CNN 4.5 to 6.4%).
+- When a tooth two places away goes wrong, it often takes the number of
+  the tooth between it and the gap (33% for Faster R-CNN, 63% for
+  RT-DETR-l, 53% for YOLOv8x, of 101, 38 and 17 errors): part of the run
+  shifts one place toward the gap.
+
+**Reading.** An empty slot is a cause, in every detector, but a weak and
+detector-specific one. It does not reproduce the shared failure of
+Section 69: there all three detectors and the position-only model give
+the same tooth the missing number. Inpainting leaves every other tooth
+where it was, and the position-only model, which sees only the labeled
+boxes, cannot change at all. So the shared failure at real gaps most
+likely needs what an inpainted gap lacks: the neighbor having drifted or
+tipped into the space, so that its box sits where the missing tooth's
+box would be. That fits the position-only model failing on the same
+teeth. This last step is an interpretation; nothing here moves a tooth.
+
+Limits. Inpainting is not an extraction (no drift, tipping or bone
+change). Dilating the mask by 3 px can clip a neighbor's contact edge,
+which may explain part of the 4.5 to 5.3% of neighbors missed after
+removal (under 1% for N2). Bracket smears are visible in the erased
+slot. One seed of fold models.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

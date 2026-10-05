@@ -1,0 +1,13 @@
+detector,type,fill_pct,n
+fasterrcnn,canine,4.46,336
+fasterrcnn,incisor,6.40,875
+fasterrcnn,molar,6.25,448
+fasterrcnn,premolar,5.07,651
+rtdetr_l,canine,6.50,354
+rtdetr_l,incisor,4.41,907
+rtdetr_l,molar,4.54,463
+rtdetr_l,premolar,3.14,668
+yolov8x,canine,1.70,353
+yolov8x,incisor,2.20,909
+yolov8x,molar,1.30,462
+yolov8x,premolar,2.24,670

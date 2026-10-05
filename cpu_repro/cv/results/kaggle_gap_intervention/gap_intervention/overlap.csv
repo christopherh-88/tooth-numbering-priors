@@ -1,0 +1,8 @@
+detectors,n,observed,expected_if_independent
+yolov8x,2260,42,
+rtdetr_l,2260,89,
+fasterrcnn,2260,129,
+yolov8x rtdetr_l,2260,12,1.65
+yolov8x fasterrcnn,2260,6,2.40
+rtdetr_l fasterrcnn,2260,18,5.08
+yolov8x rtdetr_l fasterrcnn,2260,4,0.09

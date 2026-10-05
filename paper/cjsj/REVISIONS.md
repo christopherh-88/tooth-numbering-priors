@@ -251,3 +251,21 @@ set:
 > On a second random split, with YOLOv8x and RT-DETR-l retrained, both
 > gaps and the position match of the shared errors fell inside the first
 > split's 95% confidence intervals.
+
+## 10. Gap intervention, and a limit on section 8 (added 2026-10-05)
+
+RESULTS.md Section 71. Erasing a tooth from the image makes each detector
+sometimes give a neighbor the erased tooth's number (2.0% YOLOv8x, 4.4%
+RT-DETR-l, 5.7% Faster R-CNN, against near 0 for the controls). All
+three do it to the same tooth only 4 times in 2,260. So an empty slot
+alone does not produce the shared errors of section 8.
+
+The section 8 wording should not say that a gap causes the shared
+errors. Suggested replacement for its last clause:
+
+> ... and there every model, with or without image pixels, gives the
+> tooth the number of the missing one. Erasing a tooth from the image
+> makes each detector do this only occasionally and seldom together,
+> so the shared errors likely depend on the neighbor having moved into
+> the space, which is where the position-only model also places the
+> missing tooth.

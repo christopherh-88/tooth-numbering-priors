@@ -1,0 +1,4 @@
+detector,n2_scored,takes_mid_pct,n2_wrong
+fasterrcnn,2062,32.67,101
+rtdetr_l,2094,63.16,38
+yolov8x,2091,52.94,17
