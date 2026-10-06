@@ -288,6 +288,25 @@ TIP_S1_BODY = CLOSURE_S1_BODY.replace('"--cv-seed", "1",', '"--cv-seed", "1", "-
     "closure_s1", "closure_tip_s1")
 TIP_S2_BODY = CLOSURE_S2_BODY.replace('"--cv-seed", "2",', '"--cv-seed", "2", "--mode", "tip",').replace(
     "closure_s2", "closure_tip_s2")
+GAP_FLAG_BODY = '''import gap_flag
+subprocess.run(["git", "-C", str(REPO), "fetch", "--quiet", "origin", "01cfa88b4a73d07cc7b84b6c96242026cdb6faa2"], check=True)
+subprocess.run(["git", "-C", str(REPO), "checkout", "--quiet", "01cfa88b4a73d07cc7b84b6c96242026cdb6faa2", "--",
+                "cpu_repro/cv/folds_seed1.csv", "cpu_repro/cv/folds_seed2.csv"], check=True)
+for seed, folds in ((0, "folds.csv"), (1, "folds_seed1.csv"), (2, "folds_seed2.csv")):
+    args = ["gap_flag.py", "--repo", str(REPO), "--folds", str(REPO / "cpu_repro/cv" / folds), "--seed", str(seed)]
+    for det in ["yolov8x", "rtdetr_l", "fasterrcnn"]:
+        found = sorted(p for p in Path("/kaggle/input").rglob(f"{det}_cvseed{seed}")
+                       if p.is_dir() and "/repo/" not in str(p))
+        assert len(found) == 1, (det, seed, found)
+        args += ["--det", f"{det}={found[0]}"]
+    if seed == 0:
+        sys.argv = args + ["--out", "/kaggle/working/gap_flag_smoke", "--images", "20"]
+        gap_flag.main()
+        print("smoke run done; full runs follow", flush=True)
+    sys.argv = args + ["--out", "/kaggle/working/gap_flag"]
+    gap_flag.main()
+shutil.rmtree(REPO)
+'''
 
 
 def write(out, name, files, paths, body, gpu, sources):
@@ -368,6 +387,8 @@ def main():
     write(a.out, "tooth-numbering-cv-tip-s2", closure_files, closure_paths, TIP_S2_BODY, True,
           [f"{USER}/tooth-numbering-cv-{d}-s2" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")]
           + [f"{USER}/tooth-numbering-cv-seed2-score3"])
+    write(a.out, "tooth-numbering-cv-gapflag", ["score_cv.py", "batch3.py", "gap_flag.py"], csvs, GAP_FLAG_BODY,
+          False, [f"{USER}/tooth-numbering-cv-{d}-s{s}" for s in (0, 1, 2) for d in ("yolov8x", "rtdetr-l", "fasterrcnn")])
     write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,
           TRAIN_KERNELS)
 
