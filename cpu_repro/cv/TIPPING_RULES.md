@@ -63,3 +63,11 @@ models, same targets. Graded: replicated if the CI of j(full tip) minus
 j(open) excludes 0 and j(full tip) falls inside the seed 0 95% CI (7.73
 to 11.03%, RESULTS.md Section 80); otherwise both are reported with the
 spread. The paste check is reported as for seed 0.
+
+## Dated note 2026-10-06: replication on the seed 2 models (approved, frozen)
+
+The same procedure on the seed 2 split models and seed 2 position-only
+models, same targets. Graded: replicated if the CI of j(full tip) minus
+j(open) excludes 0 and j(full tip) falls inside the seed 0 95% CI (7.73
+to 11.03%, RESULTS.md Section 80); otherwise both are reported with the
+spread. The paste check is reported as for seed 0.
