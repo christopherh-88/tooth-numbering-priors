@@ -47,15 +47,25 @@ to gaps vs a retrained control; not extended to the other detectors).
 Paper (DRAFT.md, latex/main.tex) updated through Section 77; PDF builds at
 7 pages.
 
-**Running:** only `tooth-numbering-cv-fasterrcnn-s2` (seed 2, last
-training job). When COMPLETE: push `tooth-numbering-cv-seed2-score3`
-(built by `make_phase3_kernels.py`), pull `seed[02]_3det/*.csv` into
-`cpu_repro/cv/results/kaggle_seed2_3det`, run
-`seed1_grade.py --dir results/kaggle_seed2_3det --dets yolov8x rtdetr_l fasterrcnn --other-seed 2`,
-grade by `PHASE3_BATCH2_RULES.md` (dated note seed 2), write Section 78,
-and add the seed 2 gaps to the paper's Table 1. Training kernel outputs
-contain a repo copy: filter inputs to `/cv_out/` and `confmatch-s0`
-(done in make_phase3_kernels.py).
+**Done 2026-10-06 (later):** Section 78 (seed 2 split replicates all
+three detectors; joint-failure sets overlap about 0.55 between splits),
+79 (closure intervention replicates on the seed 1 models: 22.5% vs 0.0%
+open), 80 (tipping the neighbor into the space also causes the shared
+error, 9.4% vs 0.19% open; a repaste control gives 0.0%, so not a paste
+artifact; sliding gives 21.5% on the same movers). Paper updated through
+Section 80; PDF builds at 7 pages.
+
+**Running:** `tooth-numbering-cv-closure-s2` (closure on seed 2 models,
+graded by the seed 2 note in CLOSURE_INTERVENTION_RULES.md) and
+`tooth-numbering-cv-rtdetr-l-s0-tseed1`; queued
+`tooth-numbering-cv-fasterrcnn-s0-tseed1` (both training kernels built
+by make_kernels.py at commit 8f1dbd0 with --train-args="--train-seed 1").
+When both training kernels finish: push `tooth-numbering-cv-tseed-score3`,
+then `seed1_grade.py --dir results/kaggle_tseed_3det --dets yolov8x
+rtdetr_l fasterrcnn --other-tag tseed1` (PHASE3_BATCH2_RULES.md
+training-seed note; compare the joint-failure overlap with 0.572 and
+0.538 for the split changes). Kaggle sometimes fails a GPU kernel before
+it starts (empty log); retrying once has worked both times.
 
 **Decided or dropped:** no mAP (Metrics Reloaded file says why); the
 dentist re-read is dropped (the blinded sheet code stays,
