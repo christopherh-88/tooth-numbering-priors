@@ -265,8 +265,9 @@ on the other side [R76]. Of 1,114 moved teeth that all three detectors
 numbered right on the intact X-ray, all three gave the missing tooth's
 number to 0.18% with the space open, 2.9% when moved halfway and 20.8%
 when moved all the way (difference 20.7 points, CI 18.2 to 23.1); each
-detector alone did so 38 to 42% of the time. Models trained on a second
-split give the same result (22.5% at full closure, 0.0% open) [R79].
+detector alone did so 38 to 42% of the time. Models trained on two further
+splits give the same result (22.5% and 21.8% at full closure, at most
+0.1% open) [R79, R81].
 Tipping the neighbor about its root apex until its crown touches, which
 is closer to how real teeth drift, gives 9.4% (CI 7.7 to 11.0), near the
 11% per neighbor at real closed gaps; cutting the tooth out and pasting

@@ -5641,6 +5641,33 @@ Limits. In-plane rotation only; the root rotates with the crown; paste
 edges remain (the repaste control shows they do not drive the result);
 47 targets never touched and were skipped. Seed 0 models only.
 
+## 81. Closure intervention replicates on the seed 2 models
+
+Date 2026-10-06. Rule: dated note 2026-10-06 (seed 2) in
+`CLOSURE_INTERVENTION_RULES.md`, frozen before the run. Kernel
+`tooth-numbering-cv-closure-s2` (version 2; version 1 failed on Kaggle
+before the script started, with an empty log, as closure-s1 version 1
+did). Same procedure and the same 1,239 targets as Sections 76 and 79,
+with the seed 2 split models and seed 2 position-only models. Results:
+`cpu_repro/cv/results/kaggle_closure_s2/closure_s2/`.
+
+Check: position-only answers on unmoved boxes agree with the stored seed 2
+answers (1.0000).
+
+| All three detectors give the missing number (%) | open | half | closed (95% CI) |
+|---|---|---|---|
+| Seed 0 models (Section 76) | 0.18 | 2.87 | 20.83 (18.35 to 23.30) |
+| Seed 1 models (Section 79) | 0.00 | 2.84 | 22.52 (20.04 to 25.02) |
+| **Seed 2 models** (1,132 movers) | 0.09 | 2.12 | **21.82 (19.52 to 24.17)** |
+
+Each detector alone at full closure: YOLOv8x 42.8%, RT-DETR-l 42.6%,
+Faster R-CNN 36.5%.
+
+**Graded: replicated.** Closed minus open is 21.73 points (19.44 to
+24.07), and j(closed) lies inside the seed 0 CI. The closure effect now
+holds on three independently trained sets of models on three splits
+(20.8, 22.5, 21.8%).
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the
