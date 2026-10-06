@@ -64,3 +64,23 @@ with the seed 0 recipe and scored confidence-first. Graded by item 3
 above, unchanged: per detector, if the seed 2 gap and the three-detector
 joint position match fall inside the seed 0 95% CIs, seed 2 is reported
 as a replication; otherwise all splits are reported with the spread.
+
+## Dated note 2026-10-06: training seed on the same split (approved, frozen)
+
+Section 70 and 75 change the split and the training randomness together.
+This separates them. RT-DETR-l and Faster R-CNN are retrained on the seed 0
+split with training seed 1 (`train_cv.py --train-seed 1`; for Faster R-CNN
+this sets torch's seed, which the original runs did not set). YOLOv8x
+already has this run (`yolov8x_cvseed0_tseed1`, the Section 77 control).
+Scored together, confidence-first.
+
+Graded as item 3: per detector, replicated if the training-seed-1 gap
+falls inside the original seed 0 95% CI; and the three-detector joint
+position match inside its seed 0 CI (85.71 to 96.00%). Also reported, no
+rule: the size of the new joint-failure set and its overlap with the
+original 161 (shared teeth over the union), next to the same overlap for
+split 1 (Section 75), to say how much of the set's turnover is training
+randomness and how much is the split.
+
+Cost: about 3 h (RT-DETR-l) plus 4.5 h (Faster R-CNN) on a T4, then a CPU
+scoring kernel.

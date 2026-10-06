@@ -263,6 +263,27 @@ shutil.rmtree(REPO)
 '''
 
 
+TIP_BODY = CLOSURE_BODY.replace("str(per_tooth[0])]", "str(per_tooth[0]), \"--mode\", \"tip\"]").replace(
+    "closure_intervention_smoke", "closure_tip_smoke").replace('"/kaggle/working/closure_intervention"]',
+                                                               '"/kaggle/working/closure_tip"]')
+CLOSURE_S2_BODY = (CLOSURE_S1_BODY.replace("folds_seed1.csv", "folds_seed2.csv").replace("seed1_3det", "seed2_3det")
+                   .replace('"--cv-seed", "1"', '"--cv-seed", "2"').replace("closure_s1", "closure_s2"))
+TSEED_BODY = '''import score_cv
+for tag, suffix in (("seed0_3det", ""), ("tseed1_3det", "_tseed1")):
+    args = ["score_cv.py", "--out", f"/kaggle/working/{tag}", "--match-order", "conf",
+            "--boxes", str(REPO / "cpu_repro/cv/boxes.csv"), "--folds", str(REPO / "cpu_repro/cv/folds.csv")]
+    for det in ["yolov8x", "rtdetr_l", "fasterrcnn"]:
+        found = sorted(p for p in Path("/kaggle/input").rglob(f"{det}_cvseed0{suffix}")
+                       if p.is_dir() and "/cv_out/" in str(p))
+        assert len(found) == 1, (det, suffix, found)
+        args += ["--det", f"{det}={found[0]}"]
+    print(f"===== {tag}", flush=True)
+    sys.argv = args
+    score_cv.main()
+shutil.rmtree(REPO)
+'''
+
+
 def write(out, name, files, paths, body, gpu, sources):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
@@ -326,6 +347,15 @@ def main():
           csvs + ["Dataset/bb_u_net_dataset/panoramic_x_rays", "Dataset/bb_u_net_dataset/labels"], CLOSURE_S1_BODY,
           True, [f"{USER}/tooth-numbering-cv-{d}-s1" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")]
           + [f"{USER}/tooth-numbering-cv-seed1-score3"])
+    closure_files = ["shift_test.py", "gap_check.py", "gap_intervention.py", "closure_intervention.py"]
+    closure_paths = csvs + ["Dataset/bb_u_net_dataset/panoramic_x_rays", "Dataset/bb_u_net_dataset/labels"]
+    write(a.out, "tooth-numbering-cv-tip-s0", closure_files, closure_paths, TIP_BODY, True,
+          TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-confmatch-s0"])
+    write(a.out, "tooth-numbering-cv-closure-s2", closure_files, closure_paths, CLOSURE_S2_BODY, True,
+          [f"{USER}/tooth-numbering-cv-{d}-s2" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")]
+          + [f"{USER}/tooth-numbering-cv-seed2-score3"])
+    write(a.out, "tooth-numbering-cv-tseed-score3", ["score_cv.py"], csvs, TSEED_BODY, False,
+          TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-{d}-s0-tseed1" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")])
     write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,
           TRAIN_KERNELS)
 

@@ -41,13 +41,15 @@ def main():
     ap.add_argument("--dir", type=Path, required=True)
     ap.add_argument("--dets", nargs="+", default=["yolov8x", "rtdetr_l"])
     ap.add_argument("--other-seed", type=int, default=1, help="the split compared with seed 0 (1 or 2)")
+    ap.add_argument("--other-tag", default=None, help="folder prefix of the compared run (default seed<other-seed>), "
+                                                       "e.g. tseed1 for the training-seed run on split 0")
     a = ap.parse_args()
     DETS = a.dets
     tag = f"{len(DETS)}det"
     rows = []
     other = a.other_seed
     for s in (0, other):
-        d = a.dir / f"seed{s}_{tag}"
+        d = a.dir / (f"seed{s}_{tag}" if s == 0 or a.other_tag is None else f"{a.other_tag}_{tag}")
         pooled = pd.read_csv(d / "cv_pooled_summary.csv")
         for det in DETS:
             r = pooled[(pooled["detector"] == det) & (pooled["metric"] == "gap_pp")].iloc[0]
@@ -59,8 +61,23 @@ def main():
     s1 = out[out.seed == other].set_index("metric")
     out[f"seed{other}_inside_seed0_ci"] = out["metric"].map(
         lambda m: bool(s0.loc[m, "lo"] <= s1.loc[m, "point"] <= s0.loc[m, "hi"]))
-    out.to_csv(a.dir / f"seed{other}_grade.csv", index=False, float_format="%.4f")
+    name = a.other_tag or f"seed{other}"
+    out.to_csv(a.dir / f"{name}_grade.csv", index=False, float_format="%.4f")
     print(out.round(2).to_string(index=False))
+    # Turnover of the joint-failure set: shared teeth over the union (no rule).
+    sets = []
+    for d in (a.dir / f"seed0_{tag}", a.dir / (f"{a.other_tag}_{tag}" if a.other_tag else f"seed{other}_{tag}")):
+        t = pd.read_csv(d / "per_tooth_predictions.csv", dtype={"fdi": str})
+        p = [t[f"{x}_pred"] for x in DETS]
+        sw = t["coord_pred"] != t["class_id"]
+        for x in p:
+            sw &= (x != t["class_id"]) & x.notna()
+        for x in p[1:]:
+            sw &= p[0] == x
+        sets.append(set(zip(t.loc[sw, "image_id"], t.loc[sw, "fdi"])))
+    inter, union = len(sets[0] & sets[1]), len(sets[0] | sets[1])
+    print(f"joint-failure overlap: {inter} shared of {union} (Jaccard {inter / union:.3f}); "
+          f"sizes {len(sets[0])} and {len(sets[1])}", flush=True)
 
 
 if __name__ == "__main__":

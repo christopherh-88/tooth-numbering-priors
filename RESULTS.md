@@ -5530,6 +5530,39 @@ Limits. One detector, one augmentation recipe (probability 0.5, one tooth
 per X-ray), one training seed per arm. The joint-failure set comes from
 the original models.
 
+## 78. CV seed 2: a third split replicates all three detectors
+
+Date 2026-10-06. Rule: `PHASE3_BATCH2_RULES.md`, dated note 2026-10-05
+(seed 2), graded as item 3. Split `folds_seed2.csv` (each fold overlaps
+at most about 26% with any fold of the other splits). YOLOv8x, RT-DETR-l
+and Faster R-CNN trained with the seed 0 recipe at commit `01cfa88`
+(kernels `tooth-numbering-cv-{yolov8x,rtdetr-l,fasterrcnn}-s2`), scored
+with seed 0 in `tooth-numbering-cv-seed2-score3` (confidence-first).
+Grading: `seed1_grade.py --other-seed 2`. Results:
+`cpu_repro/cv/results/kaggle_seed2_3det/` (`seed2_grade.csv`).
+
+Check: the seed 0 rows reproduce Section 65.
+
+| | seed 0 (95% CI) | seed 1 (Section 75) | seed 2 | seed 2 inside seed 0 CI |
+|---|---|---|---|---|
+| Position-only top-1 (%) | 78.50 | 79.06 | 78.68 | |
+| Gap, YOLOv8x (pp) | 16.49 (15.09 to 17.86) | 15.76 | 16.41 | yes |
+| Gap, RT-DETR-l (pp) | 16.66 (15.26 to 18.06) | 15.89 | 16.39 | yes |
+| Gap, Faster R-CNN (pp) | 14.33 (12.97 to 15.69) | 13.80 | 14.26 | yes |
+| Joint same-wrong teeth | 161 | 166 | 165 | |
+| Position match (%) | 91.30 (85.71 to 96.00) | 91.57 | 90.91 | yes |
+
+**Graded: replication for all three detectors.** Across three splits the
+gaps span 15.8 to 16.5 (YOLOv8x), 15.9 to 16.7 (RT-DETR-l) and 13.8 to
+14.3 pp (Faster R-CNN), and the position match 90.9 to 91.6%.
+
+Turnover of the joint-failure set (no rule): seed 0 and seed 2 share 114
+of 212 teeth (Jaccard 0.54); seed 0 and seed 1 share 119 of 208 (0.57).
+About half the individual teeth change with the split while the rate and
+the position match stay put: the pattern is stable, the particular teeth
+less so. The training-seed runs (PHASE3_BATCH2_RULES.md, 2026-10-06 note)
+will say how much of that turnover is training randomness alone.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

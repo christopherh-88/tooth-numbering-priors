@@ -173,8 +173,13 @@ def run_ultralytics(detector, fold, work, out, device, smoke, train_seed=0):
 
 
 # ---------------------------------------------------------------- Faster R-CNN
-def run_fasterrcnn(fold, work, out, device, smoke):
+def run_fasterrcnn(fold, work, out, device, smoke, train_seed=0):
     import torch
+    if train_seed:  # the original runs set no seed; only seed when asked (PHASE3_BATCH2_RULES.md, 2026-10-06)
+        import random
+        random.seed(train_seed)
+        np.random.seed(train_seed)
+        torch.manual_seed(train_seed + fold)
     from PIL import Image
     from torch.utils.data import DataLoader, Dataset
     from torchvision.models.detection import (FasterRCNN_ResNet50_FPN_V2_Weights,
@@ -336,7 +341,7 @@ def main():
         t0 = time.time()
         if a.detector == "fasterrcnn":
             dev = "cpu" if a.device == "cpu" else f"cuda:{a.device}"
-            run_fasterrcnn(fold, a.work, out, dev, a.smoke)
+            run_fasterrcnn(fold, a.work, out, dev, a.smoke, a.train_seed)
         else:
             run_ultralytics(a.detector, fold, a.work, out, a.device, a.smoke, a.train_seed)
         print(f"fold {fold} done in {(time.time() - t0) / 60:.1f} min", flush=True)

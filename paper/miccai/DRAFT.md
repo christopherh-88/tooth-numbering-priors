@@ -25,8 +25,8 @@ bounding box and no pixels. On 425 uncropped panoramic X-rays (11,602
 teeth) with five-fold cross-validation grouped by X-ray, it numbers
 78.5% of teeth correctly [R65]. Three detectors of different design
 (YOLOv8x, RT-DETR-l, Faster R-CNN) beat it by 14.3 to 16.7 percentage
-points, on all 32 tooth numbers, and the gap replicates on a second
-split [R65, R70, R74]. Their errors still follow position. On 1.4% of
+points, on all 32 tooth numbers, and the gap replicates on two further
+splits [R65, R75, R78, R74]. Their errors still follow position. On 1.4% of
 teeth all three detectors give the same wrong number, and in 91% of
 these the position-only model gives it too, against under 7% by chance
 [R65]. A sequence of interventions locates these shared errors. Shifting
@@ -69,7 +69,7 @@ contributions:
 1. A position-only baseline, trained in seconds on six box features,
    that numbers 78.5% of teeth correctly under grouped five-fold
    cross-validation. Three detectors beat it by 14 to 17 pp on every
-   tooth number, and the result replicates on a second split.
+   tooth number, and the result replicates on two further splits.
 2. An error analysis showing that the detectors' shared errors are
    position-like: when all three give the same wrong number, the
    position-only model gives that number 91% of the time.
@@ -118,9 +118,9 @@ data adds randomly cropped copies, which move teeth within the frame and
 lowered position-only accuracy by about 8 pp in our earlier splits
 [R59]. X-rays are split into five folds stratified by the dataset's
 category labels; each training fold holds out 15% of its X-rays for model
-selection, and each X-ray is tested once, by models that never saw it. A
-second split with a different seed (seed 1) shares a test fold with the
-first for 20.9% of X-rays [R70].
+selection, and each X-ray is tested once, by models that never saw it. Two
+further splits (seeds 1 and 2) share at most about a quarter of any test
+fold with the first [R70, R78].
 
 ### 3.2 Models
 
@@ -185,22 +185,22 @@ shuffling the position-only model's answers among the joint failures
 
 ### 4.1 Position explains most, detectors add 14 to 17 pp
 
-Table 1. Top-1 on 11,602 teeth, split 0 (95% CI) [R65, R70, R73].
+Table 1. Top-1 on 11,602 teeth, split 0 (95% CI) [R65, R73, R75, R78].
 
-| | Top-1 | Gap over position-only (pp) | Numbered F1 | Split 1 gap (pp) |
+| | Top-1 | Gap over position-only (pp) | Numbered F1 | Splits 2, 3 gap (pp) |
 |---|---|---|---|---|
 | Position-only | 78.5 (76.9 to 80.0) | | | |
-| YOLOv8x | 95.0 (94.2 to 95.8) | 16.5 (15.1 to 17.9) | 95.0 | 15.8 |
-| RT-DETR-l | 95.2 (94.4 to 95.9) | 16.7 (15.3 to 18.1) | 92.3 | 15.9 |
-| Faster R-CNN | 92.8 (91.9 to 93.7) | 14.3 (13.0 to 15.7) | 89.6 | 13.8 |
+| YOLOv8x | 95.0 (94.2 to 95.8) | 16.5 (15.1 to 17.9) | 95.0 | 15.8, 16.4 |
+| RT-DETR-l | 95.2 (94.4 to 95.9) | 16.7 (15.3 to 18.1) | 92.3 | 15.9, 16.4 |
+| Faster R-CNN | 92.8 (91.9 to 93.7) | 14.3 (13.0 to 15.7) | 89.6 | 13.8, 14.3 |
 
 Position alone numbers more than three in four teeth. Each detector beats
 it on all 32 tooth numbers; the per-number gap is smallest at the third
 molars (4.3 to 5.8 pp) and largest at the lower central incisors (up to
 25.5 pp) [R74]. Fed the detectors' own predicted boxes instead of labeled
 ones, the baseline does slightly better (79.0 to 80.2%) and the gap is
-14.5 to 16.2 pp, so labeled boxes do not flatter it [R66]. On split 1 the
-gaps fall inside the split 0 CIs [R70]. YOLOv8x and RT-DETR-l tie on
+14.5 to 16.2 pp, so labeled boxes do not flatter it [R66]. On two further
+splits every gap falls inside the split 0 CI [R75, R78]. YOLOv8x and RT-DETR-l tie on
 top-1 (difference 0.17 pp against a minimum detectable difference of
 0.50 pp) [R66], but RT-DETR-l leaves about 1.9 unmatched boxes per X-ray
 against 0.4, which lowers its F1 by 2.7 pp [R73].
@@ -302,8 +302,8 @@ sideways, which is not drift (real teeth tip and rotate) and leaves paste
 edges, and masks on a 2D projection can touch without the teeth
 touching. Third-molar
 gaps and longer gaps, which hold most missing positions, are outside the
-closure analysis. The detectors were trained once per split; a second
-split replicates the main numbers but changes split and training
+closure analysis. The detectors were trained once per split; two further
+splits replicate the main numbers but change split and training
 randomness together. About 10% of joint failures may be label errors.
 
 ## 6 Conclusion

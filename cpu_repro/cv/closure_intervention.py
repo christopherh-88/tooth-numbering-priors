@@ -25,7 +25,9 @@ from gap_check import ORDER
 from gap_intervention import DILATE_PX, INPAINT_RADIUS, dilate, draw_targets, load_mask
 
 DETS = ["yolov8x", "rtdetr_l", "fasterrcnn"]
-CONDITIONS = {"open": 0.0, "half": 0.5, "closed": 1.0}
+CONDITIONS = {"open": 0.0, "half": 0.5, "closed": 1.0}  # slide mode (Section 76)
+TIP_CONDITIONS = {"open": None, "repaste": 0.0, "half": 0.5, "closed": 1.0}  # tip mode (TIPPING_RULES.md)
+MAX_ANGLE, ANGLE_STEP = 45.0, 0.5
 FEATURES = ["x_center", "y_center", "width", "height", "area", "aspect_ratio"]
 MAX_SHIFT = 200
 N_BOOT = 10_000
@@ -82,6 +84,53 @@ def move_tooth(img, t_region, n_region, s):
     return base
 
 
+def apex(n_mask, upper):
+    """Root apex: mean x of the mask's top rows (upper teeth) or bottom rows (lower teeth)."""
+    ys, xs = np.nonzero(n_mask)
+    edge = ys.min() if upper else ys.max()
+    near = np.abs(ys - edge) <= 2
+    return float(xs[near].mean()), float(edge)
+
+
+def rotate(a, center, angle, nearest=False):
+    import cv2
+    m = cv2.getRotationMatrix2D(center, angle, 1.0)
+    flags = cv2.INTER_NEAREST if nearest else cv2.INTER_LINEAR
+    return cv2.warpAffine(a, m, (a.shape[1], a.shape[0]), flags=flags, borderValue=0)
+
+
+def tip_sign(n_mask, center, direction):
+    """Rotation sign (degrees, OpenCV counter-clockwise positive) that moves N's crown toward M."""
+    x0 = np.nonzero(n_mask)[1].mean()
+    x1 = np.nonzero(rotate(n_mask, center, 2.0, nearest=True))[1].mean()
+    return 1.0 if np.sign(x1 - x0) == direction else -1.0
+
+
+def touch_angle(n_mask, m_mask, center, sign):
+    """Smallest tip angle (degrees) at which N's rotated mask touches or overlaps M's."""
+    m1 = dilate_px(m_mask, 1)
+    for ang in np.arange(ANGLE_STEP, MAX_ANGLE + 1e-9, ANGLE_STEP):
+        if (rotate(n_mask, center, sign * ang, nearest=True) & m1).any():
+            return float(ang)
+    return None
+
+
+def tip_tooth(img, t_region, n_region, center, angle):
+    """Erase T and N's old place, then paste N rotated by angle about its apex (angle 0 = paste back unmoved)."""
+    import cv2
+    base = cv2.inpaint(img, (t_region | n_region).astype(np.uint8), INPAINT_RADIUS, cv2.INPAINT_TELEA)
+    reg = rotate(n_region.astype(np.uint8), center, angle, nearest=True).astype(bool)
+    base[reg] = rotate(img, center, angle)[reg]
+    return base
+
+
+def mask_box(m, shape):
+    ys, xs = np.nonzero(m)
+    h, w = shape
+    x0, x1, y0, y1 = xs.min(), xs.max() + 1, ys.min(), ys.max() + 1
+    return np.array([(x0 + x1) / 2 / w, (y0 + y1) / 2 / h, (x1 - x0) / w, (y1 - y0) / h])
+
+
 def position_models(boxes, folds):
     b = boxes.merge(folds[["image_id", "fold"]], on="image_id", validate="m:1")
     b = b.assign(area=b["width"] * b["height"], aspect_ratio=b["width"] / b["height"])
@@ -122,6 +171,7 @@ def main():
     ap.add_argument("--images", type=int, default=0, help="smoke test on N X-rays spread over the list")
     ap.add_argument("--cv-seed", type=int, default=0, help="which split's models (0, or 1 for the replication)")
     ap.add_argument("--folds", type=Path, default=None, help="folds CSV for that split (default folds.csv)")
+    ap.add_argument("--mode", choices=["slide", "tip"], default="slide", help="slide (Section 76) or tip")
     a = ap.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
     st.MATCH_ORDER = "conf"
@@ -152,26 +202,46 @@ def main():
             t_region = dilate(load_mask(mask_path[f"{image_id}_{T}"], img.shape[:2])).astype(bool)
             n_mask = load_mask(mask_path[f"{image_id}_{N}"], img.shape[:2])
             m_mask = load_mask(mask_path[f"{image_id}_{M}"], img.shape[:2])
-            full = touch_shift(n_mask, m_mask, direction)
-            if full is None:
-                skipped += 1
-                continue
             n_region = dilate(n_mask).astype(bool)
             i_n = row_of[N]
-            for cond, frac in CONDITIONS.items():
-                s = int(round(frac * full)) * direction
-                altered = move_tooth(img, t_region, n_region, s)
-                box = g.loc[i_n, ["x_center", "y_center", "width", "height"]].to_numpy(float).copy()
-                box[0] += s / img.shape[1]
-                jobs.append(dict(image_id=image_id, fold=int(g.loc[0, "fold"]), target=T, mover=N, mesial=M,
-                                 target_class=int(g.loc[row_of[T], "class_id"]),
-                                 mover_class=int(g.loc[i_n, "class_id"]), condition=cond, shift_px=abs(s),
-                                 full_shift_px=full, img=altered, mover_box=box, g=g, row_of=row_of))
+            base = dict(image_id=image_id, fold=int(g.loc[0, "fold"]), target=T, mover=N, mesial=M,
+                        target_class=int(g.loc[row_of[T], "class_id"]), mover_class=int(g.loc[i_n, "class_id"]),
+                        g=g, row_of=row_of)
+            if a.mode == "slide":
+                full = touch_shift(n_mask, m_mask, direction)
+                if full is None:
+                    skipped += 1
+                    continue
+                for cond, frac in CONDITIONS.items():
+                    s = int(round(frac * full)) * direction
+                    box = g.loc[i_n, ["x_center", "y_center", "width", "height"]].to_numpy(float).copy()
+                    box[0] += s / img.shape[1]
+                    jobs.append(base | dict(condition=cond, shift_px=abs(s), full_shift_px=full,
+                                            img=move_tooth(img, t_region, n_region, s), mover_box=box))
+            else:
+                center = apex(n_mask, N[0] in "12")
+                sign = tip_sign(n_mask, center, direction)
+                full = touch_angle(n_mask, m_mask, center, sign)
+                if full is None:
+                    skipped += 1
+                    continue
+                for cond, frac in TIP_CONDITIONS.items():
+                    if frac is None:  # open: only T erased
+                        altered = move_tooth(img, t_region, n_region, 0)
+                        box, ang = g.loc[i_n, ["x_center", "y_center", "width", "height"]].to_numpy(float), 0.0
+                    else:
+                        ang = frac * full
+                        altered = tip_tooth(img, t_region, n_region, center, sign * ang)
+                        box = mask_box(rotate(n_mask, center, sign * ang, nearest=True), img.shape[:2])
+                    jobs.append(base | dict(condition=cond, shift_px=ang, full_shift_px=full, img=altered,
+                                            mover_box=box))
+            n_conds = len(CONDITIONS) if a.mode == "slide" else len(TIP_CONDITIONS)
             if examples < N_EXAMPLES:
-                panels = [img] + [j["img"] for j in jobs[-3:]]
+                panels = [img] + [j["img"] for j in jobs[-n_conds:]]
                 cv2.imwrite(str(a.out / f"example_{image_id}_{T}.png"), np.concatenate(panels, 1))
                 examples += 1
-    print(len(jobs) // 3, "targets with a mover;", skipped, "skipped", flush=True)
+    n_conds = len(CONDITIONS) if a.mode == "slide" else len(TIP_CONDITIONS)
+    print(len(jobs) // n_conds, "targets with a mover;", skipped, "skipped", flush=True)
 
     # Position-only answer for the moved box.
     for j in jobs:
@@ -216,10 +286,10 @@ def main():
     d = pd.DataFrame(rows)
     d.to_csv(a.out / "closure_rows.csv", index=False)
 
-    summarize(d, a.out)
+    summarize(d, a.out, list(CONDITIONS) if a.mode == "slide" else list(TIP_CONDITIONS))
 
 
-def summarize(d, out_dir):
+def summarize(d, out_dir, conds=tuple(CONDITIONS)):
     """Movers all three detectors number right on the intact image; paired rates by condition."""
     key = ["image_id", "target", "condition"]
     base = d.drop_duplicates(key).set_index(key)[["target_class", "mover_class", "position_only_pred"]]
@@ -242,12 +312,18 @@ def summarize(d, out_dir):
     rng = np.random.default_rng(0)
     out = []
     for measure in ["all3", "all4", "pos_fill"] + [f"fill_{x}" for x in DETS] + [f"missed_{x}" for x in DETS]:
-        x = pd.DataFrame({c: wide[(measure, c)].to_numpy() for c in CONDITIONS})
+        x = pd.DataFrame({c: wide[(measure, c)].to_numpy() for c in conds})
         x["image_id"] = wide.index.get_level_values("image_id")
         r = dict(measure=measure, n_movers=n_movers)
         r |= boot_pair(x, "closed", "open", rng)
         r |= {k: v for k, v in boot_pair(x, "half", "open", rng).items() if k.startswith("half")}
+        if "repaste" in conds:  # TIPPING_RULES.md paste check
+            r |= {k: v for k, v in boot_pair(x, "repaste", "open", rng).items() if k.startswith("repaste")}
+            r |= {k: v for k, v in boot_pair(x, "closed", "repaste", rng).items() if k.startswith("closed_minus")}
         r["rule"] = rule(r) if measure == "all3" else np.nan
+        if measure == "all3" and "repaste" in conds:
+            r["paste_confounded"] = bool(r["repaste_minus_open_lo"] > 0
+                                         and r["repaste_minus_open"] > r["closed_minus_open"] / 3)
         out.append(r)
     out = pd.DataFrame(out)
     out.to_csv(out_dir / "closure_summary.csv", index=False, float_format="%.4f")

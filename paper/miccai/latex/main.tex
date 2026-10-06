@@ -27,7 +27,7 @@ box and no pixels. On 425 uncropped panoramic X-rays (11,602 teeth) with
 five-fold cross-validation grouped by X-ray, it numbers 78.5\% of teeth
 correctly. Three detectors of different design (YOLOv8x, RT-DETR-l, Faster
 R-CNN) beat it by 14.3 to 16.7 percentage points, on all 32 tooth numbers,
-and the gap replicates on a second split. Their errors still follow
+and the gap replicates on two further splits. Their errors still follow
 position. On 1.4\% of teeth all three detectors give the same wrong number,
 and in 91\% of these the position-only model gives it too, against under 7\%
 by chance. A sequence of interventions locates these shared errors.
@@ -109,8 +109,8 @@ teeth in the frame and lowered position-only accuracy by about 8 points in
 our earlier splits. X-rays are split into five folds stratified by the
 dataset's categories; each training fold holds out 15\% of its X-rays for
 model selection, and each X-ray is tested once by models that never saw it.
-A second split (another seed) shares a test fold with the first for 20.9\%
-of X-rays.
+Two further splits (other seeds) share at most about a quarter of any test
+fold with the first.
 
 \textbf{Models.} The position-only baseline is a gradient-boosted tree
 classifier (scikit-learn HistGradientBoosting, default settings) on six
@@ -159,18 +159,18 @@ the other side, with its box moved to match.
 
 \begin{table}[t]
 \caption{Top-1 on 11,602 teeth (split 0, 95\% CI) and the gap over the
-position-only model. F1 counts extra boxes. Split 1: gap on the second
-split.}\label{tab:main}
+position-only model. F1 counts extra boxes. Splits 2, 3: gap on two
+further random splits.}\label{tab:main}
 \centering
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{lcccc}
 \toprule
- & Top-1 (\%) & Gap (points) & Numbered F1 & Split 1 gap \\
+ & Top-1 (\%) & Gap (points) & Numbered F1 & Splits 2, 3 gap \\
 \midrule
 Position-only & 78.5 (76.9--80.0) & & & \\
-YOLOv8x & 95.0 (94.2--95.8) & 16.5 (15.1--17.9) & 95.0 & 15.8 \\
-RT-DETR-l & 95.2 (94.4--95.9) & 16.7 (15.3--18.1) & 92.3 & 15.9 \\
-Faster R-CNN & 92.8 (91.9--93.7) & 14.3 (13.0--15.7) & 89.6 & 13.8 \\
+YOLOv8x & 95.0 (94.2--95.8) & 16.5 (15.1--17.9) & 95.0 & 15.8, 16.4 \\
+RT-DETR-l & 95.2 (94.4--95.9) & 16.7 (15.3--18.1) & 92.3 & 15.9, 16.4 \\
+Faster R-CNN & 92.8 (91.9--93.7) & 14.3 (13.0--15.7) & 89.6 & 13.8, 14.3 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -182,7 +182,7 @@ smallest at the third molars (4.3 to 5.8 points) and largest at the lower
 central incisors (up to 25.5). Given the detectors' own predicted boxes
 instead of labeled ones, the baseline does slightly better (79.0 to 80.2\%)
 and the gap is 14.5 to 16.2 points, so labeled boxes do not flatter it. On
-the second split the gaps fall inside the first split's CIs. YOLOv8x and
+two further splits every gap falls inside the first split's CI. YOLOv8x and
 RT-DETR-l tie on top-1 (difference 0.17 against a minimum detectable
 difference of 0.50), but RT-DETR-l leaves about 1.9 unmatched boxes per
 X-ray against 0.4, which lowers its F1 by 2.7 points.
@@ -272,8 +272,8 @@ tooth and no demographic data; we did not validate on an external dataset
 such as DENTEX. The closure intervention slides a tooth sideways, which
 is not drift (real teeth tip and rotate) and leaves paste edges, and masks
 on a 2D projection can touch when the teeth do not. Third-molar and longer gaps,
-which hold most missing positions, are outside the closure analysis. A
-second split replicates the main numbers but changes split and training
+which hold most missing positions, are outside the closure analysis. Two
+further splits replicate the main numbers but change split and training
 randomness together. About 10\% of joint failures may be label errors.
 
 \section{Conclusion}

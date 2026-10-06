@@ -70,3 +70,10 @@ position-only models. Graded: replicated if the CI of j(closed) minus
 j(open) excludes 0 and j(closed) falls inside the seed 0 95% CI (18.35 to
 23.30%, RESULTS.md Section 76); otherwise both are reported with the
 spread.
+
+## Dated note 2026-10-06: replication on the seed 2 models (approved, frozen)
+
+The same procedure and grading as the seed 1 note above, on the seed 2
+split models (`folds_seed2.csv`) and the seed 2 position-only models:
+replicated if the CI of j(closed) minus j(open) excludes 0 and j(closed)
+falls inside the seed 0 95% CI (18.35 to 23.30%).
