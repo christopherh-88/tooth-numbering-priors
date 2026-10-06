@@ -1,0 +1,10 @@
+comparison,subset,n,top1_a,top1_b,diff,diff_lo,diff_hi,rule
+augmented minus control,overall,11602,95.0267,94.9491,0.0776,-0.2482,0.4001,
+augmented minus control,next_to_gap,1364,79.8387,79.7654,0.0733,-1.5521,1.7341,2.0000
+augmented minus control,joint_failures,161,9.3168,7.4534,1.8634,-3.0303,7.3175,
+augmented minus original,overall,11602,95.0267,94.9836,0.0431,-0.2556,0.3324,
+augmented minus original,next_to_gap,1364,79.8387,79.9853,-0.1466,-1.7986,1.4862,
+augmented minus original,joint_failures,161,9.3168,0.0000,9.3168,4.4872,15.5283,
+control minus original,overall,11602,94.9491,94.9836,-0.0345,-0.3358,0.2602,
+control minus original,next_to_gap,1364,79.7654,79.9853,-0.2199,-1.8992,1.4982,
+control minus original,joint_failures,161,7.4534,0.0000,7.4534,3.7037,12.3470,

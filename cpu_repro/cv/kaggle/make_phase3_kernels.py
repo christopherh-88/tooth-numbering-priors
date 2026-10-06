@@ -224,6 +224,45 @@ SEED1_3DET_BODY = SEED1_BODY.replace('["yolov8x", "rtdetr_l"]', '["yolov8x", "rt
 CLOSURE_BODY = GAPINT_BODY.replace("gap_intervention", "closure_intervention").replace('"10"]', '"10"]')
 
 
+AUGGRADE_BODY = '''import gap_augment_grade
+# Training kernels leave a repo copy in their output; use only the real result folders.
+per_tooth = sorted(p for p in Path("/kaggle/input").rglob("per_tooth_predictions.csv")
+                   if "tooth-numbering-cv-confmatch-s0" in str(p) and "/repo/" not in str(p))
+assert len(per_tooth) == 1, per_tooth
+run = {r: sorted(p for p in Path("/kaggle/input").rglob(f"yolov8x_cvseed0{s}") if p.is_dir() and "/cv_out/" in str(p))
+       for r, s in (("original", ""), ("control", "_tseed1"), ("augmented", "_aug"))}
+assert all(len(v) == 1 for v in run.values()), run
+sys.argv = ["gap_augment_grade.py", "--per-tooth", str(per_tooth[0]), "--out", "/kaggle/working/augment"]
+for r, v in run.items():
+    sys.argv += [f"--{r}", str(v[0])]
+gap_augment_grade.main()
+shutil.rmtree(REPO)
+'''
+
+
+SEED2_BODY = (SEED1_3DET_BODY.replace("if p.is_dir())", "if p.is_dir() and \"/cv_out/\" in str(p))").replace("f12fa7bb0f34828ec967261d263ef1a985f5fa47", "01cfa88b4a73d07cc7b84b6c96242026cdb6faa2")
+              .replace("folds_seed1.csv", "folds_seed2.csv").replace("1: REPO", "2: REPO")
+              .replace("for seed in (0, 1):", "for seed in (0, 2):"))
+
+
+CLOSURE_S1_BODY = '''subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "ultralytics==8.4.143"], check=True)
+import closure_intervention
+subprocess.run(["git", "-C", str(REPO), "fetch", "--quiet", "origin", "01cfa88b4a73d07cc7b84b6c96242026cdb6faa2"], check=True)
+subprocess.run(["git", "-C", str(REPO), "checkout", "--quiet", "01cfa88b4a73d07cc7b84b6c96242026cdb6faa2", "--",
+                "cpu_repro/cv/folds_seed1.csv"], check=True)
+per_tooth = sorted(p for p in Path("/kaggle/input").rglob("per_tooth_predictions.csv")
+                   if "seed1_3det" in str(p) and "/repo/" not in str(p))
+assert len(per_tooth) == 1, per_tooth
+args = ["closure_intervention.py", "--repo", str(REPO), "--models", "/kaggle/input", "--per-tooth", str(per_tooth[0]),
+        "--cv-seed", "1", "--folds", str(REPO / "cpu_repro/cv/folds_seed1.csv")]
+sys.argv = args + ["--out", "/kaggle/working/closure_s1_smoke", "--images", "10"]
+closure_intervention.main()
+sys.argv = args + ["--out", "/kaggle/working/closure_s1"]
+closure_intervention.main()
+shutil.rmtree(REPO)
+'''
+
+
 def write(out, name, files, paths, body, gpu, sources):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
@@ -277,6 +316,16 @@ def main():
           ["shift_test.py", "gap_check.py", "gap_intervention.py", "closure_intervention.py"],
           csvs + ["Dataset/bb_u_net_dataset/panoramic_x_rays", "Dataset/bb_u_net_dataset/labels"], CLOSURE_BODY,
           True, TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-confmatch-s0"])
+    write(a.out, "tooth-numbering-cv-augment-grade", ["score_cv.py", "gap_check.py", "gap_augment_grade.py"], csvs,
+          AUGGRADE_BODY, False, [f"{USER}/tooth-numbering-cv-yolov8x-s0", f"{USER}/tooth-numbering-cv-yolov8x-s0-tseed1",
+                                 f"{USER}/tooth-numbering-cv-yolov8x-s0-aug", f"{USER}/tooth-numbering-cv-confmatch-s0"])
+    write(a.out, "tooth-numbering-cv-seed2-score3", ["score_cv.py"], csvs, SEED2_BODY, False,
+          [f"{USER}/tooth-numbering-cv-{d}-s{s}" for d in ("yolov8x", "rtdetr-l", "fasterrcnn") for s in (0, 2)])
+    write(a.out, "tooth-numbering-cv-closure-s1",
+          ["shift_test.py", "gap_check.py", "gap_intervention.py", "closure_intervention.py"],
+          csvs + ["Dataset/bb_u_net_dataset/panoramic_x_rays", "Dataset/bb_u_net_dataset/labels"], CLOSURE_S1_BODY,
+          True, [f"{USER}/tooth-numbering-cv-{d}-s1" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")]
+          + [f"{USER}/tooth-numbering-cv-seed1-score3"])
     write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,
           TRAIN_KERNELS)
 

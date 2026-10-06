@@ -34,8 +34,10 @@ the whole image barely changes the detectors' answers, and masking
 distant context rarely fixes them [R67, R68]. They sit next to a missing
 tooth five times as often as correct teeth and usually take the missing
 tooth's number [R69], and they occur where the neighbors have closed the
-space (AUROC 0.78) [R72], while erasing a tooth, which leaves the space
-open, seldom produces them [R71]. We release the per-tooth table and a
+space (AUROC 0.78) [R72]. Closing a gap on purpose reproduces them: when
+a neighbor is moved into an erased tooth's space, all three detectors give
+it the missing number 21% of the time, against 0.2% when the space is left
+open [R71, R76]. We release the per-tooth table and a
 scorer so new models can be compared with the baseline and on the shared
 failures.
 
@@ -71,8 +73,8 @@ contributions:
 2. An error analysis showing that the detectors' shared errors are
    position-like: when all three give the same wrong number, the
    position-only model gives that number 91% of the time.
-3. Four interventions and checks (image shift, context masking, tooth
-   erasure, and a space-closure measure) that place these errors at
+3. Interventions and checks (image shift, context masking, tooth
+   erasure, a space-closure measure, and closing a gap on purpose) that place these errors at
    closed gaps: next to a missing tooth whose neighbors have moved
    together, so the arch looks complete.
 4. A released per-tooth benchmark with folds, reference predictions and
@@ -174,6 +176,10 @@ shuffling the position-only model's answers among the joint failures
   S is the shortest distance between the two neighbors' masks divided by
   the missing tooth's median width (0 when they touch). We test whether S
   separates gaps with a joint failure from gaps without one.
+- **Gap closure.** After erasing a target tooth, its distal neighbor is
+  cut out and pasted shifted toward the gap by half or all of the
+  distance at which its mask touches the tooth on the other side, with its
+  box moved to match [R76].
 
 ## 4 Results
 
@@ -186,7 +192,7 @@ Table 1. Top-1 on 11,602 teeth, split 0 (95% CI) [R65, R70, R73].
 | Position-only | 78.5 (76.9 to 80.0) | | | |
 | YOLOv8x | 95.0 (94.2 to 95.8) | 16.5 (15.1 to 17.9) | 95.0 | 15.8 |
 | RT-DETR-l | 95.2 (94.4 to 95.9) | 16.7 (15.3 to 18.1) | 92.3 | 15.9 |
-| Faster R-CNN | 92.8 (91.9 to 93.7) | 14.3 (13.0 to 15.7) | 89.6 | [pending, R75] |
+| Faster R-CNN | 92.8 (91.9 to 93.7) | 14.3 (13.0 to 15.7) | 89.6 | 13.8 |
 
 Position alone numbers more than three in four teeth. Each detector beats
 it on all 32 tooth numbers; the per-number gap is smallest at the third
@@ -253,6 +259,15 @@ controls [R71]. But all three detectors do it to the same neighbor in
 only 4 of 2,260 cases (0.18%), while at real gaps 72 joint failures show
 all three agreeing.
 
+**Closing the gap reproduces the shared error.** For the same erased
+teeth, we moved the distal neighbor sideways until it touched the tooth
+on the other side [R76]. Of 1,114 moved teeth that all three detectors
+numbered right on the intact X-ray, all three gave the missing tooth's
+number to 0.18% with the space open, 2.9% when moved halfway and 20.8%
+when moved all the way (difference 20.7 points, CI 18.2 to 23.1); each
+detector alone did so 38 to 42% of the time. A moved tooth keeps its own
+shape, so the detectors number it by the slot it occupies.
+
 ## 5 Discussion
 
 The detectors read teeth; they do not number by position in the frame,
@@ -265,7 +280,7 @@ gives the tooth next to the closed space the missing tooth's number, and
 that tooth also sits roughly where the missing one would. Appearance,
 context and position then point the same way, and every model follows.
 An inpainted gap, which leaves a full-width space, does not create this
-agreement, which is why erasure rarely reproduces it.
+agreement; closing the gap does [R76].
 
 Two practical points follow. First, a position-only baseline is cheap
 and should be reported with any tooth-numbering result: on standardized
@@ -276,13 +291,16 @@ outside the model works better: check the numbering next to every
 missing tooth, in particular where the space has closed. In this data
 such a rule would catch nearly all shared errors at gaps (97%) but flag
 many gaps without one (precision 13%), since most gaps are partly closed
-[R72].
+[R72]. Training does not remove the error easily: YOLOv8x retrained with
+simulated missing and closed teeth numbered teeth next to real gaps no
+better than a retrained control (+0.1 points, CI -1.6 to 1.7) [R77].
 
 **Limitations.** One dataset from one source, with a single annotation
 per tooth and no demographic information; we did not validate on an
-external dataset such as DENTEX. The space-closure result is
-correlational: we measured closure but did not manipulate it, and masks
-on a 2D projection can touch without the teeth touching. Third-molar
+external dataset such as DENTEX. The closure intervention slides a tooth
+sideways, which is not drift (real teeth tip and rotate) and leaves paste
+edges, and masks on a 2D projection can touch without the teeth
+touching. Third-molar
 gaps and longer gaps, which hold most missing positions, are outside the
 closure analysis. The detectors were trained once per split; a second
 split replicates the main numbers but changes split and training
@@ -326,7 +344,6 @@ LaTeX version: `paper/miccai/latex/main.tex`, compiled on Kaggle by
 
 ## Open before submission
 
-- Faster R-CNN split 1 gap (R75), running.
 - Convert to LNCS LaTeX and check the 8-page limit.
 - Fill funding and conflict statements (author).
 - Code and data link after acceptance (anonymized now).

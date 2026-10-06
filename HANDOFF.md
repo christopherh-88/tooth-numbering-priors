@@ -40,13 +40,22 @@ wording for this is `paper/cjsj/REVISIONS.md` section 12.
 The mechanism the paper now states: closed gaps, not "position as a
 tie-breaker" (REVISIONS sections 8 to 12).
 
-**Running:** Faster R-CNN seed 1 training on Kaggle
-(`tooth-numbering-cv-fasterrcnn-s1`, pushed 2026-10-05, about 4.5 h).
-When COMPLETE, push the prebuilt `tooth-numbering-cv-seed1-score3`
-(from `cpu_repro/cv/kaggle/make_phase3_kernels.py`), then
-`cpu_repro/cv/seed1_grade.py --dir <out> --dets yolov8x rtdetr_l fasterrcnn`
-and write RESULTS.md Section 75 graded by `PHASE3_BATCH2_RULES.md` item 3.
-Fill the pending cell in DRAFT.md Table 1.
+**Done 2026-10-06:** Section 75 (seed 1, all three detectors replicate),
+76 (closing a gap on purpose makes all three detectors give the missing
+number: 20.8% vs 0.18% open), 77 (gap augmentation training: no gain next
+to gaps vs a retrained control; not extended to the other detectors).
+Paper (DRAFT.md, latex/main.tex) updated through Section 77; PDF builds at
+7 pages.
+
+**Running:** only `tooth-numbering-cv-fasterrcnn-s2` (seed 2, last
+training job). When COMPLETE: push `tooth-numbering-cv-seed2-score3`
+(built by `make_phase3_kernels.py`), pull `seed[02]_3det/*.csv` into
+`cpu_repro/cv/results/kaggle_seed2_3det`, run
+`seed1_grade.py --dir results/kaggle_seed2_3det --dets yolov8x rtdetr_l fasterrcnn --other-seed 2`,
+grade by `PHASE3_BATCH2_RULES.md` (dated note seed 2), write Section 78,
+and add the seed 2 gaps to the paper's Table 1. Training kernel outputs
+contain a repo copy: filter inputs to `/cv_out/` and `confmatch-s0`
+(done in make_phase3_kernels.py).
 
 **Decided or dropped:** no mAP (Metrics Reloaded file says why); the
 dentist re-read is dropped (the blinded sheet code stays,

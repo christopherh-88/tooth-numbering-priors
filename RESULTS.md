@@ -5395,6 +5395,141 @@ lower incisors (22.7 to 25.5 pp at 31 and 41). The CIs separate on 30
 - Joint failures are spread over the arch (0 to 9 per number) with more
   at molars and third molars (78 of 161, from 34% of teeth).
 
+## 75. CV seed 1 with all three detectors: Faster R-CNN replicates too
+
+Date 2026-10-06. Rule: `PHASE3_BATCH2_RULES.md` item 3 (frozen), the
+same rule as Section 70, now with Faster R-CNN retrained on
+`folds_seed1.csv` (kernel `tooth-numbering-cv-fasterrcnn-s1`, commit
+`f12fa7b`, seed 0 recipe). Both splits scored with all three detectors in
+`tooth-numbering-cv-seed1-score3` (CPU, confidence-first). Grading:
+`seed1_grade.py --dets yolov8x rtdetr_l fasterrcnn`. Results:
+`cpu_repro/cv/results/kaggle_seed1_3det/` (`seed1_grade.csv`).
+
+Check: the seed 0 three-detector rescore reproduces Section 65 (gaps
+16.49 / 16.66 / 14.33, 161 same-wrong teeth, position match 91.3%).
+
+| | seed 0 (95% CI) | seed 1 | inside seed 0 CI |
+|---|---|---|---|
+| Gap, YOLOv8x (pp) | 16.49 (15.09 to 17.86) | 15.76 | yes |
+| Gap, RT-DETR-l (pp) | 16.66 (15.26 to 18.06) | 15.89 | yes |
+| Gap, Faster R-CNN (pp) | 14.33 (12.97 to 15.69) | 13.80 | yes |
+| Joint same-wrong teeth | 161 | 166 | |
+| Position match (%) | 91.30 (85.71 to 96.00) | 91.57 | yes |
+| Permutation null p95 (%) | 6.83 | 6.63 | |
+
+**Graded: replication for all three detectors.** Faster R-CNN's seed 1
+top-1 is 92.86% (seed 0: 92.82%); the gap is 0.5 pp smaller because the
+position-only model is 0.56 pp better on this split, as for the other
+two. The shared wrong answer is one place away in the same quadrant for
+92.2% of seed 1 joint failures (94.4% on seed 0).
+
+Limits as in Section 70: one extra split, which changes the split and
+the training randomness together. A third split (seed 2) is queued.
+
+## 76. Closure intervention: closing a gap makes all three detectors give the tooth the missing number
+
+Date 2026-10-06. Rule: `cpu_repro/cv/CLOSURE_INTERVENTION_RULES.md`,
+frozen 2026-10-05 before the run (thresholds set on measured anchors at
+the user's request). Script `closure_intervention.py`, Kaggle T4 kernel
+`tooth-numbering-cv-closure-s0` (seed 0 fold models, confidence-first).
+Targets are the 1,248 Section 71 targets (same draw, checked tooth by
+tooth); 1,239 have a distal neighbor that can be moved (9 skipped; 8 of
+those moved need no shift because the masks already touch once T is
+erased). Results: `cpu_repro/cv/results/kaggle_closure/closure_intervention/`.
+
+Visual check before reading the numbers: the moved tooth slides into the
+space with visible but plausible edges; brackets smear as in Section 71.
+Moving the tooth leaves an inpainted space behind it, so the gap moves
+one place distally rather than vanishing. Full shifts are 18.7 px on
+average (median 17, up to 45), about one tooth width.
+
+Scored: 1,114 movers numbered right by all three detectors on the intact
+image. j = share given the erased tooth's number by all three detectors.
+95% CIs from 10,000 bootstrap draws of X-rays, paired by mover.
+
+| Outcome for the mover | open (tooth erased) | half closed | closed |
+|---|---|---|---|
+| **All three detectors give the missing number (j)** | 0.18 (0.00 to 0.45) | 2.87 (1.88 to 3.94) | **20.83 (18.35 to 23.30)** |
+| All three and the position-only model | 0.09 | 1.71 | 16.07 |
+| YOLOv8x gives it | 1.97 | 11.76 | 42.28 |
+| RT-DETR-l gives it | 4.22 | 10.86 | 37.70 |
+| Faster R-CNN gives it | 4.67 | 12.48 | 38.24 |
+| Position-only model gives it (moved box) | 10.23 | 31.15 | 56.46 |
+| YOLOv8x misses the mover | 2.87 | 3.50 | 6.46 |
+
+**Graded: rule 1.** j(closed) minus j(open) is 20.65 points (18.16 to
+23.14), and j(closed) is 20.8%, above the 5% bar and above the about 11%
+per neighbor seen at really closed gaps (Section 72). The open-gap rate
+reproduces Section 71 (0.18%).
+
+**Reading, with Sections 69 to 72.**
+- The effect grows with closure: about 3% shared at half closure, 21% at
+  full. An open gap barely produces it; a closed one does.
+- Each detector alone fills the closed gap 38 to 42% of the time; YOLOv8x,
+  which depended least on context in Section 68, fills most.
+- This turns the Section 72 association into an intervention: a tooth
+  that sits in a closed space next to a missing tooth gets the missing
+  tooth's number from all three detectors at about the real-data rate.
+  The detectors number by counting along the arch and by the slot a tooth
+  occupies, not by the tooth's own shape alone (a moved molar or premolar
+  keeps its anatomy and still takes the missing number).
+
+Limits. A sideways paste is not drift: real teeth tip and rotate, the
+paste leaves edges, and the space behind the moved tooth stays open (in
+real mouths it may close too). Only the distal neighbor moves. Masks on a
+2D projection. One seed of fold models.
+
+## 77. Gap augmentation training: no gain next to gaps
+
+Date 2026-10-06. Rule: `cpu_repro/cv/GAP_AUGMENT_RULES.md`, frozen
+2026-10-05 before training (thresholds on measured anchors; a control
+model added before any run). Training: `train_cv.py --augment-gaps`
+(augmented, training seed 0) and `--train-seed 1` (control, no
+augmentation), YOLOv8x, seed 0 split, kernels
+`tooth-numbering-cv-yolov8x-s0-aug` and `-tseed1` at commit `01cfa88`.
+Grading: `gap_augment_grade.py` in `tooth-numbering-cv-augment-grade`
+(version 2; version 1 stopped on an input-path error before scoring).
+Results: `cpu_repro/cv/results/kaggle_augment/augment/`.
+
+Check: the original YOLOv8x run scores 94.9836%, as Section 65.
+
+| Comparison (points, 95% CI) | Overall top-1 | Next to a gap (1,364 teeth) | Joint failures numbered right (161) |
+|---|---|---|---|
+| **Augmented minus control (graded)** | +0.08 (-0.25 to 0.40) | **+0.07 (-1.55 to 1.73)** | +1.9 (-3.0 to 7.3) |
+| Augmented minus original | +0.04 | -0.15 | +9.3 (4.5 to 15.5) |
+| Control minus original (retraining noise) | -0.03 | -0.22 | +7.5 (3.7 to 12.4) |
+
+Top-1: original 94.98%, control 94.95%, augmented 95.03%; next to a gap
+79.99%, 79.77%, 79.84%.
+
+**Graded: rule 2.** The next-to-gap change against the control has a CI
+that includes 0. Training with simulated missing and closed gaps does
+not make YOLOv8x number teeth next to real gaps better, and it costs
+nothing overall. By the rule, RT-DETR-l and Faster R-CNN are not
+retrained this way.
+
+**Why the control mattered.** Against the original model, the augmented
+model fixes 9.3% of the 161 joint failures, which looks like a gain. But
+the control, retrained with no augmentation, fixes 7.5%: the joint
+failures were selected as teeth the original model got wrong, so any
+retrain gets some of them right by chance (regression to the mean). The
+augmented model's edge over the control (1.9 points) is not
+distinguishable from 0. Retraining noise on overall top-1 is small
+(0.03 points), well under the 0.5-point bar.
+
+**Reading, with Section 76.** Closing a gap in a test image makes the
+detectors give the missing number (Section 76), but showing them such
+images in training does not stop them doing it at real gaps. A likely
+reason, not tested: the training copies (an erased tooth, half of them
+with a neighbor slid sideways) do not look like real closed gaps, where
+teeth tip and rotate; the model can learn the copies without learning
+real closure. A mitigation would need realistic closed-gap examples or a
+rule outside the model (Section 72).
+
+Limits. One detector, one augmentation recipe (probability 0.5, one tooth
+per X-ray), one training seed per arm. The joint-failure set comes from
+the original models.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

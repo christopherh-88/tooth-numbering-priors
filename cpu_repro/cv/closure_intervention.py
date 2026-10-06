@@ -120,6 +120,8 @@ def main():
     ap.add_argument("--per-tooth", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--images", type=int, default=0, help="smoke test on N X-rays spread over the list")
+    ap.add_argument("--cv-seed", type=int, default=0, help="which split's models (0, or 1 for the replication)")
+    ap.add_argument("--folds", type=Path, default=None, help="folds CSV for that split (default folds.csv)")
     a = ap.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
     st.MATCH_ORDER = "conf"
@@ -132,7 +134,7 @@ def main():
     plan = draw_targets(t, all_ids, mask_path, np.random.default_rng(0))  # identical to Section 71
     ids = all_ids[::max(1, len(all_ids) // a.images)][:a.images] if a.images else all_ids
     pos_models = position_models(pd.read_csv(a.repo / "cpu_repro/cv/boxes.csv", dtype={"fdi": str}),
-                                 pd.read_csv(a.repo / "cpu_repro/cv/folds.csv"))
+                                 pd.read_csv(a.folds or a.repo / "cpu_repro/cv/folds.csv"))
 
     # Build every altered image once; reused by all detectors.
     jobs, skipped, examples = [], 0, 0
@@ -176,10 +178,16 @@ def main():
         x, y, w, h = j["mover_box"]
         f = pd.DataFrame([dict(x_center=x, y_center=y, width=w, height=h, area=w * h, aspect_ratio=w / h)])
         j["position_only_pred"] = int(pos_models[j["fold"]].predict(f[FEATURES])[0])
+    # Check: on unmoved boxes the position-only answer must equal the stored one.
+    opens = [j for j in jobs if j["condition"] == "open"]
+    agree = np.mean([j["position_only_pred"] == j["g"].loc[j["row_of"][j["mover"]], "coord_pred"] for j in opens])
+    print(f"position-only check on unmoved boxes: {agree:.4f} agree with the per-tooth file", flush=True)
 
     rows = []
     for det in DETS:
-        run = next(a.models.rglob(f"{det}_cvseed0"))
+        runs = [p for p in a.models.rglob(f"{det}_cvseed{a.cv_seed}") if p.is_dir() and "/repo/" not in str(p)]
+        assert len(runs) == 1, (det, runs)
+        run = runs[0]
         for fold in range(5):
             fj = [j for j in jobs if j["fold"] == fold]
             if not fj:

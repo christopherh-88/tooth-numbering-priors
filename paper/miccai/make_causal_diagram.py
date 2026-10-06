@@ -30,7 +30,7 @@ EDGES = [
     ("number", "look", "", None, True, 0),
     ("gap", "drift", "assumed", (0.385, 0.505), False, 0),
     ("gap", "space", "", None, True, 0),
-    ("drift", "box", "closed gaps:\nAUROC 0.78 (72)", (0.53, 0.745), True, 0),
+    ("drift", "box", "AUROC 0.78 (72);\nclosing causes it (76)", (0.53, 0.745), True, 0),
     ("box", "pos", "78.5% top-1 (65)", (0.645, 0.905), True, 0),
     ("box", "det", "absolute position\nbarely used (63, 67)", (0.70, 0.70), True, 0),
     ("look", "det", "nearby context needed\nby 2 of 3 (68)", (0.645, 0.335), True, 0),
@@ -66,8 +66,8 @@ def main():
                     color="#222222" if tested else "#666666",
                     bbox=dict(fc="white", ec="none", pad=1))
     ax.text(0.84, -0.04, "Shared wrong number at real gaps:\n44.7% of joint failures sit next to a gap,\n"
-            "and 93% of those get the missing tooth's\nnumber (69). It happens at closed gaps (72);\n"
-            "erasing a tooth does not reproduce it (71).", ha="center", va="center", fontsize=8.5,
+            "and 93% of those get the missing tooth's\nnumber (69). Closing a gap reproduces it\n"
+            "(21%, 76); erasing a tooth does not (71).", ha="center", va="center", fontsize=8.5,
             bbox=dict(fc="#fff8e6", ec="#c9a227", boxstyle="round,pad=0.4"))
     ax.text(-0.01, 0.98, "Solid: tested (RESULTS.md section). Dashed: assumed or not yet tested.",
             fontsize=8.5, color="#444444")

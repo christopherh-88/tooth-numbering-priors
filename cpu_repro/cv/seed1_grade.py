@@ -2,6 +2,7 @@
 
     python seed1_grade.py --dir results/kaggle_seed1
     python seed1_grade.py --dir results/kaggle_seed1_3det --dets yolov8x rtdetr_l fasterrcnn
+    python seed1_grade.py --dir results/kaggle_seed2_3det --dets yolov8x rtdetr_l fasterrcnn --other-seed 2
 
 Reads seed{0,1}_{N}det/ from the tooth-numbering-cv-seed1-score(3) kernel
 (--dets, default YOLOv8x and RT-DETR-l; confidence-first). Gaps and CIs come from
@@ -39,11 +40,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", type=Path, required=True)
     ap.add_argument("--dets", nargs="+", default=["yolov8x", "rtdetr_l"])
+    ap.add_argument("--other-seed", type=int, default=1, help="the split compared with seed 0 (1 or 2)")
     a = ap.parse_args()
     DETS = a.dets
     tag = f"{len(DETS)}det"
     rows = []
-    for s in (0, 1):
+    other = a.other_seed
+    for s in (0, other):
         d = a.dir / f"seed{s}_{tag}"
         pooled = pd.read_csv(d / "cv_pooled_summary.csv")
         for det in DETS:
@@ -53,10 +56,10 @@ def main():
         rows.append(dict(seed=s, metric="position_match_pct", n=n, point=pt, lo=lo, hi=hi))
     out = pd.DataFrame(rows)
     s0 = out[out.seed == 0].set_index("metric")
-    s1 = out[out.seed == 1].set_index("metric")
-    out["seed1_inside_seed0_ci"] = out["metric"].map(
+    s1 = out[out.seed == other].set_index("metric")
+    out[f"seed{other}_inside_seed0_ci"] = out["metric"].map(
         lambda m: bool(s0.loc[m, "lo"] <= s1.loc[m, "point"] <= s0.loc[m, "hi"]))
-    out.to_csv(a.dir / "seed1_grade.csv", index=False, float_format="%.4f")
+    out.to_csv(a.dir / f"seed{other}_grade.csv", index=False, float_format="%.4f")
     print(out.round(2).to_string(index=False))
 
 
