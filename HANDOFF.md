@@ -56,8 +56,15 @@ artifact; sliding gives 21.5% on the same movers), 81 (closure replicates
 on the seed 2 models, 21.8%), 82 (tipping replicates on the seed 1 models,
 9.35%; repaste 0.0%), 83 (retraining on the same split with training seed
 1 replicates all three detectors; joint-failure overlap 0.63 against 0.54
-to 0.57 across splits). Paper updated through Section 83; PDF builds at 7
-pages.
+to 0.57 across splits), 84 (a gap flag from the detector's own output
+catches 41 to 47% of joint failures at 12 to 16% of teeth; beats
+confidence on all splits but the pre-set 1.5-fold bar fails on seed 1).
+Paper updated through Section 84.
+
+**Anonymized release:** `paper/miccai/make_anon_release.py --out <folder
+outside the repo>` builds the code and data release and fails on any
+identifier left. Waiting on the anonymous.4open.science link to add to the
+paper.
 
 **Not run:** `tooth-numbering-cv-tip-s2` (tipping on the seed 2 models;
 rule note frozen in TIPPING_RULES.md, kernel in make_phase3_kernels.py)

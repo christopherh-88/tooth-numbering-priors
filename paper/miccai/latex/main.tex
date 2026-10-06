@@ -268,7 +268,12 @@ And the errors that different models share are not found by confidence; a
 review rule from outside the model works better: check the numbering next
 to every missing tooth, especially where the space has closed. Here such a
 rule catches 97\% of the shared errors at gaps but flags many gaps without
-one (precision 13\%), since most gaps are partly closed. Training does
+one (precision 13\%), since most gaps are partly closed. The rule can run
+on a model's own output: flagging teeth next to a position the detector
+left empty, or sharing a number, marks 12 to 16\% of teeth and catches 41
+to 47\% of the shared errors on every split, against 17 to 32\% for the
+same number of least-confident teeth (our pre-set 1.5-fold bar was met on
+two of three splits). Training does
 not remove the error easily: YOLOv8x retrained with simulated missing and
 closed teeth numbered teeth next to real gaps no better than a retrained
 control ($+0.1$ points, CI $-1.6$ to $1.7$).

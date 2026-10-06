@@ -297,7 +297,11 @@ outside the model works better: check the numbering next to every
 missing tooth, in particular where the space has closed. In this data
 such a rule would catch nearly all shared errors at gaps (97%) but flag
 many gaps without one (precision 13%), since most gaps are partly closed
-[R72]. Training does not remove the error easily: YOLOv8x retrained with
+[R72]. The rule can run on a model's own output: flagging teeth next to a
+position the detector left empty, or sharing a number, marks 12 to 16% of
+teeth and catches 41 to 47% of the shared errors on every split, against
+17 to 32% for the same number of least-confident teeth (our pre-set
+1.5-fold bar was met on two of three splits) [R84]. Training does not remove the error easily: YOLOv8x retrained with
 simulated missing and closed teeth numbered teeth next to real gaps no
 better than a retrained control (+0.1 points, CI -1.6 to 1.7) [R77].
 

@@ -5732,6 +5732,59 @@ is already there from training randomness alone; changing the split adds
 little. The rate and the position match are stable; which particular
 teeth fail is partly chance.
 
+## 84. Gap flag from the detector's own output: useful on seed 0, not replicated at the pre-set bar
+
+Date 2026-10-06. Rule: `cpu_repro/cv/GAP_FLAG_RULES.md`, frozen before the
+run. Script `cpu_repro/cv/gap_flag.py`, Kaggle CPU kernel
+`tooth-numbering-cv-gapflag` (a 20-X-ray smoke pass, then seeds 0, 1 and 2,
+confidence-first). Results: `cpu_repro/cv/results/kaggle_gapflag/gap_flag/`.
+
+Flag, from one detector's boxes only: teeth numbered next to a position 1
+to 7 that the detector left empty, plus teeth sharing a number. Compared
+with the same number of least-confident teeth.
+
+Check: the joint-failure sets reproduce 161, 166 and 165.
+
+| Seed | Detector | Teeth flagged (%) | Joint failures caught: flag / confidence (%) | Difference, pp (95% CI) | Ratio |
+|---|---|---|---|---|---|
+| 0 | YOLOv8x | 11.6 | 45.3 / 16.8 | 28.6 (20.5 to 38.5) | **2.70** |
+| 0 | RT-DETR-l | 12.5 | 46.6 / 23.6 | 23.0 (10.7 to 36.0) | **1.97** |
+| 0 | Faster R-CNN | 16.2 | 44.7 / 32.3 | 12.4 (3.4 to 22.4) | 1.38 |
+| 1 | YOLOv8x | 11.7 | 42.2 / 29.5 | 12.7 (5.6 to 21.0) | 1.43 |
+| 1 | RT-DETR-l | 12.9 | 42.8 / 29.5 | 13.3 (0.0 to 27.2) | 1.45 |
+| 1 | Faster R-CNN | 16.1 | 41.0 / 30.1 | 10.8 (0.7 to 21.4) | 1.36 |
+| 2 | YOLOv8x | 11.7 | 42.4 / 23.6 | 18.8 (9.7 to 29.1) | **1.79** |
+| 2 | RT-DETR-l | 12.3 | 44.8 / 21.8 | 23.0 (13.4 to 34.5) | **2.06** |
+| 2 | Faster R-CNN | 15.8 | 44.2 / 30.3 | 13.9 (4.8 to 23.7) | 1.46 |
+
+**Graded: rule 1 met** (seed 0: YOLOv8x and RT-DETR-l reach 1.5 times
+with CIs above 0). **Rule 2 met** for both (11.6 and 12.5% of teeth, under
+15%). **Rule 3 not met:** seed 2 meets rule 1 (2 of 3), seed 1 does not
+(ratios 1.36 to 1.45, all three just under 1.5).
+
+What is stable across all nine detector-split pairs: the flag catches 41
+to 47% of joint failures while marking 12 to 16% of teeth, and beats
+confidence at the same count by 11 to 29 pp, with the CI above 0 in 8 of 9
+and touching 0 in one (RT-DETR-l, seed 1). What varies is the confidence
+baseline (17 to 32%), and with it the ratio. The flag's catch rate matches
+the 44.7% that the gap rule reached using the labels (Section 69), so the
+detector's own empty positions find the gaps about as well as the labels
+do. On each detector's own misnumbered teeth the flag catches 59 to 74%
+(confidence 37 to 66%).
+
+Also reported: the gap part does nearly all the work (40 to 43%); the
+duplicate part alone flags 1 to 5% of teeth and catches 5 to 9%, not
+better than confidence. Counting third-molar positions as gaps raises the
+catch to 49 to 56% at 14 to 18% of teeth.
+
+**Reading.** A review flag computed from the detector's own output, with
+no labels, catches several times more of the shared errors than the
+confidence flag of Section 66 and about as many as the label-based gap
+rule, at a cost of about 3 to 4 teeth per X-ray. Its advantage over
+confidence is consistent in sign but fell short of the pre-set 1.5-fold
+bar on one of three splits, so it is reported as a consistent improvement,
+not as replicated at that bar.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the
