@@ -5,7 +5,7 @@ content; it moves to the LNCS LaTeX template (8 pages plus references)
 once the text is stable. Anonymized for double-blind review: no author
 names, no repo link (the code link goes in after acceptance). Every
 number cites the RESULTS.md section it comes from in a trailing comment
-`[R##]`; strip these before conversion. References marked [verify] were
+`[R##]`; strip these before conversion. References marked were
 not checked against the source in this repo's citation audits.
 
 ---
@@ -101,7 +101,7 @@ information about tooth number.
 
 **Error consistency.** Whether two models fail on the same inputs is
 measured beyond chance by error-consistency kappa [Geirhos et al. 2020,
-NeurIPS] [verify]. We report it with permutation baselines and go one
+NeurIPS]. We report it with permutation baselines and go one
 step further, comparing the wrong answers themselves.
 
 ## 3 Methods
@@ -128,9 +128,9 @@ the labeled box: center x and y, width, height, area and aspect ratio,
 all relative to image size. It never sees pixels. It is trained on the
 training folds' labeled boxes and predicts on the test fold.
 
-**Detectors.** YOLOv8x [Jocher et al.] [verify], RT-DETR-l [Zhao et al.]
-[verify] and Faster R-CNN with a ResNet-50 FPN backbone [Ren et al.;
-Li et al.] [verify], all from COCO-pretrained weights, chosen as a
+**Detectors.** YOLOv8x [Jocher et al.], RT-DETR-l [Zhao et al.]
+and Faster R-CNN with a ResNet-50 FPN backbone [Ren et al.;
+Li et al.], all from COCO-pretrained weights, chosen as a
 single-stage CNN, a transformer and a two-stage CNN with two separate
 training code bases. All are trained for 30 epochs at 640 pixels with
 horizontal flipping off (a flip would swap left and right tooth numbers);
@@ -167,7 +167,7 @@ shuffling the position-only model's answers among the joint failures
   position in the arch has no labeled tooth.
 - **Tooth erasure.** For up to three teeth per X-ray with both neighbors
   present, we inpaint the tooth's mask (dilated 3 px, Telea's method
-  [Telea 2004] [verify]) and ask whether a neighbor that was numbered
+  [Telea 2004]) and ask whether a neighbor that was numbered
   right now takes the erased tooth's number. Controls: teeth two places
   away, and a sham inpaint of the same shape over bone.
 - **Space closure.** For each missing tooth with both neighbors present,
@@ -301,26 +301,28 @@ failures.
 
 ## Figures
 
-- Fig. 1: `paper/miccai/causal_diagram.png` (causal diagram with the
-  evidence for each edge). Candidate replacement for the camera-ready: a
-  two-panel figure with an example X-ray of a closed gap and the S
-  distributions for gaps with and without a joint failure.
+- Fig. 1: `paper/miccai/fig_closed_gap.png` / `.pdf`, from
+  `make_fig_closed_gap.py`: (a) a closed gap where every model numbers
+  tooth 17 as the missing 16; (b) cumulative share of gaps by space S,
+  with and without a joint failure.
+- The causal diagram (`causal_diagram.png`) is for the supplement or a
+  talk; it does not fit in 8 pages.
 
-## References (to complete in LNCS style)
+## References
 
-Verified in `paper/DRAFT.md`'s reference audit: Geirhos et al. 2020
-(Nature Machine Intelligence); DeGrave et al. 2021; Winkler et al. 2019;
-Lin et al. 2024 (MICCAI); Hamamci et al. DENTEX (arXiv:2305.19112v2);
-Hamamci et al. HierarchicalDet (MICCAI 2023); He et al. 2023; Mei et al.
-2023; Choi et al. 2023; Hill et al. 2024; Cajas et al. 2026; Budagam et
-al. UFBA-425 (figshare 2025); Budagam et al. OralBBNet (arXiv:2406.03747).
+All references are in `paper/miccai/latex/refs.bib`. The nine marked
+[verify] in earlier versions were checked by web search on 2026-10-05
+(Geirhos et al. NeurIPS 2020, pp. 13890-13902; Zhao et al. CVPR 2024,
+pp. 16965-16974; Ren et al. NIPS 2015, pp. 91-99; Li et al.
+arXiv:2111.11429, which torchvision cites for Faster R-CNN v2; Telea,
+J. Graphics Tools 9(1):25-36, 2004; Northcutt et al. JAIR 70:1373-1411,
+2021; Maier-Hein et al. Nat. Methods 21:195-212, 2024; Tejani et al.
+Radiol. AI 6(4):e240300, 2024; Jocher et al., Ultralytics YOLOv8,
+2023). Where first names were not verified, the .bib entry uses surnames
+only.
 
-To verify before submission: Geirhos et al. 2020 NeurIPS (error
-consistency); Jocher et al. (Ultralytics YOLOv8); Zhao et al. 2024
-(RT-DETR, CVPR); Ren et al. 2015 (Faster R-CNN); Li et al. 2021
-(Faster R-CNN v2 recipe in torchvision); Telea 2004 (inpainting);
-Northcutt et al. 2021 (confident learning); Maier-Hein et al. 2024
-(Metrics Reloaded); Tejani et al. 2024 (CLAIM).
+LaTeX version: `paper/miccai/latex/main.tex`, compiled on Kaggle by
+`make_compile_kernel.py`.
 
 ## Open before submission
 
