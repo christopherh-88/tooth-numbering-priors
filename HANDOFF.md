@@ -118,9 +118,8 @@ to 25. **How the headline is worded is waiting on the user**; nothing in
 `paper/cjsj/REVISIONS.md` has been changed for it yet.
 
 **Next target: MICCAI 2027** (deadline assumed about Feb 2027). The plan
-was written up in a chat outside this repo (`claude/tooth-numbering-roadmap.md`
-and `claude/cjsj-revisions-from-hyunjun.md` were referenced but never
-saved here). Phase 2 items as the user listed them: grouped 5-fold CV
+was written up outside this repo (a roadmap and a list of CJSJ revisions
+from Hyunjun were referenced but never saved here). Phase 2 items as the user listed them: grouped 5-fold CV
 by source image with a validation split inside each fold (replacing
 best-epoch-on-test selection); Faster R-CNN learning rate scaled for batch
 size 2; bootstrap by image; power analysis before any new supernumerary
