@@ -1,12 +1,71 @@
-# Handoff (last synced 2026-10-01)
+# Handoff (last synced 2026-10-05)
 
 Read this first in the next session before doing anything else. It exists
-so nothing has to be re-derived from chat history. **The two sections below
-are current; the "What's actually done" / "Exact next steps" sections further
-down are the 2026-09-08 snapshot, kept for the early Claim-A groundwork
-detail. Don't read them as describing where things stand now.**
+so nothing has to be re-derived from chat history. **The 2026-10-05
+section below is current. The 2026-10-01 section is kept for the Phase 2
+setup; the sections after it are older snapshots. Don't read them as
+describing where things stand now.**
 
-## Where things stand (2026-10-01)
+## Where things stand (2026-10-05)
+
+**Target: MICCAI 2027.** First full draft: `paper/miccai/DRAFT.md`
+(Markdown, anonymized; moves to LNCS LaTeX once the text settles).
+Phase 4 packaging is in `paper/miccai/` (causal diagram, Metrics Reloaded
+and CLAIM checks) and `benchmark/` (per-tooth table, scorer, per-FDI
+table).
+
+**Headline (decided 2026-10-05):** the uncropped 5-fold CV with
+confidence-first matching. Position-only 78.5%; detectors 92.8 to 95.2%;
+gap 14.3 to 16.7 pp, on all 32 tooth numbers. The old 24 to 25 pp / 69%
+numbers came from a mostly cropped test set (Section 59). CJSJ revision
+wording for this is `paper/cjsj/REVISIONS.md` section 12.
+
+**Results since 2026-10-01 (RESULTS.md Sections 63 to 74):**
+- 63, 67: shifting the image barely changes detector answers.
+- 64, 65: matcher order. Confidence-first (COCO order) is now primary; the
+  joint same-wrong set is 161 teeth, 91.3% match position-only.
+- 66: predicted-box baseline, arch-order post-processor (no help),
+  look-alike flag (fails), power/MDE.
+- 68: masking context hurts two detectors; shared errors persist.
+- 69: shared errors sit next to missing teeth (44.7% vs 8.5%), usually
+  with the missing tooth's number.
+- 70: seed 1 split replicates YOLOv8x and RT-DETR-l.
+- 71: erasing a tooth (inpainting) makes each detector fill the gap 2 to
+  6% of the time, but almost never all three together.
+- 72: shared errors happen at closed gaps (mask-based space, AUROC 0.78).
+- 73: false positives and numbered F1 (RT-DETR-l leaves about 1.9 extra
+  boxes per X-ray).
+- 74: per-FDI top-1; detectors beat position-only on every number.
+
+The mechanism the paper now states: closed gaps, not "position as a
+tie-breaker" (REVISIONS sections 8 to 12).
+
+**Running:** Faster R-CNN seed 1 training on Kaggle
+(`tooth-numbering-cv-fasterrcnn-s1`, pushed 2026-10-05, about 4.5 h).
+When COMPLETE, push the prebuilt `tooth-numbering-cv-seed1-score3`
+(from `cpu_repro/cv/kaggle/make_phase3_kernels.py`), then
+`cpu_repro/cv/seed1_grade.py --dir <out> --dets yolov8x rtdetr_l fasterrcnn`
+and write RESULTS.md Section 75 graded by `PHASE3_BATCH2_RULES.md` item 3.
+Fill the pending cell in DRAFT.md Table 1.
+
+**Decided or dropped:** no mAP (Metrics Reloaded file says why); the
+dentist re-read is dropped (the blinded sheet code stays,
+`dentist_sheet.py`); Zenodo DOI on hold.
+
+**Open:** DENTEX external validation (blocked by the no-download rule;
+the main gap a reviewer will flag); LNCS conversion and page check;
+funding and conflict statements (author); references marked [verify]
+in DRAFT.md; which README lines the `5a0ecd6` rewrite dropped (low
+priority).
+
+**How the work runs:** everything on Kaggle (`.venv312/bin/kaggle`,
+credentials in `~/.kaggle/`); only tiny checks locally. Kernels embed the
+scripts and check out data at a pinned commit. Pull only CSVs from kernel
+output with `--file-pattern` (a failed kernel's output can include the
+repo pack). Each experiment's decision rule is written, shown to the user
+and frozen before running; the user runs the git commits.
+
+## Where things stood (2026-10-01)
 
 **Git:** everything through `eb8ed20` (CJSJ figures) is committed and
 pushed; `main` matches `origin/main`. The 2026-09-28 work below is in

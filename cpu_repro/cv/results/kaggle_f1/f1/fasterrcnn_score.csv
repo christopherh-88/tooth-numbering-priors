@@ -1,0 +1,15 @@
+metric,value,ci_lo,ci_hi
+top1,92.8202,91.8579,93.7420
+missed,0.9481,0.6994,1.2209
+misnumbered,6.2317,5.4065,7.1007
+position_only_top1,78.4951,76.9540,79.9831
+gap_pp,14.3251,12.9740,15.6928
+top1_next_to_gap,75.5132,72.5307,78.3665
+top1_joint,0.0000,0.0000,0.0000
+repeats_shared,100.0000,100.0000,100.0000
+false_pos_per_xray,3.8918,3.5647,4.2306
+f1_numbered,89.6483,88.5905,90.6541
+top1_macro,92.7944,,
+n_teeth,11602.0000,,
+n_joint,161.0000,,
+n_next_to_gap,1364.0000,,

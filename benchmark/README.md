@@ -26,6 +26,7 @@ the position-only model all fail together.
   - `joint_failure`, `shared_wrong_class`: all three reference detectors
     and the position-only model are wrong with the same answer (161 teeth)
 - `score.py`: scores your detections (format in its docstring).
+- `per_fdi.py`, `per_fdi.csv`: top-1 per tooth number for the reference models.
 - `build_benchmark.py`: rebuilds `teeth.csv` from the repo's results.
 
 ## Protocol
@@ -53,9 +54,10 @@ Top-1 on the joint failures is 0 for these models by construction. For a
 new model it shows whether it escapes the failure the others share, and
 `repeats_shared` shows whether it falls into the same wrong answer.
 
-`false_pos_per_xray` and `f1_numbered` need the raw detections, which are
-not in this table for the reference detectors (they were scored from
-matched answers only).
+From the reference detectors' raw fold detections (RESULTS.md Section 73):
+false positives per X-ray 1.34 / 2.99 / 3.89 and numbered F1 95.03 /
+92.34 / 89.65 for YOLOv8x / RT-DETR-l / Faster R-CNN. Top-1 ignores extra
+boxes; F1 does not, and it separates YOLOv8x from RT-DETR-l.
 
 ## Limits
 

@@ -269,3 +269,70 @@ errors. Suggested replacement for its last clause:
 > so the shared errors likely depend on the neighbor having moved into
 > the space, which is where the position-only model also places the
 > missing tooth.
+
+## 11. Closed gaps (added 2026-10-05)
+
+RESULTS.md Section 72 tests the explanation suggested in section 10.
+Where a tooth is missing and both its neighbors are present, the shared
+errors happen where the neighbors have closed the space: the space left
+is a predictor of a shared error with AUROC 0.78 (0.70 to 0.84), and 56%
+of these errors sit at gaps where the neighbors' outlines touch, against
+20% of gaps without one. This replaces the "likely" in section 10's
+suggested wording:
+
+> ... and there every model, with or without image pixels, gives the
+> tooth the number of the missing one. This happens where the teeth on
+> either side have closed the space, so the arch shows nothing missing.
+> Erasing a tooth, which leaves a full-width space, seldom produces it.
+
+Suggested review rule, replacing section 8's: check the numbering next to
+every missing tooth whose space has closed. Note for the text: most gaps
+in this data are at least partly closed, so the rule is broad (it would
+catch 97% of these errors but only 13% of flagged gaps hold one).
+
+## 12. Headline decision (added 2026-10-05)
+
+Decided: the headline numbers come from the uncropped 5-fold
+cross-validation with confidence-first matching (RESULTS.md Sections 60,
+65, 70), not the submitted split. The submitted 24 to 25 pp gap and the
+"about 69%" position-only figure were measured on a test set that was
+mostly randomly cropped copies (Section 59), which inflates the gap.
+Sections 1 and 7 above become:
+
+| | Old headline | New headline |
+|---|---|---|
+| Position-only top-1 | about 69% | 78.5% (76.9 to 80.0) |
+| Detector minus position-only | 24 to 25 pp | 14.3 to 16.7 pp, on all 32 tooth numbers |
+| Detector top-1 | 93 to 95% | 92.8 to 95.2% |
+| Shared errors | 97% same wrong tooth; 84 to 88% match position | 1.4% of teeth; 91.3% match position (chance p95 6.8%) |
+| Replication | five random splits of the cropped set | a second 5-fold split (Section 70) |
+| Mechanism | position breaks ties between look-alike neighbors | closed gaps: the arch looks complete next to a missing tooth (Sections 69 to 72) |
+
+DENTEX (68.5%) and periapical (26.6%) position-only numbers were measured
+under the original protocol, not this one. If they stay in the CJSJ
+paper, say so in the sentence ("on DENTEX, under the original splits").
+The MICCAI draft leaves them out.
+
+Replacement abstract for section 1:
+
+> AI systems that number teeth on dental X-rays report high accuracy, and
+> a wrong number attaches a finding to the wrong tooth. A model could get
+> many numbers right from where a tooth sits in the image rather than what
+> it looks like. On 425 uncropped panoramic X-rays (11,602 teeth), with
+> five-fold cross-validation grouped by X-ray, a model given only each
+> tooth's bounding box, with no image pixels, named the tooth correctly
+> 78.5% of the time. Three object detectors of different designs
+> (YOLOv8x, RT-DETR-l and Faster R-CNN) beat it by 14 to 17 percentage
+> points, on every one of the 32 tooth numbers, and the result held on a
+> second random split. Position still shaped where they failed. On 1.4%
+> of teeth all three detectors gave the same wrong number, and the
+> position-only model gave that number too 91% of the time, against under
+> 7% by chance. These shared errors sat next to a missing tooth five
+> times as often as correctly numbered teeth, usually took the missing
+> tooth's number, and happened where the neighboring teeth had closed the
+> space. Erasing a tooth from the image, which leaves the space open,
+> rarely produced them. Where a gap has closed, the arch looks complete,
+> and every model numbers the tooth as if it had moved into the space.
+> A position-only baseline trains in seconds and shows how much a
+> tooth-numbering model adds beyond position, and checking the numbering
+> next to closed gaps targets the errors that models share.

@@ -10,7 +10,7 @@ online tool before submission.
 | Question | This study |
 |---|---|
 | Problem category | Object detection with a class per object: find each tooth, give it one of 32 FDI numbers. Numbering is the quantity of interest, not localization. |
-| Reference annotation | Boxes from tooth masks (UFBA-425), one annotator set, no repeat labels. A confident-learning check flags about 10% of the joint failures as possible label errors (RESULTS.md Section 65); a blinded dentist sheet is built but not yet read. |
+| Reference annotation | Boxes from tooth masks (UFBA-425), one annotator set, no repeat labels. A confident-learning check flags about 10% of the joint failures as possible label errors (RESULTS.md Section 65). An expert re-read was dropped (2026-10-05). |
 | Class balance | Balanced: 289 to 417 teeth per class (third molars fewest). Macro and micro top-1 differ by under 0.4 pp for every model. |
 | Object size and spacing | Small, touching or overlapping objects in a row. Neighbors are the main confusion (92.8 to 94.8% of shared errors are one place off, Sections 65, 70). |
 | Stratification needed | By X-ray: teeth in one X-ray are not independent. All CIs resample X-rays. Folds are grouped by X-ray. |
@@ -34,9 +34,9 @@ online tool before submission.
 | Missed and misnumbered rates | Separates detection from numbering | Reported |
 | Top-1 on matched teeth only | Numbering given detection | Reported |
 | Macro top-1 (per-class mean) | Class balance check | Computed in `benchmark/score.py`; equals micro within 0.4 pp |
-| False positives and numbered F1 | Top-1 ignores extra boxes; the framework expects a metric that counts them for detection | **Gap.** `benchmark/score.py` computes both, but the reference detectors' raw fold detections have not been run through it. Needs a Kaggle CPU kernel over the fold detection CSVs. |
-| Per-class (per-FDI) top-1 | Shows where errors sit | Computable from `benchmark/teeth.csv`; no paper table yet |
-| AP / mAP | Standard detection ranking metric | Not used as headline: it averages over confidence thresholds, while the study compares fixed answers with a model that has no scores. Could be added as a secondary column. |
+| False positives and numbered F1 | Top-1 ignores extra boxes; the framework expects a metric that counts them for detection | Done (RESULTS.md Section 73): F1 95.0 / 92.3 / 89.6 for YOLOv8x / RT-DETR-l / Faster R-CNN; RT-DETR-l leaves about 1.9 extra boxes per X-ray |
+| Per-class (per-FDI) top-1 | Shows where errors sit | Done (RESULTS.md Section 74, `benchmark/per_fdi.csv`): every detector beats position-only on all 32 numbers |
+| AP / mAP | Standard detection ranking metric | Not reported (decided 2026-10-05). It averages over confidence thresholds, and the position-only model has no scores to compare with; numbered F1 covers the false positives mAP would add. |
 | Risk-coverage (AURC), calibration | For review flags | Reported (Sections 65, 66) |
 | Agreement between models (kappa, kappa max, phi, permutation nulls) | The shared-error claim | Reported (Sections 59, 65, 70) |
 
@@ -50,8 +50,5 @@ online tool before submission.
 
 ## To do before submission
 
-1. Run `benchmark/score.py` (or the same F1 code) on the reference
-   detectors' raw fold detections, so the paper can state false
-   positives and numbered F1.
-2. Add a per-FDI top-1 table or figure.
-3. Decide whether to show mAP as a secondary column.
+Nothing open on metrics. Check the paraphrased questions against the
+paper.

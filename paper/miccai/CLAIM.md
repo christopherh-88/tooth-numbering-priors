@@ -10,8 +10,8 @@ before submission. Status: done, partial, gap, or n/a.
 
 | Item | Status | Where / what is missing |
 |---|---|---|
-| Says it is an AI study and names the task | partial | The CJSJ title does; the MICCAI title is not written yet |
-| Structured abstract with design, data, results and limits | gap | No MICCAI abstract yet |
+| Says it is an AI study and names the task | done | Draft title in `paper/miccai/DRAFT.md` |
+| Structured abstract with design, data, results and limits | partial | Draft in `paper/miccai/DRAFT.md` |
 | Clinical or scientific background and the question | done | `paper/DRAFT.md` introduction; question: does box position alone predict FDI number, and do detectors share position's errors |
 | Study goals and hypotheses stated before testing | done | Every experiment has a rule file frozen before running (`cpu_repro/cv/*_RULES.md`) |
 
@@ -36,7 +36,7 @@ before submission. Status: done, partial, gap, or n/a.
 | Rationale for it | done | Only reference available; standard for this task |
 | Annotators' number and qualifications | partial | From the dataset paper; not restated |
 | Annotation tool and instructions | partial | Same |
-| Inter- or intra-rater variability | gap | Single annotation. Proxy: confident-learning check flags 10.0% of joint failures (Sections 61, 65). The blinded dentist sheet (161 joint failures + 161 controls) is built but not yet read |
+| Inter- or intra-rater variability | gap | Single annotation. Proxy: confident-learning check flags 10.0% of joint failures (Sections 61, 65), and the position match holds without them. An expert re-read was dropped; state it as a limitation |
 
 ## Methods: data partitions
 
@@ -54,7 +54,7 @@ before submission. Status: done, partial, gap, or n/a.
 | Model description, inputs, outputs | done | YOLOv8x and RT-DETR-l (Ultralytics 8.4.143), Faster R-CNN ResNet-50 FPN v2 (torchvision); position-only HistGradientBoosting on 6 box features |
 | Software, versions, hardware | done | `ENVIRONMENT.md`, kernel builders in `cpu_repro/cv/kaggle/`; Kaggle T4 |
 | Initialization (pretrained weights) | partial | COCO-pretrained (`yolov8x.pt`, `rtdetr-l.pt`, torchvision default weights for Faster R-CNN); state it in the paper |
-| Training details: epochs, optimizer, learning rate, augmentation, stopping | partial | In `train_cv.py`: 30 epochs, horizontal flip off (a flip would swap left and right FDI numbers). Faster R-CNN uses torchvision's learning rate for batch 16 at batch 2 (disclosed, Section 58) |
+| Training details: epochs, optimizer, learning rate, augmentation, stopping | partial | In `train_cv.py`: 30 epochs, horizontal flip off (a flip would swap left and right FDI numbers). Faster R-CNN: SGD, learning rate scaled to batch 2 (0.0025; the earlier non-CV runs used the batch-16 rate, Section 58), steps at epochs 18 and 25 |
 | Model selection criterion | done | Epoch with the best inner-validation fitness (0.1 x mAP50 + 0.9 x mAP50-95, Ultralytics' rule, used for all three) |
 | Ensembling | n/a | None |
 
@@ -77,13 +77,13 @@ before submission. Status: done, partial, gap, or n/a.
 | Case characteristics | partial | Category counts, missing teeth (1,364 teeth next to a gap); no demographics |
 | Performance with CIs | done | Sections 65, 70 |
 | Failure analysis | done | Joint failures, gaps, erasure (65, 69, 71) |
-| Per-class results | partial | Computable from `benchmark/teeth.csv`; table not made |
+| Per-class results | done | Section 74, `benchmark/per_fdi.csv` |
 
 ## Discussion and other information
 
 | Item | Status | Where / what is missing |
 |---|---|---|
-| Limitations | partial | Listed per section in RESULTS.md; needs one paper paragraph: one dataset, single annotation, no external set, no demographics, inpainting is not extraction, one extra seed |
+| Limitations | done | In `paper/miccai/DRAFT.md`: one dataset, single annotation, no external set, no demographics, closure is correlational, one extra seed |
 | Implications for practice | partial | The gap check wording in `paper/cjsj/REVISIONS.md` sections 8 to 10 |
 | Code availability | done | GitHub repo; Zenodo DOI on hold |
 | Data availability | done | Public dataset; per-tooth table in `benchmark/` |

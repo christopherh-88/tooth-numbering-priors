@@ -5264,6 +5264,137 @@ which may explain part of the 4.5 to 5.3% of neighbors missed after
 removal (under 1% for N2). Bracket smears are visible in the erased
 slot. One seed of fold models.
 
+## 72. Space closure: shared errors happen at gaps the neighbors have closed
+
+Date 2026-10-05. Rule: `cpu_repro/cv/DRIFT_RULES.md`, frozen 2026-10-05
+before the run (approved with the mask-based measure as primary). Script
+`drift_check.py`, Kaggle CPU kernel `tooth-numbering-cv-drift-s0` (version
+2; version 1 stopped in its smoke test, which drew 15 X-rays with no
+slots, before any results). Input: the confidence-first per-tooth file
+(Section 65) and the tooth masks. Results:
+`cpu_repro/cv/results/kaggle_drift/drift/`.
+
+**Slots.** 372 missing teeth (in 195 X-rays) with both arch neighbors
+labeled. Left out: 510 missing third-molar positions and 1,116 positions
+in longer gaps. 36 slots are filled (a neighbor is a joint failure given
+the missing tooth's number); the other filled cases of Section 69 sit at
+third-molar or longer gaps, which this test does not cover.
+
+S = shortest distance between the two neighbors' masks over the missing
+tooth's median width (0 = touching). AUROC: lower S predicts filled.
+95% CIs from 10,000 bootstrap draws of X-rays.
+
+| Outcome | filled slots | median S filled | median S unfilled | AUROC | median difference (unfilled minus filled) |
+|---|---|---|---|---|---|
+| **Joint failure (graded)** | 36 | 0.000 | 0.323 | **0.778 (0.701 to 0.843)** | 0.323 (0.244 to 0.370) |
+| YOLOv8x alone | 78 | 0.028 | 0.354 | 0.758 (0.688 to 0.823) | 0.325 |
+| RT-DETR-l alone | 97 | 0.039 | 0.380 | 0.786 (0.731 to 0.835) | 0.342 |
+| Faster R-CNN alone | 98 | 0.041 | 0.362 | 0.744 (0.682 to 0.800) | 0.321 |
+| Position-only alone | 134 | 0.103 | 0.378 | 0.682 (0.617 to 0.742) | 0.275 |
+
+**Graded: rule 1.** The median difference CI excludes 0 and the AUROC is
+0.778, above the 0.75 bar. The CI's lower end (0.70) is below 0.75; the
+rule grades the point estimate, but the bar is not cleared with
+confidence. The box-based S gives the same answer (AUROC 0.789, 0.720 to
+0.854).
+
+**Detail.**
+- 35 of the 36 filled slots (97%) have S < 0.5, and 20 (56%) are fully
+  closed (masks touching), against 20% of unfilled slots.
+- A filled slot is 23% of fully closed slots and 5.6% of the rest. Below
+  S = 0.25 it is 18.7% of slots; above, 2.0%.
+- Closure is common: 69% of unfilled slots also have S < 0.5. So a closed
+  space is close to necessary for a shared error but far from enough. As
+  a review flag, S < 0.5 would catch 97% of these errors at a precision of
+  13%.
+- Each detector on its own tracks closure about as well as the joint
+  outcome does (AUROC 0.74 to 0.79), and better than the position-only
+  model (0.68). The Limits worry in the rule (that the result is built in
+  through the position-only model) does not hold up: the detectors, which
+  do not see box positions as input, show the effect more strongly than
+  the position model does.
+
+**Reading, with Sections 69 and 71.** The shared failure is a closed-gap
+failure. When the teeth on either side of a missing tooth have moved
+together, the arch shows no empty space, every model counts along it as
+if nothing were missing, and the tooth next to the closed gap gets the
+missing tooth's number. An erased tooth leaves a full-width space
+(Section 71), which is why erasure seldom produces the shared error. This
+remains correlational: the space was not manipulated.
+
+Limits. Masks are outlines on a 2D projection; touching in the image may
+be overlap in projection rather than contact. Third-molar gaps and longer
+gaps are not covered, and they hold most missing positions. 36 filled
+slots, so the per-category picture is not estimable. One seed.
+
+## 73. False positives and numbered F1 for the reference detectors
+
+Date 2026-10-05. Not a hypothesis test (no rule); closes the Metrics
+Reloaded gap in `paper/miccai/METRICS_RELOADED.md`. Kaggle CPU kernel
+`tooth-numbering-cv-f1-s0`: the seed 0 fold detections of each detector
+(`fold*/test_detections.csv`) scored with `benchmark/score.py` (commit
+`a78cfa6`), confidence-first matching at 0.5 / 0.5. Results:
+`cpu_repro/cv/results/kaggle_f1/f1/`.
+
+Check: top-1, missed and gap equal Section 65 to 4 decimals for all three
+detectors, so the benchmark scorer and `score_cv.py` agree on real
+detections, not only on the synthetic check of Phase 4.
+
+| | top-1 | false positives per X-ray | of which misnumbered | of which extra boxes | numbered F1 |
+|---|---|---|---|---|---|
+| YOLOv8x | 94.98 | 1.34 (1.14 to 1.57) | 0.94 | 0.40 | 95.03 (94.21 to 95.78) |
+| RT-DETR-l | 95.16 | 2.99 (2.67 to 3.33) | 1.11 | 1.88 | 92.34 (91.37 to 93.24) |
+| Faster R-CNN | 92.82 | 3.89 (3.56 to 4.23) | 1.70 | 2.19 | 89.65 (88.59 to 90.65) |
+
+False positives are kept detections (confidence 0.5 or more) that are not
+a correctly numbered match; "extra boxes" are the ones matched to no
+labeled tooth (total minus misnumbered teeth per X-ray, 425 X-rays).
+Numbered F1 = 2 TP / (2 TP + FP + FN).
+
+**Reading.** On top-1, YOLOv8x and RT-DETR-l tie (Section 66 D). Counting
+extra boxes separates them: RT-DETR-l leaves almost 2 unmatched boxes per
+X-ray against 0.4 for YOLOv8x, so its numbered F1 is 2.7 pp lower. That
+fits Section 64 (RT-DETR has no NMS and emits near-duplicate boxes).
+Faster R-CNN is last on both. None of this changes the gap over
+position-only, which is defined on labeled teeth; it does mean the paper
+should not rank the detectors on top-1 alone.
+
+Limits. Extra boxes include real teeth the labels miss (if any); no
+check of those was made. Seed 0 only.
+
+## 74. Top-1 per tooth number
+
+Date 2026-10-05. Descriptive, no rule; closes the per-class item in
+`paper/miccai/METRICS_RELOADED.md`. Script `benchmark/per_fdi.py` on
+`benchmark/teeth.csv` (split 0, confidence-first, Section 65). Output
+`benchmark/per_fdi.csv` (top-1 per FDI number with X-ray bootstrap CIs).
+
+**Every detector beats position-only on all 32 tooth numbers.** The
+smallest per-number gaps are at the third molars (YOLOv8x 5.7 pp and
+Faster R-CNN 4.3 pp at 38; RT-DETR-l 5.8 pp at 48), the largest at the
+lower incisors (22.7 to 25.5 pp at 31 and 41). The CIs separate on 30
+(YOLOv8x), 31 (RT-DETR-l) and 29 (Faster R-CNN) of 32 numbers.
+
+| Tooth type | Teeth | Joint failures | YOLOv8x | RT-DETR-l | Faster R-CNN | Position-only |
+|---|---|---|---|---|---|---|
+| Incisors | 3,134 | 34 | 96.5 | 96.6 | 94.6 | 78.0 |
+| Canines | 1,600 | 17 | 96.4 | 97.1 | 93.7 | 77.2 |
+| Premolars | 2,949 | 32 | 94.2 | 94.5 | 92.3 | 74.8 |
+| First and second molars | 2,729 | 50 | 93.5 | 93.1 | 90.8 | 80.7 |
+| Third molars | 1,190 | 28 | 94.5 | 95.0 | 92.9 | 85.5 |
+
+**Reading.**
+- Position-only is best at the ends of the arch (third molars 82.4 to
+  88.3% per number) and worst for the lower incisors and all four first
+  premolars (69.9 to 76.3%), where several similar teeth sit close
+  together.
+- The detectors are weakest on the upper second molars (17 and 27: 88.2
+  to 92.6%), which are also the numbers most often next to a gap (29 to
+  32% of those teeth). The lower second molars (37, 47) are next to a gap
+  just as often (35 to 36%) but the detectors stay at 90.5 to 95.1% there.
+- Joint failures are spread over the arch (0 to 9 per number) with more
+  at molars and third molars (78 of 161, from 34% of teeth).
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the
