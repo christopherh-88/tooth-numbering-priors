@@ -187,6 +187,40 @@ shutil.rmtree(REPO)
 '''
 
 
+DRIFT_BODY = '''import drift_check
+per_tooth = sorted(Path("/kaggle/input").rglob("per_tooth_predictions.csv"))
+assert len(per_tooth) == 1, per_tooth
+args = ["drift_check.py", "--repo", str(REPO), "--per-tooth", str(per_tooth[0])]
+sys.argv = args + ["--out", "/kaggle/working/drift_smoke", "--images", "40"]
+drift_check.main()
+sys.argv = args + ["--out", "/kaggle/working/drift"]
+drift_check.main()
+shutil.rmtree(REPO)
+'''
+
+
+F1_BODY = '''import pandas as pd
+subprocess.run(["git", "-C", str(REPO), "checkout", "--quiet", "a78cfa6", "--", "benchmark"], check=True)
+OUT = Path("/kaggle/working/f1")
+OUT.mkdir(parents=True, exist_ok=True)
+for det in ["yolov8x", "rtdetr_l", "fasterrcnn"]:
+    run = next(Path("/kaggle/input").rglob(f"{det}_cvseed0"))
+    files = sorted(run.glob("fold*/test_detections.csv"))
+    assert len(files) == 5, (det, files)
+    d = pd.concat([pd.read_csv(f) for f in files]).rename(
+        columns={"x1": "x_min", "y1": "y_min", "x2": "x_max", "y2": "y_max"})
+    d.to_csv(f"/kaggle/temp_{det}.csv", index=False)
+    print("=====", det, len(d), "detections", flush=True)
+    subprocess.run([sys.executable, str(REPO / "benchmark/score.py"), "--pred", f"/kaggle/temp_{det}.csv",
+                    "--out", str(OUT / f"{det}_score.csv")], check=True)
+shutil.rmtree(REPO)
+'''
+
+
+SEED1_3DET_BODY = SEED1_BODY.replace('["yolov8x", "rtdetr_l"]', '["yolov8x", "rtdetr_l", "fasterrcnn"]').replace(
+    "_2det", "_3det")
+
+
 def write(out, name, files, paths, body, gpu, sources):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
@@ -222,6 +256,9 @@ def main():
           TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-confmatch-s0"])
     seed1_sources = [f"{USER}/tooth-numbering-cv-{d}-s{s}" for d in ("yolov8x", "rtdetr-l") for s in (0, 1)]
     write(a.out, "tooth-numbering-cv-seed1-score", ["score_cv.py"], csvs, SEED1_BODY, False, seed1_sources)
+    seed1_3det_sources = [f"{USER}/tooth-numbering-cv-{d}-s{s}" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")
+                          for s in (0, 1)]
+    write(a.out, "tooth-numbering-cv-seed1-score3", ["score_cv.py"], csvs, SEED1_3DET_BODY, False, seed1_3det_sources)
     write(a.out, "tooth-numbering-cv-gapcheck-s0", ["gap_check.py"], csvs, GAP_BODY, False,
           [f"{USER}/tooth-numbering-cv-confmatch-s0"])
     write(a.out, "tooth-numbering-cv-dentist-s0", ["dentist_sheet.py"], ["Dataset/bb_u_net_dataset/panoramic_x_rays"],
@@ -229,6 +266,10 @@ def main():
     write(a.out, "tooth-numbering-cv-gapint-s0", ["shift_test.py", "gap_check.py", "gap_intervention.py"],
           csvs + ["Dataset/bb_u_net_dataset/panoramic_x_rays", "Dataset/bb_u_net_dataset/labels"], GAPINT_BODY, True,
           TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-confmatch-s0"])
+    write(a.out, "tooth-numbering-cv-drift-s0", ["gap_check.py", "drift_check.py"],
+          csvs + ["Dataset/bb_u_net_dataset/labels"], DRIFT_BODY, False,
+          [f"{USER}/tooth-numbering-cv-confmatch-s0"])
+    write(a.out, "tooth-numbering-cv-f1-s0", [], ["cpu_repro/cv/folds.csv"], F1_BODY, False, TRAIN_KERNELS)
     write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,
           TRAIN_KERNELS)
 
