@@ -14,11 +14,11 @@ the position-only model all fail together.
     21 to 28, 31 to 38, 41 to 48)
   - `x_center`, `y_center`, `width`, `height`: the labeled box, as
     fractions of the image size
-  - `fold_seed0`, `fold_seed1`: test fold under the two 5-fold splits
+  - `fold_seed0`, `fold_seed1`, `fold_seed2`: test fold under the three 5-fold splits
     (grouped by X-ray, stratified by category)
   - `next_to_gap`: an arch neighbor of this tooth has no label in the
     X-ray (third molars count)
-  - `position_only_pred_seed0`, `position_only_pred_seed1`: the
+  - `position_only_pred_seed0`, `_seed1`, `_seed2`: the
     out-of-fold answer of a gradient-boosted model on box position and
     shape only (6 features)
   - `yolov8x_pred`, `rtdetr_l_pred`, `fasterrcnn_pred`: reference
@@ -31,9 +31,9 @@ the position-only model all fail together.
 
 ## Protocol
 
-1. Train one model per fold of a split (`fold_seed0` or `fold_seed1`),
+1. Train one model per fold of a split (`fold_seed0`, `fold_seed1` or `fold_seed2`),
    never on that fold's X-rays. The splits and inner validation sets are
-   in `cpu_repro/cv/folds.csv` and `folds_seed1.csv`.
+   in `cpu_repro/cv/folds.csv`, `folds_seed1.csv` and `folds_seed2.csv`.
 2. Run each model on its test fold and write all detections to one CSV.
 3. `python benchmark/score.py --pred your.csv --split 0`
 
@@ -64,4 +64,4 @@ boxes; F1 does not, and it separates YOLOv8x from RT-DETR-l.
 One dataset (UFBA-425, Budagam et al. 2025, doi 10.6084/m9.figshare.29827475;
 cite it as the repo README shows), one annotation per tooth, no
 dentist re-check yet. The joint-failure set comes from split 0 models and
-is not refit for split 1.
+is not refit for splits 1 and 2.

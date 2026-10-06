@@ -22,7 +22,7 @@ from sklearn.ensemble import HistGradientBoostingClassifier
 
 import shift_test as st
 from gap_check import ORDER
-from gap_intervention import DILATE_PX, INPAINT_RADIUS, dilate, draw_targets, load_mask
+from gap_intervention import INPAINT_RADIUS, dilate, draw_targets, load_mask
 
 DETS = ["yolov8x", "rtdetr_l", "fasterrcnn"]
 CONDITIONS = {"open": 0.0, "half": 0.5, "closed": 1.0}  # slide mode (Section 76)

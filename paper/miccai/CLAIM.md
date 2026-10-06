@@ -45,7 +45,7 @@ before submission. Status: done, partial, gap, or n/a.
 | How data were split and at what level | done | 5-fold CV grouped by X-ray, stratified by category; 15% inner validation inside each training fold for model selection; the test fold is never used for selection |
 | Number of images and teeth per partition | done | Fold tables in Sections 60, 65, 70 |
 | Independence between partitions | done | Grouping by X-ray; uncropped originals only, so no crop of a test X-ray is in training |
-| Second split | done | Seed 1 replication (Section 70) |
+| Further splits | done | Seeds 1 and 2 replicate all three detectors (Sections 75, 78) |
 
 ## Methods: models and training
 
@@ -64,7 +64,7 @@ before submission. Status: done, partial, gap, or n/a.
 |---|---|---|
 | Metrics and why | done | `paper/miccai/METRICS_RELOADED.md` |
 | Statistical methods, CIs, significance | done | X-ray bootstrap (10,000), paired differences, permutation nulls, minimum detectable effects (Section 66 D) |
-| Robustness or sensitivity analysis | done | Matching cutoffs and order (62, 64, 65), image shift (63, 67), context masking (68), second split (70) |
+| Robustness or sensitivity analysis | done | Matching cutoffs and order (62, 64, 65), image shift (63, 67), context masking (68), two further splits (75, 78), gap closure and tipping interventions with replications and a paste control (76, 79 to 81) |
 | Explainability or interpretation | done | Interventions instead of saliency maps: shift, masking, tooth erasure (63, 67, 68, 71) |
 | External validation | gap | DENTEX not used in this phase. State it as a limit |
 | Benchmark or comparison with other work | partial | `benchmark/` releases the per-tooth table and scorer; no comparison with published numbering systems |

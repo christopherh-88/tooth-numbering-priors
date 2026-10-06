@@ -45,7 +45,7 @@ online tool before submission.
 - Pooled over the five test folds, so every X-ray is scored once by a
   model that did not train on it. Fold-level values are also reported.
 - 95% CIs from 10,000 bootstrap draws of X-rays; paired for differences.
-- Second split (seed 1) as replication (Section 70). Minimum detectable
+- Two further splits (seeds 1 and 2) as replications (Sections 75, 78). Minimum detectable
   effects given in Section 66 D.
 
 ## To do before submission

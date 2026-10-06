@@ -22,7 +22,6 @@ from PIL import Image
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / "cpu_repro/cv"))
-from gap_check import ORDER  # noqa: E402
 
 FDI = [f"{q}{t}" for q in "1234" for t in "12345678"]
 FILLED, OPEN = "#eb6834", "#2a78d6"  # dataviz reference palette slots 2 and 1, validated light

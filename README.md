@@ -25,6 +25,17 @@ geometry-only guess 84 to 88% of the time (chance: 4 to 11%). On periapical
 X-rays (DenPAR), which lack the fixed framing, the geometry-only model falls
 to 26.6%.
 
+**Current numbers (uncropped five-fold cross-validation, used in the
+MICCAI paper).** Most test images in the splits above were randomly cropped
+copies, which weaken the position cue (RESULTS.md Section 59). On the 425
+original X-rays with cross-validation grouped by X-ray, the geometry-only
+model numbers 78.5% of teeth, and the detectors beat it by 14 to 17 points
+on all 32 tooth numbers, replicated on three splits (Sections 65, 75, 78).
+The errors all three detectors share (1.4% of teeth) match the
+geometry-only answer 91% of the time and sit next to missing teeth whose
+neighbors have closed the space; closing or tipping a neighbor into an
+erased tooth's space on purpose reproduces them (Sections 69 to 81).
+
 ## Where to look
 
 This is a research log, not a packaged library.
@@ -36,8 +47,14 @@ This is a research log, not a packaged library.
 - **`RESULTS.md`**: every result in the project, in order, with the script
   and split behind it. If a number anywhere else disagrees, this file wins.
 - **`HANDOFF.md`**: current status and next steps.
-- **`paper/DRAFT.md`** and **`paper/figures/`**: the longer MICCAI draft
-  and its figures.
+- **`paper/miccai/`**: the MICCAI 2027 paper (`DRAFT.md`, the LNCS
+  version in `latex/`, figures, and the Metrics Reloaded and CLAIM
+  checklists). It uses the uncropped five-fold cross-validation in
+  `cpu_repro/cv/` (RESULTS.md Sections 60 onward).
+- **`benchmark/`**: the per-tooth table, splits and scorer for comparing a
+  tooth-numbering model with the position-only baseline.
+- **`paper/DRAFT.md`** and **`paper/figures/`**: the earlier long draft on
+  the original (partly cropped) splits, kept for reference.
 - **`ENVIRONMENT.md`**: setup. The project uses TensorFlow (U-Net) and
   PyTorch/Ultralytics (detectors) in one environment, and the install
   order matters. Read it before installing anything.

@@ -73,7 +73,7 @@ def boot(per_image, stat, rng):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pred", type=Path, required=True)
-    ap.add_argument("--split", type=int, default=0, choices=[0, 1],
+    ap.add_argument("--split", type=int, default=0, choices=[0, 1, 2],
                     help="which CV split the predictions follow (the position-only model is matched to it)")
     ap.add_argument("--out", type=Path)
     a = ap.parse_args()
@@ -125,7 +125,7 @@ def main():
              dict(metric="n_teeth", value=len(t)), dict(metric="n_joint", value=int(t["joint_failure"].sum())),
              dict(metric="n_next_to_gap", value=int(t["next_to_gap"].sum()))]
     out = pd.DataFrame(rows)
-    if a.split == 1:
+    if a.split != 0:
         print("note: the joint-failure set comes from split 0 reference detectors")
     print(out.round(2).to_string(index=False))
     if a.out:
