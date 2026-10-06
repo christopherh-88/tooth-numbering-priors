@@ -240,7 +240,12 @@ the other side. Of 1,114 moved teeth that all three detectors numbered
 right on the intact X-ray, all three gave the missing tooth's number to
 0.18\% with the space open, 2.9\% when moved halfway and 20.8\% when moved
 all the way (difference from open 20.7 points, CI 18.2 to 23.1); each
-detector alone did so 38 to 42\% of the time. A moved tooth keeps its own
+detector alone did so 38 to 42\% of the time. Models trained on a second
+split give the same result (22.5\% at full closure, 0.0\% open). Tipping
+the neighbor about its root apex until its crown touches, which is closer
+to how real teeth drift, gives 9.4\% (CI 7.7 to 11.0), near the 11\% per
+neighbor at real closed gaps; cutting the tooth out and pasting it back
+unmoved gives 0.0\%, so paste edges do not cause the effect. A moved tooth keeps its own
 shape, so the detectors number it by the slot it occupies.
 
 \section{Discussion}
@@ -269,8 +274,8 @@ control ($+0.1$ points, CI $-1.6$ to $1.7$).
 
 \textbf{Limitations.} One dataset from one source, a single annotation per
 tooth and no demographic data; we did not validate on an external dataset
-such as DENTEX. The closure intervention slides a tooth sideways, which
-is not drift (real teeth tip and rotate) and leaves paste edges, and masks
+such as DENTEX. The interventions slide or tip a tooth within the image
+plane only (real teeth also rotate about their long axis), and masks
 on a 2D projection can touch when the teeth do not. Third-molar and longer gaps,
 which hold most missing positions, are outside the closure analysis. Two
 further splits replicate the main numbers but change split and training

@@ -5563,6 +5563,84 @@ the position match stay put: the pattern is stable, the particular teeth
 less so. The training-seed runs (PHASE3_BATCH2_RULES.md, 2026-10-06 note)
 will say how much of that turnover is training randomness alone.
 
+## 79. Closure intervention replicates on the seed 1 models
+
+Date 2026-10-06. Rule: dated note 2026-10-06 (seed 1) in
+`CLOSURE_INTERVENTION_RULES.md`, frozen before the run. Kernel
+`tooth-numbering-cv-closure-s1` (version 2; version 1 failed on Kaggle
+before the script started, with an empty log). Same procedure and the
+same 1,239 targets as Section 76, with the three seed 1 split models and
+seed 1 position-only models. Results:
+`cpu_repro/cv/results/kaggle_closure_s1/closure_s1/`.
+
+Check: the seed 1 position-only models reproduce the stored seed 1
+answers on unmoved boxes (agreement 1.0000).
+
+| All three detectors give the missing number (%, 95% CI) | open | half | closed |
+|---|---|---|---|
+| Seed 0 models (Section 76) | 0.18 | 2.87 | 20.83 (18.35 to 23.30) |
+| **Seed 1 models** (1,128 movers) | 0.00 | 2.84 | **22.52 (20.04 to 25.02)** |
+
+Each detector alone at full closure: YOLOv8x 42.7%, RT-DETR-l 38.5%,
+Faster R-CNN 39.7% (seed 0: 42.3, 37.7, 38.2). All three plus the
+position-only model: 17.3% (seed 0: 16.1%).
+
+**Graded: replicated.** Closed minus open is 22.52 points (20.04 to
+25.02), and j(closed) lies inside the seed 0 CI. The dose-response
+(about 3% at half closure, about 21 to 23% at full) and each detector's
+own rate repeat on independently trained models on a different split.
+
+## 80. Tipping intervention: tipping a tooth into the space also causes the shared error
+
+Date 2026-10-06. Rule: `cpu_repro/cv/TIPPING_RULES.md`, frozen
+2026-10-06 before the run (with the repaste control added at freezing).
+Script `closure_intervention.py --mode tip`, Kaggle T4 kernel
+`tooth-numbering-cv-tip-s0` (seed 0 fold models, confidence-first), the
+Section 71 targets. 1,201 targets had a distal neighbor that tips into
+contact; 47 never touched by 45 degrees and were skipped. Tip angles:
+mean 12.7, median 11.0 degrees. Results:
+`cpu_repro/cv/results/kaggle_tip/closure_tip/`.
+
+Checks: position-only answers on unmoved boxes agree with the per-tooth
+file (1.0000). Examples viewed before the numbers: the crown leans into
+the space about the root apex; the repaste panel matches the open panel
+apart from the restored neighbor.
+
+Scored: 1,079 movers numbered right by all three detectors on the intact
+image. 95% CIs from 10,000 bootstrap draws of X-rays, paired by mover.
+
+| Outcome for the mover (%) | open | repaste (control) | half tip | full tip |
+|---|---|---|---|---|
+| **All three detectors give the missing number (j)** | 0.19 | 0.00 | 1.20 | **9.36 (7.73 to 11.03)** |
+| All three and the position-only model | 0.09 | 0.00 | 0.74 | 6.30 |
+| YOLOv8x gives it | 2.04 | 1.11 | 8.06 | 26.60 |
+| RT-DETR-l gives it | 4.36 | 1.11 | 8.90 | 27.71 |
+| Faster R-CNN gives it | 4.82 | 2.32 | 7.97 | 23.36 |
+| Position-only model gives it | 10.57 | 10.01 | 25.58 | 37.35 |
+
+**Graded: rule 1.** j(full tip) minus j(open) is 9.18 points (7.52 to
+10.85), and j(full tip) is 9.4%, above the 5% bar. **Paste check:
+clean.** j(repaste) minus j(open) is -0.19 (-0.47 to 0.00): cutting the
+tooth out and pasting it back in place produces no shared errors (each
+detector alone fills less after repaste than with the space open), so
+the tip effect is not a paste artifact.
+
+**Tip against slide** (`tip_vs_slide.py`, the 1,079 movers scored in
+both runs): slide 21.50%, tip 9.36%, slide minus tip 12.14 points (9.68
+to 14.62). 69 of the 101 movers that tipping makes a shared error are
+also shared errors when slid.
+
+**Reading.** Moving a tooth into the space causes the shared error
+whether it slides or tips; tipping, which moves only the crown, does it
+about half as often. Tipping is the more realistic of the two, and its
+rate (9.4% of neighbors) is close to the about 11% per neighbor seen at
+really closed gaps (Section 72), while sliding overshoots it. The
+detectors respond to how much of the empty slot the tooth fills.
+
+Limits. In-plane rotation only; the root rotates with the crown; paste
+edges remain (the repaste control shows they do not drive the result);
+47 targets never touched and were skipped. Seed 0 models only.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the
