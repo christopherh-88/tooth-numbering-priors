@@ -5698,6 +5698,40 @@ movers scored in both runs): slide 23.10%, tip 9.35%, slide minus tip
 13.75 points (11.32 to 16.24); 80 of the 102 movers that tipping makes a
 shared error are also shared errors when slid. Same pattern as seed 0.
 
+## 83. Training seed on the same split: all three detectors replicate
+
+Date 2026-10-06. Rule: dated note 2026-10-06 (training seed) in
+`PHASE3_BATCH2_RULES.md`, graded as item 3, frozen before the runs.
+RT-DETR-l and Faster R-CNN retrained on the seed 0 split with
+`train_cv.py --train-seed 1` (kernels
+`tooth-numbering-cv-{rtdetr-l,fasterrcnn}-s0-tseed1`, built at commit
+`8f1dbd0`); YOLOv8x uses the existing `yolov8x_cvseed0_tseed1` (the
+Section 77 control). Scored with the original seed 0 models in
+`tooth-numbering-cv-tseed-score3` (confidence-first). Grading:
+`seed1_grade.py --dets yolov8x rtdetr_l fasterrcnn --other-tag tseed1`.
+Results: `cpu_repro/cv/results/kaggle_tseed_3det/` (`tseed1_grade.csv`).
+
+Check: the seed 0 rows reproduce Section 65. The position-only model is
+the same (same split), 78.50%.
+
+| | training seed 0 (95% CI) | training seed 1 | inside seed 0 CI |
+|---|---|---|---|
+| Gap, YOLOv8x (pp) | 16.49 (15.09 to 17.86) | 16.45 | yes |
+| Gap, RT-DETR-l (pp) | 16.66 (15.26 to 18.06) | 16.45 | yes |
+| Gap, Faster R-CNN (pp) | 14.33 (12.97 to 15.69) | 14.24 | yes |
+| Joint same-wrong teeth | 161 | 179 | |
+| Position match (%) | 91.30 (85.71 to 96.00) | 87.71 | yes |
+
+**Graded: replicated for all three detectors.** Retraining on the same
+split moves each gap by at most 0.21 pp.
+
+Turnover of the joint-failure set (no rule): training seed 0 and 1 share
+131 of 209 teeth (Jaccard 0.63), against 0.57 (split 1) and 0.54 (split
+2) when the split also changes. Most of the turnover seen across splits
+is already there from training randomness alone; changing the split adds
+little. The rate and the position match are stable; which particular
+teeth fail is partly chance.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

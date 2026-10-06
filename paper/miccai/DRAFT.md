@@ -308,9 +308,10 @@ within the image plane only (real teeth also rotate about their long
 axis), and masks on a 2D projection can touch without the teeth
 touching. Third-molar
 gaps and longer gaps, which hold most missing positions, are outside the
-closure analysis. The detectors were trained once per split; two further
-splits replicate the main numbers but change split and training
-randomness together. About 10% of joint failures may be label errors.
+closure analysis. Two further splits, and retraining on
+the same split with a new seed, replicate the main numbers [R78, R83];
+about a third of the jointly failed teeth change with training
+randomness alone (overlap 0.63, against 0.54 to 0.57 across splits). About 10% of joint failures may be label errors.
 
 ## 6 Conclusion
 

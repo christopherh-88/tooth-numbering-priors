@@ -30,7 +30,7 @@ MICCAI paper).** Most test images in the splits above were randomly cropped
 copies, which weaken the position cue (RESULTS.md Section 59). On the 425
 original X-rays with cross-validation grouped by X-ray, the geometry-only
 model numbers 78.5% of teeth, and the detectors beat it by 14 to 17 points
-on all 32 tooth numbers, replicated on three splits (Sections 65, 75, 78).
+on all 32 tooth numbers, replicated on three splits and a second training seed (Sections 65, 75, 78, 83).
 The errors all three detectors share (1.4% of teeth) match the
 geometry-only answer 91% of the time and sit next to missing teeth whose
 neighbors have closed the space; closing or tipping a neighbor into an

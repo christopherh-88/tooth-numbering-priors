@@ -54,18 +54,18 @@ open), 80 (tipping the neighbor into the space also causes the shared
 error, 9.4% vs 0.19% open; a repaste control gives 0.0%, so not a paste
 artifact; sliding gives 21.5% on the same movers), 81 (closure replicates
 on the seed 2 models, 21.8%), 82 (tipping replicates on the seed 1 models,
-9.35%; repaste 0.0%). Paper updated through Section 82; PDF builds at 7
+9.35%; repaste 0.0%), 83 (retraining on the same split with training seed
+1 replicates all three detectors; joint-failure overlap 0.63 against 0.54
+to 0.57 across splits). Paper updated through Section 83; PDF builds at 7
 pages.
 
-**Running:** `tooth-numbering-cv-fasterrcnn-s0-tseed1`
-(`tooth-numbering-cv-rtdetr-l-s0-tseed1` is done; both built by
-make_kernels.py at commit 8f1dbd0 with --train-args="--train-seed 1").
-When both training kernels finish: push `tooth-numbering-cv-tseed-score3`,
-then `seed1_grade.py --dir results/kaggle_tseed_3det --dets yolov8x
-rtdetr_l fasterrcnn --other-tag tseed1` (PHASE3_BATCH2_RULES.md
-training-seed note; compare the joint-failure overlap with 0.572 and
-0.538 for the split changes). Kaggle sometimes fails a GPU kernel before
-it starts (empty log); retrying once has worked both times.
+**Not run:** `tooth-numbering-cv-tip-s2` (tipping on the seed 2 models;
+rule note frozen in TIPPING_RULES.md, kernel in make_phase3_kernels.py)
+failed three times on Kaggle before the script started, with an empty log
+and no failure message, twice alongside another GPU kernel and once
+alone. Stopped there; tipping is replicated on two model sets (Sections
+80, 82). Kaggle sometimes fails a GPU kernel before it starts; a retry
+fixed it for closure-s1 and closure-s2.
 
 **Decided or dropped:** no mAP (Metrics Reloaded file says why); the
 dentist re-read is dropped (the blinded sheet code stays,

@@ -21,7 +21,7 @@ written, approved and frozen in a `*_RULES.md` file before it ran;
 - `score_cv.py`: confidence-first matching, top-1, gap over the
   position-only model, X-ray bootstrap CIs, joint failures (Sections 60, 65).
 - `seed1_grade.py`: compares a split or training seed with split 0
-  (Sections 70, 75, 78).
+  (Sections 70, 75, 78, 83).
 - `calib_sweep.py`, `label_check.py`: cutoffs, calibration and label
   checks (Sections 61, 62, 64).
 - `batch3.py`: predicted-box baseline, arch-order fix, review flag, power

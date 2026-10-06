@@ -279,8 +279,9 @@ such as DENTEX. The interventions slide or tip a tooth within the image
 plane only (real teeth also rotate about their long axis), and masks
 on a 2D projection can touch when the teeth do not. Third-molar and longer gaps,
 which hold most missing positions, are outside the closure analysis. Two
-further splits replicate the main numbers but change split and training
-randomness together. About 10\% of joint failures may be label errors.
+further splits, and retraining on the same split with a new seed, replicate
+the main numbers; about a third of the jointly failed teeth change with
+training randomness alone (overlap 0.63, against 0.54 to 0.57 across splits). About 10\% of joint failures may be label errors.
 
 \section{Conclusion}
 
