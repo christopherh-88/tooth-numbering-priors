@@ -55,7 +55,7 @@ print("versions: torch", torch.__version__, "torchvision", torchvision.__version
 t0 = time.time()
 cmd = [sys.executable, str(REPO / "cpu_repro/cv/train_cv.py"), "--detector", DETECTOR,
        "--out-root", str(OUT), "--work", "/kaggle/working/prepared", "--device", "0",
-       "--folds", *map(str, FOLDS), "--cv-seed", "{cv_seed}"]
+       "--folds", *map(str, FOLDS), "--cv-seed", "{cv_seed}", *{train_args!r}]
 try:
     sh(cmd, cwd=str(REPO), timeout={watchdog})
     status = "finished"
@@ -86,6 +86,7 @@ def main():
     ap.add_argument("--folds", type=int, nargs="+", default=[0, 1, 2, 3, 4])
     ap.add_argument("--suffix", default="")
     ap.add_argument("--cv-seed", type=int, default=0)
+    ap.add_argument("--train-args", nargs="*", default=[], help="extra train_cv.py arguments, e.g. --augment-gaps")
     a = ap.parse_args()
     for det in a.detectors:
         name = f"tooth-numbering-cv-{det.replace('_', '-')}-s{a.cv_seed}{a.suffix}"
@@ -93,7 +94,7 @@ def main():
         d.mkdir(parents=True, exist_ok=True)
         (d / f"{name}.py").write_text(SCRIPT.format(
             detector=det, folds=a.folds, commit=a.commit, cv_seed=a.cv_seed, ultralytics=ULTRALYTICS,
-            repo_url=REPO_URL, watchdog=WATCHDOG_SECONDS))
+            repo_url=REPO_URL, watchdog=WATCHDOG_SECONDS, train_args=a.train_args))
         (d / "kernel-metadata.json").write_text(json.dumps({
             "id": f"{USER}/{name}", "title": name, "code_file": f"{name}.py",
             "language": "python", "kernel_type": "script", "is_private": True,

@@ -221,6 +221,9 @@ SEED1_3DET_BODY = SEED1_BODY.replace('["yolov8x", "rtdetr_l"]', '["yolov8x", "rt
     "_2det", "_3det")
 
 
+CLOSURE_BODY = GAPINT_BODY.replace("gap_intervention", "closure_intervention").replace('"10"]', '"10"]')
+
+
 def write(out, name, files, paths, body, gpu, sources):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
@@ -270,6 +273,10 @@ def main():
           csvs + ["Dataset/bb_u_net_dataset/labels"], DRIFT_BODY, False,
           [f"{USER}/tooth-numbering-cv-confmatch-s0"])
     write(a.out, "tooth-numbering-cv-f1-s0", [], ["cpu_repro/cv/folds.csv"], F1_BODY, False, TRAIN_KERNELS)
+    write(a.out, "tooth-numbering-cv-closure-s0",
+          ["shift_test.py", "gap_check.py", "gap_intervention.py", "closure_intervention.py"],
+          csvs + ["Dataset/bb_u_net_dataset/panoramic_x_rays", "Dataset/bb_u_net_dataset/labels"], CLOSURE_BODY,
+          True, TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-confmatch-s0"])
     write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,
           TRAIN_KERNELS)
 

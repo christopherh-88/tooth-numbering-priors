@@ -52,10 +52,65 @@ def fold_lists(work: Path, fold: int):
             for k in ("train", "val", "test")}
 
 
-def prepare(work: Path, cv_seed: int):
+def prepare(work: Path, cv_seed: int, augment_gaps: bool = False):
     boxes = pd.read_csv(HERE / "boxes.csv")
     folds = pd.read_csv(prep.folds_path(cv_seed))  # folds.csv for seed 0, folds_seed<s>.csv otherwise
     prep.write_yolo(work, boxes, folds)
+    if augment_gaps:
+        write_gap_augmented(work, boxes)
+
+
+def write_gap_augmented(work: Path, boxes):
+    """GAP_AUGMENT_RULES.md: each X-ray gets, with probability 0.5 (seed 0), an altered
+    copy with one tooth erased, and in half of those its distal neighbor moved fully into
+    the space. Training lists point to the copy; validation and test lists are unchanged."""
+    import cv2
+    import closure_intervention as ci
+    from gap_check import NEIGHBORS
+    from gap_intervention import dilate, load_mask
+    mask_path = {p.name.replace(".ome.tiff", ""): p for p in (prep.SRC / "labels").glob("*/*.ome.tiff")}
+    img_dir, lab_dir = work / "aug" / "images", work / "aug" / "labels"
+    img_dir.mkdir(parents=True, exist_ok=True)
+    lab_dir.mkdir(parents=True, exist_ok=True)
+    rng = np.random.default_rng(0)
+    altered, log = set(), []
+    for image_id, g in boxes.astype({"fdi": str}).groupby("image_id"):
+        present = set(g["fdi"])
+        if rng.random() >= 0.5:
+            continue
+        ok = sorted(f for f in present if f[1] != "8" and all(n in present for n in NEIGHBORS[f])
+                    and len(NEIGHBORS[f]) == 2)
+        close = rng.random() < 0.5
+        if not ok:
+            continue
+        T = str(rng.choice(ok))
+        img = cv2.imread(str(prep.SRC / "panoramic_x_rays" / f"{image_id}.jpg"))
+        t_region = dilate(load_mask(mask_path[f"{image_id}_{T}"], img.shape[:2])).astype(bool)
+        g = g[g["fdi"] != T].copy()
+        s = 0
+        if close:
+            N, M, direction = ci.neighbors_of(T)
+            n_mask = load_mask(mask_path[f"{image_id}_{N}"], img.shape[:2])
+            full = ci.touch_shift(n_mask, load_mask(mask_path[f"{image_id}_{M}"], img.shape[:2]), direction)
+            if full is not None:
+                s = full * direction
+                img = ci.move_tooth(img, t_region, dilate(n_mask).astype(bool), s)
+                g.loc[g["fdi"] == N, "x_center"] += s / img.shape[1]
+        if s == 0:
+            img = cv2.inpaint(img, t_region.astype(np.uint8), 5, cv2.INPAINT_TELEA)
+        cv2.imwrite(str(img_dir / f"{image_id}.jpg"), img, [cv2.IMWRITE_JPEG_QUALITY, 100])
+        lines = [f"{r.class_id} {r.x_center:.6f} {r.y_center:.6f} {r.width:.6f} {r.height:.6f}"
+                 for r in g.itertuples()]
+        (lab_dir / f"{image_id}.txt").write_text("\n".join(lines) + "\n")
+        altered.add(image_id)
+        log.append(dict(image_id=image_id, erased=T, closed=bool(s), shift_px=abs(s)))
+    pd.DataFrame(log).to_csv(work / "aug" / "augment_log.csv", index=False)
+    for f in range(prep.N_FOLDS):
+        p = work / f"fold{f}_train.txt"
+        paths = [str(img_dir / Path(x).name) if Path(x).stem in altered else x for x in p.read_text().split()]
+        p.write_text("\n".join(paths) + "\n")
+    print(f"gap augmentation: {len(altered)} altered X-rays, {sum(r['closed'] for r in log)} with a closed gap",
+          flush=True)
 
 
 def label_path(img: Path) -> Path:
@@ -74,7 +129,7 @@ def save_detections(rows, out: Path):
 
 
 # ---------------------------------------------------------------- Ultralytics
-def run_ultralytics(detector, fold, work, out, device, smoke):
+def run_ultralytics(detector, fold, work, out, device, smoke, train_seed=0):
     from ultralytics import RTDETR, YOLO
     lists = fold_lists(work, fold)
     if smoke:
@@ -88,7 +143,7 @@ def run_ultralytics(detector, fold, work, out, device, smoke):
 
     cls, base, args = ((YOLO, "yolov8x.pt", YOLO_ARGS) if detector == "yolov8x"
                        else (RTDETR, "rtdetr-l.pt", RTDETR_ARGS))
-    args = dict(args)
+    args = dict(args, seed=train_seed)
     if smoke:
         args.update(epochs=1, batch=2, imgsz=320)
         base = "yolov8n.pt" if detector == "yolov8x" else base
@@ -265,12 +320,15 @@ def main():
     ap.add_argument("--out-root", type=Path, default=OUT_ROOT)
     ap.add_argument("--device", default="0")
     ap.add_argument("--smoke", action="store_true", help="CPU, 1 epoch, 4 images per split")
+    ap.add_argument("--augment-gaps", action="store_true", help="GAP_AUGMENT_RULES.md training copies")
+    ap.add_argument("--train-seed", type=int, default=0, help="Ultralytics training seed (default 0, as before)")
     a = ap.parse_args()
     if a.smoke:
         a.device = "cpu"
-    prepare(a.work, a.cv_seed)
+    prepare(a.work, a.cv_seed, a.augment_gaps)
+    tag = ("_aug" if a.augment_gaps else "") + (f"_tseed{a.train_seed}" if a.train_seed else "")
     for fold in a.folds:
-        out = a.out_root / f"{a.detector}_cvseed{a.cv_seed}{'_smoke' if a.smoke else ''}" / f"fold{fold}"
+        out = a.out_root / f"{a.detector}_cvseed{a.cv_seed}{tag}{'_smoke' if a.smoke else ''}" / f"fold{fold}"
         out.mkdir(parents=True, exist_ok=True)
         if (out / "test_detections.csv").exists():
             print(f"fold {fold}: test_detections.csv exists, skipping")
@@ -280,7 +338,7 @@ def main():
             dev = "cpu" if a.device == "cpu" else f"cuda:{a.device}"
             run_fasterrcnn(fold, a.work, out, dev, a.smoke)
         else:
-            run_ultralytics(a.detector, fold, a.work, out, a.device, a.smoke)
+            run_ultralytics(a.detector, fold, a.work, out, a.device, a.smoke, a.train_seed)
         print(f"fold {fold} done in {(time.time() - t0) / 60:.1f} min", flush=True)
 
 

@@ -54,3 +54,13 @@ recomputed with confidence-first matching and the same two detectors),
 seed 1 is reported as a replication of seed 0. Otherwise both are
 reported with the spread, and the paper's headline uses the mean of the
 two seeds with the wider of the two CIs.
+
+
+## Dated note 2026-10-05: CV seed 2
+
+The user approved a third split. `prepare_uncropped_cv.py --split-seed 2`
+gives `folds_seed2.csv`; YOLOv8x, RT-DETR-l and Faster R-CNN are trained
+with the seed 0 recipe and scored confidence-first. Graded by item 3
+above, unchanged: per detector, if the seed 2 gap and the three-detector
+joint position match fall inside the seed 0 95% CIs, seed 2 is reported
+as a replication; otherwise all splits are reported with the spread.

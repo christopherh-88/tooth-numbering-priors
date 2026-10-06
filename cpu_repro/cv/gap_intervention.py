@@ -91,6 +91,19 @@ def boot(df, rng, pairs):
     return out
 
 
+def draw_targets(t, ids, mask_path, rng):
+    """Targets, drawn once with seed 0 and shared by all detectors (also used by
+    closure_intervention.py, so both tests use the same teeth)."""
+    plan = {}
+    for image_id in ids:
+        g = t[t["image_id"] == image_id]
+        present = set(g["fdi"])
+        ok = sorted(f for f in present if f[1] != "8" and len(NEIGHBORS[f]) == 2
+                    and all(n in present for n in NEIGHBORS[f]) and f"{image_id}_{f}" in mask_path)
+        plan[image_id] = list(rng.choice(ok, size=min(N_TARGETS, len(ok)), replace=False)) if ok else []
+    return plan
+
+
 def rule(r):
     if r["g"] < 1:
         return 2
@@ -120,14 +133,7 @@ def main():
     if a.images:
         ids = ids[:a.images]
 
-    # Targets, drawn once with seed 0 and shared by all detectors.
-    plan = {}
-    for image_id in ids:
-        g = t[t["image_id"] == image_id]
-        present = set(g["fdi"])
-        ok = sorted(f for f in present if f[1] != "8" and len(NEIGHBORS[f]) == 2
-                    and all(n in present for n in NEIGHBORS[f]) and f"{image_id}_{f}" in mask_path)
-        plan[image_id] = list(rng.choice(ok, size=min(N_TARGETS, len(ok)), replace=False)) if ok else []
+    plan = draw_targets(t, ids, mask_path, rng)
     print("targets:", sum(map(len, plan.values())), "in", sum(map(bool, plan.values())), "X-rays", flush=True)
 
     rows, examples = [], 0
