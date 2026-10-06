@@ -34,7 +34,7 @@ on all 32 tooth numbers, replicated on three splits (Sections 65, 75, 78).
 The errors all three detectors share (1.4% of teeth) match the
 geometry-only answer 91% of the time and sit next to missing teeth whose
 neighbors have closed the space; closing or tipping a neighbor into an
-erased tooth's space on purpose reproduces them (Sections 69 to 81).
+erased tooth's space on purpose reproduces them (Sections 69 to 82).
 
 ## Where to look
 

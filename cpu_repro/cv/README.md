@@ -36,8 +36,8 @@ written, approved and frozen in a `*_RULES.md` file before it ran;
 | `gap_check.py` | Do shared errors sit next to missing teeth? | PHASE3_BATCH3_RULES.md | 69 |
 | `gap_intervention.py`, `gap_intervention_overlap.py` | Does erasing a tooth cause them? | GAP_INTERVENTION_RULES.md | 71 |
 | `drift_check.py` | Are they at closed gaps? | DRIFT_RULES.md | 72 |
-| `closure_intervention.py` | Does closing a gap cause them (slide, tip)? | CLOSURE_INTERVENTION_RULES.md, TIPPING_RULES.md | 76, 79 to 81 |
-| `tip_vs_slide.py` | Tip against slide on the same teeth | TIPPING_RULES.md | 80 |
+| `closure_intervention.py` | Does closing a gap cause them (slide, tip)? | CLOSURE_INTERVENTION_RULES.md, TIPPING_RULES.md | 76, 79 to 82 |
+| `tip_vs_slide.py` | Tip against slide on the same teeth | TIPPING_RULES.md | 80, 82 |
 | `gap_augment_grade.py` | Does training on simulated gaps help? | GAP_AUGMENT_RULES.md | 77 |
 | `dentist_sheet.py` | Blinded expert sheet (built, not used) | LABEL_CHECK_RULES.md | 65 |
 

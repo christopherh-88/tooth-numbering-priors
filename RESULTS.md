@@ -5668,6 +5668,36 @@ Faster R-CNN 36.5%.
 holds on three independently trained sets of models on three splits
 (20.8, 22.5, 21.8%).
 
+## 82. Tipping intervention replicates on the seed 1 models
+
+Date 2026-10-06. Rule: dated note 2026-10-06 (seed 1) in
+`TIPPING_RULES.md`, frozen before the run. Kernel
+`tooth-numbering-cv-tip-s1`, `closure_intervention.py --mode tip` with the
+seed 1 split models and seed 1 position-only models, the same targets as
+Section 80 (1,201 with a neighbor that tips into contact, 47 skipped).
+Results: `cpu_repro/cv/results/kaggle_tip_s1/closure_tip_s1/`.
+
+Check: position-only answers on unmoved boxes agree with the stored seed 1
+answers (1.0000).
+
+| All three detectors give the missing number (%) | open | repaste (control) | half tip | full tip (95% CI) |
+|---|---|---|---|---|
+| Seed 0 models (Section 80, 1,079 movers) | 0.19 | 0.00 | 1.20 | 9.36 (7.73 to 11.03) |
+| **Seed 1 models** (1,091 movers) | 0.00 | 0.00 | 1.28 | **9.35 (7.69 to 11.07)** |
+
+Each detector alone at full tip: YOLOv8x 25.3%, RT-DETR-l 29.1%, Faster
+R-CNN 20.3%; all three and the position-only model 5.68%.
+
+**Graded: replicated.** j(full tip) minus j(open) is 9.35 points (7.69 to
+11.07), and j(full tip) lies inside the seed 0 CI. **Paste check: clean.**
+j(repaste) is 0.00, and each detector alone fills less after repaste than
+with the space open.
+
+**Tip against slide** (`tip_vs_slide.py` against Section 79, the 1,091
+movers scored in both runs): slide 23.10%, tip 9.35%, slide minus tip
+13.75 points (11.32 to 16.24); 80 of the 102 movers that tipping makes a
+shared error are also shared errors when slid. Same pattern as seed 0.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

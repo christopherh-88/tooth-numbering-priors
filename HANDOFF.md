@@ -52,14 +52,14 @@ three detectors; joint-failure sets overlap about 0.55 between splits),
 79 (closure intervention replicates on the seed 1 models: 22.5% vs 0.0%
 open), 80 (tipping the neighbor into the space also causes the shared
 error, 9.4% vs 0.19% open; a repaste control gives 0.0%, so not a paste
-artifact; sliding gives 21.5% on the same movers). Paper updated through
-Section 80; PDF builds at 7 pages.
+artifact; sliding gives 21.5% on the same movers), 81 (closure replicates
+on the seed 2 models, 21.8%), 82 (tipping replicates on the seed 1 models,
+9.35%; repaste 0.0%). Paper updated through Section 82; PDF builds at 7
+pages.
 
-**Running:** `tooth-numbering-cv-closure-s2` (closure on seed 2 models,
-graded by the seed 2 note in CLOSURE_INTERVENTION_RULES.md) and
-`tooth-numbering-cv-rtdetr-l-s0-tseed1`; queued
-`tooth-numbering-cv-fasterrcnn-s0-tseed1` (both training kernels built
-by make_kernels.py at commit 8f1dbd0 with --train-args="--train-seed 1").
+**Running:** `tooth-numbering-cv-fasterrcnn-s0-tseed1`
+(`tooth-numbering-cv-rtdetr-l-s0-tseed1` is done; both built by
+make_kernels.py at commit 8f1dbd0 with --train-args="--train-seed 1").
 When both training kernels finish: push `tooth-numbering-cv-tseed-score3`,
 then `seed1_grade.py --dir results/kaggle_tseed_3det --dets yolov8x
 rtdetr_l fasterrcnn --other-tag tseed1` (PHASE3_BATCH2_RULES.md

@@ -269,9 +269,9 @@ detector alone did so 38 to 42% of the time. Models trained on two further
 splits give the same result (22.5% and 21.8% at full closure, at most
 0.1% open) [R79, R81].
 Tipping the neighbor about its root apex until its crown touches, which
-is closer to how real teeth drift, gives 9.4% (CI 7.7 to 11.0), near the
+is closer to how real teeth drift, gives 9.4% (CI 7.7 to 11.0; 9.3% on the seed 1 models), near the
 11% per neighbor at real closed gaps; cutting the tooth out and pasting
-it back unmoved gives 0.0%, so paste edges do not cause the effect [R80]. A moved tooth keeps its own
+it back unmoved gives 0.0%, so paste edges do not cause the effect [R80, R82]. A moved tooth keeps its own
 shape, so the detectors number it by the slot it occupies.
 
 ## 5 Discussion
