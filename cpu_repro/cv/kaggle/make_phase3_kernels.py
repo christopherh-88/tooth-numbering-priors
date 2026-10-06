@@ -284,6 +284,10 @@ shutil.rmtree(REPO)
 '''
 
 
+TIP_S1_BODY = CLOSURE_S1_BODY.replace('"--cv-seed", "1",', '"--cv-seed", "1", "--mode", "tip",').replace(
+    "closure_s1", "closure_tip_s1")
+
+
 def write(out, name, files, paths, body, gpu, sources):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
@@ -356,6 +360,9 @@ def main():
           + [f"{USER}/tooth-numbering-cv-seed2-score3"])
     write(a.out, "tooth-numbering-cv-tseed-score3", ["score_cv.py"], csvs, TSEED_BODY, False,
           TRAIN_KERNELS + [f"{USER}/tooth-numbering-cv-{d}-s0-tseed1" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")])
+    write(a.out, "tooth-numbering-cv-tip-s1", closure_files, closure_paths, TIP_S1_BODY, True,
+          [f"{USER}/tooth-numbering-cv-{d}-s1" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")]
+          + [f"{USER}/tooth-numbering-cv-seed1-score3"])
     write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,
           TRAIN_KERNELS)
 

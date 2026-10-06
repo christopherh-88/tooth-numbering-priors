@@ -55,3 +55,11 @@ crown, which a real tipped tooth's root is not quite. Examples are saved
 for a visual check before the numbers are read.
 
 **Cost.** About 1.5 hours on a T4.
+
+## Dated note 2026-10-06: replication on the seed 1 models (approved, frozen)
+
+The same procedure on the seed 1 split models and seed 1 position-only
+models, same targets. Graded: replicated if the CI of j(full tip) minus
+j(open) excludes 0 and j(full tip) falls inside the seed 0 95% CI (7.73
+to 11.03%, RESULTS.md Section 80); otherwise both are reported with the
+spread. The paste check is reported as for seed 0.
