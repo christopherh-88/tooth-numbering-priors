@@ -307,9 +307,24 @@ for seed, folds in ((0, "folds.csv"), (1, "folds_seed1.csv"), (2, "folds_seed2.c
     gap_flag.main()
 shutil.rmtree(REPO)
 '''
+DENTEX_BODY = '''subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "ultralytics==8.4.143"], check=True)
+import dentex_external
+xrays = sorted(p for p in Path("/kaggle/input").rglob("xrays")
+               if p.is_dir() and p.parent.name == "quadrant_enumeration" and "/repo/" not in str(p))
+assert len(xrays) == 1, xrays
+args = ["dentex_external.py", "--labels", str(REPO / "cpu_repro/anomaly_scan/dentex_raw/train_quadrant_enumeration.json"),
+        "--images", str(xrays[0]), "--models", "/kaggle/input", "--ufba-boxes", str(REPO / "cpu_repro/cv/boxes.csv"),
+        "--ufba-folds", str(REPO / "cpu_repro/cv/folds.csv")]
+sys.argv = args + ["--out", "/kaggle/working/dentex_smoke", "--images-limit", "10"]
+dentex_external.main()
+print("smoke run done; full run follows", flush=True)
+sys.argv = args + ["--out", "/kaggle/working/dentex"]
+dentex_external.main()
+shutil.rmtree(REPO)
+'''
 
 
-def write(out, name, files, paths, body, gpu, sources):
+def write(out, name, files, paths, body, gpu, sources, datasets=()):
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
     code = HEADER.format(files={f: (HERE / f).read_text() for f in files}, repo_url=REPO_URL,
@@ -317,7 +332,7 @@ def write(out, name, files, paths, body, gpu, sources):
     (d / f"{name}.py").write_text(code)
     meta = {"id": f"{USER}/{name}", "title": name, "code_file": f"{name}.py", "language": "python",
             "kernel_type": "script", "is_private": True, "enable_gpu": gpu, "enable_tpu": False,
-            "enable_internet": True, "dataset_sources": [], "kernel_sources": sources,
+            "enable_internet": True, "dataset_sources": list(datasets), "kernel_sources": sources,
             "competition_sources": [], "model_sources": []}
     if gpu:
         meta["machine_shape"] = "NvidiaTeslaT4"
@@ -389,6 +404,11 @@ def main():
           + [f"{USER}/tooth-numbering-cv-seed2-score3"])
     write(a.out, "tooth-numbering-cv-gapflag", ["score_cv.py", "batch3.py", "gap_flag.py"], csvs, GAP_FLAG_BODY,
           False, [f"{USER}/tooth-numbering-cv-{d}-s{s}" for s in (0, 1, 2) for d in ("yolov8x", "rtdetr-l", "fasterrcnn")])
+    write(a.out, "tooth-numbering-cv-dentex-external",
+          ["score_cv.py", "batch3.py", "gap_flag.py", "shift_test.py", "gap_check.py", "gap_intervention.py",
+           "closure_intervention.py", "dentex_external.py"],
+          csvs + ["cpu_repro/anomaly_scan/dentex_raw/train_quadrant_enumeration.json"], DENTEX_BODY, True,
+          TRAIN_KERNELS, ["truthisneverlinear/dentex-challenge-2023"])
     write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,
           TRAIN_KERNELS)
 
