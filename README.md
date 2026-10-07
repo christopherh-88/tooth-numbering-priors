@@ -37,7 +37,10 @@ neighbors have closed the space; closing or tipping a neighbor into an
 erased tooth's space on purpose reproduces them (Sections 69 to 82). A
 flag computed from a detector's own output (teeth next to a position it
 left empty, or sharing a number) catches 41 to 47% of them while marking
-12 to 16% of teeth (Section 84).
+12 to 16% of teeth (Section 84). On 634 DENTEX X-rays from other clinics
+the unchanged models met one of four pre-set replication bars: shared
+errors still follow position (87.5%), but the floor, two of three margins
+and the gap link weaken (Section 85).
 
 ## Where to look
 

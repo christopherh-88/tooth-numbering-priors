@@ -5785,6 +5785,87 @@ confidence is consistent in sign but fell short of the pre-set 1.5-fold
 bar on one of three splits, so it is reported as a consistent improvement,
 not as replicated at that bar.
 
+## 85. External test on DENTEX: shared errors still follow position; floor, margin and gap link not replicated
+
+Date 2026-10-06. Rule: `cpu_repro/cv/DENTEX_EXTERNAL_RULES.md`, frozen
+before the run. Script `cpu_repro/cv/dentex_external.py`, Kaggle GPU kernel
+`tooth-numbering-cv-dentex-external` (a 10-X-ray smoke pass, then the full
+run). Follow-up checks, reported only: `cpu_repro/cv/dentex_sensitivity.py`.
+Results: `cpu_repro/cv/results/kaggle_dentex/`.
+
+The seed 0 UFBA fold models, unchanged, on the 634 DENTEX
+`quadrant_enumeration` X-rays (18,095 teeth; both counts checked in the
+log), each X-ray sent to one fold's models. Position-only five-fold
+cross-validated within DENTEX. Confidence-first scoring at confidence 0.5
+and IoU 0.5, as everywhere else.
+
+| | DENTEX top-1 (95% CI) | Missed | Misnumbered | Margin over position-only, pp (95% CI) |
+|---|---|---|---|---|
+| Position-only (within DENTEX) | 66.9 (65.5 to 68.2) | | | |
+| Position-only (UFBA-trained) | 30.5 (29.5 to 31.4) | | | |
+| YOLOv8x | 67.4 (65.7 to 69.1) | 28.9 | 3.7 | +0.5 (-1.4 to 2.3) |
+| RT-DETR-l | 81.6 (80.4 to 82.8) | 10.7 | 7.7 | **+14.7 (13.2 to 16.2)** |
+| Faster R-CNN | 46.5 (45.0 to 48.0) | 24.3 | 29.2 | -20.4 (-22.0 to -18.8) |
+
+Shared errors (all three detectors and position-only wrong with the same
+answer): 160 teeth.
+
+**Graded:**
+
+1. Floor: **not met.** The CI lower end is 65.6, under 68.5 (point 66.9).
+2. Margin: **not met.** RT-DETR-l passes (+14.7, inside the UFBA 14 to 17);
+   YOLOv8x ties position-only and Faster R-CNN falls 20 points below it.
+3. Shared errors follow position: **met.** 87.5% (82.1 to 92.5) of the 160
+   give position-only's answer, inside the UFBA CI (85.71 to 96.00).
+4. Shared errors at gaps: **not met.** 27.5% sit next to a missing labeled
+   neighbor against 12.1% of teeth all three get right, ratio 2.26 (1.68 to
+   2.96), under 4.2. When they do, the shared answer is the number of a
+   tooth with no label in that X-ray 86% of the time (UFBA 93%).
+
+**Not replicated** (1 of 4).
+
+**Checks on why (reported only, after grading):**
+
+- Framing. DENTEX teeth span x 0.26 to 0.76 of the image (UFBA 0.17 to
+  0.84) and are narrower (median width 0.039 against 0.051). The
+  UFBA-trained position model keeps the quadrant for 96% of teeth but
+  numbers them 0.9 positions toward the midline on average. Rescaling each
+  X-ray's boxes to the span of its labeled teeth raises it from 30.5 to
+  62.0% (60.7 to 63.2), near the within-DENTEX 66.9; within DENTEX the
+  rescaling changes little (65.4). The UFBA position map transfers once
+  framing is removed. No left-right or label-convention error.
+- Thresholds. Rescoring the saved detections:
+
+  | Confidence / IoU | YOLOv8x top-1, margin | RT-DETR-l top-1, margin | Faster R-CNN top-1, margin |
+  |---|---|---|---|
+  | 0.5 / 0.5 (graded) | 67.4, +0.5 | 81.6, +14.7 | 46.5, -20.4 |
+  | 0.25 / 0.5 | 73.3, +6.4 (4.6 to 8.1) | 82.6, +15.7 | 49.0, -17.9 |
+  | 0.5 / 0.3 | 73.5, +6.6 (4.8 to 8.3) | 86.6, +19.7 | 50.5, -16.4 |
+  | 0.25 / 0.3 | 81.2, +14.3 (12.7 to 15.9) | 88.2, +21.3 | 53.2, -13.7 |
+
+  YOLOv8x finds the teeth but below UFBA's confidence (missed teeth are
+  often detected in place at 0.2 to 0.4), and its boxes are shorter than
+  DENTEX's (median labeled height 0.23 to 0.24 against UFBA 0.19 to 0.21),
+  so some correct answers fail IoU 0.5. At 0.25 / 0.3 it misses 13% and
+  regains the UFBA-size margin. Faster R-CNN does not recover: 39% of its
+  matched teeth are misnumbered, 75% of them toward the distal within the
+  right quadrant and 56% exactly one position (34 to 35, 13 to 14, 44 to
+  45, 23 to 24 most often), so its loss is numbering, not detection.
+- Gap flag (Section 84) on DENTEX: catches 35.6 / 31.3 / 41.9% of shared
+  errors against 23.8 / 11.9 / 43.8% for confidence (YOLOv8x 1.50x,
+  RT-DETR-l 2.63x, Faster R-CNN 0.96x), at 23, 21 and 62% of teeth, above
+  the 15% cost bar.
+
+**Reading.** On other clinics' X-rays the central mechanism holds: when
+all three detectors agree on a wrong number, it is position-only's answer
+87.5% of the time, as on UFBA. The rest weakens. Position alone still
+numbers two thirds of teeth, a little under the pre-set floor. Only the
+detector that detects well under the shift (RT-DETR-l) keeps its margin;
+YOLOv8x's loss is mostly missed teeth at UFBA's thresholds, and Faster
+R-CNN's is mostly a distal shift of one position. Shared errors sit at gaps about twice
+as often as correct teeth, not five times. The pre-set replication bar
+was not met and the paper reports it as a partial replication.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

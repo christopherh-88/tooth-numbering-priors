@@ -40,6 +40,8 @@ written, approved and frozen in a `*_RULES.md` file before it ran;
 | `tip_vs_slide.py` | Tip against slide on the same teeth | TIPPING_RULES.md | 80, 82 |
 | `gap_augment_grade.py` | Does training on simulated gaps help? | GAP_AUGMENT_RULES.md | 77 |
 | `gap_flag.py` | Can the detector's own output flag the shared errors? | GAP_FLAG_RULES.md | 84 |
+| `dentex_external.py` | Do the UFBA models' results carry over to DENTEX? | DENTEX_EXTERNAL_RULES.md | 85 |
+| `dentex_sensitivity.py` | DENTEX thresholds and framing (reported only) | DENTEX_EXTERNAL_RULES.md | 85 |
 | `dentist_sheet.py` | Blinded expert sheet (built, not used) | LABEL_CHECK_RULES.md | 65 |
 
 ## Results

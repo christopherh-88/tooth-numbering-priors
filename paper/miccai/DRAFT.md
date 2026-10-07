@@ -306,8 +306,14 @@ simulated missing and closed teeth numbered teeth next to real gaps no
 better than a retrained control (+0.1 points, CI -1.6 to 1.7) [R77].
 
 **Limitations.** One dataset from one source, with a single annotation
-per tooth and no demographic information; we did not validate on an
-external dataset such as DENTEX. The interventions slide or tip a tooth
+per tooth and no demographic information. On 634 DENTEX X-rays from
+other clinics [Hamamci et al.], the unchanged models met one of four
+pre-set replication bars [R85]: shared errors still gave position-only's
+answer (87.5%), but position alone numbered 66.9% of teeth, only RT-DETR-l
+kept its margin (+14.7 points; YOLOv8x +0.5, mostly teeth found below the
+confidence and overlap thresholds, and Faster R-CNN -20.4, mostly
+numbering one position too distal), and shared errors sat at gaps 2.3
+times as often as correct teeth rather than 5. The interventions slide or tip a tooth
 within the image plane only (real teeth also rotate about their long
 axis), and masks on a 2D projection can touch without the teeth
 touching. Third-molar

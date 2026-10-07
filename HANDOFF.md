@@ -78,8 +78,13 @@ fixed it for closure-s1 and closure-s2.
 dentist re-read is dropped (the blinded sheet code stays,
 `dentist_sheet.py`); Zenodo DOI on hold.
 
-**Open:** DENTEX external validation (blocked by the no-download rule;
-the main gap a reviewer will flag); LNCS conversion and page check;
+**DENTEX external test (Section 85):** run 2026-10-06 on the public Kaggle
+copy; 1 of 4 pre-set bars met (shared errors follow position), so the
+paper reports a partial replication. Training the detectors within DENTEX
+(five-fold) is the next step if a stronger second-dataset result is
+wanted (about 6 to 10 GPU hours; rule not yet written).
+
+**Open:** LNCS conversion and page check;
 funding and conflict statements (author); references marked [verify]
 in DRAFT.md; which README lines the `5a0ecd6` rewrite dropped (low
 priority).
