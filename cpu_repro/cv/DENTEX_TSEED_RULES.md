@@ -1,6 +1,6 @@
 # Training within DENTEX, second training seed: do Section 86's numbers hold up?
 
-Draft 2026-10-07, to be frozen at approval, before any of it is run.
+Approved 2026-10-07 (pushed in 45a5fe8), frozen before any of it is run.
 
 ## Question
 
