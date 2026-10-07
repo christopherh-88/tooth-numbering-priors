@@ -114,7 +114,7 @@ def main():
     ap.add_argument("--train-args", default="", help='extra train_cv.py arguments as one string, e.g. --train-args="--augment-gaps"')
     a = ap.parse_args()
     for det in a.detectors:
-        name = (f"tooth-numbering-cv-{det.replace('_', '-')}-dentex" if a.dentex
+        name = (f"tooth-numbering-cv-{det.replace('_', '-')}-dentex{a.suffix}" if a.dentex
                 else f"tooth-numbering-cv-{det.replace('_', '-')}-s{a.cv_seed}{a.suffix}")
         d = a.out / name
         d.mkdir(parents=True, exist_ok=True)

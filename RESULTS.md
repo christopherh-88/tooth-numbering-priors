@@ -5932,6 +5932,41 @@ holds; the size of the gap link does not reach the UFBA bar, and the
 position share misses its bar by 0.2 points. Reported as a partial
 replication.
 
+## 87. Gap ratio by number of missing teeth: patient mix explains part of DENTEX's lower ratio
+
+Date 2026-10-07. Rule: `cpu_repro/cv/GAP_STRATA_RULES.md`, written before
+the analysis; reported only, no grade (Sections 85 and 86 stand). Script
+`cpu_repro/cv/gap_strata.py`. Results: `cpu_repro/cv/results/gap_strata/`.
+Inputs: UFBA seed 0 confidence-first per-tooth table (Section 64; 161
+shared errors reproduced), Section 86 and Section 85 per-tooth tables (303
+and 160 reproduced).
+
+Missing teeth per X-ray count positions 1 to 7 with no label. "Next to a
+gap" is unchanged (any arch neighbor, positions 1 to 8, unlabeled).
+
+| Missing teeth | UFBA: X-rays, shared errors, ratio | DENTEX within: X-rays, shared errors, ratio |
+|---|---|---|
+| 0 | 196, 16, 7.9 | 263, 77, 9.3 |
+| 1 to 2 | 87, 41, 5.2 | 199, 103, 3.0 |
+| 3 to 5 | 55, 57, 1.7 | 110, 81, 2.0 |
+| 6 or more | 87, 47, 1.7 | 62, 42, 1.3 |
+| All | 425, 161, **5.3** | 634, 303, **3.5** |
+
+In both datasets the ratio falls as X-rays lose more teeth, because
+correct teeth are then often next to a gap too (all-right teeth at a gap:
+0.8 to 33% on UFBA, 3.2 to 31% on DENTEX across the strata).
+
+Standardized to UFBA's mix of missing teeth: **DENTEX within 3.9 (95% CI
+3.2 to 5.1)**, shared errors at a gap 39.0% against 9.9% of all-right
+teeth; DENTEX external 2.4 (1.6 to 3.7).
+
+**Reading (fixed in advance).** The standardized ratio (3.9) is between
+the two pre-set readings: below the UFBA CI's lower end (4.2) but with a
+CI that covers most of the UFBA interval (4.2 to 6.6). Patient mix
+explains part of DENTEX's lower ratio (3.5 to 3.9 of the 5.3), not all of
+it; the strata with 1 to 2 missing teeth carry most of the remaining
+difference (3.0 against 5.2).
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

@@ -69,6 +69,7 @@ def main():
     ap.add_argument("--images", type=Path)
     ap.add_argument("--models", type=Path)
     ap.add_argument("--saved", type=Path, help="score saved within-DENTEX detections, no inference")
+    ap.add_argument("--saved-tag", default="_dentex", help="output-dir tag of the saved runs (DENTEX_TSEED_RULES.md: _dentex_tseed1)")
     ap.add_argument("--ufba-boxes", type=Path, required=True)
     ap.add_argument("--ufba-folds", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
@@ -92,7 +93,7 @@ def main():
     if a.saved:
         parts = []
         for d in DETS:
-            runs = [p for p in a.saved.rglob(f"{d}_cvseed0_dentex") if p.is_dir() and "/repo/" not in str(p)]
+            runs = [p for p in a.saved.rglob(f"{d}_cvseed0{a.saved_tag}") if p.is_dir() and "/repo/" not in str(p)]
             assert len(runs) == 1, (d, runs)
             files = sorted(runs[0].glob("fold*/test_detections.csv"))
             assert len(files) == 5, (d, files)

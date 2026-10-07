@@ -354,6 +354,15 @@ dentex_external.main()
 shutil.rmtree(REPO)
 '''
 
+DENTEX_TSEED1_BODY = '''subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "ultralytics==8.4.143"], check=True)
+import dentex_external
+sys.argv = ["dentex_external.py", "--labels", str(REPO / "cpu_repro/anomaly_scan/dentex_raw/train_quadrant_enumeration.json"),
+            "--ufba-boxes", str(REPO / "cpu_repro/cv/boxes.csv"), "--ufba-folds", str(REPO / "cpu_repro/cv/folds.csv"),
+            "--saved", "/kaggle/input", "--saved-tag", "_dentex_tseed1", "--out", "/kaggle/working/dentex_tseed1"]
+dentex_external.main()
+shutil.rmtree(REPO)
+'''
+
 
 def write(out, name, files, paths, body, gpu, sources, datasets=()):
     d = out / name
@@ -448,6 +457,11 @@ def main():
           csvs + ["cpu_repro/anomaly_scan/dentex_raw/train_quadrant_enumeration.json"], DENTEX_INDOMAIN_BODY, False,
           [f"{USER}/tooth-numbering-cv-{d}-dentex" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")]
           + [f"{USER}/tooth-numbering-cv-dentex-external"])
+    write(a.out, "tooth-numbering-cv-dentex-tseed1",
+          ["score_cv.py", "batch3.py", "gap_flag.py", "shift_test.py", "gap_check.py", "gap_intervention.py",
+           "closure_intervention.py", "dentex_external.py"],
+          csvs + ["cpu_repro/anomaly_scan/dentex_raw/train_quadrant_enumeration.json"], DENTEX_TSEED1_BODY, False,
+          [f"{USER}/tooth-numbering-cv-{d}-dentex-tseed1" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")])
 
 
 if __name__ == "__main__":
