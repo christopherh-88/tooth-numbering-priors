@@ -80,14 +80,17 @@ dentist re-read is dropped (the blinded sheet code stays,
 
 **DENTEX external test (Section 85):** run 2026-10-06 on the public Kaggle
 copy; 1 of 4 pre-set bars met (shared errors follow position), so the
-paper reports a partial replication. Training the detectors within DENTEX
-(five-fold) is the next step if a stronger second-dataset result is
-wanted (about 6 to 10 GPU hours; rule not yet written).
+paper reports a partial replication.
 
-**Open:** LNCS conversion and page check;
-funding and conflict statements (author); references marked [verify]
-in DRAFT.md; which README lines the `5a0ecd6` rewrite dropped (low
-priority).
+**DENTEX trained within DENTEX (Section 86):** run 2026-10-07; margins
+replicate (+22 to +25, bar 10); position share 85.5% against a bar of
+85.71; gap ratio 3.5 against 4.2. 1 of 3 bars met; reported as a partial
+replication in the paper's limitations.
+
+**Open:** anonymous code link (host the `make_anon_release.py` output on
+anonymous.4open.science, then footnote it in main.tex and DRAFT.md);
+funding and conflict statements (camera-ready only); which README lines
+the `5a0ecd6` rewrite dropped (low priority).
 
 **How the work runs:** everything on Kaggle (`.venv312/bin/kaggle`,
 credentials in `~/.kaggle/`); only tiny checks locally. Kernels embed the

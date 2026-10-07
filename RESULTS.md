@@ -5866,6 +5866,72 @@ R-CNN's is mostly a distal shift of one position. Shared errors sit at gaps abou
 as often as correct teeth, not five times. The pre-set replication bar
 was not met and the paper reports it as a partial replication.
 
+## 86. Training within DENTEX: margins replicate; shared errors follow position at 85.5% (bar 85.71) and sit at gaps 3.5 times as often
+
+Date 2026-10-07. Rule: `cpu_repro/cv/DENTEX_INDOMAIN_RULES.md`, frozen
+before the run (margin bar raised to 10 points at approval). Split:
+`cpu_repro/cv/dentex_prepare.py` (`dentex_boxes.csv`, `dentex_folds.csv`;
+test folds identical to Section 85). Training: `train_cv.py --dataset`,
+Kaggle GPU kernels `tooth-numbering-cv-{yolov8x,rtdetr-l,fasterrcnn}-dentex`
+at commit `4c7d4ff` (each with a CPU smoke pass first; all five folds
+trained the full 30 epochs: 1.7, 1.5 and 7.8 h). Scoring:
+`dentex_external.py --saved`, CPU kernel `tooth-numbering-cv-dentex-indomain`.
+Results: `cpu_repro/cv/results/kaggle_dentex_indomain/`.
+
+Check: the `--saved` path, given the Section 85 detections split by fold,
+reproduces every Section 85 estimate and CI exactly, before the new models
+are scored. 634 X-rays, 18,095 teeth.
+
+| | Top-1 (95% CI) | Missed | Misnumbered | Margin over position-only, pp (95% CI) | Section 85 (UFBA-trained) top-1 |
+|---|---|---|---|---|---|
+| Position-only | 66.9 (65.5 to 68.2) | | | | 66.9 |
+| YOLOv8x | 89.2 (88.1 to 90.1) | 6.5 | 4.3 | **+22.3 (20.9 to 23.6)** | 67.4 |
+| RT-DETR-l | 92.3 (91.4 to 93.1) | 2.2 | 5.5 | **+25.4 (24.0 to 26.7)** | 81.6 |
+| Faster R-CNN | 91.6 (90.6 to 92.5) | 1.5 | 6.9 | **+24.7 (23.4 to 26.0)** | 46.5 |
+
+Shared errors (all three detectors and position-only wrong with the same
+answer): 303 teeth (1.7% of teeth; UFBA 1.4%).
+
+**Graded:**
+
+1. Margin: **met** for all three detectors (CI lower ends 20.9, 24.0 and
+   23.4, bar 10).
+2. Shared errors follow position: **not met, by 0.2 points.** 85.5% (80.3
+   to 90.3) of the 303 give position-only's answer; the bar is 85.71.
+3. Shared errors at gaps: **not met.** 37.0% sit next to a missing labeled
+   neighbor against 10.5% of teeth all three get right, ratio 3.54 (2.94 to
+   4.25); the bar is 4.2 with the CI above 3.
+
+**Not replicated** (1 of 3). The floor is restated, not graded: 66.9%.
+
+Also reported:
+
+- Trained on DENTEX, the detectors beat position alone by 22 to 25 points,
+  more than on UFBA (14 to 17), because DENTEX's position floor is 12
+  points lower while the detectors lose only 1 to 6 points (89.2 to 92.3%
+  against 92.8 to 95.2% on UFBA).
+- Faster R-CNN's distal shift in Section 85 is gone: it misnumbers 6.9% of
+  teeth (Section 85: 29.2%), with errors split distal 57% and mesial 38%,
+  like the other two. The Section 85 losses were the domain shift.
+- When a shared error sits at a gap, its answer is the number of a tooth
+  with no label in that X-ray 91% of the time (UFBA 93%, Section 85 86%).
+- Overlap with Section 85: 133 of its 160 shared-error teeth are shared
+  errors here too (83%); Jaccard 0.40 over the two sets.
+- Gap flag (Section 84 rule, no grade): catches 28.7 / 29.0 / 25.4% of
+  shared errors against 17.8 / 17.2 / 22.1% for confidence (YOLOv8x 1.61x,
+  RT-DETR-l 1.69x, Faster R-CNN 1.15x), at 15.1, 12.9 and 14.7% of teeth;
+  the difference CI excludes 0 for YOLOv8x and RT-DETR-l.
+
+**Reading.** Without the domain shift, all three detectors clear the
+stricter margin bar by a wide margin, and Faster R-CNN's Section 85
+failure disappears. The shared errors land just under the position bar
+(85.5 against 85.71, with a CI covering most of the UFBA interval) and sit
+at gaps 3.5 times as often as correct teeth, between UFBA (about 5) and
+Section 85 (2.3). On a second dataset the direction of every UFBA finding
+holds; the size of the gap link does not reach the UFBA bar, and the
+position share misses its bar by 0.2 points. Reported as a partial
+replication.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

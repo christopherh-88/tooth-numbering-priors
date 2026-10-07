@@ -307,13 +307,14 @@ better than a retrained control (+0.1 points, CI -1.6 to 1.7) [R77].
 
 **Limitations.** One dataset from one source, with a single annotation
 per tooth and no demographic information. On 634 DENTEX X-rays from
-other clinics [Hamamci et al.], the unchanged models met one of four
-pre-set replication bars [R85]: shared errors still gave position-only's
-answer (87.5%), but position alone numbered 66.9% of teeth, only RT-DETR-l
-kept its margin (+14.7 points; YOLOv8x +0.5, mostly teeth found below the
-confidence and overlap thresholds, and Faster R-CNN -20.4, mostly
-numbering one position too distal), and shared errors sat at gaps 2.3
-times as often as correct teeth rather than 5. The interventions slide or tip a tooth
+other clinics [Hamamci et al.], position alone numbers 66.9% of teeth.
+Trained within DENTEX, all three detectors beat it by 22 to 25 points, the
+shared errors give position-only's answer 85.5% of the time (our pre-set
+bar was 85.7%), and they sit at gaps 3.5 times as often as correct teeth
+(bar 4.2) [R86]. The UFBA-trained models, run unchanged, keep the position
+share (87.5%) but lose margin under the domain shift, mostly from missed
+teeth (YOLOv8x) or numbering one position too distal (Faster R-CNN) [R85].
+The direction of each finding holds on DENTEX; the gap link is weaker. The interventions slide or tip a tooth
 within the image plane only (real teeth also rotate about their long
 axis), and masks on a 2D projection can touch without the teeth
 touching. Third-molar

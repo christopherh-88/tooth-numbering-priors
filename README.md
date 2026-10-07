@@ -37,10 +37,12 @@ neighbors have closed the space; closing or tipping a neighbor into an
 erased tooth's space on purpose reproduces them (Sections 69 to 82). A
 flag computed from a detector's own output (teeth next to a position it
 left empty, or sharing a number) catches 41 to 47% of them while marking
-12 to 16% of teeth (Section 84). On 634 DENTEX X-rays from other clinics
-the unchanged models met one of four pre-set replication bars: shared
-errors still follow position (87.5%), but the floor, two of three margins
-and the gap link weaken (Section 85).
+12 to 16% of teeth (Section 84). On 634 DENTEX X-rays from other clinics,
+detectors trained within DENTEX beat position alone by 22 to 25 points and
+their shared errors follow position 85.5% of the time (pre-set bar 85.7%)
+and sit at gaps 3.5 times as often as correct teeth (bar 4.2): the
+direction replicates, the gap link is weaker (Section 86). The UFBA-trained
+models run unchanged lose margin under the domain shift (Section 85).
 
 ## Where to look
 
