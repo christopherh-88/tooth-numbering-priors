@@ -153,4 +153,9 @@ later revision was posted 2025-07-02. See `paper/DRAFT.md`'s References
 section for the citation-year note.)
 
 Licensed under Apache 2.0 (`LICENSE`), inherited from the upstream
-project.
+project. Exception: files derived from the DENTEX labels (Hamamci et al.,
+2023; `cpu_repro/anomaly_scan/dentex_raw/`, `cpu_repro/cv/dentex_boxes.csv`,
+`cpu_repro/cv/dentex_folds.csv`, `cpu_repro/cv/results/kaggle_dentex*/`,
+`cpu_repro/coord_baseline/dentex/` and other files with `dentex` in their
+path) remain under DENTEX's CC BY-NC-SA 4.0 license: attribution,
+non-commercial use only, and derivatives under the same license.

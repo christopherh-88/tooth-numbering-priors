@@ -49,7 +49,13 @@ interventions ran as Kaggle GPU kernels written by
 `cpu_repro/cv/kaggle/make_kernels.py` and `make_phase3_kernels.py`; set
 `USER` and `REPO_URL` in those files before use.
 
-Licensed under Apache 2.0 (`LICENSE`).
+Licensed under Apache 2.0 (`LICENSE`), except the files derived from the
+DENTEX labels (Hamamci et al., 2023; every file with `dentex` in its path,
+for example `cpu_repro/cv/dentex_boxes.csv` and
+`cpu_repro/cv/results/kaggle_dentex*/`), which remain under DENTEX's
+CC BY-NC-SA 4.0 license: attribution, non-commercial use only, and
+derivatives under the same license. The DENTEX X-rays are not included;
+they are available from the DENTEX challenge.
 """
 
 

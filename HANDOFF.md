@@ -85,7 +85,18 @@ paper reports a partial replication.
 **DENTEX trained within DENTEX (Section 86):** run 2026-10-07; margins
 replicate (+22 to +25, bar 10); position share 85.5% against a bar of
 85.71; gap ratio 3.5 against 4.2. 1 of 3 bars met; reported as a partial
-replication in the paper's limitations.
+replication in the paper's limitations, and in the abstract.
+
+**Gap ratio by missing teeth (Section 87):** weighting DENTEX to UFBA's
+mix of missing teeth raises the ratio from 3.5 to 3.9 (CI 3.2 to 5.1);
+patient mix explains part of the difference. Reported only.
+
+**Pending: DENTEX second training seed** (`DENTEX_TSEED_RULES.md`, frozen
+in a170d98). Not launched: the Kaggle weekly GPU quota (30 h) was used up
+on 2026-10-07. When it resets, rebuild the kernels at the current commit
+(`make_kernels.py --dentex --suffix=-tseed1 --train-args="--train-seed 1"`
+and `make_phase3_kernels.py`), push YOLOv8x and RT-DETR-l, then Faster
+R-CNN, then `tooth-numbering-cv-dentex-tseed1`.
 
 **Open:** anonymous code link (host the `make_anon_release.py` output on
 anonymous.4open.science, then footnote it in main.tex and DRAFT.md);

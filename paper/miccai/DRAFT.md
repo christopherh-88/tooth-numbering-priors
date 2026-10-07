@@ -29,17 +29,16 @@ points, on all 32 tooth numbers, and the gap replicates on two further
 splits [R65, R75, R78, R74]. Their errors still follow position. On 1.4% of
 teeth all three detectors give the same wrong number, and in 91% of
 these the position-only model gives it too, against under 7% by chance
-[R65]. A sequence of interventions locates these shared errors. Shifting
-the whole image barely changes the detectors' answers, and masking
-distant context rarely fixes them [R67, R68]. They sit next to a missing
+[R65]. They sit next to a missing
 tooth five times as often as correct teeth and usually take the missing
 tooth's number [R69], and they occur where the neighbors have closed the
 space (AUROC 0.78) [R72]. Closing a gap on purpose reproduces them: when
 a neighbor is moved into an erased tooth's space, all three detectors give
 it the missing number 21% of the time, against 0.2% when the space is left
-open [R71, R76]. We release the per-tooth table and a
-scorer so new models can be compared with the baseline and on the shared
-failures.
+open [R71, R76]. On 634 DENTEX X-rays from other clinics, detectors
+trained there beat position alone by 22 to 25 points, and their shared
+errors give the position-only answer 85.5% of the time, with a weaker link
+to missing teeth [R86]. We release the per-tooth table and a scorer.
 
 Keywords: tooth numbering, panoramic radiography, shortcut learning,
 error consistency, object detection
@@ -311,7 +310,8 @@ other clinics [Hamamci et al.], position alone numbers 66.9% of teeth.
 Trained within DENTEX, all three detectors beat it by 22 to 25 points, the
 shared errors give position-only's answer 85.5% of the time (our pre-set
 bar was 85.7%), and they sit at gaps 3.5 times as often as correct teeth
-(bar 4.2) [R86]. The UFBA-trained models, run unchanged, keep the position
+(bar 4.2; 3.9 once DENTEX is weighted to UFBA's mix of missing
+teeth) [R86, R87]. The UFBA-trained models, run unchanged, keep the position
 share (87.5%) but lose margin under the domain shift, mostly from missed
 teeth (YOLOv8x) or numbering one position too distal (Faster R-CNN) [R85].
 The direction of each finding holds on DENTEX; the gap link is weaker. The interventions slide or tip a tooth
@@ -329,8 +329,9 @@ randomness alone (overlap 0.63, against 0.54 to 0.57 across splits). About 10% o
 On uncropped panoramic X-rays, position alone numbers 78.5% of teeth,
 and detectors add 14 to 17 pp. The few errors they share follow
 position and concentrate next to missing teeth whose neighbors have
-closed the space. We release the per-tooth table and scorer so that new
-models can be measured against the baseline and on these shared
+closed the space. On a second dataset, DENTEX, the same pattern holds
+with a weaker link to gaps. We release the per-tooth table and scorer so
+that new models can be measured against the baseline and on these shared
 failures.
 
 ---

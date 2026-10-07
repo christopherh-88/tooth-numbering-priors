@@ -43,6 +43,8 @@ written, approved and frozen in a `*_RULES.md` file before it ran;
 | `dentex_external.py` | Do the UFBA models' results carry over to DENTEX? | DENTEX_EXTERNAL_RULES.md | 85 |
 | `dentex_sensitivity.py` | DENTEX thresholds and framing (reported only) | DENTEX_EXTERNAL_RULES.md | 85 |
 | `dentex_prepare.py`, `train_cv.py --dataset` | Train the three detectors within DENTEX | DENTEX_INDOMAIN_RULES.md | 86 |
+| `gap_strata.py` | Gap ratio by number of missing teeth (reported only) | GAP_STRATA_RULES.md | 87 |
+| `train_cv.py --dataset --train-seed 1` | DENTEX second training seed | DENTEX_TSEED_RULES.md | pending (GPU quota) |
 | `dentist_sheet.py` | Blinded expert sheet (built, not used) | LABEL_CHECK_RULES.md | 65 |
 
 ## Results
