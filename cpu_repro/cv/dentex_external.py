@@ -11,6 +11,12 @@ at confidence >= 0.05 in the train_cv.py format, then scores as score_cv.py
 UFBA-trained fold model (also reported). Writes dentex_teeth.csv,
 dentex_detections.csv, dentex_summary.csv and dentex_gap_flag.csv.
 --images-limit N keeps the first N X-rays (smoke test only).
+
+    python dentex_external.py --labels <json> --saved <dir> --ufba-boxes ... --ufba-folds ... --out <dir>
+
+--saved scores detections saved by train_cv.py --dataset (models trained
+within DENTEX, DENTEX_INDOMAIN_RULES.md) instead of running the UFBA models:
+<dir> holds, at any depth, {det}_cvseed0_dentex/fold{0..4}/test_detections.csv.
 """
 import argparse
 import json
@@ -60,8 +66,9 @@ def boot(t, cols, stat, rng):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--labels", type=Path, required=True)
-    ap.add_argument("--images", type=Path, required=True)
-    ap.add_argument("--models", type=Path, required=True)
+    ap.add_argument("--images", type=Path)
+    ap.add_argument("--models", type=Path)
+    ap.add_argument("--saved", type=Path, help="score saved within-DENTEX detections, no inference")
     ap.add_argument("--ufba-boxes", type=Path, required=True)
     ap.add_argument("--ufba-folds", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
@@ -82,10 +89,23 @@ def main():
     t["tid"] = np.arange(len(t))
     print(f"{len(ids)} X-rays, {len(t)} teeth", flush=True)
 
+    if a.saved:
+        parts = []
+        for d in DETS:
+            runs = [p for p in a.saved.rglob(f"{d}_cvseed0_dentex") if p.is_dir() and "/repo/" not in str(p)]
+            assert len(runs) == 1, (d, runs)
+            files = sorted(runs[0].glob("fold*/test_detections.csv"))
+            assert len(files) == 5, (d, files)
+            parts.append(pd.concat([pd.read_csv(f) for f in files]).assign(detector=d))
+        dets = pd.concat(parts)[["detector", "image_id", "class_id", "conf", "x1", "y1", "x2", "y2"]]
+        dets = dets[dets["image_id"].isin(ids)].reset_index(drop=True)
+        for d in DETS:  # every X-ray tested exactly once, by its own fold's models
+            seen = dets.loc[dets["detector"] == d, "image_id"].unique()
+            assert len(seen) >= 0.99 * len(ids), (d, len(seen))
     # ---- inference (GPU), saved in the train_cv.py detection format
     import cv2
     det_rows = []
-    for d in DETS:
+    for d in ([] if a.saved else DETS):
         runs = [p for p in a.models.rglob(f"{d}_cvseed0") if p.is_dir() and "/repo/" not in str(p)]
         assert len(runs) == 1, (d, runs)
         for f in range(5):
@@ -98,7 +118,8 @@ def main():
                                   x2=b[2], y2=b[3]) for c, s, b in zip(cls, conf, xyxy)]
             del model
             print(d, "fold", f, "done", flush=True)
-    dets = pd.DataFrame(det_rows)
+    if not a.saved:
+        dets = pd.DataFrame(det_rows)
     dets.to_csv(a.out / "dentex_detections.csv", index=False)
 
     # ---- scoring
@@ -142,7 +163,7 @@ def main():
     rows[-1]["pass"] = rows[-1]["lo"] >= 68.5
     for d in DETS:
         add(f"margin_{d}", [f"_{d}_correct", "_coord_correct"], lambda u: 100 * (u[1] - u[2]) / u[0])
-        rows[-1]["pass"] = rows[-1]["lo"] >= 5
+        rows[-1]["pass"] = rows[-1]["lo"] >= (10 if a.saved else 5)  # DENTEX_INDOMAIN_RULES.md raises it to 10
     for c in ["joint", "pos_match", "all_right", "joint_gap", "right_gap", "joint_gap_missing_number"]:
         t[f"_{c}"] = t[c].astype(int)
     n_joint = int(joint.sum())

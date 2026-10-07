@@ -135,16 +135,18 @@ def build():
     return boxes, folds
 
 
-def write_yolo(out_dir: Path, boxes, folds):
+def write_yolo(out_dir: Path, boxes, folds, src_dir: Path = None, ext: str = "jpg"):
     """images/ symlinks to the X-rays, labels/ in YOLO format, and
-    fold{f}_{train,val,test}.txt lists of absolute image paths."""
+    fold{f}_{train,val,test}.txt lists of absolute image paths. src_dir and
+    ext default to the UFBA X-rays (DENTEX_INDOMAIN_RULES.md passes others)."""
+    src_dir = src_dir or SRC / "panoramic_x_rays"
     img_dir, lab_dir = out_dir / "images", out_dir / "labels"
     img_dir.mkdir(parents=True, exist_ok=True)
     lab_dir.mkdir(parents=True, exist_ok=True)
     for image_id, grp in boxes.groupby("image_id"):
-        link = img_dir / f"{image_id}.jpg"
+        link = img_dir / f"{image_id}.{ext}"
         if not link.exists():
-            link.symlink_to(SRC / "panoramic_x_rays" / f"{image_id}.jpg")
+            link.symlink_to(src_dir / f"{image_id}.{ext}")
         lines = [f"{r.class_id} {r.x_center:.6f} {r.y_center:.6f} {r.width:.6f} {r.height:.6f}"
                  for r in grp.itertuples()]
         (lab_dir / f"{image_id}.txt").write_text("\n".join(lines) + "\n")
@@ -154,7 +156,7 @@ def write_yolo(out_dir: Path, boxes, folds):
                  "val": (folds["fold"] != f) & folds[val_col],
                  "train": (folds["fold"] != f) & ~folds[val_col]}
         for name, mask in parts.items():
-            paths = [str(img_dir / f"{i}.jpg") for i in folds.loc[mask, "image_id"]]
+            paths = [str(img_dir / f"{i}.{ext}") for i in folds.loc[mask, "image_id"]]
             (out_dir / f"fold{f}_{name}.txt").write_text("\n".join(paths) + "\n")
     print(f"wrote YOLO labels and fold lists to {out_dir}")
 

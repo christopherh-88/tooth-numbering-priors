@@ -42,6 +42,7 @@ written, approved and frozen in a `*_RULES.md` file before it ran;
 | `gap_flag.py` | Can the detector's own output flag the shared errors? | GAP_FLAG_RULES.md | 84 |
 | `dentex_external.py` | Do the UFBA models' results carry over to DENTEX? | DENTEX_EXTERNAL_RULES.md | 85 |
 | `dentex_sensitivity.py` | DENTEX thresholds and framing (reported only) | DENTEX_EXTERNAL_RULES.md | 85 |
+| `dentex_prepare.py`, `train_cv.py --dataset` | Train the three detectors within DENTEX | DENTEX_INDOMAIN_RULES.md | 86 (pending) |
 | `dentist_sheet.py` | Blinded expert sheet (built, not used) | LABEL_CHECK_RULES.md | 65 |
 
 ## Results

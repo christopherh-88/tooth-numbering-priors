@@ -52,7 +52,11 @@ def fold_lists(work: Path, fold: int):
             for k in ("train", "val", "test")}
 
 
-def prepare(work: Path, cv_seed: int, augment_gaps: bool = False):
+def prepare(work: Path, cv_seed: int, augment_gaps: bool = False, dataset=None):
+    if dataset:  # (boxes csv, folds csv, image dir, extension): DENTEX_INDOMAIN_RULES.md
+        boxes_csv, folds_csv, image_dir, ext = dataset
+        prep.write_yolo(work, pd.read_csv(boxes_csv), pd.read_csv(folds_csv), Path(image_dir), ext)
+        return
     boxes = pd.read_csv(HERE / "boxes.csv")
     folds = pd.read_csv(prep.folds_path(cv_seed))  # folds.csv for seed 0, folds_seed<s>.csv otherwise
     prep.write_yolo(work, boxes, folds)
@@ -327,11 +331,14 @@ def main():
     ap.add_argument("--smoke", action="store_true", help="CPU, 1 epoch, 4 images per split")
     ap.add_argument("--augment-gaps", action="store_true", help="GAP_AUGMENT_RULES.md training copies")
     ap.add_argument("--train-seed", type=int, default=0, help="Ultralytics training seed (default 0, as before)")
+    ap.add_argument("--dataset", nargs=4, metavar=("BOXES", "FOLDS", "IMAGE_DIR", "EXT"), default=None,
+                    help="train on another dataset (DENTEX_INDOMAIN_RULES.md); output dirs get a _dentex tag")
     a = ap.parse_args()
     if a.smoke:
         a.device = "cpu"
-    prepare(a.work, a.cv_seed, a.augment_gaps)
-    tag = ("_aug" if a.augment_gaps else "") + (f"_tseed{a.train_seed}" if a.train_seed else "")
+    prepare(a.work, a.cv_seed, a.augment_gaps, a.dataset)
+    tag = (("_dentex" if a.dataset else "") + ("_aug" if a.augment_gaps else "")
+           + (f"_tseed{a.train_seed}" if a.train_seed else ""))
     for fold in a.folds:
         out = a.out_root / f"{a.detector}_cvseed{a.cv_seed}{tag}{'_smoke' if a.smoke else ''}" / f"fold{fold}"
         out.mkdir(parents=True, exist_ok=True)

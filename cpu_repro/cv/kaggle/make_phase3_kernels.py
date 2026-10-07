@@ -14,6 +14,9 @@ tooth-numbering-cv-dentist-s0 (CPU): dentist_sheet.py (LABEL_CHECK_RULES.md chec
 tooth-numbering-cv-seed1-score (CPU): seed 0 and seed 1 scored with YOLOv8x and
 RT-DETR-l, confidence-first (PHASE3_BATCH2_RULES.md item 3).
 tooth-numbering-cv-gapcheck-s0 (CPU): gap_check.py (PHASE3_BATCH3_RULES.md note).
+tooth-numbering-cv-dentex-indomain (CPU): dentex_external.py --saved on the
+models trained within DENTEX (DENTEX_INDOMAIN_RULES.md), after checking that
+the --saved path reproduces Section 85 from its own detections.
 Each kernel
 embeds the scripts it runs (written to disk at start, so the code that ran
 is visible in the kernel itself), reads the training and scoring kernels'
@@ -323,6 +326,34 @@ dentex_external.main()
 shutil.rmtree(REPO)
 '''
 
+DENTEX_INDOMAIN_BODY = '''subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "ultralytics==8.4.143"], check=True)
+import pandas as pd
+import dentex_external
+ext = sorted(p for p in Path("/kaggle/input").rglob("dentex_detections.csv") if p.parent.name == "dentex")
+assert len(ext) == 1, ext
+args = ["dentex_external.py", "--labels", str(REPO / "cpu_repro/anomaly_scan/dentex_raw/train_quadrant_enumeration.json"),
+        "--ufba-boxes", str(REPO / "cpu_repro/cv/boxes.csv"), "--ufba-folds", str(REPO / "cpu_repro/cv/folds.csv")]
+# Check: the --saved path, fed the Section 85 detections split by fold, reproduces Section 85.
+teeth = pd.read_csv(ext[0].parent / "dentex_teeth.csv")
+fold_of = teeth.drop_duplicates("image_id").set_index("image_id")["fold"]
+d85 = pd.read_csv(ext[0])
+chk = Path("/kaggle/working/check85")
+for (d, f), g in d85.groupby(["detector", d85["image_id"].map(fold_of)]):
+    o = chk / f"{d}_cvseed0_dentex" / f"fold{f}"
+    o.mkdir(parents=True, exist_ok=True)
+    g.drop(columns="detector").to_csv(o / "test_detections.csv", index=False)
+sys.argv = args + ["--saved", str(chk), "--out", "/kaggle/working/check85_out"]
+dentex_external.main()
+a = pd.read_csv("/kaggle/working/check85_out/dentex_summary.csv").set_index("metric")[["point", "lo", "hi"]]
+b = pd.read_csv(ext[0].parent / "dentex_summary.csv").set_index("metric")[["point", "lo", "hi"]]
+assert ((a - b).abs() < 1e-9).all().all(), (a - b)
+shutil.rmtree(chk)
+print("check passed: --saved reproduces Section 85", flush=True)
+sys.argv = args + ["--saved", "/kaggle/input", "--out", "/kaggle/working/dentex_indomain"]
+dentex_external.main()
+shutil.rmtree(REPO)
+'''
+
 
 def write(out, name, files, paths, body, gpu, sources, datasets=()):
     d = out / name
@@ -411,6 +442,12 @@ def main():
           TRAIN_KERNELS, ["truthisneverlinear/dentex-challenge-2023"])
     write(a.out, "tooth-numbering-cv-batch3-s0", ["score_cv.py", "batch3.py"], csvs, BATCH3_BODY, False,
           TRAIN_KERNELS)
+    write(a.out, "tooth-numbering-cv-dentex-indomain",
+          ["score_cv.py", "batch3.py", "gap_flag.py", "shift_test.py", "gap_check.py", "gap_intervention.py",
+           "closure_intervention.py", "dentex_external.py"],
+          csvs + ["cpu_repro/anomaly_scan/dentex_raw/train_quadrant_enumeration.json"], DENTEX_INDOMAIN_BODY, False,
+          [f"{USER}/tooth-numbering-cv-{d}-dentex" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")]
+          + [f"{USER}/tooth-numbering-cv-dentex-external"])
 
 
 if __name__ == "__main__":
