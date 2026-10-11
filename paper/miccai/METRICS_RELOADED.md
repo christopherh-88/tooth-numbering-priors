@@ -1,9 +1,25 @@
 # Metrics Reloaded check
 
 Metric choices checked against the Metrics Reloaded framework (Maier-Hein
-et al., Nature Methods 2024). The framework's questions are paraphrased
-here from memory, not quoted; check the wording against the paper and its
-online tool before submission.
+et al., Nature Methods 2024; open-access text PMC11182665, main text read
+2026-10-09). What was checked: the object detection (ObD) path described
+in the main text (localization criterion, assignment strategy, counting
+metric, multi-threshold metric, per-class application). What was not: the
+supplementary notes, the extended data figures (S8, S9) and the online
+tool, so the fingerprint item numbers (FP) are the paper's, but each
+mapping below is this study's reading and should be re-run in the tool
+before submission.
+
+**One departure from the framework, now closed in the supplement.** For
+detectors that give continuous class scores (FP5.1), the paper recommends
+complementing a counting metric with a multi-threshold metric, AP or the
+FROC score, rather than relying on a single score cutoff. The main text
+reports numbered F1 and top-1 at one cutoff (0.5), cutoff sweeps (0.25 to
+0.75; Sections 62, 65) and risk-coverage and calibration for the review
+flags (Sections 65, 66). AP50 and AP50:95 (class-aware, COCO matching) are
+computed for every detector set and go in the supplement (RESULTS.md
+Section 89, `AP_RULES.md`); FROC is not computed. The main text says that
+top-1 stays the headline because the position-only baseline has no scores.
 
 ## Problem fingerprint
 
@@ -29,14 +45,14 @@ online tool before submission.
 
 | Metric | Why | Status |
 |---|---|---|
-| Top-1 over all labeled teeth (missed = wrong) | Headline, directly comparable with the position-only model, which always answers | Reported with X-ray bootstrap CIs |
+| Top-1 over all labeled teeth (missed = wrong) | Headline, directly comparable with the position-only model, which always answers. It is a per-reference-tooth recall (detected and correctly numbered over labeled), so it needs no true negatives, which the framework says rules out accuracy and specificity for detection | Reported with X-ray bootstrap CIs |
 | Gap over position-only (pp, paired) | The study's question | Reported |
 | Missed and misnumbered rates | Separates detection from numbering | Reported |
 | Top-1 on matched teeth only | Numbering given detection | Reported |
 | Macro top-1 (per-class mean) | Class balance check | Computed in `benchmark/score.py`; equals micro within 0.4 pp |
 | False positives and numbered F1 | Top-1 ignores extra boxes; the framework expects a metric that counts them for detection | Done (RESULTS.md Section 73): F1 95.0 / 92.3 / 89.6 for YOLOv8x / RT-DETR-l / Faster R-CNN; RT-DETR-l leaves about 1.9 extra boxes per X-ray |
 | Per-class (per-FDI) top-1 | Shows where errors sit | Done (RESULTS.md Section 74, `benchmark/per_fdi.csv`): every detector beats position-only on all 32 numbers |
-| AP / mAP | Standard detection ranking metric | Not reported (decided 2026-10-05). It averages over confidence thresholds, and the position-only model has no scores to compare with; numbered F1 covers the false positives mAP would add. |
+| AP | The framework's multi-threshold metric for scored detectors (FP5.1) | **Supplement only (2026-10-10, RESULTS.md Section 89).** Headline stays top-1 because the position-only model has no scores to compare with. FROC not computed. |
 | Risk-coverage (AURC), calibration | For review flags | Reported (Sections 65, 66) |
 | Agreement between models (kappa, kappa max, phi, permutation nulls) | The shared-error claim | Reported (Sections 59, 65, 70) |
 
@@ -50,5 +66,11 @@ online tool before submission.
 
 ## To do before submission
 
-Nothing open on metrics. Check the paraphrased questions against the
-paper.
+- Supplement file: `paper/miccai/SUPPLEMENT.md` (AP table, built 2026-10-10; add the DENTEX intervention results when they exist).
+- Run the fingerprint through the Metrics Reloaded online tool and compare
+  its recommended metrics with the table above (not done; the tool is
+  interactive).
+- Class-aware aggregation: the framework applies the metrics per class and
+  then aggregates with extra care when classes have few objects. Here
+  macro and micro top-1 differ by under 0.4 pp and per-FDI top-1 is in
+  `benchmark/per_fdi.csv`, so this holds; keep the sentence in the paper.

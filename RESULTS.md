@@ -5967,6 +5967,377 @@ explains part of DENTEX's lower ratio (3.5 to 3.9 of the 5.3), not all of
 it; the strata with 1 to 2 missing teeth carry most of the remaining
 difference (3.0 against 5.2).
 
+## 88. Training within DENTEX, second training seed: same 1 of 3 bars, and the shared errors move a third between runs
+
+Date 2026-10-10. Rule: `cpu_repro/cv/DENTEX_TSEED_RULES.md`, frozen in
+`a170d98` before the run. Design exactly as Section 86 (same folds, same
+15% validation X-rays, same settings, same scorer) with training seed 1
+(`train_cv.py --dataset --train-seed 1`). Training: Kaggle GPU kernels
+`tooth-numbering-cv-{yolov8x,rtdetr-l,fasterrcnn}-dentex-tseed1` at commit
+`cf918cb`, each with a CPU smoke pass first; all five folds trained for all
+three detectors (1.53, 1.46 and 7.84 h, 10.8 GPU hours). Scoring: CPU
+kernel `tooth-numbering-cv-dentex-tseed1` (`dentex_external.py --saved
+--saved-tag _dentex_tseed1`); the comparison with Section 86 is
+`cpu_repro/cv/dentex_tseed_compare.py`. Results:
+`cpu_repro/cv/results/kaggle_dentex_tseed1/` and
+`cpu_repro/cv/results/dentex_tseed_compare/`. Same 634 X-rays, 18,095
+teeth; position-only floor 66.9% as in Section 86.
+
+**Graded** (seed 1 alone, the bars of `DENTEX_INDOMAIN_RULES.md`, unchanged):
+
+| Bar | Seed 1 | Section 86 (seed 0) | Met by seed 1 |
+|---|---|---|---|
+| Margin over position-only, CI lower end at least 10 pp | YOLOv8x +24.0 (22.6 to 25.4), RT-DETR-l +25.6 (24.3 to 27.0), Faster R-CNN +25.1 (23.7 to 26.4) | +22.3, +25.4, +24.7 | **yes**, all three |
+| Shared errors give position-only's answer, at least 85.71% (50 or more shared errors) | 85.5% (80.8 to 89.8) of 310 | 85.5% (80.3 to 90.3) of 303 | **no**, by 0.2 points |
+| Shared errors at gaps, ratio at least 4.2 with CI above 3 | 3.28 (2.67 to 4.00) | 3.54 (2.94 to 4.25) | **no** |
+
+Seed 1 meets **1 of 3**, the same as seed 0. Section 86's grade stands.
+
+Side by side (95% CIs of the X-ray bootstrap; seed 1 values from
+`dentex_summary.csv`, seed 0 from Section 86):
+
+| | Top-1, seed 0 | Top-1, seed 1 | Missed, seed 0 | Missed, seed 1 |
+|---|---|---|---|---|
+| YOLOv8x | 89.2 (88.1 to 90.1) | 90.9 (89.9 to 91.9) | 6.5 | 4.5 |
+| RT-DETR-l | 92.3 (91.4 to 93.1) | 92.5 (91.6 to 93.4) | 2.2 | 2.1 |
+| Faster R-CNN | 91.6 (90.6 to 92.5) | 91.9 (91.0 to 92.8) | 1.5 | 1.5 |
+
+Also reported, no rule:
+
+- **Overlap of the two shared-error sets:** 237 teeth are shared errors in
+  both runs, of 376 in either (Jaccard 0.63, the same as the UFBA
+  same-split new-seed value in Section 83). 78% of seed 0's 303 are shared
+  errors in seed 1 too, and 76% of seed 1's 310 are in seed 0's.
+- **Pooled over both seeds** (shared-error rows from both runs, X-rays
+  resampled jointly, 613 rows): position share 85.5% (80.7 to 89.8), gap
+  ratio 3.40 (2.85 to 4.08). Not graded: a pooled bar would be set after
+  seeing seed 0.
+- When a shared error sits at a gap, its answer is the number of a tooth
+  with no label in that X-ray 88.7% of the time (seed 0: 91.1%). Shared
+  errors at a gap: 34.2% against 10.4% of all-right teeth (seed 0: 37.0%
+  against 10.5%).
+- Gap flag (Section 84 rule, no grade): catches 30.3 / 29.0 / 30.0% of
+  shared errors against 20.0 / 20.0 / 20.3% for confidence, at 13.1, 12.9
+  and 14.5% of teeth; the difference CI excludes 0 for all three (lower
+  ends 4.2, 3.8 and 3.0 points). Seed 0: 28.7 / 29.0 / 25.4% against 17.8
+  / 17.2 / 22.1%, with the CI excluding 0 for YOLOv8x and RT-DETR-l only.
+- The bootstrap CIs in the comparison script use another random stream
+  from the scorer's, so the seed 0 CIs there differ from Section 86's in
+  the first decimal; points are identical. Graded numbers above are the
+  scorer's.
+
+**Reading.** The question was whether Section 86's partial replication is a
+property of DENTEX or of one training run. It is a property of DENTEX: a
+second training run gives the same position share (85.5%, again 0.2 points
+under the bar), a gap ratio of 3.3 against 3.5 (both under 4.2; the pooled
+CI upper end, 4.08, is also under it), and the same margins (all three
+detectors 22 points or more above position-only at the CI lower end). The
+UFBA bars for the position share and gap link are not reached on DENTEX in
+either run. About a third of the shared-error teeth change with training
+randomness alone (overlap 0.63), as on UFBA, so individual teeth should not
+be read as fixed, but the rates are stable.
+
+## 89. Average precision of the three detectors (appendix, reported only)
+
+Date 2026-10-10. Rule: `cpu_repro/cv/AP_RULES.md`, written before the
+numbers were computed. Script `cpu_repro/cv/ap_eval.py`. Results:
+`cpu_repro/cv/results/ap/{ufba,dentex}/ap_summary.csv`. Inputs: the raw
+detections the training kernels saved (confidence at least 0.05,
+`test_detections.csv`, pooled over the five test folds, one file per
+detector): UFBA kernels `tooth-numbering-cv-{yolov8x,rtdetr-l,fasterrcnn}-s{0,1,2}`
+(425 X-rays, 11,602 teeth) and, for DENTEX, `dentex_detections.csv` of
+Sections 86 and 88 (634 X-rays, 18,095 teeth).
+
+COCO-style AP, class-aware (a box counts for the tooth number it gives), 101-point
+interpolation, mean over the 32 numbers; AP50 and AP50:95 (IoU 0.50 to 0.95).
+95% CIs from 1,000 bootstrap draws of X-rays.
+
+Check: the implementation equals `pycocotools` on two synthetic cases
+(AP50:95 32.026 and 31.836, AP50 63.879 and 63.796, identical to three
+decimals) and scores a perfect detector at 100.
+
+| Set | Detector | AP50 (95% CI) | AP50:95 (95% CI) |
+|---|---|---|---|
+| UFBA split 0 | YOLOv8x | 94.9 (93.9 to 95.9) | 69.7 (68.9 to 70.9) |
+| | RT-DETR-l | 96.7 (96.1 to 97.4) | 71.3 (70.7 to 72.4) |
+| | Faster R-CNN | 95.1 (94.3 to 96.0) | 66.4 (65.7 to 67.5) |
+| UFBA split 1 | YOLOv8x | 94.8 (93.8 to 95.8) | 69.7 (68.9 to 70.9) |
+| | RT-DETR-l | 96.7 (96.2 to 97.4) | 71.4 (70.8 to 72.5) |
+| | Faster R-CNN | 95.0 (94.1 to 96.0) | 66.5 (65.8 to 67.6) |
+| UFBA split 2 | YOLOv8x | 94.7 (93.8 to 95.9) | 69.6 (68.8 to 70.9) |
+| | RT-DETR-l | 96.7 (96.2 to 97.4) | 71.5 (70.9 to 72.5) |
+| | Faster R-CNN | 95.0 (94.2 to 96.0) | 66.4 (65.8 to 67.5) |
+| DENTEX, training seed 0 | YOLOv8x | 91.4 (90.2 to 92.7) | 51.2 (50.1 to 52.8) |
+| | RT-DETR-l | 93.5 (92.7 to 94.5) | 52.5 (51.5 to 54.0) |
+| | Faster R-CNN | 91.5 (90.3 to 92.9) | 49.3 (48.4 to 50.8) |
+| DENTEX, training seed 1 | YOLOv8x | 91.7 (90.5 to 93.0) | 52.0 (51.0 to 53.6) |
+| | RT-DETR-l | 93.5 (92.5 to 94.6) | 52.3 (51.3 to 53.8) |
+| | Faster R-CNN | 91.9 (90.9 to 93.2) | 49.5 (48.7 to 51.0) |
+
+Reading.
+
+- AP50 is 94.7 to 96.7% on UFBA and 91.4 to 93.5% on DENTEX; AP50:95 is
+  66.4 to 71.5% and 49.3 to 52.5%. The three UFBA splits differ by 0.3
+  points or less per detector, the two DENTEX seeds by 0.8 or less.
+- The detector ranking by AP is not the ranking by top-1 at confidence 0.5
+  (UFBA split 0, Section 64: 95.0, 95.2 and 92.8% for YOLOv8x, RT-DETR-l,
+  Faster R-CNN). By AP50 YOLOv8x and Faster R-CNN are level and RT-DETR-l
+  leads; by AP50:95 Faster R-CNN is about 3 points lower. AP uses every
+  detection from confidence 0.05 up, not the one cutoff, and RT-DETR-l
+  gives about 10 times as many low-confidence boxes (about 290 per X-ray),
+  so AP and top-1 answer different questions. The paper's claims use top-1.
+- Limits: detections under 0.05 were not saved, so the end of each
+  precision-recall curve is cut there; the position-only model has no scores
+  and no AP.
+
+## 90. Interventions on DENTEX (training seed 0 models): the slide reproduces at about half the UFBA size; the tip stays just under its 5% bar
+
+Date 2026-10-10. Rule: `cpu_repro/cv/DENTEX_INTERVENTION_RULES.md`, approved
+as written and frozen before any kernel was pushed; two amendments logged
+before any intervention image was scored (position-only models rebuilt from
+the full-precision per-tooth table, which the Q1 check demanded; targets
+with a repeated label skipped and counted). Script
+`closure_intervention.py --dataset dentex`; Kaggle T4 kernels
+`tooth-numbering-cv-dentex-closure-s0` and `-tip-s0` (version 2), models of
+Section 86. Results: `cpu_repro/cv/results/kaggle_dentex_{closure,tip}_s0/`.
+
+**Flow.** 1,902 targets drawn (3 in each of the 634 X-rays).
+
+| | Slide | Tip |
+|---|---|---|
+| Targets with a mover | 1,894 | 1,836 |
+| Skipped | 8 (a label repeated in the X-ray) | 66 (8 repeated label; 58 never touch within 45 degrees) |
+| Scored movers (all three detectors right on the intact image) | 1,456 | 1,416 |
+
+**Quality control (section 6 of the rule).**
+
+- Q1: position-only agreement 1.0000 on the smoke pass and on every full
+  run.
+- Q3 (intact answers at working size against the stored full-size answers,
+  same 18,095 teeth): YOLOv8x top-1 89.2% stored, 89.6% now; RT-DETR-l
+  92.3 and 92.5; **Faster R-CNN 91.6 and 83.0.** Faster R-CNN's loss of 8.6
+  points is above the 2-point line, so it is stated here with the grade:
+  resizing to 640 px costs Faster R-CNN accuracy. A likely reason, not
+  tested: torchvision's Faster R-CNN scales the short side to 800 px, so a
+  640-px X-ray is enlarged about 2.4 times, while the other two read 640 px
+  natively. Share of identical answers: 96.8, 96.9 and 86.5%.
+- Q4: 3.5% (tip) and 0.4% (slide) of targets skipped, under 10%.
+- Q5: saved examples looked at (intact, open, repaste, half tip, full tip;
+  slide the same): T is erased, the neighbor slides or leans into the space,
+  with the edge artifacts and the inpainted smear behind it seen on UFBA.
+  Nothing implausible.
+
+**Slide** (movers 1,456; j = all three detectors give the erased tooth's
+number; 95% CIs from 10,000 bootstrap draws of X-rays, paired by mover):
+
+| Condition | j % (95% CI) | UFBA, Section 76 |
+|---|---|---|
+| open | 0.34 (0.07 to 0.76) | 0.18 (0.00 to 0.45) |
+| half | 2.61 (1.81 to 3.43) | 2.87 (1.88 to 3.94) |
+| **closed** | **11.81 (10.12 to 13.54)** | 20.83 (18.35 to 23.30) |
+| closed minus open | 11.47 (9.76 to 13.24) | 20.65 (18.16 to 23.14) |
+
+**Tip** (movers 1,416):
+
+| Condition | j % (95% CI) | UFBA, Section 80 |
+|---|---|---|
+| open | 0.35 (0.07 to 0.77) | 0.19 |
+| repaste (cut and paste back, unmoved) | 0.14 (0.00 to 0.36) | 0.0 |
+| half tip | 1.48 (0.91 to 2.13) | |
+| **full tip** | **4.80 (3.69 to 6.01)** | 9.4 (7.73 to 11.03) |
+| full tip minus open | 4.45 (3.28 to 5.68) | |
+| repaste minus open | -0.21 (-0.63 to 0.07) | |
+| full tip minus repaste | 4.66 (3.54 to 5.81) | |
+
+Full tip angle: mean 14.0 degrees, median 12, largest 44. Full slide: mean
+14.0 px, median 13, largest 42.
+
+**Graded** (section 8 of the rule):
+
+| Bar | Result | Met |
+|---|---|---|
+| H1: CI of closed minus open excludes 0 and j(closed) is at least 5% | 11.47 (9.76 to 13.24); 11.81% | **yes** |
+| H2: CI of full tip minus open excludes 0, j(full tip) at least 5%, paste check not confounded | CI 3.28 to 5.68 excludes 0; **4.80% is 0.2 points under 5%**; paste: repaste minus open -0.21 (-0.63 to 0.07), not confounded | **no** |
+| S1: j(closed) at least 18.35% | 11.81 | no |
+| S2: j(full tip) at least 7.73% | 4.80 | no |
+
+**Reading, as fixed in advance** (section 8, row "H1 met, H2 not met"):
+only one intervention reproduces by the pre-set bars, and the claim is
+narrowed to the intervention that reproduced. The slide reproduces at about
+57% of the UFBA size (11.8% against 20.8%). The tip is a smaller effect:
+it is clearly above its own baseline (the CI of full tip minus open, and of
+full tip minus repaste, excludes 0; j rises 0.35, 1.48, 4.80 with the
+angle; the paste control is at 0.14%), but its point estimate is under the
+5% bar, at 51% of UFBA's (4.8% against 9.4%), and it does not meet the
+pre-set bar. On UFBA's own tipping rule this is outcome 3, "a partial
+cause".
+
+Also reported, no rule:
+
+- **Per detector, fill rate at full closure:** slide 33.9 (YOLOv8x), 36.1
+  (RT-DETR-l), 34.2% (Faster R-CNN), against 42.3, 37.7 and 38.2% on UFBA;
+  tip 21.3, 26.3 and 19.1%.
+- **Position-only model on the moved box** gives the erased tooth's number
+  50.2% (slide) and 34.0% (tip) of the time at full closure; with all three
+  detectors, 7.1% and 2.4%.
+- **Tip against slide on the 1,416 movers scored in both:** 4.80 against
+  11.51%, slide minus tip 6.71 points (5.02 to 8.44); 38 of the 68 tip
+  fills are also slide fills.
+- **Missed mover share, open condition:** YOLOv8x 20.9%, RT-DETR-l 8.1%,
+  Faster R-CNN 50.3% (UFBA YOLOv8x: 2.9%).
+
+**Post hoc, not part of the grade.** The open condition is higher in missed
+movers than on UFBA, and the pattern points at the neighbor, not the gap.
+DENTEX polygons of adjacent teeth overlap more than UFBA's masks: the
+erased region (T's polygon dilated 3 px) covers on average 19.0% of the
+mover's pixels in DENTEX (median 17.2%; more than 10% in 75% of targets)
+against 8.4% on UFBA (median 6.4%; 31%). In open, N is partly inpainted;
+in repaste, half, closed and full tip, N is cut from the original and
+pasted, so N is whole. The repaste control is therefore the cleaner
+baseline in DENTEX, and j is near 0 either way (0.14 against 0.35), so
+neither grade changes: against repaste the full tip gains 4.66 points (3.54
+to 5.81).
+
+**Post hoc, not part of the grade: without Faster R-CNN.** Defined after the
+results above, to ask whether the smaller DENTEX effect is only the Q3
+loss. Same movers rule and the same rows, with "all three detectors"
+replaced by YOLOv8x and RT-DETR-l (the two within 0.4 points of their
+stored top-1), on both datasets:
+
+| Both of YOLOv8x and RT-DETR-l give the erased tooth's number | Open | Full closure (95% CI) | Ratio DENTEX / UFBA |
+|---|---|---|---|
+| UFBA slide (1,165 movers) | 0.77 | 28.50 (25.89 to 31.13) | |
+| DENTEX slide (1,659) | 3.98 | 18.93 (17.02 to 20.87) | 0.66 |
+| UFBA tip (1,129) | 0.80 | 18.07 (15.85 to 20.30) | |
+| DENTEX tip (1,612) | 4.09 | 11.91 (10.34 to 13.54) | 0.66 |
+
+With three detectors the ratios are 0.57 (slide) and 0.51 (tip), so the
+Faster R-CNN loss explains part of the gap, and about a third of the UFBA
+effect is still missing in DENTEX with the two unaffected detectors. The
+open rate is also higher in DENTEX (about 4% against 0.8%), consistent with
+the damaged neighbor above.
+
+**Limits.** All of section 11 of the rule, plus: resizing to 640 px costs
+Faster R-CNN 8.6 points of top-1 (Q3), so the all-three condition is on
+movers Faster R-CNN gets right at that size. The training seed 1
+replication is Section 91.
+
+## 91. Interventions on DENTEX, training seed 1 models: the slide replicates; the tip is 5.55% here (bar 5%) and 4.80% on seed 0
+
+Date 2026-10-11. Rule: `cpu_repro/cv/DENTEX_INTERVENTION_RULES.md`, section
+9 (written before any kernel was pushed; no amendment after Section 90).
+Same script, same drawn targets (same draw as Section 90, 1,902 in 634
+X-rays), same constants; the models are the seed 1 detectors of Section 88
+and the position-only models rebuilt from that run's per-tooth table.
+Kaggle T4 kernels `tooth-numbering-cv-dentex-closure-t1` and `-tip-t1`.
+Results:
+`cpu_repro/cv/results/kaggle_dentex_{closure,tip}_t1/`.
+
+**Flow.**
+
+| | Slide | Tip |
+|---|---|---|
+| Targets with a mover | 1,894 | 1,836 |
+| Skipped | 8 (a label repeated in the X-ray) | 66 (8 repeated label; 58 never touch within 45 degrees) |
+| Scored movers (all three detectors right on the intact image) | 1,461 | 1,424 |
+
+The skip counts and reasons equal seed 0's (they depend on the labels
+and the geometry, not on the models).
+
+**Quality control.**
+
+- Q1: position-only agreement 1.0000 on the smoke pass and on both full
+  runs.
+- Q3 (intact answers at working size against the stored full-size answers,
+  18,095 teeth): YOLOv8x top-1 90.9% stored, 91.0% now; RT-DETR-l 92.5 and
+  92.7; **Faster R-CNN 91.9 and 82.9**, the same 9-point loss as seed 0
+  (Section 90), so the same limit applies. Identical answers: 97.5, 97.0
+  and 86.5%.
+- Q4: 0.4% (slide) and 3.5% (tip) skipped, under 10%.
+- Q5: saved examples looked at (tooth 26 of the first X-ray, all
+  conditions, both modes): the erased tooth leaves the same smear and the
+  neighbor moves or leans into the space as on seed 0; nothing new.
+
+**Slide** (movers 1,461; j = all three detectors give the erased tooth's
+number; 95% CIs from 10,000 bootstrap draws of X-rays):
+
+| Condition | Seed 1, j % (95% CI) | Seed 0, Section 90 |
+|---|---|---|
+| open | 0.21 (0.00 to 0.48) | 0.34 |
+| half | 1.98 (1.30 to 2.73) | 2.61 (1.81 to 3.43) |
+| **closed** | **12.05 (10.37 to 13.76)** | 11.81 (10.12 to 13.54) |
+| closed minus open | 11.84 (10.18 to 13.56) | 11.47 (9.76 to 13.24) |
+
+**Tip** (movers 1,424):
+
+| Condition | Seed 1, j % (95% CI) | Seed 0, Section 90 |
+|---|---|---|
+| open | 0.21 (0.00 to 0.49) | 0.35 |
+| repaste | 0.14 (0.00 to 0.35) | 0.14 |
+| half tip | 0.98 (0.50 to 1.51) | 1.48 (0.91 to 2.13) |
+| **full tip** | **5.55 (4.38 to 6.77)** | 4.80 (3.69 to 6.01) |
+| full tip minus open | 5.34 (4.16 to 6.58) | 4.45 (3.28 to 5.68) |
+| repaste minus open | -0.07 (-0.41 to 0.21) | -0.21 (-0.63 to 0.07) |
+| full tip minus repaste | 5.41 (4.21 to 6.61) | 4.66 (3.54 to 5.81) |
+
+**Graded on seed 1** (the same bars as Section 90):
+
+| Bar | Result | Met |
+|---|---|---|
+| H1 | CI of closed minus open 10.18 to 13.56 excludes 0; j(closed) 12.05% | **yes** |
+| H2 | CI of full tip minus open 4.16 to 6.58 excludes 0; **j(full tip) 5.55% is at least 5%**; paste: repaste minus open -0.07 (-0.41 to 0.21), not confounded | **yes** |
+| S1: j(closed) at least 18.35% | 12.05 | no |
+| S2: j(full tip) at least 7.73% | 5.55 | no |
+
+**Replication (section 9 of the rule).** "Replicated" needs H1 and H2 to
+hold on seed 1 *and* j(closed) and j(full tip) inside the seed 0 CIs.
+
+- **Slide: replicated.** H1 is met on both seeds; j(closed) 12.05 is inside
+  seed 0's 10.12 to 13.54, and seed 0's 11.81 is inside seed 1's 10.37 to
+  13.76. Spread between the seeds 0.24 points.
+- **Tip: not replicated in the rule's sense, and the reason is the seed 0
+  grade.** Seed 1 meets H2 (5.55%), seed 0 did not (4.80%, 0.2 under the
+  bar). Both full-tip values are inside the other seed's CI (5.55 inside
+  3.69 to 6.01; 4.80 inside 4.38 to 6.77). The rule says seed 0 is the
+  primary analysis and seed 1 does not replace it, and that where the
+  replication condition is not met "both are reported with the spread and
+  the claim rests on whichever the readings above allow". The reading
+  stays "H1 met, H2 not met": **seed 0 grade unchanged.** What the pair
+  adds is the size of the spread: the tip effect is 4.80 and 5.55%
+  (mean 5.2, a descriptive average, not a graded quantity), straddling the
+  5% bar, so what the data support is that the tip effect on DENTEX is a
+  few percent, on a bar that the pre-set rule places inside run-to-run
+  variation. S1 and S2 are missed on both seeds, so on both seeds the
+  DENTEX effect is smaller than UFBA's (slide 12.0 against 20.8; tip 5.5
+  against 9.4).
+
+**Also reported, no rule.**
+
+- **Per detector, fill rate at full closure** (seed 1): slide 33.7
+  (YOLOv8x), 36.5 (RT-DETR-l), 32.7% (Faster R-CNN); tip 21.8, 30.5, 18.2%.
+- **Position-only model on the moved box** gives the erased tooth's number
+  50.7% (slide) and 33.8% (tip) at full closure (seed 0: 50.2, 34.0); with
+  all three detectors 6.7 and 3.0% (seed 0: 7.1, 2.4).
+- **Tip against slide on the 1,424 movers scored in both:** 5.55 against
+  11.80%, slide minus tip 6.25 points (4.50 to 7.96); 44 of the 79 tip
+  fills are also slide fills (seed 0: 38 of 68).
+- **Missed mover share, open condition:** YOLOv8x 16.6%, RT-DETR-l 8.2%,
+  Faster R-CNN 53.2%.
+- **Which teeth fill changes much more than how many.** Targets scored in
+  both seeds: 1,298 (slide) and 1,265 (tip). Full-closure fills among
+  them: slide 172 (seed 0) and 176 (seed 1), **82 in both of 266 in
+  either (31%)**; tip 68 and 79, **22 in both of 125 (18%)**. The rates
+  agree (slide 11.86 and 11.94% on the 1,298 movers common to both; tip
+  4.74 and 5.53% on the 1,265), the individual teeth much less. This is
+  the same picture as Section 88, where about a third of the observational
+  shared errors changed between training seeds, and is why the rates, not
+  the teeth, are the unit of the claim.
+
+**Limits.** All of section 11 of the rule and the limits of Section 90.
+Two training seeds on one split of DENTEX; a pre-set bar that sits within
+the spread of two seeds (tip) cannot separate "just under" from "just
+over", and the paper states the pair, not the grade alone.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

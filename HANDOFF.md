@@ -1,8 +1,9 @@
-# Handoff (last synced 2026-10-05)
+# Handoff (last synced 2026-10-09)
 
 Read this first in the next session before doing anything else. It exists
 so nothing has to be re-derived from chat history. **The 2026-10-05
-section below is current. The 2026-10-01 section is kept for the Phase 2
+section below is current through 2026-10-07; the 2026-10-09 note under it
+is the latest. The 2026-10-01 section is kept for the Phase 2
 setup; the sections after it are older snapshots. Don't read them as
 describing where things stand now.**
 
@@ -91,12 +92,70 @@ replication in the paper's limitations, and in the abstract.
 mix of missing teeth raises the ratio from 3.5 to 3.9 (CI 3.2 to 5.1);
 patient mix explains part of the difference. Reported only.
 
-**Pending: DENTEX second training seed** (`DENTEX_TSEED_RULES.md`, frozen
-in a170d98). Not launched: the Kaggle weekly GPU quota (30 h) was used up
-on 2026-10-07. When it resets, rebuild the kernels at the current commit
-(`make_kernels.py --dentex --suffix=-tseed1 --train-args="--train-seed 1"`
-and `make_phase3_kernels.py`), push YOLOv8x and RT-DETR-l, then Faster
-R-CNN, then `tooth-numbering-cv-dentex-tseed1`.
+**DENTEX second training seed (Section 88, 2026-10-10):** done. Seed 1 meets
+1 of 3 bars again: margins +24.0, +25.6, +25.1 (bar 10); position share 85.5%
+(bar 85.71); gap ratio 3.28 (bar 4.2). Overlap with seed 0's shared errors
+0.63 (237 of 376); pooled position share 85.5%, gap ratio 3.40 (2.85 to
+4.08). Reading: Section 86's partial replication is a property of DENTEX,
+not of one training run. Kernels `tooth-numbering-cv-{yolov8x,rtdetr-l,
+fasterrcnn}-dentex-tseed1` (commit `cf918cb`, 10.8 GPU hours) and the CPU
+scoring kernel `tooth-numbering-cv-dentex-tseed1`. Results in
+`cpu_repro/cv/results/kaggle_dentex_tseed1/` and `dentex_tseed_compare/`.
+Paper limitations (main.tex, DRAFT.md) updated; abstract and conclusion
+stay as they were. LaTeX recompiled on Kaggle CPU 2026-10-10: 8 pages
+(text ends at the top of page 7, then references; was 7 pages). The
+anonymized release (`make_anon_release.py`) uses `git ls-files`, so
+commit the new files first or they are left out.
+
+**2026-10-10, DENTEX interventions and AP (built, awaiting approval):**
+- AP (RESULTS.md Section 89, `AP_RULES.md`, `ap_eval.py`): done; AP50
+  94.7 to 96.7 (UFBA) and 91.4 to 93.5 (DENTEX); supplement in
+  `paper/miccai/SUPPLEMENT.md`; main text points to it.
+- DENTEX interventions (rule approved and frozen 2026-10-10, amendments 1 and
+  2 logged): seed 0 models done, RESULTS.md Section 90. Slide: j(closed)
+  11.81% (10.12 to 13.54), closed minus open 11.47 (9.76 to 13.24), H1 met,
+  S1 not met (UFBA 20.8). Tip: j(full tip) 4.80% (3.69 to 6.01), CI of the
+  difference excludes 0 and the paste control is clean, but 4.80 is under
+  the 5% bar, so H2 not met (S2 not met; UFBA 9.4). Q3: Faster R-CNN loses
+  8.6 top-1 points at 640 px (91.6 to 83.0), flagged. Post hoc: DENTEX
+  polygons overlap more (erased region covers 19% of the mover vs 8.4% on
+  UFBA), so repaste is the cleaner baseline. Seed 1 replication done
+  2026-10-11, RESULTS.md Section 91 (kernels
+  `tooth-numbering-cv-dentex-{closure,tip}-t1`, QC passed): slide j(closed)
+  12.05% (10.37 to 13.76), H1 met, replicated; tip j(full tip) 5.55%
+  (4.38 to 6.77), H2 met on seed 1, but seed 0's grade stays (primary):
+  "H1 met, H2 not met", tip reported as 4.80 and 5.5%, straddling the bar.
+  Fills overlap little between seeds (slide 82 of 266 in either, tip 22 of
+  125). Paper (abstract, limitations, conclusion), DRAFT.md, SUPPLEMENT.md
+  S2, CLAIM.md item 33, README updated; LaTeX recompiled 2026-10-11
+  (8 pages: text ends on page 6, references on 7 and 8).
+- **Follow-ups running (rule `DENTEX_FOLLOWUP_RULES.md`, approved 2026-10-11,
+  amendment 1 logged before any push).** N: slide and tip at the X-ray's
+  stored size, seed 0 models (kernels `tooth-numbering-cv-dentex-{closure,
+  tip}-s0n`, each with a 640-px regression gate against Section 90's rows,
+  then smoke, then 40-X-ray chunks). S: third DENTEX training seed
+  (`tooth-numbering-cv-{yolov8x,rtdetr-l,fasterrcnn}-dentex-tseed2`), CPU
+  scorer `tooth-numbering-cv-dentex-tseed2`, then
+  `tooth-numbering-cv-dentex-{closure,tip}-t2`. Kaggle allows 2 GPU
+  sessions at once; the first two trainings were pushed 09:20 PDT and a
+  queue script pushes the rest as slots free (generated kernels are rebuilt
+  with `make_phase3_kernels.py --out <dir>` and `make_kernels.py --dentex
+  --suffix=-tseed2 --train-args="--train-seed 2"`). Results go to RESULTS.md
+  Sections 92 (N) and 93 (S); then update SUPPLEMENT.md S2, the limitations
+  sentence and the numbers in README and CLAIM.md item 33.
+  `closure_intervention.py` was restructured (scores in chunks; `--work-width
+  0` keeps stored size) with byte-identical rows against the old script on a
+  local check.
+
+**Checklists matched to the official lists (2026-10-09):** `CLAIM.md` now
+follows the CLAIM 2024 update's 44 items (read from PMC11304031);
+`METRICS_RELOADED.md` was checked against the main text of PMC11182665.
+Finding: the framework recommends AP or FROC next to a counting metric for
+scored detectors; this study reports neither (decision of 2026-10-05), so
+the paper now says why (one sentence in Scoring). Not done: the online
+Metrics Reloaded tool. README lines dropped in `5a0ecd6`: checked, they
+were a pointer to process rules that `718066e` removed on purpose;
+nothing to restore.
 
 **Open:** anonymous code link (host the `make_anon_release.py` output on
 anonymous.4open.science, then footnote it in main.tex and DRAFT.md);

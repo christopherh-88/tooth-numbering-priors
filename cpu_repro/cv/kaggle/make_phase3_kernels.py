@@ -362,6 +362,57 @@ sys.argv = ["dentex_external.py", "--labels", str(REPO / "cpu_repro/anomaly_scan
 dentex_external.main()
 shutil.rmtree(REPO)
 '''
+# Same scorer for the third training seed (DENTEX_FOLLOWUP_RULES.md, follow-up S).
+DENTEX_TSEED2_BODY = DENTEX_TSEED1_BODY.replace("tseed1", "tseed2")
+
+
+def dentex_intervention_body(name, teeth_dir, run_tag, mode, size_bar, native=False, regress_run=None):
+    """DENTEX_INTERVENTION_RULES.md: closure_intervention.py --dataset dentex, smoke pass on 10 X-rays first.
+    native: DENTEX_FOLLOWUP_RULES.md follow-up N, X-rays at their stored size, scored 40 X-rays at a time.
+    regress_run: before anything else, rerun 10 X-rays at 640 px and compare with that seed 0 run's rows
+    (the script was restructured after Sections 90 and 91; geometry must match exactly)."""
+    extra = 'args += ["--work-width", "0", "--chunk", "40"]  # stored size, 40 X-rays at a time\n' if native else ""
+    gate = ""
+    if regress_run:
+        gate = f'''
+sys.argv = args + ["--out", "/kaggle/working/{name}_regress", "--images", "10"]
+closure_intervention.main()
+import numpy as np, pandas as pd
+ref = [p for p in Path("/kaggle/input").rglob("closure_rows.csv") if p.parent.name == "{regress_run}"]
+assert len(ref) == 1, ref
+new = pd.read_csv("/kaggle/working/{name}_regress/closure_rows.csv")
+old = pd.read_csv(ref[0])
+old = old[old["image_id"].isin(set(new["image_id"]))]
+key = ["detector", "image_id", "target", "condition"]
+old, new = old.sort_values(key).reset_index(drop=True), new.sort_values(key).reset_index(drop=True)
+assert len(old) == len(new) > 0 and (old[key].values == new[key].values).all(), (len(old), len(new))
+geom = ["mover", "target_class", "mover_class", "shift_px", "full_shift_px", "position_only_pred"]
+geom_same = np.allclose(old[geom].astype(float).values, new[geom].astype(float).values, rtol=0, atol=1e-9)
+share = float(np.mean([((old[c] == new[c]) | (old[c].isna() & new[c].isna())).mean() for c in ("intact_pred", "pred")]))
+print("regression gate:", len(new), "rows; geometry identical:", geom_same, "; model answers identical share:", round(share, 4), flush=True)
+if not geom_same or share < 0.99:
+    raise SystemExit("regression gate failed; not interpreted")
+'''
+    return f'''subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "ultralytics==8.4.143"], check=True)
+import closure_intervention
+subprocess.run(["git", "-C", str(REPO), "fetch", "--quiet", "origin", "cf918cb31f0461411e708dbc56b5584dd250bbae"], check=True)
+subprocess.run(["git", "-C", str(REPO), "checkout", "--quiet", "cf918cb31f0461411e708dbc56b5584dd250bbae", "--",
+                "cpu_repro/cv/dentex_boxes.csv", "cpu_repro/cv/dentex_folds.csv"], check=True)
+xrays = sorted(p for p in Path("/kaggle/input").rglob("xrays")
+               if p.is_dir() and p.parent.name == "quadrant_enumeration")
+assert len(xrays) == 1, xrays
+per_tooth = sorted(p for p in Path("/kaggle/input").rglob("dentex_teeth.csv")
+                   if p.parent.name == "{teeth_dir}" and "/repo/" not in str(p))
+assert len(per_tooth) == 1, per_tooth
+args = ["closure_intervention.py", "--repo", str(REPO), "--models", "/kaggle/input", "--per-tooth", str(per_tooth[0]),
+        "--dataset", "dentex", "--labels", str(REPO / "cpu_repro/anomaly_scan/dentex_raw/train_quadrant_enumeration.json"),
+        "--images-dir", str(xrays[0]), "--run-tag", "{run_tag}", "--mode", "{mode}", "--size-bar", "{size_bar}"]{gate}
+{extra}sys.argv = args + ["--out", "/kaggle/working/{name}_smoke", "--images", "10"]
+closure_intervention.main()
+sys.argv = args + ["--out", "/kaggle/working/{name}"]
+closure_intervention.main()
+shutil.rmtree(REPO)
+'''
 
 
 def write(out, name, files, paths, body, gpu, sources, datasets=()):
@@ -462,6 +513,31 @@ def main():
            "closure_intervention.py", "dentex_external.py"],
           csvs + ["cpu_repro/anomaly_scan/dentex_raw/train_quadrant_enumeration.json"], DENTEX_TSEED1_BODY, False,
           [f"{USER}/tooth-numbering-cv-{d}-dentex-tseed1" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")])
+    # DENTEX_FOLLOWUP_RULES.md follow-up S: scorer of the third training seed
+    write(a.out, "tooth-numbering-cv-dentex-tseed2",
+          ["score_cv.py", "batch3.py", "gap_flag.py", "shift_test.py", "gap_check.py", "gap_intervention.py",
+           "closure_intervention.py", "dentex_external.py"],
+          csvs + ["cpu_repro/anomaly_scan/dentex_raw/train_quadrant_enumeration.json"], DENTEX_TSEED2_BODY, False,
+          [f"{USER}/tooth-numbering-cv-{d}-dentex-tseed2" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")])
+    # DENTEX_INTERVENTION_RULES.md: slide and tip on the DENTEX-trained models, training seed 0 and 1
+    dx_files = ["shift_test.py", "gap_check.py", "gap_intervention.py", "closure_intervention.py"]
+    dx_paths = ["cpu_repro/anomaly_scan/dentex_raw/train_quadrant_enumeration.json"]
+    for label, suffix, teeth_dir, scorer in (("s0", "", "dentex_indomain", "tooth-numbering-cv-dentex-indomain"),
+                                             ("t1", "-tseed1", "dentex_tseed1", "tooth-numbering-cv-dentex-tseed1"),
+                                             ("t2", "-tseed2", "dentex_tseed2", "tooth-numbering-cv-dentex-tseed2")):
+        sources = ([f"{USER}/tooth-numbering-cv-{d}-dentex{suffix}" for d in ("yolov8x", "rtdetr-l", "fasterrcnn")]
+                   + [f"{USER}/{scorer}"])
+        tag = "_dentex" + suffix.replace("-", "_")
+        for mode, bar in (("slide", 18.35), ("tip", 7.73)):  # lower ends of the UFBA seed 0 CIs (Sections 76, 80)
+            name = f"tooth-numbering-cv-dentex-{'closure' if mode == 'slide' else 'tip'}-{label}"
+            write(a.out, name, dx_files, dx_paths, dentex_intervention_body(name.replace("tooth-numbering-cv-", ""),
+                  teeth_dir, tag, mode, bar), True, sources, ["truthisneverlinear/dentex-challenge-2023"])
+            if label == "s0":  # follow-up N: the same seed 0 models on X-rays at their stored size
+                nname = name + "n"
+                write(a.out, nname, dx_files, dx_paths,
+                      dentex_intervention_body(nname.replace("tooth-numbering-cv-", ""), teeth_dir, tag, mode, bar,
+                                               native=True, regress_run=name.replace("tooth-numbering-cv-", "")),
+                      True, sources + [f"{USER}/{name}"], ["truthisneverlinear/dentex-challenge-2023"])
 
 
 if __name__ == "__main__":

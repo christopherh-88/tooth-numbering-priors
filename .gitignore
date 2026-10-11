@@ -188,3 +188,7 @@ cpu_repro/boundary_condition/denpar_periapical/__pycache__/
 # copied to cpu_repro/cv/results/ once scored)
 cpu_repro/cv/prepared/
 cpu_repro/cv/runs/
+
+# DENTEX intervention examples are altered DENTEX X-rays (CC BY-NC-SA 4.0); the repo and the
+# anonymized release do not carry DENTEX X-ray pixels. Kept on disk, not committed.
+cpu_repro/cv/results/kaggle_dentex_*/**/example_*.png

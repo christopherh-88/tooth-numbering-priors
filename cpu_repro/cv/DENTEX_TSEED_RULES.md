@@ -54,3 +54,10 @@ hours with two kernels at a time.
 - `make_kernels.py --dentex --suffix=-tseed1 --train-args="--train-seed 1"`
   names the kernels with the suffix (output dirs already get `_tseed1`).
 - `dentex_external.py --saved-tag _dentex_tseed1` scores those outputs.
+
+## Outcome (2026-10-10)
+
+Run and graded as written: seed 1 meets 1 of 3 bars (margins met; position
+share 85.5% against 85.71; gap ratio 3.28 against 4.2). RESULTS.md Section
+88. `cpu_repro/cv/dentex_tseed_compare.py` was added for the side-by-side,
+pooled and overlap numbers listed above under "Also reported".

@@ -41,8 +41,13 @@ left empty, or sharing a number) catches 41 to 47% of them while marking
 detectors trained within DENTEX beat position alone by 22 to 25 points and
 their shared errors follow position 85.5% of the time (pre-set bar 85.7%)
 and sit at gaps 3.5 times as often as correct teeth (bar 4.2): the
-direction replicates, the gap link is weaker (Section 86). The UFBA-trained
+direction replicates, the gap link is weaker (Section 86), and a second
+training seed gives the same result (Section 88). The UFBA-trained
 models run unchanged lose margin under the domain shift (Section 85).
+Repeating the interventions on DENTEX with DENTEX-trained detectors, moving
+the neighbor into the erased tooth's space gives the missing number 11.8
+and 12.0% of the time on two training seeds (UFBA 20.8%; Sections 90, 91);
+the tip gives 4.8 and 5.5% against a pre-set bar of 5%, met on one seed.
 
 ## Where to look
 

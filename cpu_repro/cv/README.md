@@ -44,7 +44,11 @@ written, approved and frozen in a `*_RULES.md` file before it ran;
 | `dentex_sensitivity.py` | DENTEX thresholds and framing (reported only) | DENTEX_EXTERNAL_RULES.md | 85 |
 | `dentex_prepare.py`, `train_cv.py --dataset` | Train the three detectors within DENTEX | DENTEX_INDOMAIN_RULES.md | 86 |
 | `gap_strata.py` | Gap ratio by number of missing teeth (reported only) | GAP_STRATA_RULES.md | 87 |
-| `train_cv.py --dataset --train-seed 1` | DENTEX second training seed | DENTEX_TSEED_RULES.md | pending (GPU quota) |
+| `train_cv.py --dataset --train-seed 1` | DENTEX second training seed | DENTEX_TSEED_RULES.md | 88 |
+| `dentex_tseed_compare.py` | Seed 0 against seed 1, pooled, overlap (reported only) | DENTEX_TSEED_RULES.md | 88 |
+| `closure_intervention.py --dataset dentex` | Closing a gap and tipping a tooth in DENTEX-trained detectors (slide and tip, training seeds 0 and 1) | DENTEX_INTERVENTION_RULES.md | 90, 91 |
+| `closure_intervention.py --dataset dentex --work-width 0`; third training seed | The same at the X-ray's stored size; a third training seed (reported only, pending) | DENTEX_FOLLOWUP_RULES.md | 92, 93 |
+| `ap_eval.py` | COCO-style AP of every detector set (appendix, reported only) | AP_RULES.md | 89 |
 | `dentist_sheet.py` | Blinded expert sheet (built, not used) | LABEL_CHECK_RULES.md | 65 |
 
 ## Results
