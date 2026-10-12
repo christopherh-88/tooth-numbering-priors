@@ -1,0 +1,4 @@
+,teeth,same_answer,stored_right,now_right,same_answer_pct,stored_top1_pct,now_top1_pct
+yolov8x,277.000,277.000,248.000,248.000,100.000,89.531,89.531
+rtdetr_l,277.000,277.000,260.000,260.000,100.000,93.863,93.863
+fasterrcnn,277.000,277.000,250.000,250.000,100.000,90.253,90.253

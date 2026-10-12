@@ -48,6 +48,9 @@ Repeating the interventions on DENTEX with DENTEX-trained detectors, moving
 the neighbor into the erased tooth's space gives the missing number 11.8
 and 12.0% of the time on two training seeds (UFBA 20.8%; Sections 90, 91);
 the tip gives 4.8 and 5.5% against a pre-set bar of 5%, met on one seed.
+At the X-ray's stored size (seed 0 models, Section 92) the slide gives 15.7% and
+the tip 7.0%, about 75% of UFBA's; a third training seed (Section 93) gives the
+same observational picture, and its intervention runs are pending.
 
 ## Where to look
 

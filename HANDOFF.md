@@ -129,23 +129,35 @@ commit the new files first or they are left out.
   125). Paper (abstract, limitations, conclusion), DRAFT.md, SUPPLEMENT.md
   S2, CLAIM.md item 33, README updated; LaTeX recompiled 2026-10-11
   (8 pages: text ends on page 6, references on 7 and 8).
-- **Follow-ups running (rule `DENTEX_FOLLOWUP_RULES.md`, approved 2026-10-11,
-  amendment 1 logged before any push).** N: slide and tip at the X-ray's
-  stored size, seed 0 models (kernels `tooth-numbering-cv-dentex-{closure,
-  tip}-s0n`, each with a 640-px regression gate against Section 90's rows,
-  then smoke, then 40-X-ray chunks). S: third DENTEX training seed
-  (`tooth-numbering-cv-{yolov8x,rtdetr-l,fasterrcnn}-dentex-tseed2`), CPU
-  scorer `tooth-numbering-cv-dentex-tseed2`, then
-  `tooth-numbering-cv-dentex-{closure,tip}-t2`. Kaggle allows 2 GPU
-  sessions at once; the first two trainings were pushed 09:20 PDT and a
-  queue script pushes the rest as slots free (generated kernels are rebuilt
-  with `make_phase3_kernels.py --out <dir>` and `make_kernels.py --dentex
-  --suffix=-tseed2 --train-args="--train-seed 2"`). Results go to RESULTS.md
-  Sections 92 (N) and 93 (S); then update SUPPLEMENT.md S2, the limitations
-  sentence and the numbers in README and CLAIM.md item 33.
-  `closure_intervention.py` was restructured (scores in chunks; `--work-width
-  0` keeps stored size) with byte-identical rows against the old script on a
-  local check.
+- **Follow-ups N and S, state at 2026-10-12 (rule `DENTEX_FOLLOWUP_RULES.md`;
+  paused on the Kaggle weekly GPU quota, nothing running).**
+  N (stored size, seed 0 models) is done: RESULTS.md Section 92, kernels
+  `tooth-numbering-cv-dentex-{closure,tip}-s0n`, QC passed (regression gate,
+  Q1, Q3 met: Faster R-CNN 91.6% at stored size). Slide j(closed) 15.70%
+  (13.91 to 17.55) against 11.81% at 640 px; tip j(full tip) 7.02% (5.78 to
+  8.29) against 4.80%; H1 and H2 met, S1 and S2 missed; the rule's reading
+  is "the resize lowers the effect", effect about 75% of UFBA's. Post hoc:
+  the increase is Faster R-CNN's (YOLOv8x and RT-DETR-l alone: tip 12.09 vs
+  12.01%), not a mover-set artifact. S, observational half, is done:
+  Section 93 (three training seeds trained and scored; seed 2 meets 1 of 3
+  bars like seeds 0 and 1; 213 of 410 shared errors in all three seeds;
+  `dentex_tseed_compare.py --seed2`). **Not run:** the seed 2 intervention
+  kernels `tooth-numbering-cv-dentex-{tip,closure}-t2`; Kaggle refused the
+  pushes ("Maximum weekly GPU quota of 30.00 hours reached"). Section 93 has
+  a marked placeholder. To finish: when the quota resets, push the tip
+  kernel first (`kernels push -p <dir>`; the generated kernel folders were in
+  the session scratchpad and are rebuilt with `make_phase3_kernels.py
+  --out <dir>`), then closure; pull outputs, QC as in Section 92, fill
+  Section 93 (per-seed j, H1 and H2 per seed, range and mean, "H2 met on k
+  of 3", three-way overlap of fill sets). The paper does not need them: the
+  seed 0 grade stands; they only change one sentence ("met on k of 3").
+  **Paper not yet updated for Sections 92 and 93:** main.tex DENTEX
+  paragraph (stored-size result, abstract slide and tip together, move the
+  DENTEX replication out of "Limitations" if pages allow), DRAFT.md,
+  SUPPLEMENT.md S2, CLAIM.md item 33, README numbers; then recompile (8-page
+  cap), attribution grep, rebuild the anonymized release after committing.
+  After the paper: the post-paper directions are in the session memory
+  (verified closed-gap set, generalization pilot, model-side fix).
 
 **Checklists matched to the official lists (2026-10-09):** `CLAIM.md` now
 follows the CLAIM 2024 update's 44 items (read from PMC11304031);
