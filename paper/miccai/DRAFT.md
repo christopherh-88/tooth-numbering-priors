@@ -269,16 +269,22 @@ one position off), though their shared errors still follow position (87.5%)
 cross-validation. They then beat position alone by 22 to 25 points. Their
 303 shared errors give the baseline's answer 85.5% of the time (UFBA: 91.3%)
 and sit next to a missing tooth 3.5 times as often as correct teeth (UFBA:
-5.3) [R86]. Both fall short of the targets we set in advance (85.7% and 4.2), so we call this a partial replication. Two more training runs on the
-same folds give the same picture: margins of 24 to 26 points, a position
-match of 85.5% and 84.2%, and a gap ratio of 3.3 and 3.2; 213 of the 410
-teeth that are a shared error in any run are one in all three [R88, R93].
-Part of the weaker gap link depends on which X-rays are in the data: after weighting DENTEX to UFBA's mix of missing teeth per X-ray, the ratio is 3.9 [R87, R94]. The
-interventions also work on DENTEX, with smaller effects (tables in the code release). At
-each X-ray's stored size, sliding a neighbor into the erased tooth's space
-gives the missing number 15.7% of the time (0.4% open) and tipping it 7.0%
-(0.4% open), about three quarters of the UFBA rates (one training run) [R92].
-On X-rays shrunk to 640 pixels wide the rates are lower (slide 11.8%, 12.0% and 12.6%, tip 4.8%, 5.5% and 6.5% on three training runs; our target of 5% for the tip was met on two of the three), mostly because Faster R-CNN reads the shrunken X-rays less well [R90, R91, R92, R93]. The individual teeth that fill differ between runs: of 341 slide fills in any of the three runs, 57 occur in all three [R93].
+5.3) [R86]. Both fall short of the targets we set in advance (85.7% and 4.2), so we
+call this a partial replication. Two more training runs on the same folds give
+the same picture: margins of 24 to 26 points, a position match of 85.5% and
+84.2%, and a gap ratio of 3.3 and 3.2 [R88, R93]. Part of the weaker gap link depends on
+which X-rays are in the data: after weighting DENTEX to UFBA's mix of missing
+teeth per X-ray, the ratio is 3.9 [R87, R94].
+
+**Interventions on DENTEX.** They also work there, with smaller
+effects (tables in the code release). At each X-ray's stored size,
+sliding a neighbor into the erased tooth's space gives the missing number
+15.7% of the time (0.4% open) and tipping it 7.0% (0.4% open), about three
+quarters of the UFBA rates (one training run) [R92]. On X-rays shrunk to 640
+pixels wide the rates are lower, mostly because Faster R-CNN reads the shrunken
+X-rays less well: slide 11.8%, 12.0% and 12.6%, tip 4.8%, 5.5% and 6.5%
+on three training runs. Our target of 5% for the tip was met on two of the
+three [R90, R91, R92, R93].
 
 ## 5 Discussion
 

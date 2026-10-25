@@ -47,9 +47,14 @@ written, approved and frozen in a `*_RULES.md` file before it ran;
 | `train_cv.py --dataset --train-seed 1` | DENTEX second training seed | DENTEX_TSEED_RULES.md | 88 |
 | `dentex_tseed_compare.py` | Seed 0 against seed 1, pooled, overlap (reported only) | DENTEX_TSEED_RULES.md | 88 |
 | `closure_intervention.py --dataset dentex` | Closing a gap and tipping a tooth in DENTEX-trained detectors (slide and tip, training seeds 0 and 1) | DENTEX_INTERVENTION_RULES.md | 90, 91 |
-| `closure_intervention.py --dataset dentex --work-width 0`; third training seed | The same at the X-ray's stored size (done, 92); a third training seed (scored, 93; its intervention kernels not yet run, quota) | DENTEX_FOLLOWUP_RULES.md | 92, 93 |
+| `closure_intervention.py --dataset dentex --work-width 0`; third training seed | The same at the X-ray's stored size (92); a third training seed, scored and with its slide and tip runs (93) | DENTEX_FOLLOWUP_RULES.md | 92, 93 |
 | `ap_eval.py` | COCO-style AP of every detector set (appendix, reported only) | AP_RULES.md | 89 |
 | `dentist_sheet.py` | Blinded expert sheet (built, not used) | LABEL_CHECK_RULES.md | 65 |
+| `missing_teeth.py` | Missing teeth per X-ray in UFBA and DENTEX (reported only) | none | 94 |
+| `post_hoc_two_detector.py` | The stored-size increase with YOLOv8x and RT-DETR-l only (post hoc, reported only) | none | 95 |
+| `fold_overlap.py` | How much the three splits' test folds overlap (reported only) | none | 96 |
+| `ap_vs_pycocotools.py` | Check of `ap_eval.py` against pycocotools on synthetic detections | none | 97 |
+| `gap_rank.py`, `gap_rank_power.py` | Does ordering the Section 84 flag by estimated space help? (rules 1 and 2 met on seed 0, rule 3 not met); the power simulation that set its thresholds | GAP_RANK_RULES.md | 98 |
 
 ## Results
 

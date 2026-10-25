@@ -268,7 +268,7 @@ check("position share seed 2", v("seed2", "position_share_pct"), 84.2)
 check("gap ratio seed 1", v("seed1", "gap_ratio"), 3.3, "ratio of 3.3 and 3.2")
 check("gap ratio seed 2", v("seed2", "gap_ratio"), 3.2)
 o = tc[tc.group == "overlap3"].iloc[0]
-check("shared in all three", o.both, 213, "213 of the 410", 0)
+check("shared in all three", o.both, 213, None, 0)
 check("shared in any", o.n, 410, None, 0)
 gs = csv("gap_strata/gap_strata_standardized.csv")
 print("  standardized-ratio file:", gs.to_dict("records")[:2])
@@ -317,7 +317,7 @@ F = [fills(p.replace("closure_summary", "closure_rows")) for p in
      ("kaggle_dentex_closure_s0/dentex-closure-s0/closure_summary.csv",
       "kaggle_dentex_closure_t1/dentex-closure-t1/closure_summary.csv",
       "kaggle_dentex_closure_t2/dentex-closure-t2/closure_summary.csv")]
-check("slide fills any", len(F[0] | F[1] | F[2]), 341, "of 341 slide fills in any of the three runs, 57 occur in all three", 0)
+check("slide fills any", len(F[0] | F[1] | F[2]), 341, None, 0)
 check("slide fills all", len(F[0] & F[1] & F[2]), 57, None, 0)
 
 # data facts quoted in Methods and Results
@@ -347,6 +347,10 @@ def in_supp(label, text):
         n_ok += 1
     else:
         fails.append(f"{label}: not in supplement: {text!r}")
+
+
+in_supp("shared in all three runs (supplement)", "213 of the 410 teeth that are a shared error in any run")
+in_supp("slide fills in all three runs (supplement)", "57 of 341 slide fills")
 
 
 f1d = lambda x: f"{x:.1f}"

@@ -6790,6 +6790,109 @@ the supplement is not an artifact of the implementation. Not covered: the
 bootstrap CIs (separate code) and the cut of the precision-recall tail at
 confidence 0.05 that the saved detections impose, which the supplement states.
 
+## 98. Closure-ranked review flag: met on seed 0, not replicated, paper unchanged
+
+Date 2026-10-25. Rule: `cpu_repro/cv/GAP_RANK_RULES.md`, approved and frozen
+before the run (thresholds from the power simulation `cpu_repro/cv/gap_rank_power.py`).
+Script `cpu_repro/cv/gap_rank.py`, Kaggle CPU kernel `tooth-numbering-cv-gaprank`
+(a 20-X-ray smoke pass, then seeds 0, 1 and 2, confidence-first). Results:
+`cpu_repro/cv/results/kaggle_gaprank/gap_rank/`.
+
+Flag: Section 84's (teeth numbered next to a position the detector left empty,
+plus teeth sharing a number), ordered by the estimated space at the empty
+position (horizontal distance between the boxes of its two arch neighbors over
+their mean width), from the detector's own output only. Budget 4% of matched
+teeth (about 460, one per X-ray), compared with the least-confident teeth and
+with the unranked flag cut to the same count (its expected recall).
+
+Checks: the flag equals Section 84's on every X-ray (asserted in the script);
+joint-failure sets 161, 166 and 165 (asserted in the kernel).
+
+| Seed | Detector | Reviewed (n) | Ranked recall % | Confidence % | Unranked flag cut % | Ranked / confidence (diff pp, 95% CI) | Ranked / unranked cut (diff pp, 95% CI) | Rule 1 | Rule 2 |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | YOLOv8x | 457 | 21.7 | 9.3 | 15.6 | 2.33 (12.4, 6.3 to 19.3) | 1.39 (6.1, 1.0 to 11.9) | yes | no |
+| 0 | RT-DETR-l | 460 | 23.6 | 8.7 | 14.9 | 2.71 (14.9, 8.0 to 23.0) | 1.58 (8.7, 3.6 to 14.2) | yes | yes |
+| 0 | Faster R-CNN | 460 | 17.4 | 8.1 | 11.0 | 2.15 (9.3, 2.7 to 16.4) | 1.58 (6.4, 1.0 to 11.9) | yes | yes |
+| 1 | YOLOv8x | 457 | 19.9 | 13.9 | 14.4 | 1.43 (6.0, -0.7 to 13.1) | 1.38 (5.4, 0.6 to 10.6) | no | no |
+| 1 | RT-DETR-l | 460 | 19.9 | 12.0 | 13.3 | 1.65 (7.8, 0.5 to 16.7) | 1.50 (6.6, 1.8 to 12.1) | yes | no |
+| 1 | Faster R-CNN | 459 | 15.1 | 5.4 | 10.2 | 2.78 (9.6, 3.6 to 16.0) | 1.48 (4.9, 0.3 to 9.7) | yes | no |
+| 2 | YOLOv8x | 458 | 20.0 | 12.7 | 14.6 | 1.57 (7.3, 0.6 to 14.7) | 1.37 (5.4, -0.0 to 11.4) | yes | no |
+| 2 | RT-DETR-l | 460 | 23.0 | 9.7 | 14.5 | 2.38 (13.3, 6.1 to 21.9) | 1.59 (8.5, 3.1 to 14.8) | yes | yes |
+| 2 | Faster R-CNN | 460 | 12.7 | 7.9 | 11.2 | 1.62 (4.8, -2.7 to 12.2) | 1.14 (1.5, -2.9 to 6.2) | no | no |
+
+**Graded** (kernel output): seed 0, rule 1 on 3 of 3 detectors, rule 2 on 2,
+both on 2 (RT-DETR-l and Faster R-CNN). **Rules 1 and 2 met on seed 0. Rule 3
+not met:** seed 1 has rule 1 on 2 detectors and rule 2 on none; seed 2 has
+rule 1 on 2 and rule 2 on 1 (both on 1 detector, 2 are needed).
+
+Reported only:
+
+| Seed | Detector | Joint failures flagged (full flag) % | AUROC of the space estimate among flagged teeth (95% CI) |
+|---|---|---|---|
+| 0 | YOLOv8x | 45.3 | 0.55 (0.48 to 0.62) |
+| 0 | RT-DETR-l | 46.6 | 0.56 (0.49 to 0.63) |
+| 0 | Faster R-CNN | 44.7 | 0.56 (0.49 to 0.64) |
+| 1 | YOLOv8x | 42.2 | 0.52 (0.44 to 0.59) |
+| 1 | RT-DETR-l | 42.8 | 0.52 (0.46 to 0.60) |
+| 1 | Faster R-CNN | 41.0 | 0.52 (0.44 to 0.59) |
+| 2 | YOLOv8x | 42.4 | 0.53 (0.44 to 0.60) |
+| 2 | RT-DETR-l | 44.8 | 0.54 (0.47 to 0.62) |
+| 2 | Faster R-CNN | 44.2 | 0.50 (0.43 to 0.58) |
+
+The space estimate carries little information about which flagged teeth are
+joint failures: AUROC 0.50 to 0.56, and in none of the nine detector-split pairs does the 95%
+CI exclude 0.5.
+
+Other budgets (no rule; 2% was the rejected too-lenient setting and 8% the
+rejected too-weak one in the rules file):
+
+| Budget | Seed | Detector | Ranked % | Confidence % | Unranked cut % | Ranked / unranked cut |
+|---|---|---|---|---|---|---|
+| 2% | 0 | Faster R-CNN | 7.5 | 4.3 | 5.5 | 1.35 |
+| 2% | 0 | RT-DETR-l | 11.2 | 3.7 | 7.5 | 1.50 |
+| 2% | 0 | YOLOv8x | 13.0 | 5.0 | 7.8 | 1.67 |
+| 2% | 1 | Faster R-CNN | 10.2 | 3.6 | 5.1 | 2.01 |
+| 2% | 1 | RT-DETR-l | 12.0 | 7.8 | 6.6 | 1.82 |
+| 2% | 1 | YOLOv8x | 15.7 | 7.8 | 7.2 | 2.17 |
+| 2% | 2 | Faster R-CNN | 9.1 | 3.0 | 5.6 | 1.62 |
+| 2% | 2 | RT-DETR-l | 11.5 | 6.1 | 7.3 | 1.59 |
+| 2% | 2 | YOLOv8x | 12.1 | 8.5 | 7.3 | 1.66 |
+| 8% | 0 | Faster R-CNN | 24.2 | 16.1 | 22.0 | 1.10 |
+| 8% | 0 | RT-DETR-l | 29.2 | 17.4 | 29.9 | 0.98 |
+| 8% | 0 | YOLOv8x | 34.2 | 11.2 | 31.2 | 1.09 |
+| 8% | 1 | Faster R-CNN | 19.3 | 13.9 | 20.4 | 0.95 |
+| 8% | 1 | RT-DETR-l | 24.1 | 20.5 | 26.6 | 0.91 |
+| 8% | 1 | YOLOv8x | 25.3 | 24.1 | 28.8 | 0.88 |
+| 8% | 2 | Faster R-CNN | 21.8 | 19.4 | 22.4 | 0.97 |
+| 8% | 2 | RT-DETR-l | 27.3 | 17.0 | 29.1 | 0.94 |
+| 8% | 2 | YOLOv8x | 30.3 | 16.4 | 29.1 | 1.04 |
+
+At 8% the ranked flag is no better than a random part of the flag (ratio 0.88
+to 1.10). At 2% it is at least 1.5 times the random part for 7 of 9 pairs, and 5 of 9 also have the CI of the difference above 0 (the rule-2 test at that budget; the rules file says 2% passes a weak ranking about half the time). In the 4% table, Seed 1 RT-DETR-l shows 1.50 for rule 2 but is 1.497, so it fails the bar.
+
+**The ceiling column (`recall_ceiling` in the CSVs) is not valid and is not
+used.** It ranks flagged teeth by the space between the labeled boxes at the
+detector's empty position, but for a joint failure whose wrong number is the
+missing tooth's, one of the two neighbors of that position is the missing
+tooth, which has no labeled box, so the space is undefined and the tooth is
+ranked last (the column gives 3.0 to 6.2%, below a random pick). This was found after the run;
+the column was reported-only. A ceiling measured correctly would need the
+space across the missing tooth itself.
+
+**Reading.** The rules were met on seed 0 but not replicated, so the paper
+keeps its Section 84 sentence unchanged. The pass on seed 0 is not evidence
+that closure orders the review: the estimate's AUROC is about 0.5 everywhere,
+and the two 4% passes on seed 0 are modest (RT-DETR-l 23.6% against 14.9% for a
+random part of the flag, Faster R-CNN 17.4% against 11.0%). Untested explanations, none examined: the ordering
+breaks ties by x position, so it may follow where on the X-ray the teeth sit;
+and for a shared error the two boxes around the empty position are ordinary
+neighbors, so their space may look like any other pair's, since the detectors
+cannot see which tooth is absent. What the run does show again is the Section
+84 result: the flag itself catches 41 to 47% of the joint failures (full flag
+column above).
+
+**Paper:** unchanged.
+
 ## Adding a new entry
 
 Append a new numbered section, not an edit to an existing one. Include the

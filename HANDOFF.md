@@ -3,16 +3,27 @@
 ## Current state (2026-10-25), read this first
 
 The MICCAI paper (`paper/miccai/latex/main.tex`, 8 pages) is finished and
-checked. Nothing is running on Kaggle and nothing has to be run there. Run
-`python paper/miccai/check_numbers.py` after any edit to the paper (it
-recomputes the paper's numbers from the result files; 189 checks pass).
+checked (as of commit cc2cd57). Run `python paper/miccai/check_numbers.py`
+after any edit to the paper (it recomputes the paper's numbers from the result
+files; 195 checks pass).
+
+**Done (2026-10-25):** the closure-ranked review flag (Kaggle kernel
+`tooth-numbering-cv-gaprank`, rules `cpu_repro/cv/GAP_RANK_RULES.md`, script
+`gap_rank.py`) was run and graded: rules 1 and 2 met on seed 0, rule 3 not
+met, so the paper is unchanged. RESULTS.md Section 98 has the numbers
+(`cpu_repro/cv/results/kaggle_gaprank/`). The estimate's AUROC among flagged
+teeth is 0.50 to 0.56, so it is not evidence that closure orders the review;
+the reported-only ceiling column is invalid (explained in Section 98). The user
+has no clinical contact, so the expert-reviewed closed-gap set and an expert
+check of the 161 joint failures cannot be done.
 
 **Open, in order:**
-1. Commit (the user runs commits; run the attribution grep first). New
-   untracked files: `cpu_repro/cv/{fold_overlap,missing_teeth,post_hoc_two_detector,ap_vs_pycocotools}.py`,
-   their result folders, `cpu_repro/cv/results/kaggle_dentex_{tip,closure}_t2/`
-   and `paper/miccai/check_numbers.py`.
-2. Build the anonymized release (`make_anon_release.py --out <folder outside
+1. Commit (the user runs commits; run the attribution grep first). Untracked or
+   modified:
+   `cpu_repro/cv/{GAP_RANK_RULES.md,gap_rank.py,gap_rank_power.py}`,
+   `cpu_repro/cv/kaggle/make_phase3_kernels.py`, `cpu_repro/cv/results/kaggle_gaprank/`,
+   RESULTS.md Section 98 and this file.
+2. Build the anonymized release after that commit, not before (`make_anon_release.py --out <folder outside
    the repo>`; it only sees committed files), host it on anonymous.4open.science,
    and add the link as a footnote in main.tex and DRAFT.md; recompile.
 3. Supplement policy: MICCAI 2026's rules say supplementary material is for
@@ -39,7 +50,8 @@ DENTEX authors' own dataset card says CC BY-NC-SA 4.0, which the paper and the
 repo README follow.
 
 **After the paper (decided 2026-10-11, do not start before the user approves):**
-verified closed-gap test set, a generalization pilot on another counting-based
+verified closed-gap test set (needs a clinical contact; the user has none, so
+not possible for now), a generalization pilot on another counting-based
 labeling task, a model-side fix.
 
 ---

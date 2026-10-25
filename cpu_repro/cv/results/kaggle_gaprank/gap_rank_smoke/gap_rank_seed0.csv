@@ -1,0 +1,10 @@
+seed,detector,budget_pct,n_review,n_flag,n_joint,recall_ranked,recall_conf,recall_trunc,recall_full_flag,recall_ceiling,diff_vs_conf,diff_vs_conf_lo,diff_vs_conf_hi,ratio_vs_conf,diff_vs_trunc,diff_vs_trunc_lo,diff_vs_trunc_hi,ratio_vs_trunc,precision_ranked,auroc_flagged,auroc_lo,auroc_hi,pass_rule1,pass_rule2
+0,yolov8x,2.0,4,4,0,,,,,,,,,inf,,,,inf,0.0,,,,False,False
+0,yolov8x,4.0,4,4,0,,,,,,,,,inf,,,,inf,0.0,,,,False,False
+0,yolov8x,8.0,4,4,0,,,,,,,,,inf,,,,inf,0.0,,,,False,False
+0,rtdetr_l,2.0,11,11,0,,,,,,,,,inf,,,,inf,0.0,,,,False,False
+0,rtdetr_l,4.0,11,11,0,,,,,,,,,inf,,,,inf,0.0,,,,False,False
+0,rtdetr_l,8.0,11,11,0,,,,,,,,,inf,,,,inf,0.0,,,,False,False
+0,fasterrcnn,2.0,13,27,0,,,,,,,,,inf,,,,inf,0.0,,,,False,False
+0,fasterrcnn,4.0,25,27,0,,,,,,,,,inf,,,,inf,0.0,,,,False,False
+0,fasterrcnn,8.0,27,27,0,,,,,,,,,inf,,,,inf,0.0,,,,False,False
