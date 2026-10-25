@@ -5532,6 +5532,8 @@ the original models.
 
 ## 78. CV seed 2: a third split replicates all three detectors
 
+*Update note, 2026-10-25: the fold overlap quoted below ("at most about 26%") holds for splits 0 and 1 only; split 2 shares up to 31.8% with a fold of split 0 (Section 96).*
+
 Date 2026-10-06. Rule: `PHASE3_BATCH2_RULES.md`, dated note 2026-10-05
 (seed 2), graded as item 3. Split `folds_seed2.csv` (each fold overlaps
 at most about 26% with any fold of the other splits). YOLOv8x, RT-DETR-l
@@ -6340,6 +6342,8 @@ over", and the paper states the pair, not the grade alone.
 
 ## 92. Interventions on DENTEX at the stored X-ray size (training seed 0 models): both effects are larger than at 640 px, and the difference is Faster R-CNN's
 
+*Update note, 2026-10-25: the post hoc table near the end of this section was recomputed with a saved script in Section 95; the values differ by at most 0.1 point and every conclusion holds. Use Section 95's numbers.*
+
 Date 2026-10-12. Rule: `cpu_repro/cv/DENTEX_FOLLOWUP_RULES.md`, follow-up N
 (section 2; approved and frozen before any kernel was pushed; amendment 1
 logged before any kernel was pushed: stored widths and the regression gate).
@@ -6559,13 +6563,232 @@ property of DENTEX, not of one training run, now on three. Individual
 teeth are not fixed: about two thirds of a run's shared errors are in both
 other runs.
 
-**Interventions on seed 2: not yet run.** The kernels `-closure-t2` and
-`-tip-t2` could not be pushed because the weekly Kaggle GPU quota (30 h)
-was reached; they run after the quota resets, and the sections below are
-filled in then (per-seed j, H1 and H2 per seed, range and mean, "H2 met on
-k of 3", the three-way overlap of the fill sets). Until then the
-intervention picture rests on two seeds at 640 px (Sections 90 and 91) and
-one seed at the stored size (Section 92).
+### Interventions on the seed 2 models (640 px)
+
+Kernels `tooth-numbering-cv-dentex-{closure,tip}-t2` (GPU, pushed and run
+2026-10-25 after the weekly quota reset; about an hour each), built with
+`make_phase3_kernels.py` exactly as the seed 1 kernels of Section 91 (same
+1,902 drawn targets, same constants, X-rays resized to 640 px wide, bars
+unchanged). Results: `cpu_repro/cv/results/kaggle_dentex_{closure,tip}_t2/`.
+
+**Quality control (section 4 of the rule).**
+
+- Q1: position-only agreement with the stored answers 1.0000 on the smoke
+  pass and both full runs (hard stop; passed).
+- Q3 (intact answers at 640 px against the stored-size answers of this
+  seed): YOLOv8x 93.05 stored, 92.89 now; RT-DETR-l 92.11 and 91.90;
+  **Faster R-CNN 91.74 and 85.20, a loss of 6.5 points, flagged** (the rule
+  flags more than 2). Seeds 0 and 1 lost 8.6 and 9 points the same way
+  (Sections 90, 91), and Section 92 removed the loss by running at the stored
+  size, so this is the resize and not a fault of the run. The all-three
+  condition is on movers Faster R-CNN still numbers right at 640 px.
+- Q4: skipped 8 of 1,902 targets (0.4%, a label repeated in the X-ray) for
+  the slide, and 66 (3.5%; 8 repeated label, 58 never touch within 45
+  degrees) for the tip; both under 10%.
+- Q5: examples looked at (tip: X-ray train_101, tooth 21, intact against
+  full tip, enlarged; slide: train_102, tooth 11, intact against closed,
+  enlarged). The tooth is erased to a smooth smear, the neighbor leans or
+  slides into the space, and the pasted edges are faint to visible. Same as
+  Sections 90 and 91; nothing implausible.
+
+**Slide** (movers 1,519; j = all three detectors give the erased tooth's
+number; 95% CIs from 10,000 bootstrap draws of X-rays, paired by mover):
+
+| Condition | Seed 2, j % (95% CI) | Seed 1 (Section 91) | Seed 0 (Section 90) |
+|---|---|---|---|
+| open | 0.07 (0.00 to 0.20) | 0.21 | 0.34 |
+| half | 2.04 | 1.98 | 2.61 |
+| **closed** | **12.57 (10.80 to 14.38)** | 12.05 (10.37 to 13.76) | 11.81 (10.12 to 13.54) |
+| closed minus open | 12.51 (10.75 to 14.30) | 11.84 | 11.47 |
+
+**Tip** (movers 1,476):
+
+| Condition | Seed 2, j % (95% CI) | Seed 1 (Section 91) | Seed 0 (Section 90) |
+|---|---|---|---|
+| open | 0.07 (0.00 to 0.21) | 0.21 | 0.35 |
+| repaste | 0.14 (0.00 to 0.34) | 0.14 | 0.14 |
+| half tip | 1.02 | 0.98 | 1.48 |
+| **full tip** | **6.50 (5.24 to 7.78)** | 5.55 (4.38 to 6.77) | 4.80 (3.69 to 6.01) |
+| full tip minus open | 6.44 (5.17 to 7.70) | 5.34 | 4.45 |
+| repaste minus open | 0.07 (-0.14 to 0.33) | | -0.21 |
+| full tip minus repaste | 6.37 (5.17 to 7.64) | | 4.66 |
+
+**Graded, seed 2 alone** (the Section 90 bars):
+
+| Bar | Result | Met |
+|---|---|---|
+| H1: CI of closed minus open excludes 0 and j(closed) at least 5% | 12.51 (10.75 to 14.30); 12.57% | **yes** |
+| H2: CI of full tip minus open excludes 0, j(full tip) at least 5%, paste check not confounded | CI 5.17 to 7.70 excludes 0; 6.50%; repaste minus open 0.07 (-0.14 to 0.33), not confounded | **yes** |
+| S1: j(closed) at least 18.35% | 12.57 | no |
+| S2: j(full tip) at least 7.73% | 6.50 | no |
+
+**Across the three training seeds (640 px).** Slide j(closed) 11.81, 12.05
+and 12.57% (range 11.8 to 12.6, mean 12.14). Tip j(full tip) 4.80, 5.55 and
+6.50% (range 4.8 to 6.5, mean 5.62). H1 is met on 3 of 3 seeds and **H2 on 2
+of 3** (seeds 1 and 2; seed 0 missed by 0.2 points). S1 and S2 are missed on
+all three. Seed 0's grade stands as the primary one ("H1 met, H2 not met");
+the per-seed values are shown side by side and not pooled. The rule's
+reading for "H2 met on 2 or 3 of 3": the tip effect on DENTEX is about 5%
+(4.8 to 6.5%) and met the 5% bar on 2 of 3 training seeds. All three seeds
+stay under the lower end of UFBA's interval (slide 18.35, tip 7.73).
+
+Per detector at full closure, seed 2 (seed 0 in brackets, Section 90):
+slide YOLOv8x 33.6 (33.9), RT-DETR-l 34.0 (36.1), Faster R-CNN 35.7 (34.2);
+tip 24.3 (21.3), 25.6 (26.3), 20.4 (19.1).
+
+**Overlap of the fill sets across the three seeds** (movers whose fill, all
+three detectors giving the erased tooth's number at full closure, is
+counted; the pairwise numbers for seeds 0 and 1 reproduce Section 91's 82 of
+266 and 22 of 125):
+
+| | Slide | Tip |
+|---|---|---|
+| Fills in seed 0 / 1 / 2 | 172 / 176 / 191 | 68 / 79 / 96 |
+| In both of seeds 0 and 1 (of those in either) | 82 of 266 | 22 of 125 |
+| In both of seeds 0 and 2 | 86 of 277 | 30 of 134 |
+| In both of seeds 1 and 2 | 87 of 280 | 29 of 146 |
+| In any of the three | 341 | 174 |
+| In all three | **57 (17%)** | **12 (7%)** |
+| In at least two | 141 | 57 |
+
+The rate of filling is stable across training seeds, but which teeth fill
+changes a great deal: only about one in six slide fills, and one in fourteen
+tip fills, occur in all three runs.
+
+**Reading.** The three runs agree on the direction and rough size of both
+effects at 640 px. The slide is 12 to 13% on every seed and the tip 5 to 6.5%,
+so the tip's distance to the 5% bar is within run-to-run variation, and
+"met on 2 of 3" is the right summary and not a verdict either way. At the
+stored size (Section 92, seed 0 only) the slide was 15.7% and the tip 7.0%;
+seeds 1 and 2 were not run at the stored size.
+
+**Limits.** All of section 6 of the follow-up rule and of
+`DENTEX_INTERVENTION_RULES.md` section 11. Three training seeds on one split.
+Faster R-CNN's loss at 640 px (Q3) lowers the 640-px rates, as Section 92
+showed.
+
+## 94. Missing teeth per X-ray in UFBA and DENTEX (descriptive; checks a premise of Section 87)
+
+Date 2026-10-25. Script `cpu_repro/cv/missing_teeth.py` (no rule; reported
+only), local, from `boxes.csv`, `folds.csv`, `dentex_boxes.csv` and
+`dentex_folds.csv`. Result: `cpu_repro/cv/results/missing_teeth/missing_teeth.csv`.
+Same definition as Section 87: a position is missing when the X-ray has no
+labeled tooth there, counted over positions 1 to 7 of the four quadrants (28
+positions; third molars left out). Check: the numbers of X-rays per stratum
+reproduce Section 87's exactly (UFBA 196, 87, 55, 87; DENTEX 263, 199, 110,
+62).
+
+| | UFBA (425 X-rays) | DENTEX (634 X-rays) |
+|---|---|---|
+| Mean missing teeth per X-ray | 3.50 | 1.89 |
+| Median | 1 | 1 |
+| Missing, share of the 28 positions | 12.5% | 6.7% |
+| X-rays with 0 missing | 196 (46.1%) | 263 (41.5%) |
+| 1 to 2 missing | 87 (20.5%) | 199 (31.4%) |
+| 3 to 5 missing | 55 (12.9%) | 110 (17.4%) |
+| 6 or more missing | 87 (20.5%) | 62 (9.8%) |
+
+**Reading.** DENTEX X-rays have fewer missing teeth than UFBA's, by about
+half on average (1.89 against 3.50), mostly because UFBA has twice the share
+of X-rays with six or more missing (20.5% against 9.8%). Section 87's rule
+guessed the opposite ("DENTEX X-rays may simply have more missing teeth").
+This does not change Section 87's result, but it changes how to read it. The
+gap ratio falls as X-rays lose more teeth in both datasets (Section 87), so
+fewer missing teeth in DENTEX would raise its ratio, not lower it. What moves
+the DENTEX ratio from 3.5 to 3.9 when weighted to UFBA's mix is a different
+feature of the mix: DENTEX's shared errors sit more often in the stratum of
+1 to 2 missing teeth (103 of 303, 34%, against 41 of 161, 25%, on UFBA), and
+that is the stratum where DENTEX's ratio is lowest compared with UFBA (3.0
+against 5.2). The paper therefore says that part of the weaker gap link
+depends on the mix of X-rays (3.9 after weighting), and does not say that
+DENTEX's patients have fewer missing teeth as an explanation.
+
+Limits. Third molars are excluded, as in Section 87. A missing position can
+be a tooth never formed, extracted or not labeled; the labels do not say
+which.
+
+## 95. Check of Section 92's post hoc two-detector numbers (reproducible rerun)
+
+Date 2026-10-25. Script `cpu_repro/cv/post_hoc_two_detector.py` (no rule;
+local, from the `closure_rows.csv` files of Sections 76, 80, 90 and 92).
+Result: `cpu_repro/cv/results/post_hoc_two_detector/post_hoc_two_detector.csv`.
+Section 92's post hoc table was recomputed from the rows files, but its
+script was not saved. This section redoes it with the definition the
+interventions' own summaries use (a mover is a tooth every listed detector
+numbers right on the intact image; j is the share of movers to which every
+listed detector gives the erased tooth's number at full closure; a missed
+detection counts as not filling). Check: with all three detectors the
+script reproduces the summary rates exactly (slide 15.70 and 11.81, tip 7.02
+and 4.80, UFBA 20.83 and 9.36), and for two detectors on UFBA it reproduces
+Section 90's 28.5 and 18.1.
+
+| Full closure, j % (movers) | Stored size | 640 px | Section 92 said (stored, 640 px) |
+|---|---|---|---|
+| Slide, all three, own movers | 15.70 (1,599) | 11.81 (1,456) | 15.72, 11.81 |
+| Slide, all three, movers scored at both sizes (1,406) | 15.93 | 11.81 | 15.94, 11.81 (1,405) |
+| Slide, YOLOv8x and RT-DETR-l only | 20.07 (1,649) | 18.93 (1,659) | 20.10, 18.94 |
+| Tip, all three, own movers | 7.02 (1,553) | 4.80 (1,416) | 7.03, 4.83 |
+| Tip, all three, movers scored at both sizes (1,366) | 7.47 | 4.83 | 7.52, 4.86 (1,357) |
+| Tip, YOLOv8x and RT-DETR-l only | 12.06 (1,600) | 11.91 (1,612) | 12.09, 12.01 |
+| UFBA, two detectors: slide, tip | 28.50 (1,165), 18.07 (1,129) | | 28.5, 18.1 |
+
+**Reading.** The rerun differs from Section 92's recomputation by at most 0.1
+point (largest: the two-detector tip at 640 px, 11.91 against 12.01) and
+the mover counts by a few rows, which fits Section 92's note that its
+recomputation dropped missed detections differently. Every conclusion of
+Section 92 holds. The increase is not a mover-set artifact (on movers scored
+at both sizes it is +4.1 points for the slide and +2.6 for the tip). It sits
+with Faster R-CNN: with YOLOv8x and RT-DETR-l only, the tip moves 0.15 points
+(12.06 against 11.91) and the slide 1.1 (20.07 against 18.93). Against UFBA's
+two-detector rates the DENTEX ratios are 0.70 (20.07 over 28.50) and 0.67
+(12.06 over 18.07), so about a third of UFBA's effect is still missing with
+the two unaffected detectors. The supplement uses these numbers. Section 92
+is left as written.
+
+## 96. Overlap between the test folds of the three splits (corrects Section 78)
+
+Date 2026-10-25. Script `cpu_repro/cv/fold_overlap.py` (no rule; local, from
+`folds.csv`, `folds_seed1.csv` and `folds_seed2.csv`). Result:
+`cpu_repro/cv/results/fold_overlap/fold_overlap.csv`. For each pair of
+splits, the largest share of a test fold's X-rays that also lie in one test
+fold of the other split, and the largest Jaccard index.
+
+| Splits | Largest share of a fold (%) | Largest Jaccard |
+|---|---|---|
+| 0 and 1 | 26.2 | 0.151 |
+| 0 and 2 | 31.8 | 0.186 |
+| 1 and 2 | 29.4 | 0.174 |
+
+**Correction.** Section 78 says each fold "overlaps at most about 26% with
+any fold of the other splits". That holds for splits 0 and 1 (26.2%) but not
+for the pair involving split 2: a fold of split 2 shares up to 31.8% of its
+X-rays with a fold of split 0 and 29.4% with split 1. The paper's sentence
+("share at most about a quarter of any test fold with the first") repeated
+the 26% and was too low for split 2; it now says 26% and 32%. The Section 78
+text is left as written. The conclusions of Sections 75 and 78 do not depend
+on the overlap being under any particular value, which is only context for
+how independent the splits are.
+
+## 97. Check of the AP implementation against pycocotools
+
+Date 2026-10-25. Script `cpu_repro/cv/ap_vs_pycocotools.py` (no rule; local;
+needs `pip install pycocotools`, installed outside the repo for the run).
+Section 89 states that `ap_eval.py` equals `pycocotools` on two synthetic
+cases but saved no test. This one is saved. For three seeds, 80 X-rays of
+`boxes.csv` (about 2,200 labeled teeth each) get synthetic detections built
+from their boxes (box jitter, 8% missed, 10% misnumbered by one place, 15%
+extra boxes, random confidence). Class-aware AP, COCOeval default settings.
+
+| Seed | Detections | AP50, ap_eval / pycocotools | AP50:95, ap_eval / pycocotools |
+|---|---|---|---|
+| 0 | 2,318 | 73.271 / 73.271 | 26.352 / 26.352 |
+| 1 | 2,322 | 73.769 / 73.769 | 27.027 / 27.027 |
+| 2 | 2,284 | 74.576 / 74.576 | 26.741 / 26.741 |
+
+**Reading.** The two agree to three decimals on every case, so the AP table in
+the supplement is not an artifact of the implementation. Not covered: the
+bootstrap CIs (separate code) and the cut of the precision-recall tail at
+confidence 0.05 that the saved detections impose, which the supplement states.
 
 ## Adding a new entry
 

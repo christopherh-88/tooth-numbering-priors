@@ -45,12 +45,9 @@ direction replicates, the gap link is weaker (Section 86), and a second
 training seed gives the same result (Section 88). The UFBA-trained
 models run unchanged lose margin under the domain shift (Section 85).
 Repeating the interventions on DENTEX with DENTEX-trained detectors, moving
-the neighbor into the erased tooth's space gives the missing number 11.8
-and 12.0% of the time on two training seeds (UFBA 20.8%; Sections 90, 91);
-the tip gives 4.8 and 5.5% against a pre-set bar of 5%, met on one seed.
+the neighbor into the erased tooth's space gives the missing number 11.8, 12.0 and 12.6% of the time on three training seeds (UFBA 20.8%; Sections 90, 91, 93); the tip gives 4.8, 5.5 and 6.5% against a pre-set bar of 5%, met on two of the three seeds.
 At the X-ray's stored size (seed 0 models, Section 92) the slide gives 15.7% and
-the tip 7.0%, about 75% of UFBA's; a third training seed (Section 93) gives the
-same observational picture, and its intervention runs are pending.
+the tip 7.0%, about 75% of UFBA's; a third training seed (Section 93) gives the same observational picture.
 
 ## Where to look
 

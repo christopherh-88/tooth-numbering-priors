@@ -1,4 +1,49 @@
-# Handoff (last synced 2026-10-09)
+# Handoff (last synced 2026-10-25)
+
+## Current state (2026-10-25), read this first
+
+The MICCAI paper (`paper/miccai/latex/main.tex`, 8 pages) is finished and
+checked. Nothing is running on Kaggle and nothing has to be run there. Run
+`python paper/miccai/check_numbers.py` after any edit to the paper (it
+recomputes the paper's numbers from the result files; 189 checks pass).
+
+**Open, in order:**
+1. Commit (the user runs commits; run the attribution grep first). New
+   untracked files: `cpu_repro/cv/{fold_overlap,missing_teeth,post_hoc_two_detector,ap_vs_pycocotools}.py`,
+   their result folders, `cpu_repro/cv/results/kaggle_dentex_{tip,closure}_t2/`
+   and `paper/miccai/check_numbers.py`.
+2. Build the anonymized release (`make_anon_release.py --out <folder outside
+   the repo>`; it only sees committed files), host it on anonymous.4open.science,
+   and add the link as a footnote in main.tex and DRAFT.md; recompile.
+3. Supplement policy: MICCAI 2026's rules say supplementary material is for
+   multimedia only, may not show additional results or analysis, and takes no
+   PDFs; the 2027 rules were not published when this was checked (2026-10-25).
+   The paper therefore points to "the code release" (which includes
+   `SUPPLEMENT.md` and the result log), not to a supplement. Re-read the 2027
+   rules when they appear. The paper has a data-use statement (MICCAI asks for
+   origin, license and ethics of the data).
+4. At submission: the statement of novelty and impact (the 2026 rules say up to
+   500 characters, no identifiers), and MICCAI's policy on LLM use (the 2026
+   rules permit it as writing assistance, with the authors fully responsible);
+   read the 2027 wording and follow it.
+5. Camera-ready only: funding and conflict statements (placeholder comment in
+   main.tex). Zenodo DOI stays on hold.
+
+**Kaggle:** nothing required. Optional, not needed for any claim in the paper:
+`tooth-numbering-cv-tip-s2` (tipping on the UFBA seed 2 models; failed to start
+three times, Section 80 and 82 already replicate tipping on two model sets),
+and stored-size DENTEX interventions on seeds 1 and 2 (about 10 GPU hours;
+Section 92 is seed 0 only). The Kaggle copy of DENTEX
+(`truthisneverlinear/dentex-challenge-2023`) is labeled CC0 there, but the
+DENTEX authors' own dataset card says CC BY-NC-SA 4.0, which the paper and the
+repo README follow.
+
+**After the paper (decided 2026-10-11, do not start before the user approves):**
+verified closed-gap test set, a generalization pilot on another counting-based
+labeling task, a model-side fix.
+
+---
+
 
 Read this first in the next session before doing anything else. It exists
 so nothing has to be re-derived from chat history. **The 2026-10-05
@@ -141,21 +186,22 @@ commit the new files first or they are left out.
   12.01%), not a mover-set artifact. S, observational half, is done:
   Section 93 (three training seeds trained and scored; seed 2 meets 1 of 3
   bars like seeds 0 and 1; 213 of 410 shared errors in all three seeds;
-  `dentex_tseed_compare.py --seed2`). **Not run:** the seed 2 intervention
-  kernels `tooth-numbering-cv-dentex-{tip,closure}-t2`; Kaggle refused the
-  pushes ("Maximum weekly GPU quota of 30.00 hours reached"). Section 93 has
-  a marked placeholder. To finish: when the quota resets, push the tip
-  kernel first (`kernels push -p <dir>`; the generated kernel folders were in
-  the session scratchpad and are rebuilt with `make_phase3_kernels.py
-  --out <dir>`), then closure; pull outputs, QC as in Section 92, fill
-  Section 93 (per-seed j, H1 and H2 per seed, range and mean, "H2 met on k
-  of 3", three-way overlap of fill sets). The paper does not need them: the
-  seed 0 grade stands; they only change one sentence ("met on k of 3").
-  **Paper not yet updated for Sections 92 and 93:** main.tex DENTEX
-  paragraph (stored-size result, abstract slide and tip together, move the
-  DENTEX replication out of "Limitations" if pages allow), DRAFT.md,
-  SUPPLEMENT.md S2, CLAIM.md item 33, README numbers; then recompile (8-page
-  cap), attribution grep, rebuild the anonymized release after committing.
+  `dentex_tseed_compare.py --seed2`). **Done 2026-10-25:** the seed 2
+  intervention kernels `tooth-numbering-cv-dentex-{tip,closure}-t2` ran
+  (about an hour each; results in `cpu_repro/cv/results/kaggle_dentex_{tip,closure}_t2/`,
+  QC passed, Faster R-CNN's 640-px loss of 6.5 points flagged as on the other
+  seeds). Section 93 is filled: slide 12.57% (10.80 to 14.38), tip 6.50% (5.24
+  to 7.78), H1 and H2 met on seed 2; across three seeds slide 11.8, 12.0, 12.6%
+  and tip 4.8, 5.5, 6.5%, H2 met on 2 of 3; 57 of 341 slide fills and 12 of
+  174 tip fills occur in all three seeds. Seed 0's grade stands.
+  **Paper updated for Sections 92 and 93 (2026-10-25, not yet committed):**
+  main.tex and DRAFT.md (abstract 16%, limitations with the stored-size
+  result as the DENTEX effect size and 640 px as a lower bound, three
+  training runs), SUPPLEMENT.md S2.1 and S2.2, CLAIM.md item 33; LaTeX
+  recompiled on Kaggle CPU (8 pages). Same day, cross-verification: `paper/miccai/check_numbers.py` recomputes the paper's numbers from the raw result files (per-tooth table and summary CSVs) and checks that each appears in main.tex and in the supplement (186 checks, all pass; run it after any edit). Found and fixed: the joint-failure definition in the abstract, Faster R-CNN's input size in Methods, Table 1's column label, a double-rounding error ("20.7" should be 20.6 points above open), the fold-overlap sentence (26% and 32%, not "about a quarter"; RESULTS.md Section 96), the related-work sentence on DENTEX challenge entries (only one of the three cited is YOLO-based), the missing-teeth explanation (DENTEX has fewer missing teeth, which does not explain its lower gap ratio; Section 94), the supplement's post hoc two-detector numbers (reproducible rerun, Section 95), and the reference list (every entry checked against Crossref, arXiv or the publisher on 2026-10-25: Telea's pages are 23-34, two unverifiable NeurIPS/NIPS page ranges dropped, Shortkit-ML DOI added, authors completed). Known remaining: the position-only CI in Table 1 (76.9 to 80.0) comes from the score_cv bootstrap of Section 65, while the benchmark scorer's own bootstrap gives 76.95 (77.0); Ultralytics YOLOv8 is cited by repository URL only; Section 92's own post hoc table is left as written and differs from Section 95 by at most 0.1. The text was rewritten in plainer language, with the DENTEX results moved from Limitations into Results.  The seed 2 intervention results are now in
+  main.tex, DRAFT.md, SUPPLEMENT.md S2, CLAIM.md item 33 and README. To do:
+  attribution grep, commit (including `kaggle_dentex_{tip,closure}_t2/`),
+  then rebuild the anonymized release.
   After the paper: the post-paper directions are in the session memory
   (verified closed-gap set, generalization pilot, model-side fix).
 

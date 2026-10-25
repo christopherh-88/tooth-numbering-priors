@@ -1,0 +1,3 @@
+dataset,xrays,mean_missing,median_missing,missing_total,missing_pct_of_28,xrays_0,share_0_pct,xrays_1-2,share_1-2_pct,xrays_3-5,share_3-5_pct,xrays_6+,share_6+_pct
+UFBA,425,3.5012,1.0000,1488,12.5042,196,46.1176,87,20.4706,55,12.9412,87,20.4706
+DENTEX,634,1.8896,1.0000,1198,6.7485,263,41.4826,199,31.3880,110,17.3502,62,9.7792

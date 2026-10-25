@@ -36,7 +36,7 @@ def sh(cmd, check=True):
 subprocess.run(["apt-get", "update", "-qq"], check=True)
 subprocess.run(["apt-get", "install", "-y", "-qq", "--no-install-recommends", "texlive-latex-base",
                 "texlive-latex-recommended", "texlive-latex-extra", "texlive-fonts-recommended",
-                "poppler-utils"], check=True)
+                "cm-super", "poppler-utils"], check=True)
 try:  # LNCS class from CTAN; fall back to Ubuntu's texlive-publishers, which ships it too
     urllib.request.urlretrieve("https://mirrors.ctan.org/macros/latex/contrib/llncs.zip", "/tmp/llncs.zip")
     with zipfile.ZipFile("/tmp/llncs.zip") as z:

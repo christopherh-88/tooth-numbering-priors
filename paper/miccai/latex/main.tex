@@ -19,28 +19,17 @@
 \maketitle
 
 \begin{abstract}
-Tooth-numbering models for panoramic X-rays report high accuracy, but the
-X-ray format places each tooth in a predictable spot, so part of that
-accuracy could come from position rather than appearance. We measure this
-with a position-only baseline: a classifier that sees each tooth's bounding
-box and no pixels. On 425 uncropped panoramic X-rays (11,602 teeth) with
-five-fold cross-validation grouped by X-ray, it numbers 78.5\% of teeth
-correctly. Three detectors of different design (YOLOv8x, RT-DETR-l, Faster
-R-CNN) beat it by 14.3 to 16.7 percentage points, on all 32 tooth numbers,
-and the gap replicates on two further splits. Their errors still follow
-position. On 1.4\% of teeth all three detectors give the same wrong number,
-and in 91\% of these the position-only model gives it too, against under 7\%
-by chance. They sit next to a missing tooth five
-times as often as correct teeth and usually take the missing tooth's
-number, and they occur where the neighbors have closed the space (AUROC
-0.78). Closing a gap on purpose reproduces them: when a neighbor is moved
-into an erased tooth's space, all three detectors give it the missing
-number 21\% of the time, against 0.2\% left open. On 634
-DENTEX X-rays from other clinics, detectors trained there beat position
-alone by 22 to 25 points; their shared errors give the position-only
-answer 85.5\% of the time, link weakly to missing teeth, and closing a gap
-reproduces them at 12\%. We release
-the per-tooth table and a scorer.
+Tooth-numbering detectors for panoramic X-rays reach high accuracy, but the format puts each tooth in a predictable place, so some of that accuracy could come from position alone. We measure this with a
+position-only baseline: a classifier that sees each tooth's bounding box and
+no pixels. On 425 uncropped X-rays (11,602 teeth), with cross-validation grouped by X-ray, it numbers 78.5\% of teeth correctly.
+Three detectors (YOLOv8x, RT-DETR-l, Faster R-CNN) beat
+it by 14.3 to 16.7 percentage points, on all 32 tooth numbers, and this
+holds on two more splits. Their rare shared mistakes still follow position.
+On 1.4\% of teeth the three detectors and the baseline are all wrong and the
+detectors agree on one wrong number; in 91\% of these the baseline gives the
+same number, against under 7\% by chance. These teeth are five times as
+likely as correct teeth to sit next to a missing tooth, and the wrong number
+is usually the missing tooth's number. They occur where the neighbors have closed the space. Closing a gap on purpose reproduces them: when a neighbor is moved into an erased tooth's space, all three detectors give it the missing number 21\% of the time, against 0.2\% when it is left open. On 634 DENTEX X-rays, detectors trained there beat position alone by 22 to 25 points, their shared errors again give the baseline's answer (85.5\%), and closing a gap reproduces them 12 to 16\% of the time. We release the per-tooth table and a scorer.
 \keywords{Tooth numbering \and Panoramic radiography \and Shortcut learning \and Error consistency}
 \end{abstract}
 
@@ -49,45 +38,40 @@ the per-tooth table and a scorer.
 Assigning each tooth its FDI number is the first step of most automated
 dental charting: a caries or a periapical lesion found by a detector is
 only useful once it is attached to the right tooth. Public benchmarks such
-as DENTEX~\cite{hamamci2023dentex} score numbering together with detection,
-and reported accuracies are high.
+as DENTEX~\cite{hamamci2023dentex} score numbering together with detection, and detectors reach high numbering accuracy (Table~\ref{tab:main}).
 
-Panoramic X-rays are a strongly standardized format. The patient bites on a
-guide, the arch runs left to right across the image, and each tooth number
-has a typical location. This invites a shortcut~\cite{geirhos2020shortcut}:
-a model can get many numbers right from where a box sits, without reading
-the tooth. Such a shortcut would be invisible in aggregate accuracy and
-would fail on the patients who differ from the typical arch, for example
-after extractions.
+Panoramic X-rays are a standardized format. The patient bites on a guide,
+the arch runs left to right across the image, and each tooth number has a
+typical location. This invites a shortcut~\cite{geirhos2020shortcut}: a
+model can get many numbers right from where a box sits, without reading the
+tooth. Such a shortcut would not show in overall accuracy, and it would fail
+on patients who differ from the typical arch, for example after extractions.
 
 We ask how much of tooth numbering position alone explains, and whether
-detectors fail where position fails. Our contributions:
+detectors fail where position fails. Our contributions are:
 (1)~a position-only baseline, trained in seconds on six box features, that
 numbers 78.5\% of teeth correctly under grouped cross-validation, with three
 detectors beating it by 14 to 17 points on every tooth number;
-(2)~an error analysis showing that the detectors' shared errors are
+(2)~an error analysis showing that the errors the detectors share are
 position-like;
-(3)~interventions and checks (image shift, context masking, tooth
-erasure, a space-closure measure and gap closure on purpose) that place
-these errors at closed gaps, next to a
-missing tooth whose neighbors have moved together so the arch looks
-complete; and
+(3)~experiments (image shift, context masking, tooth erasure, and moving a
+neighbor into the space of an erased tooth) that place these errors at
+closed gaps, next to a missing tooth whose neighbors have moved together so
+that the arch looks complete; and
 (4)~a released per-tooth benchmark with folds, reference predictions and a
 scorer.
 
 \section{Related Work}
 
 \textbf{Tooth numbering.} Detection-based numbering on panoramic X-rays is
-standard, with DENTEX~\cite{hamamci2023dentex} and hierarchical diffusion
-detectors~\cite{hamamci2023hierarchical} as recent examples and many DENTEX
-challenge entries building on YOLO or DETR
-variants~\cite{he2023dentex,mei2023yolortho,choi2023detdet}. Some methods
+standard, with DENTEX~\cite{hamamci2023dentex} and diffusion-based
+detectors~\cite{hamamci2023hierarchical} as recent examples. DENTEX challenge entries combine segmentation with detection~\cite{he2023dentex}, build a YOLO-based framework~\cite{mei2023yolortho}, or use Mask R-CNN with a DiffusionDet and DINO ensemble~\cite{choi2023detdet}. Some methods
 use the arch layout as an explicit prior~\cite{budagam2024oralbbnet}.
 Evaluations report accuracy or mAP; we found none that compares a model with
 what position alone achieves on the same teeth.
 
 \textbf{Shortcut learning.} Models can rely on cues that correlate with the
-label in training data, from skin markings in
+label in the training data, from skin markings in
 dermoscopy~\cite{winkler2019markings} to site-specific features in chest
 X-rays~\cite{degrave2021covid} and segmentation~\cite{lin2024shortcut}; see
 also~\cite{hill2024shortcutting,cajas2026shortkit}. These studies show a
@@ -102,118 +86,134 @@ wrong answers themselves.
 
 \section{Methods}
 
-\textbf{Data and splits.} UFBA-425~\cite{budagam2025ufba} contains 425
-panoramic X-rays ($512\times512$ pixels) with per-tooth masks labeled by FDI
-number (32 classes, third molars included). Each tooth's box is the full
-extent of its mask, giving 11,602 teeth. We use the original X-rays only;
-an augmented export of this data adds randomly cropped copies, which move
-teeth in the frame and lowered position-only accuracy by about 8 points in
-our earlier splits. X-rays are split into five folds stratified by the
-dataset's categories; each training fold holds out 15\% of its X-rays for
-model selection, and each X-ray is tested once by models that never saw it.
-Two further splits (other seeds) share at most about a quarter of any test
-fold with the first.
+\textbf{Data and splits.} UFBA-425~\cite{budagam2025ufba} has 425 panoramic
+X-rays ($512\times512$ pixels) with a mask for each tooth, labeled by FDI
+number (32 classes, third molars included). A tooth's box is the full extent
+of its mask, which gives 11,602 teeth. We use the original X-rays only. An
+augmented export of this data adds randomly cropped copies, which move teeth
+within the frame and lowered position-only accuracy by about 8 points in our
+earlier splits. The X-rays are split into five folds balanced by the
+dataset's categories. Each training fold holds out 15\% of its X-rays for
+model selection, and every X-ray is tested once, by models that never saw
+it. Two further splits (other random seeds) share at most 26\% and 32\% of any test fold with the first.
 
-\textbf{Models.} The position-only baseline is the gradient-boosted tree
-classifier of scikit-learn (Hist\-Gradient\-Boosting, default settings) on six
-features of the labeled box: center $x$ and $y$, width, height, area and
-aspect ratio, relative to image size. It never sees pixels. The detectors
-are YOLOv8x~\cite{jocher2023yolov8}, RT-DETR-l~\cite{zhao2024rtdetr} and
-Faster R-CNN~\cite{ren2015faster} with a ResNet-50 FPN
-backbone~\cite{li2021benchmarking}, all from COCO weights: a single-stage
-CNN, a transformer and a two-stage CNN, from two separate code bases. Each
-is trained for 30 epochs at 640 pixels with horizontal flips off (a flip
-swaps left and right tooth numbers); Faster R-CNN uses SGD with a learning
-rate scaled to its batch of 2. The epoch with the best validation fitness
-($0.1\,\mathrm{mAP}_{50} + 0.9\,\mathrm{mAP}_{50:95}$) is kept.
+\textbf{Data use.} Both datasets are public and were used as released; we
+collected no patient data. UFBA-425 is a set of anonymized X-rays on Figshare
+under CC BY 4.0; we found no ethics statement for it. DENTEX is released by
+its authors under CC BY-NC-SA 4.0, and they report ethics committee approval
+for the X-rays from three hospitals~\cite{hamamci2023dentex}.
 
-\textbf{Scoring.} Detections with confidence at least 0.5 are matched
-one-to-one to labeled teeth at IoU at least 0.5, highest confidence first,
-regardless of class. A tooth with no match counts as wrong. Top-1 is the
-share of labeled teeth matched and given the right number, which puts the
-detectors and the baseline (which always answers) on the same teeth. We
-also report numbered F1, which counts extra boxes. AP50 and AP50:95 are
-in the supplement; top-1 stays the headline because the position-only
-baseline has no scores. CIs are 95\% intervals
-from 10,000 bootstrap draws of X-rays, paired for differences. Each
-experiment's decision rule was written and frozen before it was run. A
-tooth is a \emph{joint failure} when all three detectors and the
-position-only model are wrong and the detectors give the same answer. The
-\emph{position match} is the share of joint failures where the
-position-only model also gives that answer; its chance level comes from
-shuffling the position-only answers among the joint failures.
+\textbf{Models.} The position-only baseline is scikit-learn's gradient-boosted
+tree classifier (Hist\-Gradient\-Boosting, default settings) on six features of
+the labeled box: center $x$ and $y$, width, height, area and aspect ratio,
+all relative to image size. It never sees pixels. The detectors are
+YOLOv8x~\cite{jocher2023yolov8}, RT-DETR-l~\cite{zhao2024rtdetr} and Faster
+R-CNN~\cite{ren2015faster} with a ResNet-50 FPN
+backbone~\cite{li2021benchmarking}, all starting from COCO weights. They are
+a single-stage CNN, a transformer and a two-stage CNN, from two separate code
+bases. Each is trained for 30 epochs with horizontal flips off (a flip would
+swap left and right tooth numbers). YOLOv8x and RT-DETR-l read 640-pixel
+input; Faster R-CNN uses torchvision's default resizing (short side 800
+pixels) and SGD with a learning rate scaled to its batch of 2. We keep the
+epoch with the best validation fitness
+($0.1\,\mathrm{mAP}_{50} + 0.9\,\mathrm{mAP}_{50:95}$).
 
-\textbf{Interventions.} \emph{Shift:} the whole image is translated by
-$\pm10\%$ of its width (about two tooth widths), labels moved to match.
-\emph{Context masking:} everything outside a tooth's box widened by $k$ box
-widths and heights ($k=0.5,1,2$) is blacked out. \emph{Missing neighbor:} an
-adjacent arch position has no labeled tooth. \emph{Tooth erasure:} for up to
-three teeth per X-ray with both neighbors present, the tooth's mask (dilated
-3 px) is inpainted~\cite{telea2004inpainting}, and we ask whether a
-correctly numbered neighbor now takes the erased tooth's number; controls
-are the teeth two places away and a sham inpaint over bone. \emph{Space
-closure:} for each missing tooth with both neighbors present, $S$ is the
-shortest distance between the neighbors' masks over the missing tooth's
-median width (0 when they touch). \emph{Gap closure:} after erasing a
-target tooth, its distal neighbor is cut out and pasted shifted toward the
-gap by half or all of the distance at which its mask touches the tooth on
-the other side, with its box moved to match.
+\textbf{Scoring.} Detections with confidence of at least 0.5 are matched
+one-to-one to labeled teeth at IoU of at least 0.5, highest confidence
+first, whatever number they give. A tooth with no match counts as wrong.
+Top-1 is the share of labeled teeth that are matched and given the right
+number; this puts the detectors and the baseline, which always answers, on
+the same teeth. We also report numbered F1, which also penalizes extra
+boxes. AP50 and AP50:95 are in the code release; top-1 stays the headline
+because the baseline has no scores. CIs are 95\% intervals from 10,000
+bootstrap draws of X-rays, paired when two models are compared. The decision
+rule for each experiment was written and frozen before it was run.
+
+A tooth is a \emph{joint failure} when the position-only model and all three
+detectors are wrong, no detector missed the tooth, and the three detectors
+give the same number. The \emph{position match} is the share of joint
+failures where the position-only model gives that same number. Its chance
+level comes from shuffling the position-only answers among the joint
+failures.
+
+\textbf{Interventions.} \emph{Shift:} the whole image is moved sideways by
+10\% of its width (about two tooth widths), and the labels move with it.
+\emph{Context masking:} everything outside a tooth's box, widened by $k$ box
+widths and heights ($k=0.5,1,2$), is blacked out. \emph{Missing neighbor:}
+the next position in the arch has no labeled tooth. \emph{Tooth erasure:}
+for up to three teeth per X-ray with both neighbors present, the tooth's
+mask (grown by 3 px) is filled in by inpainting~\cite{telea2004inpainting},
+and we ask whether a neighbor that was numbered right now takes the erased
+tooth's number. Controls are the teeth two places away and a sham inpaint
+over bone. \emph{Space closure:} for each missing tooth with both neighbors
+present, $S$ is the shortest distance between the neighbors' masks divided
+by the missing tooth's median width ($S=0$ when they touch). \emph{Gap
+closure:} after erasing a tooth, its distal neighbor (the next one toward
+the back of the mouth) is cut out and pasted back shifted toward the gap, by
+half or all of the distance at which it touches the tooth on the other side,
+with its box moved to match. In a variant, \emph{tipping}, the neighbor is
+instead rotated about its root apex until its crown touches.
 
 \section{Results}
 
 \begin{table}[t]
-\caption{Top-1 on 11,602 teeth (split 0, 95\% CI) and the gap over the
-position-only model. F1 counts extra boxes. Splits 2, 3: gap on two
-further random splits.}\label{tab:main}
+\caption{Top-1 on 11,602 teeth (first split, 95\% CI) and each detector's gap
+over the position-only model. F1 also penalizes extra boxes. The last column
+gives the gap on the two further splits.}\label{tab:main}
 \centering
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
- & Top-1 (\%) & Gap (points) & Numbered F1 & Splits 2, 3 gap \\
+ & Top-1 (\%) & Gap (points) & Numbered F1 & Gap, other splits \\
 \midrule
-Position-only & 78.5 (76.9--80.0) & & & \\
-YOLOv8x & 95.0 (94.2--95.8) & 16.5 (15.1--17.9) & 95.0 & 15.8, 16.4 \\
-RT-DETR-l & 95.2 (94.4--95.9) & 16.7 (15.3--18.1) & 92.3 & 15.9, 16.4 \\
-Faster R-CNN & 92.8 (91.9--93.7) & 14.3 (13.0--15.7) & 89.6 & 13.8, 14.3 \\
+Position-only & 78.5 (77.0 to 80.0) & & & \\
+YOLOv8x & 95.0 (94.2 to 95.8) & 16.5 (15.1 to 17.9) & 95.0 & 15.8, 16.4 \\
+RT-DETR-l & 95.2 (94.4 to 95.9) & 16.7 (15.3 to 18.1) & 92.3 & 15.9, 16.4 \\
+Faster R-CNN & 92.8 (91.9 to 93.7) & 14.3 (13.0 to 15.7) & 89.6 & 13.8, 14.3 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \textbf{Position explains most; detectors add 14 to 17 points.}
-Table~\ref{tab:main}. Position alone numbers more than three in four teeth.
-Each detector beats it on all 32 tooth numbers; the per-number gap is
-smallest at the third molars (4.3 to 5.8 points) and largest at the lower
-central incisors (up to 25.5). Given the detectors' own predicted boxes
-instead of labeled ones, the baseline does slightly better (79.0 to 80.2\%)
-and the gap is 14.5 to 16.2 points, so labeled boxes do not flatter it. On
-two further splits every gap falls inside the first split's CI. YOLOv8x and
-RT-DETR-l tie on top-1 (difference 0.17 against a minimum detectable
-difference of 0.50), but RT-DETR-l leaves about 1.9 unmatched boxes per
-X-ray against 0.4, which lowers its F1 by 2.7 points.
+Position alone numbers more than three in four teeth (Table~\ref{tab:main}).
+Each detector beats it on all 32 tooth numbers. The gap is smallest at the
+third molars (4.3 to 5.8 points) and largest at the lower central incisors
+(up to 25.5). If the baseline is given the detectors' own boxes instead of
+the labeled ones, it does slightly better (79.0 to 80.2\%) and the gap is
+14.5 to 16.2 points, so the labeled boxes do not inflate its score. On the
+two further splits, every gap falls inside the first split's CI. YOLOv8x and
+RT-DETR-l tie on top-1 (difference 0.17 points, where the smallest
+difference we could detect is 0.50), but RT-DETR-l leaves about 1.9
+unmatched boxes per X-ray against 0.4 for YOLOv8x, which lowers its F1 by
+2.7 points.
 
 \textbf{Shared errors follow position.} 161 teeth (1.4\%) are joint
 failures. In 91.3\% of them the position-only model gives the same wrong
-number, against a permutation 95th percentile of 6.8\%, and 94.4\% of the
-shared wrong numbers are one place away in the same quadrant. The detectors
-are about as confident on these teeth as on correct ones (AUROC 0.53 to
-0.66), so a confidence threshold does not find them, and neither does a
-rule based on the detectors' second choices. About 10\% of joint failures
-may be label errors by confident learning~\cite{northcutt2021confident};
-without them the position match is 91.7\%.
+number as the detectors; shuffling its answers gives at most 6.8\% (95th
+percentile). In 94.4\% the wrong number is the next tooth over in the same
+quadrant. The detectors are about as confident on these teeth as on correct
+ones (AUROC 0.53 to 0.66, where 0.5 is chance), so a confidence cutoff does
+not find them, and neither does a rule based on the detectors' second
+choices. About 10\% of joint failures may be label
+errors~\cite{northcutt2021confident}; without them the position match is
+91.7\%.
 
-\textbf{Not absolute position, not distant context.} Shifting the image by
-two tooth widths, which leaves the position-only model right on under 9\% of
-teeth, changes the detectors' top-1 by under 0.3 points. Masking everything
-beyond one box width costs Faster R-CNN and RT-DETR-l about 26 points on
-correctly numbered teeth (YOLOv8x 9.6), but among detected joint failures 74
-to 93\% keep the shared wrong number.
+\textbf{Not position in the frame, not distant teeth.} Shifting the image by
+two tooth widths leaves the position-only model right on under 9\% of teeth,
+but changes the detectors' top-1 by under 0.3 points. Blacking out everything
+beyond one box width costs Faster R-CNN and RT-DETR-l about 26 points
+(YOLOv8x 9.6), counting teeth that are no longer detected as wrong. Even so,
+among the joint failures that are still detected, 74 to 93\% keep the shared
+wrong number.
 
 \textbf{Next to missing teeth.} 44.7\% of joint failures have a missing
-neighbor, against 8.5\% of teeth all three detectors get right (ratio 5.3,
-CI 4.2 to 6.6). 67 of the 72 joint failures next to a gap (93\%) take the
-missing tooth's number. Teeth that only the position-only model gets wrong
-have a missing neighbor 10.5\% of the time: gaps are not where position
-fails in general, but where position and the detectors fail together.
+neighbor, against 8.5\% of teeth that all three detectors get right (ratio
+5.3, CI 4.2 to 6.6). In 67 of the 72 joint failures next to a gap (93\%), the
+wrong number is the missing tooth's. Teeth that only the position-only model
+gets wrong have a missing neighbor 10.5\% of the time, so gaps are not where
+position fails in general, only where position and the detectors fail
+together.
 
 \begin{figure}[t]
 \centering
@@ -224,99 +224,95 @@ touch. All three detectors and the position-only model number tooth 17 as
 most $S$, for gaps with and without a joint failure.}\label{fig:gap}
 \end{figure}
 
-\textbf{At closed gaps.} Fig.~\ref{fig:gap}. Across 372 missing teeth with
-both neighbors present, the space left between the neighbors separates gaps
-with a joint failure from gaps without one (AUROC 0.78, CI 0.70 to 0.84;
-median $S$ 0.00 against 0.32). 56\% of these errors sit at gaps whose
+\textbf{At closed gaps.} Across 372 missing teeth with both neighbors
+present, the space left between the neighbors separates gaps with a joint
+failure from gaps without one (Fig.~\ref{fig:gap}; AUROC 0.78, CI 0.70 to
+0.84; median $S$ 0.00 against 0.32). 56\% of these errors sit at gaps whose
 neighbors touch, against 20\% of other gaps. Each detector's own errors
-track closure as well (AUROC 0.74 to 0.79), more than the position-only
-model's (0.68).
+follow closure about as well (AUROC 0.74 to 0.79), and better than the
+position-only model's (0.68).
 
-\textbf{An open gap is not enough.} Erasing a tooth makes a correctly
-numbered neighbor take its number in 2.0\% (YOLOv8x), 4.4\% (RT-DETR-l)
-and 5.7\% (Faster R-CNN) of cases, against 0 to 0.2\% for both controls.
-But all three detectors do it to the same neighbor in only 4 of 2,260 cases
-(0.18\%).
+\textbf{An open gap is not enough.} After a tooth is erased, a correctly
+numbered neighbor takes its number in 2.0\% (YOLOv8x), 4.4\% (RT-DETR-l) and
+5.7\% (Faster R-CNN) of cases, against 0 to 0.2\% for both controls. But all
+three detectors do it to the same neighbor in only 4 of 2,260 cases (0.18\%).
 
 \textbf{Closing the gap reproduces the shared error.} For the same erased
 teeth, we moved the distal neighbor sideways until it touched the tooth on
-the other side. Of 1,114 moved teeth that all three detectors numbered
-right on the intact X-ray, all three gave the missing tooth's number to
-0.18\% with the space open, 2.9\% when moved halfway and 20.8\% when moved
-all the way (difference from open 20.7 points, CI 18.2 to 23.1); each
-detector alone did so 38 to 42\% of the time. Models trained on two further
-splits give the same result (22.5\% and 21.8\% at full closure, at most
-0.1\% open). Tipping
-the neighbor about its root apex until its crown touches, which is closer
-to how real teeth drift, gives 9.4\% (CI 7.7 to 11.0; 9.3\% on the seed 1 models), near the 11\% per
-neighbor at real closed gaps; cutting the tooth out and pasting it back
-unmoved gives 0.0\%, so paste edges do not cause the effect. A moved tooth keeps its own
-shape, so the detectors number it by the slot it occupies.
+the other side. Of 1,114 moved teeth that all three detectors numbered right
+on the intact X-ray, all three gave the missing tooth's number for 0.18\%
+with the space open, 2.9\% when moved halfway and 20.8\% when moved all the
+way (20.6 points above open, CI 18.2 to 23.1). Each detector alone did so
+38 to 42\% of the time. Models trained on the two further splits give the
+same result (22.5\% and 21.8\% at full closure, at most 0.1\% open). Tipping
+the neighbor, which is closer to how real teeth drift, gives 9.4\% (CI 7.7 to 11.0; 9.3\% on the second split's models). At real gaps whose neighbors almost touch ($S\le0.1$), 22\% hold a joint failure, about 11\% per neighbor. Cutting the tooth out and pasting it back
+unmoved gives 0.0\%, so the pasted edges do not cause the effect. In these cases the moved tooth looks the same as before, yet the detectors number it by the slot it now occupies.
+
+\textbf{A second dataset.} We repeated the main steps on 634 DENTEX X-rays
+(18,095 teeth) from other clinics~\cite{hamamci2023dentex}. Position alone
+numbers 66.9\% of these teeth. The UFBA-trained detectors, run unchanged,
+lose accuracy under this shift (YOLOv8x misses many teeth; Faster R-CNN is
+often one position off), though their shared errors still follow position
+(87.5\%). We therefore also trained all three on DENTEX with five-fold
+cross-validation. They then beat position alone by 22 to 25 points. Their 303
+shared errors give the baseline's answer 85.5\% of the time (UFBA: 91.3\%)
+and sit next to a missing tooth 3.5 times as often as correct teeth (UFBA:
+5.3). Both fall short of the targets we set in advance (85.7\% and 4.2), so we call this a partial replication. Two more training runs on the
+same folds give the same picture: margins of 24 to 26 points, a position
+match of 85.5\% and 84.2\%, and a gap ratio of 3.3 and 3.2; 213 of the 410
+teeth that are a shared error in any run are one in all three. Part of the weaker gap link depends on which X-rays are in the data: after weighting DENTEX to UFBA's mix of missing teeth per X-ray, the ratio is 3.9. The interventions also work on DENTEX, with smaller effects (tables in the code release). At each X-ray's stored size,
+sliding a neighbor into the erased tooth's space gives the missing number
+15.7\% of the time (0.4\% open) and tipping it 7.0\% (0.4\% open), about
+three quarters of the UFBA rates (one training run). On X-rays shrunk to 640 pixels wide the rates are lower (slide 11.8\%, 12.0\% and 12.6\%, tip 4.8\%, 5.5\% and 6.5\% on three training runs; our target of 5\% for the tip was met on two of the three), mostly because Faster R-CNN reads the shrunken X-rays less well. The individual teeth that fill differ between runs: of 341 slide fills in any of the three runs, 57 occur in all three.
 
 \section{Discussion}
 
-The detectors read teeth: they do not number by position in the frame, and
-they beat a position-only model on every tooth. Yet their rare shared
-errors are the position-only model's errors, and our results show where
-they happen. When a tooth is missing and its neighbors have moved together,
-the arch shows no gap. Counting along it gives the tooth next to the closed
-space the missing tooth's number, and that tooth also sits roughly where the
-missing one would. Appearance, context and position then point the same
-way, and every model follows. An inpainted gap leaves a full-width space and
-does not create this agreement; closing it does.
+The detectors read teeth: shifting the image barely changes their answers, and they beat the position-only model on every tooth number. Yet their rare
+shared errors are the position-only model's errors, and our results suggest
+where they come from. When a tooth is missing and its neighbors have moved
+together, the arch shows no gap. Counting along it gives the tooth next to
+the closed space the missing tooth's number, and that tooth also sits roughly
+where the missing one would. Appearance, context and position then point the
+same way, and every model follows. An erased tooth leaves a full-width empty
+space, which does not create this agreement; closing the space does.
 
-Two practical points follow. A position-only baseline is cheap and should
-be reported with tooth-numbering results: on standardized panoramic X-rays
-it sets a high floor, and the margin above it is what a model contributes.
-And the errors that different models share are not found by confidence; a
-review rule from outside the model works better: check the numbering next
-to every missing tooth, especially where the space has closed. Here such a
-rule catches 97\% of the shared errors at gaps but flags many gaps without
-one (precision 13\%), since most gaps are partly closed. The rule can run
-on a model's own output: flagging teeth next to a position the detector
-left empty, or sharing a number, marks 12 to 16\% of teeth and catches 41
-to 47\% of the shared errors on every split, against 17 to 32\% for the
-same number of least-confident teeth (our pre-set 1.5-fold bar was met on
-two of three splits). Training does
-not remove the error easily: YOLOv8x retrained with simulated missing and
-closed teeth numbered teeth next to real gaps no better than a retrained
+Two practical points follow. First, a position-only baseline is cheap and
+should be reported with tooth-numbering results: on standardized panoramic
+X-rays it sets a high floor, and the margin above it shows what a model adds.
+Second, confidence does not find the errors that models share. A check from
+outside the model works better: look at the numbering next to every missing
+tooth, especially where the space has closed. In our data this check covers
+97\% of the shared errors at gaps, but it also flags many gaps without one
+(precision 13\%), because most gaps are partly closed. A version that uses
+only a model's own output flags teeth next to a position the model left
+empty, and teeth that share a number. It flags 12 to 16\% of teeth and
+catches 41 to 47\% of the shared errors on every split, against 17 to 32\%
+for the same number of least-confident teeth. We had set a target of at
+least 1.5 times as many as confidence, which it reached on two of three
+splits. Training with simulated missing and closed teeth did not remove the
+error: YOLOv8x numbered teeth next to real gaps no better than a retrained
 control ($+0.1$ points, CI $-1.6$ to $1.7$).
 
-\textbf{Limitations.} One dataset from one source, a single annotation per
-tooth and no demographic data. On 634 DENTEX X-rays from other
-clinics~\cite{hamamci2023dentex}, position alone numbers 66.9\% of teeth.
-Trained within DENTEX, all three detectors beat it by 22 to 25 points, the
-shared errors give position-only's answer 85.5\% of the time (our pre-set
-bar was 85.7\%), and they sit at gaps 3.5 times as often as correct teeth
-(bar 4.2; 3.9 once DENTEX is weighted to UFBA's mix of missing teeth).
-A second training run on the same folds gives the same picture: margins of
-24 to 26 points, 85.5\% and a ratio of 3.3, with 237 of the 376 shared-error
-teeth in either run common to both.
-The UFBA-trained models, run unchanged, keep the position share
-(87.5\%) but lose margin under the domain shift, mostly from missed teeth
-(YOLOv8x) or numbering one position too distal (Faster R-CNN). The
-direction of each finding holds on DENTEX; the gap link is weaker. Repeating the interventions on DENTEX
-X-rays with DENTEX-trained detectors (Supplement), moving the neighbor into
-the erased tooth's space gives the missing number 11.8\% and 12.0\% of the
-time on two training seeds (0.3\% and 0.2\% open), about 57\% of the UFBA
-rate; the tip gives 4.8\% and 5.5\%, against our pre-set bar of 5\%, met on
-one seed. The effect is present and smaller, and the individual teeth
-that fill differ between seeds (82 of 266 slide fills common to both). The interventions slide or tip a tooth within the image
-plane only (real teeth also rotate about their long axis), and masks
-on a 2D projection can touch when the teeth do not. Third-molar and longer gaps,
-which hold most missing positions, are outside the closure analysis. Two
-further splits, and retraining on the same split with a new seed, replicate
-the main numbers; about a third of the jointly failed teeth change with
-training randomness alone (overlap 0.63, against 0.54 to 0.57 across splits). About 10\% of joint failures may be label errors.
+\textbf{Limitations.} UFBA is one dataset from one source, with a single
+annotation per tooth and no patient data. The DENTEX replication is partial,
+and its stored-size intervention results rest on one training run. The
+interventions move or tip a tooth within the image plane only, but real
+teeth also rotate, and outlines that touch in a flat image may not touch in
+the mouth. Third molars and longer gaps, which hold most missing positions,
+are outside the closure analysis. The rates are stable across splits and
+training runs, but the individual teeth are not: about a third of the joint
+failures change when the same model is retrained (overlap 0.63, against 0.54
+to 0.57 across splits). About 10\% of joint failures may be label errors.
 
 \section{Conclusion}
 
 On uncropped panoramic X-rays, position alone numbers 78.5\% of teeth and
-detectors add 14 to 17 points. The few errors they share follow position
-and concentrate next to missing teeth whose neighbors have closed the
-space. On a second dataset, DENTEX, the same pattern holds with a weaker
-link to gaps and a smaller intervention effect. We release the per-tooth table and scorer so that new models
-can be measured against the baseline and on these shared failures.
+detectors add 14 to 17 points. The few errors they share follow position and
+concentrate next to missing teeth whose neighbors have closed the space. On a
+second dataset, DENTEX, the same pattern holds with a weaker link to gaps and
+smaller intervention effects. We release the per-tooth table and scorer so
+that new models can be measured against the baseline and on these shared
+failures.
 
 % Disclosure of Interests: required by Springer at camera-ready only. To be
 % written by the author after acceptance.

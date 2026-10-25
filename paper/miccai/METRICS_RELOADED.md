@@ -28,7 +28,7 @@ top-1 stays the headline because the position-only baseline has no scores.
 | Problem category | Object detection with a class per object: find each tooth, give it one of 32 FDI numbers. Numbering is the quantity of interest, not localization. |
 | Reference annotation | Boxes from tooth masks (UFBA-425), one annotator set, no repeat labels. A confident-learning check flags about 10% of the joint failures as possible label errors (RESULTS.md Section 65). An expert re-read was dropped (2026-10-05). |
 | Class balance | Balanced: 289 to 417 teeth per class (third molars fewest). Macro and micro top-1 differ by under 0.4 pp for every model. |
-| Object size and spacing | Small, touching or overlapping objects in a row. Neighbors are the main confusion (92.8 to 94.8% of shared errors are one place off, Sections 65, 70). |
+| Object size and spacing | Small, touching or overlapping objects in a row. Neighbors are the main confusion (92.2 to 95.8% of shared errors are one place off in the same quadrant on the three splits, Sections 65, 75, 78). |
 | Stratification needed | By X-ray: teeth in one X-ray are not independent. All CIs resample X-rays. Folds are grouped by X-ray. |
 | Is a missed object a failure | Yes. A tooth with no matching box counts as wrong. Missed and misnumbered are also reported apart. |
 | Do predicted scores matter | Yes for the review-flag analyses (risk-coverage, Section 66 C; calibration on joint failures, Section 65). |

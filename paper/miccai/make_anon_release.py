@@ -39,6 +39,8 @@ Anonymized release accompanying a MICCAI submission.
   experiment's decision rule is in a `*_RULES.md` file, frozen before it
   ran; `cpu_repro/cv/README.md` maps scripts to rules and result sections.
   Result CSVs are in `cpu_repro/cv/results/`.
+- `SUPPLEMENT.md`: average precision of the three detectors and the DENTEX
+  intervention tables that the paper points to.
 - `RESULTS.md`: the result log for these experiments (Sections 60 onward;
   references to lower section numbers point to an earlier log on
   randomly cropped splits, not included).
@@ -82,6 +84,7 @@ def main():
     start = re.search(rf"^## {FIRST_SECTION}\. ", res, re.M).start()
     end = res.index("## Adding a new entry")
     (out / "RESULTS.md").write_text("# Results log\n\n" + res[start:end].rstrip() + "\n")
+    shutil.copyfile(ROOT / "paper/miccai/SUPPLEMENT.md", out / "SUPPLEMENT.md")
     (out / "README.md").write_text(README)
 
     changed = 0

@@ -1,0 +1,13 @@
+mode,size,detectors,movers,fills,j_pct,movers_at_both_sizes,j_at_both_pct
+slide,stored,all3,1599,251,15.6973,1406.0000,15.9317
+slide,stored,two,1649,331,20.0728,,
+slide,640,all3,1456,172,11.8132,1406.0000,11.8065
+slide,640,two,1659,314,18.9271,,
+tip,stored,all3,1553,109,7.0187,1366.0000,7.4671
+tip,stored,two,1600,193,12.0625,,
+tip,640,all3,1416,68,4.8023,1366.0000,4.8316
+tip,640,two,1612,192,11.9107,,
+slide,ufba,all3,1114,232,20.8259,,
+slide,ufba,two,1165,332,28.4979,,
+tip,ufba,all3,1079,101,9.3605,,
+tip,ufba,two,1129,204,18.0691,,

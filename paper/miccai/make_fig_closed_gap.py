@@ -19,6 +19,8 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
+plt.rcParams["pdf.fonttype"] = 42  # embed TrueType, not Type 3 (Springer rejects Type 3 fonts)
+
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / "cpu_repro/cv"))
