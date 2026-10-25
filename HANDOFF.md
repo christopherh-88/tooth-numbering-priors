@@ -3,9 +3,9 @@
 ## Current state (2026-10-25), read this first
 
 The MICCAI paper (`paper/miccai/latex/main.tex`, 8 pages) is finished and
-checked (as of commit cc2cd57). Run `python paper/miccai/check_numbers.py`
-after any edit to the paper (it recomputes the paper's numbers from the result
-files; 195 checks pass).
+checked and committed (commit 3afa37f, pushed to origin/main, 2026-10-25). Run
+`python paper/miccai/check_numbers.py` after any edit to the paper (it
+recomputes the paper's numbers from the result files; 197 checks pass).
 
 **Done (2026-10-25):** the closure-ranked review flag (Kaggle kernel
 `tooth-numbering-cv-gaprank`, rules `cpu_repro/cv/GAP_RANK_RULES.md`, script
@@ -18,14 +18,25 @@ has no clinical contact, so the expert-reviewed closed-gap set and an expert
 check of the 161 joint failures cannot be done.
 
 **Open, in order:**
-1. Commit (the user runs commits; run the attribution grep first). Untracked or
-   modified:
-   `cpu_repro/cv/{GAP_RANK_RULES.md,gap_rank.py,gap_rank_power.py}`,
-   `cpu_repro/cv/kaggle/make_phase3_kernels.py`, `cpu_repro/cv/results/kaggle_gaprank/`,
-   RESULTS.md Section 98 and this file.
-2. Build the anonymized release after that commit, not before (`make_anon_release.py --out <folder outside
-   the repo>`; it only sees committed files), host it on anonymous.4open.science,
-   and add the link as a footnote in main.tex and DRAFT.md; recompile.
+1. Committed: everything up to 3afa37f (the only untracked file is the build
+   artifact `paper/miccai/latex/build_out/main.blg`; leave it out).
+2. Anonymous release (the user chose to do this later; needed only before
+   submission, so leave a few days of margin before the deadline). A release
+   built from 3afa37f is at `/Volumes/Seagate 2TB/Research/anon-release-3afa37f`
+   (247 files, identifier scan clean, no .git). The older folder
+   `tooth-numbering-priors-anon-release` is stale and can be deleted. If anything
+   else is committed that the release should contain, rebuild with
+   `python paper/miccai/make_anon_release.py --out <new empty folder outside the
+   repo>` (it only sees committed files). The user then: new empty GitHub repo
+   (not the main repo, whose history carries their name and email); copy the
+   folder's contents in; `git init`, set an anonymous `user.name` and
+   `user.email`, one commit; push; submit the repo URL at anonymous.4open.science
+   with their name, username and email in its hidden-terms list; check the
+   anonymized view in a private window; send the link. Then: add the link as a
+   footnote in main.tex and DRAFT.md, recompile (Kaggle compile kernel
+   `tooth-numbering-miccai-latex`, built with `paper/miccai/latex/make_compile_kernel.py`),
+   re-run `check_numbers.py`, attribution grep, tell the user what to commit
+   (never commit myself).
 3. Supplement policy: MICCAI 2026's rules say supplementary material is for
    multimedia only, may not show additional results or analysis, and takes no
    PDFs; the 2027 rules were not published when this was checked (2026-10-25).
@@ -36,7 +47,17 @@ check of the 161 joint failures cannot be done.
 4. At submission: the statement of novelty and impact (the 2026 rules say up to
    500 characters, no identifiers), and MICCAI's policy on LLM use (the 2026
    rules permit it as writing assistance, with the authors fully responsible);
-   read the 2027 wording and follow it.
+   read the 2027 wording and follow it. Draft novelty statement (445
+   characters, claims checked against the paper on 2026-10-25; re-check against
+   the 2027 limit and wording):
+
+   > Three tooth-numbering detectors beat a position-only classifier by 14 to
+   > 17 points. On 1.4% of teeth, though, the detectors and the classifier are
+   > all wrong and the detectors agree on one wrong number; in 91% of these the
+   > classifier gives the same number. Erasing a tooth and moving a neighbor
+   > into its space reproduces the error, which points to closed gaps. We
+   > release a per-tooth benchmark and scorer to report results against
+   > position alone.
 5. Camera-ready only: funding and conflict statements (placeholder comment in
    main.tex). Zenodo DOI stays on hold.
 
